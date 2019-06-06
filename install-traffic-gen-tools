@@ -1,0 +1,22 @@
+#!/bin/bash
+
+###
+## Tools
+###
+
+### Benign traffic
+## install apache-bench, tool to generate benign HTTP traffic
+sudo apt install apache2-utils
+
+## install iperf3, tool to generate TCP and UDP traffic
+wget https://iperf.fr/download/ubuntu/libiperf0_3.1.3-1_amd64.deb
+wget https://iperf.fr/download/ubuntu/iperf3_3.1.3-1_amd64.deb
+sudo dpkg -i libiperf0_3.1.3-1_amd64.deb
+sudo dpkg -i iperf3_3.1.3-1_amd64.deb
+rm libiperf0_3.1.3-1_amd64.deb
+rm iperf3_3.1.3-1_amd64.deb
+
+
+### Malicious traffic
+# install 
+#git clone  https://github.com/grafov/hulk
