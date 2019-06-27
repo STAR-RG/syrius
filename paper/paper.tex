@@ -267,7 +267,7 @@ attack manifestations produces traffic that deviates from regular
 benign traffic that has been already observed by the network and that
 deviation is noticeable. Anomaly-based \nids{}, specially those that
 use machine learning, have shown useful specially for detecting denial
-of service attacks~\Fix{cite cite}. In that scenario, determining the
+of service attacks~\cite{tutorial-ml-for-anomaly-detection-dec-2018, cordy-etal-issta19}. In that scenario, determining the
 right threshold on the rate/volume of network accesses that should
 trigger an alarm is challenging. Conceptually, these two approaches
 are complementary. This paper focuses on rule-based \nids{}, which are
@@ -289,19 +289,22 @@ neither necessary nor sufficient. More precisely:
 The first statement is consequential of the inherent physical
 limitation of rule-based \nids{}. The cost of checking rules is
 proportional to the traffic load and the number of enabled rules. If
-system capacity is insufficient to support the load, the system can
-potentially miss packets and attacks\Fix{I guess we have some
+system capacity is insufficient to support the load, the intrusion
+detector can miss packets and attacks\Fix{I guess we have some
   reference for this.}. To cope with that issue, system administrators
-restrict the attack surface before applying \nids{}---they block
-certain protocols on the firewall and configure the \nids{} to use a
-selection of rules that apply to the authorized traffic. The second
-statement is supported by the observation that \numundetected{} of the
-attacks produced by Metasploit~\cite{metasploit}, a popular
-open-source penetration testing tool, went undetected by \suri{}. For
-example, \Fix{...}. (Section~\ref{sec:suri-metas-coverage} provides
-more details.) Unfortunately, manually creating those rules from
-scratch can be time-consuming and error-prone. Figure~\Fix{...}  shows
-an example rule illustrating the complexity of the Suricata rule
+block certain protocols on the firewall and configure the \nids{} to
+use a selection of rules that apply to the authorized traffic.  The
+task of selecting rules that are applicable can be non-trivial as it
+depends on the set of firewall rules enabled on the network.
+
+The second statement is supported by the observation that
+\numundetected{} of the attacks produced by
+Metasploit~\cite{metasploit}, a popular open-source penetration
+testing tool, are undetected by \suri{}. For example,
+\Fix{...}. (Section~\ref{sec:suri-metas-coverage} provides more
+details.) Unfortunately, manually creating those rules from scratch
+can be time-consuming and error-prone. Figure~\Fix{...}  shows an
+example rule illustrating the complexity of the Suricata rule
 language\footnote{Suricata extends the language used by
   Snort~\cite{snort}.}.  In addition, looking for rules from untrusted
 sources (say, the internet) is unreliable. Collectively, these issues
