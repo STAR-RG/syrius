@@ -4,19 +4,12 @@ build-essential autoconf automake libtool libpcap-dev libnet1-dev \
 libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libcap-ng-dev libcap-ng0 \
 make libmagic-dev libjansson-dev libjansson4 pkg-config
 
-wget http://www.openinfosecfoundation.org/download/suricata-3.1.tar.gz
-sudo tar -xvzf suricata-3.1.tar.gz
-cd suricata-3.1
+wget https://www.openinfosecfoundation.org/download/suricata-4.1.4.tar.gz
+tar -xf suricata-4.1.4.tar.gz
+cd suricata-4.1.4
 
 ./configure && make && make install-full
 
-sudo mkdir /var/log/suricata
-sudo mkdir /etc/suricata
-
-cd suricata-3.1/
 sudo cp classification.config /etc/suricata
 sudo cp reference.config /etc/suricata
 sudo cp suricata.yaml /etc/suricata
-
-wget http://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz
-sudo tar -C /etc/suricata -xzf emerging.rules.tar.gz
