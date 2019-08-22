@@ -87,12 +87,15 @@ void DetectFlagsRegister (void)
 static inline int FlagsMatch(const uint8_t pflags, const uint8_t modifier,
                              const uint8_t dflags, const uint8_t iflags)
 {
+    int retval = 0;
     if (!dflags && pflags) {
         if(modifier == MODIFIER_NOT) {
-            SCReturnInt(1);
+            retval = 1;
+        } else {
+            retval = 0;
         }
 
-        SCReturnInt(0);
+        SCReturnInt(retval);
     }
 
     const uint8_t flags = pflags & iflags;
@@ -100,30 +103,33 @@ static inline int FlagsMatch(const uint8_t pflags, const uint8_t modifier,
     switch (modifier) {
         case MODIFIER_ANY:
             if ((flags & dflags) > 0) {
-                SCReturnInt(1);
+                retval = 1;
+            } else {
+                retval = 0;
             }
-            SCReturnInt(0);
-
+            break;
         case MODIFIER_PLUS:
-            if (((flags & dflags) == dflags)) {
-                SCReturnInt(1);
+            if ((flags & dflags) == dflags) {
+                retval = 1;
+            } else {
+                retval = 0;
             }
-            SCReturnInt(0);
-
+            break;
         case MODIFIER_NOT:
             if ((flags & dflags) != dflags) {
-                SCReturnInt(1);
+                retval = 1;
+            } else {
+                retval = 0;
             }
-            SCReturnInt(0);
-
+            break;
         default:
             SCLogDebug("flags %"PRIu8" and de->flags %"PRIu8"", flags, dflags);
             if (flags == dflags) {
-                SCReturnInt(1);
+                retval = 1;
             }
     }
 
-    SCReturnInt(0);
+    SCReturnInt(retval);
 }
 
 /**
@@ -143,15 +149,21 @@ static int DetectFlagsMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
         const Signature *s, const SigMatchCtx *ctx)
 {
     SCEnter();
-
+    int retval = 0;
     if (!(PKT_IS_TCP(p)) || PKT_IS_PSEUDOPKT(p)) {
-        SCReturnInt(0);
+        retval = 0;
+    } else {
+        const DetectFlagsData *de = (const DetectFlagsData *)ctx;
+        const uint8_t flags = p->tcph->th_flags;
+
+        retval = FlagsMatch(flags, de->modifier, de->flags, de->ignored_flags);
     }
 
-    const DetectFlagsData *de = (const DetectFlagsData *)ctx;
-    const uint8_t flags = p->tcph->th_flags;
+    if (!retval) {
+        logFitness("flags", s->id, retval);
+    }
 
-    return FlagsMatch(flags, de->modifier, de->flags, de->ignored_flags);
+    return retval;
 }
 
 /**

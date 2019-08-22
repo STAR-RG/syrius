@@ -145,11 +145,11 @@ am_suricata_OBJECTS = alert-debuglog.$(OBJEXT) alert-fastlog.$(OBJEXT) \
 	decode-raw.$(OBJEXT) decode-sctp.$(OBJEXT) \
 	decode-sll.$(OBJEXT) decode-tcp.$(OBJEXT) \
 	decode-teredo.$(OBJEXT) decode-udp.$(OBJEXT) \
-	decode-vlan.$(OBJEXT) decode-mpls.$(OBJEXT) \
-	decode-template.$(OBJEXT) defrag-config.$(OBJEXT) \
-	defrag.$(OBJEXT) defrag-hash.$(OBJEXT) defrag-queue.$(OBJEXT) \
-	defrag-timeout.$(OBJEXT) detect-ack.$(OBJEXT) \
-	detect-app-layer-event.$(OBJEXT) \
+	decode-vlan.$(OBJEXT) decode-vxlan.$(OBJEXT) \
+	decode-mpls.$(OBJEXT) decode-template.$(OBJEXT) \
+	defrag-config.$(OBJEXT) defrag.$(OBJEXT) defrag-hash.$(OBJEXT) \
+	defrag-queue.$(OBJEXT) defrag-timeout.$(OBJEXT) \
+	detect-ack.$(OBJEXT) detect-app-layer-event.$(OBJEXT) \
 	detect-app-layer-protocol.$(OBJEXT) detect-asn1.$(OBJEXT) \
 	detect-base64-data.$(OBJEXT) detect-base64-decode.$(OBJEXT) \
 	detect-bsize.$(OBJEXT) detect-byte-extract.$(OBJEXT) \
@@ -290,22 +290,22 @@ am_suricata_OBJECTS = alert-debuglog.$(OBJEXT) alert-fastlog.$(OBJEXT) \
 	output-packet.$(OBJEXT) output-stats.$(OBJEXT) \
 	output-streaming.$(OBJEXT) output-tx.$(OBJEXT) \
 	output-json.$(OBJEXT) output-json-common.$(OBJEXT) \
-	packet-queue.$(OBJEXT) pkt-var.$(OBJEXT) reputation.$(OBJEXT) \
-	respond-reject.$(OBJEXT) respond-reject-libnet11.$(OBJEXT) \
-	runmode-af-packet.$(OBJEXT) runmode-erf-dag.$(OBJEXT) \
-	runmode-erf-file.$(OBJEXT) runmode-ipfw.$(OBJEXT) \
-	runmode-napatech.$(OBJEXT) runmode-netmap.$(OBJEXT) \
-	runmode-nfq.$(OBJEXT) runmode-nflog.$(OBJEXT) \
-	runmode-pcap.$(OBJEXT) runmode-pcap-file.$(OBJEXT) \
-	runmode-pfring.$(OBJEXT) runmode-unittests.$(OBJEXT) \
-	runmode-unix-socket.$(OBJEXT) runmode-tile.$(OBJEXT) \
-	runmode-windivert.$(OBJEXT) runmodes.$(OBJEXT) \
-	source-af-packet.$(OBJEXT) source-erf-dag.$(OBJEXT) \
-	source-erf-file.$(OBJEXT) source-ipfw.$(OBJEXT) \
-	source-mpipe.$(OBJEXT) source-napatech.$(OBJEXT) \
-	source-netmap.$(OBJEXT) source-nfq.$(OBJEXT) \
-	source-nflog.$(OBJEXT) source-pcap.$(OBJEXT) \
-	source-pcap-file.$(OBJEXT) \
+	packet-queue.$(OBJEXT) pesquisa.$(OBJEXT) pkt-var.$(OBJEXT) \
+	reputation.$(OBJEXT) respond-reject.$(OBJEXT) \
+	respond-reject-libnet11.$(OBJEXT) runmode-af-packet.$(OBJEXT) \
+	runmode-erf-dag.$(OBJEXT) runmode-erf-file.$(OBJEXT) \
+	runmode-ipfw.$(OBJEXT) runmode-napatech.$(OBJEXT) \
+	runmode-netmap.$(OBJEXT) runmode-nfq.$(OBJEXT) \
+	runmode-nflog.$(OBJEXT) runmode-pcap.$(OBJEXT) \
+	runmode-pcap-file.$(OBJEXT) runmode-pfring.$(OBJEXT) \
+	runmode-unittests.$(OBJEXT) runmode-unix-socket.$(OBJEXT) \
+	runmode-tile.$(OBJEXT) runmode-windivert.$(OBJEXT) \
+	runmodes.$(OBJEXT) source-af-packet.$(OBJEXT) \
+	source-erf-dag.$(OBJEXT) source-erf-file.$(OBJEXT) \
+	source-ipfw.$(OBJEXT) source-mpipe.$(OBJEXT) \
+	source-napatech.$(OBJEXT) source-netmap.$(OBJEXT) \
+	source-nfq.$(OBJEXT) source-nflog.$(OBJEXT) \
+	source-pcap.$(OBJEXT) source-pcap-file.$(OBJEXT) \
 	source-pcap-file-directory-helper.$(OBJEXT) \
 	source-pcap-file-helper.$(OBJEXT) source-pfring.$(OBJEXT) \
 	source-windivert.$(OBJEXT) stream.$(OBJEXT) \
@@ -445,13 +445,13 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing autoconf
-AUTOHEADER = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing autoheader
-AUTOMAKE = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing automake-1.15
+AUTOCONF = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing autoconf
+AUTOHEADER = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing autoheader
+AUTOMAKE = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing automake-1.15
 AWK = gawk
 CARGO = /usr/bin/cargo
 CARGO_HOME = /root/.cargo
@@ -489,7 +489,7 @@ HAVE_LLC =
 HAVE_PCAP_CONFIG = /usr/bin/pcap-config
 HAVE_PDFLATEX = /usr/bin/pdflatex
 HAVE_PKG_CONFIG = /usr/bin/pkg-config
-HAVE_PYTHON = /usr/bin/python3
+HAVE_PYTHON = /usr/bin/python
 HAVE_RUSTC = /usr/bin/rustc
 HAVE_SPHINXBUILD = no
 HAVE_WGET = /usr/bin/wget
@@ -527,7 +527,7 @@ LUAJIT_CFLAGS =
 LUAJIT_LIBS = 
 LUA_CFLAGS = 
 LUA_LIBS = 
-MAKEINFO = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing makeinfo
+MAKEINFO = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -540,10 +540,10 @@ OTOOL64 =
 PACKAGE = suricata
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = suricata
-PACKAGE_STRING = suricata 4.1.4
+PACKAGE_STRING = suricata 4.1.0-dev
 PACKAGE_TARNAME = suricata
 PACKAGE_URL = 
-PACKAGE_VERSION = 4.1.4
+PACKAGE_VERSION = 4.1.0-dev
 PATH_SEPARATOR = :
 PCAP_CFLAGS =  -I/usr/include
 PKG_CONFIG = /usr/bin/pkg-config
@@ -561,11 +561,11 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 SURICATA_UPDATE_DIR = 
-VERSION = 4.1.4
-abs_builddir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/src
-abs_srcdir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/src
-abs_top_builddir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4
-abs_top_srcdir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4
+VERSION = 4.1.0-dev
+abs_builddir = /home/lucas/Documents/Repositórios/GitHub/suricata/src
+abs_srcdir = /home/lucas/Documents/Repositórios/GitHub/suricata/src
+abs_top_builddir = /home/lucas/Documents/Repositórios/GitHub/suricata
+abs_top_srcdir = /home/lucas/Documents/Repositórios/GitHub/suricata
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
@@ -607,7 +607,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/install-sh
+install_sh = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libhs_CFLAGS = 
@@ -633,7 +633,7 @@ psdir = ${docdir}
 runstatedir = ${localstatedir}/run
 rust_config_comment = 
 rust_config_enabled = yes
-rust_vendor_comment = 
+rust_vendor_comment = # 
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
@@ -721,6 +721,7 @@ decode-tcp.c decode-tcp.h \
 decode-teredo.c decode-teredo.h \
 decode-udp.c decode-udp.h \
 decode-vlan.c decode-vlan.h \
+decode-vxlan.c decode-vxlan.h \
 decode-mpls.c decode-mpls.h \
 decode-template.c decode-template.h \
 defrag-config.c defrag-config.h \
@@ -989,6 +990,7 @@ output-tx.c output-tx.h \
 output-json.c output-json.h \
 output-json-common.c \
 packet-queue.c packet-queue.h \
+pesquisa.c pesquisa.h \
 pkt-var.c pkt-var.h \
 reputation.c reputation.h \
 respond-reject.c respond-reject.h \
@@ -1343,6 +1345,7 @@ include ./$(DEPDIR)/decode-template.Po
 include ./$(DEPDIR)/decode-teredo.Po
 include ./$(DEPDIR)/decode-udp.Po
 include ./$(DEPDIR)/decode-vlan.Po
+include ./$(DEPDIR)/decode-vxlan.Po
 include ./$(DEPDIR)/decode.Po
 include ./$(DEPDIR)/defrag-config.Po
 include ./$(DEPDIR)/defrag-hash.Po
@@ -1610,6 +1613,7 @@ include ./$(DEPDIR)/output-streaming.Po
 include ./$(DEPDIR)/output-tx.Po
 include ./$(DEPDIR)/output.Po
 include ./$(DEPDIR)/packet-queue.Po
+include ./$(DEPDIR)/pesquisa.Po
 include ./$(DEPDIR)/pkt-var.Po
 include ./$(DEPDIR)/reputation.Po
 include ./$(DEPDIR)/respond-reject-libnet11.Po

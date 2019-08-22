@@ -26,7 +26,7 @@ printf(
 "  PCRE jit:                                yes\n"
 "  LUA support:                             no\n"
 "  libluajit:                               no\n"
-"  libgeoip:                                no\n"
+"  GeoIP2 support:                          no\n"
 "  Non-bundled htp:                         no\n"
 "  Old barnyard2 support:                   no\n"
 "  Hyperscan support:                       no\n"

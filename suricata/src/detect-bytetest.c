@@ -229,6 +229,8 @@ int DetectBytetestDoMatch(DetectEngineThreadCtx *det_ctx,
         SCReturnInt(1);
     }
 
+    logFitness("byte_test", s->id, val - value);
+
     SCLogDebug("NO MATCH");
     SCReturnInt(0);
 

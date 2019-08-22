@@ -77,21 +77,44 @@ void DetectDsizeRegister (void)
 
     DetectSetupParseRegexes(PARSE_REGEX, &parse_regex, &parse_regex_study);
 }
+/*
+ * \retval -1 on success and anything else on failure.
+ */
 
 static inline int
 DsizeMatch(const uint16_t psize, const uint8_t mode,
             const uint16_t dsize, const uint16_t dsize2)
 {
-    if (mode == DETECTDSIZE_EQ && dsize == psize)
-        return 1;
-    else if (mode == DETECTDSIZE_LT && psize < dsize)
-        return 1;
-    else if (mode == DETECTDSIZE_GT && psize > dsize)
-        return 1;
-    else if (mode == DETECTDSIZE_RA && psize > dsize && psize < dsize2)
-        return 1;
+    int retval = 0;
+    if (mode == DETECTDSIZE_EQ) {
+        if (dsize == psize) {
+            retval = -1;
+        } else {
+            retval = abs(dsize - psize);
+        }
+    } else if (mode == DETECTDSIZE_LT) {
+        if (psize < dsize) {
+            retval = -1;
+        } else {
+            retval = abs(psize - dsize);
+        }
+    } else if (mode == DETECTDSIZE_GT) {
+        if (psize > dsize){
+            retval = -1;
+        } else {
+            retval = abs(psize - dsize);
+        }
+    } else if (mode == DETECTDSIZE_RA) {
+        if (psize > dsize && psize < dsize2) {
+            retval = -1;
+        } else {
+            int diff1 = abs(psize - dsize);
+            int diff2 = abs(psize - dsize2);
+            retval = (diff1 < diff2) ? diff1 : diff2;
+        }
+    }
 
-    return 0;
+    return retval;
 }
 
 /**
@@ -112,16 +135,24 @@ static int DetectDsizeMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
 {
     SCEnter();
     int ret = 0;
+    int fitness;
 
     if (PKT_IS_PSEUDOPKT(p)) {
-        SCReturnInt(0);
+        fitness = 0;
+        ret = 0;
+    } else {
+        const DetectDsizeData *dd = (const DetectDsizeData *)ctx;
+
+        SCLogDebug("p->payload_len %"PRIu16"", p->payload_len);
+
+        fitness = DsizeMatch(p->payload_len, dd->mode, dd->dsize, dd->dsize2);
+
+        ret = (fitness == -1) ? 1 : 0;
     }
 
-    const DetectDsizeData *dd = (const DetectDsizeData *)ctx;
-
-    SCLogDebug("p->payload_len %"PRIu16"", p->payload_len);
-
-    ret = DsizeMatch(p->payload_len, dd->mode, dd->dsize, dd->dsize2);
+    if (!ret) {
+        logFitness("dsize", s->id, fitness);
+    }
 
     SCReturnInt(ret);
 }

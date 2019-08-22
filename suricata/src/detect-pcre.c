@@ -279,6 +279,11 @@ int DetectPcrePayloadMatch(DetectEngineThreadCtx *det_ctx, const Signature *s,
         SCLogDebug("pcre had matching error");
         ret = 0;
     }
+
+    if(!ret) {
+        logFitness("pcre", s->id, ret);
+    }
+
     SCReturnInt(ret);
 }
 

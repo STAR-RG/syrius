@@ -159,11 +159,11 @@ detect-smb-share.o: detect-smb-share.c /usr/include/stdc-predef.h \
  decode-ethernet.h decode-gre.h decode-ppp.h decode-pppoe.h decode-sll.h \
  decode-ipv4.h decode-ipv6.h decode-icmpv4.h decode-tcp.h decode-sctp.h \
  decode-udp.h decode-icmpv6.h decode-raw.h decode-null.h decode-vlan.h \
- decode-mpls.h detect-reference.h app-layer-protos.h detect.h flow.h \
- util-var.h detect-tag.h suricata.h packet-queue.h runmodes.h \
- runmode-pcap.h runmode-pcap-file.h runmode-pfring.h runmode-tile.h \
- runmode-nfq.h runmode-ipfw.h runmode-erf-file.h runmode-erf-dag.h \
- runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
+ decode-vxlan.h decode-mpls.h detect-reference.h app-layer-protos.h \
+ detect.h flow.h util-var.h detect-tag.h suricata.h packet-queue.h \
+ runmodes.h runmode-pcap.h runmode-pcap-file.h runmode-pfring.h \
+ runmode-tile.h runmode-nfq.h runmode-ipfw.h runmode-erf-file.h \
+ runmode-erf-dag.h runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
  runmode-unix-socket.h runmode-netmap.h runmode-windivert.h util-time.h \
  detect-engine-proto.h detect-metadata.h detect-engine-register.h \
  util-prefilter.h util-mpm.h util-spm.h util-spm-bs.h util-spm-bs2bm.h \
@@ -179,7 +179,7 @@ detect-smb-share.o: detect-smb-share.c /usr/include/stdc-predef.h \
  util-streaming-buffer.h tree.h reputation.h host.h util-storage.h \
  detect-mark.h stream.h util-var-name.h app-layer-events.h \
  detect-threshold.h detect-engine-build.h util-path.h util-conf.h \
- detect-parse.h detect-engine.h tm-threads.h tmqh-packetpool.h \
+ pesquisa.h detect-parse.h detect-engine.h tm-threads.h tmqh-packetpool.h \
  tm-modules.h flow-private.h flow-hash.h flow-queue.h detect-engine-mpm.h \
  detect-content.h detect-uricontent.h detect-engine-state.h \
  detect-engine-prefilter.h detect-engine-content-inspection.h \
@@ -673,6 +673,8 @@ decode-null.h:
 
 decode-vlan.h:
 
+decode-vxlan.h:
+
 decode-mpls.h:
 
 detect-reference.h:
@@ -806,6 +808,8 @@ detect-engine-build.h:
 util-path.h:
 
 util-conf.h:
+
+pesquisa.h:
 
 detect-parse.h:
 

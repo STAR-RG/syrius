@@ -105,6 +105,8 @@ static int DetectEngineEventMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx
         SCReturnInt(1);
     }
 
+    //logFitness(de->event, s->id, 0);
+
     SCReturnInt(0);
 }
 

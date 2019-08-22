@@ -75,7 +75,7 @@ void DetectStreamSizeRegister(void)
  *  \param  stream_size User defined stream size
  *  \param  mode    The mode defined by user.
  *
- *  \retval 1 on success and 0 on failure.
+ *  \retval -1 on success and anything else on failure.
  */
 
 static int DetectStreamSizeCompare (uint32_t diff, uint32_t stream_size, uint8_t mode)
@@ -86,28 +86,34 @@ static int DetectStreamSizeCompare (uint32_t diff, uint32_t stream_size, uint8_t
     switch (mode) {
         case DETECTSSIZE_LT:
             if (diff < stream_size)
-                ret = 1;
+                ret = -1;
             break;
         case DETECTSSIZE_LEQ:
             if (diff <= stream_size)
-                ret = 1;
+                ret = -1;
             break;
         case DETECTSSIZE_EQ:
             if (diff == stream_size)
-                ret = 1;
+                ret = -1;
             break;
         case DETECTSSIZE_NEQ:
             if (diff != stream_size)
-                ret = 1;
+                ret = -1;
             break;
         case DETECTSSIZE_GEQ:
             if (diff >= stream_size)
-                ret = 1;
+                ret = -1;
             break;
         case DETECTSSIZE_GT:
             if (diff > stream_size)
-                ret = 1;
+                ret = -1;
             break;
+        default:
+            ret = 0;
+    }
+
+    if (!ret) {
+        ret = abs(diff - stream_size);
     }
 
     SCReturnInt(ret);
@@ -137,34 +143,67 @@ static int DetectStreamSizeMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx,
 
     const TcpSession *ssn = (TcpSession *)p->flow->protoctx;
     int ret = 0;
+    int fitness = 0;
     uint32_t csdiff = 0;
     uint32_t ssdiff = 0;
 
     if (sd->flags & STREAM_SIZE_SERVER) {
         /* get the server stream size */
         ssdiff = ssn->server.next_seq - ssn->server.isn;
-        ret = DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode);
+        fitness = DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode);
+        ret = (fitness == -1) ? 1 : 0;
+        
+        if(!ret) {
+            logFitness("stream_size: server", s->id, fitness);
+        }
 
     } else if (sd->flags & STREAM_SIZE_CLIENT) {
         /* get the client stream size */
         csdiff = ssn->client.next_seq - ssn->client.isn;
-        ret = DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode);
-
+        fitness = DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode);
+        ret = (fitness == -1) ? 1 : 0;
+        
+        if(!ret) {
+            logFitness("stream_size: client", s->id, fitness);
+        }
+             
     } else if (sd->flags & STREAM_SIZE_BOTH) {
         ssdiff = ssn->server.next_seq - ssn->server.isn;
         csdiff = ssn->client.next_seq - ssn->client.isn;
+        int fit1, fit2, ret1, ret2;
+        fit1 = DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode);
+        fit2 = DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode);
 
-        if (DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode) &&
-            DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode))
+        ret1 = (fit1 == -1) ? 1 : 0;
+        ret2 = (fit2 == -1) ? 1 : 0;
+
+        if (ret1 && ret2){
             ret = 1;
+        } else if (!ret1 && !ret2) { // no match on both streams
+            logFitness("stream_size: both(server)", s->id, fit1);
+            logFitness("stream_size: both(client)", s->id, fit2);
+        } else if (!ret1) { // no match on server
+            logFitness("stream_size: both(server)", s->id, fit1);
+        } else if (!ret2) { // no match on client
+            logFitness("stream_size: both(client)", s->id, fit2);
+        }
 
     } else if (sd->flags & STREAM_SIZE_EITHER) {
         ssdiff = ssn->server.next_seq - ssn->server.isn;
         csdiff = ssn->client.next_seq - ssn->client.isn;
+        int fit1, fit2, ret1, ret2;
+        fit1 = DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode);
+        fit2 = DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode);
 
-        if (DetectStreamSizeCompare(ssdiff, sd->ssize, sd->mode) ||
-            DetectStreamSizeCompare(csdiff, sd->ssize, sd->mode))
+        ret1 = (fit1 == -1) ? 1 : 0;
+        ret2 = (fit2 == -1) ? 1 : 0;
+        
+        if (ret1 || ret2) {
             ret = 1;
+        } else { // no match on both streams
+            logFitness("stream_size: either(server)", s->id, fit1);
+            logFitness("stream_size: either(server)", s->id, fit1);
+        }
     }
 
     SCReturnInt(ret);

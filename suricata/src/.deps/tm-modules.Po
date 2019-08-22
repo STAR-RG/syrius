@@ -159,11 +159,11 @@ tm-modules.o: tm-modules.c /usr/include/stdc-predef.h suricata-common.h \
  decode-ethernet.h decode-gre.h decode-ppp.h decode-pppoe.h decode-sll.h \
  decode-ipv4.h decode-ipv6.h decode-icmpv4.h decode-tcp.h decode-sctp.h \
  decode-udp.h decode-icmpv6.h decode-raw.h decode-null.h decode-vlan.h \
- decode-mpls.h detect-reference.h app-layer-protos.h detect.h flow.h \
- util-var.h detect-tag.h suricata.h packet-queue.h runmodes.h \
- runmode-pcap.h runmode-pcap-file.h runmode-pfring.h runmode-tile.h \
- runmode-nfq.h runmode-ipfw.h runmode-erf-file.h runmode-erf-dag.h \
- runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
+ decode-vxlan.h decode-mpls.h detect-reference.h app-layer-protos.h \
+ detect.h flow.h util-var.h detect-tag.h suricata.h packet-queue.h \
+ runmodes.h runmode-pcap.h runmode-pcap-file.h runmode-pfring.h \
+ runmode-tile.h runmode-nfq.h runmode-ipfw.h runmode-erf-file.h \
+ runmode-erf-dag.h runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
  runmode-unix-socket.h runmode-netmap.h runmode-windivert.h util-time.h \
  detect-engine-proto.h detect-metadata.h detect-engine-register.h \
  util-prefilter.h util-mpm.h util-spm.h util-spm-bs.h util-spm-bs2bm.h \
@@ -179,8 +179,8 @@ tm-modules.o: tm-modules.c /usr/include/stdc-predef.h suricata-common.h \
  util-streaming-buffer.h tree.h reputation.h host.h util-storage.h \
  detect-mark.h stream.h util-var-name.h app-layer-events.h \
  detect-threshold.h detect-engine-build.h util-path.h util-conf.h \
- tm-threads.h tmqh-packetpool.h tm-modules.h util-logopenfile.h \
- util-buffer.h
+ pesquisa.h tm-threads.h tmqh-packetpool.h tm-modules.h \
+ util-logopenfile.h util-buffer.h
 
 /usr/include/stdc-predef.h:
 
@@ -670,6 +670,8 @@ decode-null.h:
 
 decode-vlan.h:
 
+decode-vxlan.h:
+
 decode-mpls.h:
 
 detect-reference.h:
@@ -803,6 +805,8 @@ detect-engine-build.h:
 util-path.h:
 
 util-conf.h:
+
+pesquisa.h:
 
 tm-threads.h:
 

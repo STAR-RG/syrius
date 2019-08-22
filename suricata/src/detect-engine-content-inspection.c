@@ -108,7 +108,7 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
 {
     SCEnter();
     KEYWORD_PROFILING_START;
-
+    
     det_ctx->inspection_recursion_counter++;
 
     if (det_ctx->inspection_recursion_counter == de_ctx->inspection_recursion_limit) {
@@ -152,6 +152,7 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
             if ((cd->flags & DETECT_CONTENT_DISTANCE) ||
                 (cd->flags & DETECT_CONTENT_WITHIN)) {
                 SCLogDebug("det_ctx->buffer_offset %"PRIu32, det_ctx->buffer_offset);
+
 
                 offset = prev_buffer_offset;
                 depth = buffer_len;
@@ -227,7 +228,7 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
                         depth = cd->depth;
                     }
                 }
-
+                
                 if (stream_start_offset != 0 && cd->flags & DETECT_CONTENT_DEPTH) {
                     if (depth <= stream_start_offset) {
                         goto no_match;
@@ -249,13 +250,16 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
             /* update offset with prev_offset if we're searching for
              * matches after the first occurence. */
             SCLogDebug("offset %"PRIu32", prev_offset %"PRIu32, offset, prev_offset);
-            if (prev_offset != 0)
+            if (prev_offset != 0) {
                 offset = prev_offset;
+            }
+                
 
             SCLogDebug("offset %"PRIu32", depth %"PRIu32, offset, depth);
 
-            if (depth > buffer_len)
+            if (depth > buffer_len){
                 depth = buffer_len;
+            }
 
             /* if offset is bigger than depth we can never match on a pattern.
              * We can however, "match" on a negated pattern. */
@@ -267,6 +271,9 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
                 }
             }
 
+            //printf("OFFSET: %d\n", offset);
+            //printf("BUFFER_LEN: %d\n", buffer_len);
+            //printf("DEPTH: %d\n", depth);
             uint8_t *sbuffer = buffer + offset;
             uint32_t sbuffer_len = depth - offset;
             uint32_t match_offset = 0;
@@ -302,8 +309,9 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
                 SCLogDebug("content %"PRIu32" matched at offset %"PRIu32", but negated so no match", cd->id, match_offset);
                 /* don't bother carrying recursive matches now, for preceding
                  * relative keywords */
-                if (DETECT_CONTENT_IS_SINGLE(cd))
+                if (DETECT_CONTENT_IS_SINGLE(cd)){
                     det_ctx->discontinue_matching = 1;
+                }
                 goto no_match;
             } else {
                 match_offset = (uint32_t)((found - buffer) + cd->content_len);
@@ -612,6 +620,11 @@ int DetectEngineContentInspection(DetectEngineCtx *de_ctx, DetectEngineThreadCtx
 
 no_match:
     KEYWORD_PROFILING_END(det_ctx, smd->type, 0);
+
+    //DetectContentData *cd = (DetectContentData *)smd->ctx;
+    //printf("    RULE CONTENT: %s\n", cd->content);
+    //printf("    PACKET CONTENT: %s\n", buffer);
+    
     SCReturnInt(0);
 
 match:
@@ -625,7 +638,7 @@ match:
         SCReturnInt(r);
     }
 final_match:
-    KEYWORD_PROFILING_END(det_ctx, smd->type, 1);
+    KEYWORD_PROFILING_END(det_ctx, smd->type, 1);  
     SCReturnInt(1);
 }
 

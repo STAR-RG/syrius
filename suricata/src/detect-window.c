@@ -84,14 +84,26 @@ static int DetectWindowMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
         const Signature *s, const SigMatchCtx *ctx)
 {
     const DetectWindowData *wd = (const DetectWindowData *)ctx;
-
+    int notTCP = 0;
+    int fitness;
+    
     if ( !(PKT_IS_TCP(p)) || wd == NULL || PKT_IS_PSEUDOPKT(p)) {
-        return 0;
-    }
-
-    if ( (!wd->negated && wd->size == TCP_GET_WINDOW(p)) || (wd->negated && wd->size != TCP_GET_WINDOW(p))) {
+        notTCP = 1;
+    } else if ( (!wd->negated && wd->size == TCP_GET_WINDOW(p)) || (wd->negated && wd->size != TCP_GET_WINDOW(p))) {
         return 1;
     }
+
+    if (notTCP){
+        fitness = 0;
+    } else {
+        fitness = abs(wd->size - TCP_GET_WINDOW(p));
+        if (!fitness) { // wd->negated
+            fitness = -1;
+        }
+    }
+    
+    logFitness("window", s->id, fitness);
+    
 
     return 0;
 }

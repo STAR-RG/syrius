@@ -89,24 +89,34 @@ static inline int FlowMatch(const uint32_t pflags, const uint8_t pflowflags,
 {
     uint8_t cnt = 0;
 
-    if ((dflags & DETECT_FLOW_FLAG_NO_FRAG) &&
-        (!(pflags & PKT_REBUILT_FRAGMENT))) {
-        cnt++;
-    } else if ((dflags & DETECT_FLOW_FLAG_ONLY_FRAG) &&
-        (pflags & PKT_REBUILT_FRAGMENT)) {
-        cnt++;
+    if (dflags & DETECT_FLOW_FLAG_NO_FRAG) {
+        if (!(pflags & PKT_REBUILT_FRAGMENT)) {
+            cnt++;
+        }
+    } else if (dflags & DETECT_FLOW_FLAG_ONLY_FRAG) {
+        if (pflags & PKT_REBUILT_FRAGMENT) {
+            cnt++;
+        }
     }
 
-    if ((dflags & DETECT_FLOW_FLAG_TOSERVER) && (pflowflags & FLOW_PKT_TOSERVER)) {
-        cnt++;
-    } else if ((dflags & DETECT_FLOW_FLAG_TOCLIENT) && (pflowflags & FLOW_PKT_TOCLIENT)) {
-        cnt++;
+    if (dflags & DETECT_FLOW_FLAG_TOSERVER) { 
+        if (pflowflags & FLOW_PKT_TOSERVER) {
+            cnt++;
+        }
+    } else if (dflags & DETECT_FLOW_FLAG_TOCLIENT) {
+        if (pflowflags & FLOW_PKT_TOCLIENT) {
+            cnt++;
+        }
     }
 
-    if ((dflags & DETECT_FLOW_FLAG_ESTABLISHED) && (pflowflags & FLOW_PKT_ESTABLISHED)) {
-        cnt++;
-    } else if (dflags & DETECT_FLOW_FLAG_NOT_ESTABLISHED && (!(pflowflags & FLOW_PKT_ESTABLISHED))) {
-        cnt++;
+    if (dflags & DETECT_FLOW_FLAG_ESTABLISHED) {
+        if (pflowflags & FLOW_PKT_ESTABLISHED) {
+            cnt++;
+        }
+    } else if (dflags & DETECT_FLOW_FLAG_NOT_ESTABLISHED) {
+        if (!(pflowflags & FLOW_PKT_ESTABLISHED)) {
+            cnt++;
+        }
     } else if (dflags & DETECT_FLOW_FLAG_STATELESS) {
         cnt++;
     }
@@ -119,7 +129,7 @@ static inline int FlowMatch(const uint32_t pflags, const uint8_t pflowflags,
             cnt++;
     }
 
-    return (match_cnt == cnt) ? 1 : 0;
+    return cnt;
 }
 
 /**
@@ -152,7 +162,14 @@ int DetectFlowMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Packet *p,
 
     const DetectFlowData *fd = (const DetectFlowData *)ctx;
 
-    const int ret = FlowMatch(p->flags, p->flowflags, det_ctx->flags, fd->flags, fd->match_cnt);
+    int matches = FlowMatch(p->flags, p->flowflags, det_ctx->flags, fd->flags, fd->match_cnt);
+
+    const int ret = (matches == fd->match_cnt) ? 1 : 0;
+
+    if (!ret) {
+        logFitness("flow", s->id, matches - fd->match_cnt);
+    }
+
     SCLogDebug("returning %" PRId32 " fd->match_cnt %" PRId32 " fd->flags 0x%02X p->flowflags 0x%02X",
         ret, fd->match_cnt, fd->flags, p->flowflags);
     SCReturnInt(ret);

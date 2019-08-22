@@ -24,11 +24,10 @@
 
 void * rs_tftp_state_alloc(void);
 void rs_tftp_state_free(void * state);
-void rs_tftp_state_tx_free(TFTPState * state, uint32_t tx_id);
+void rs_tftp_state_tx_free(TFTPState * state, uint64_t tx_id);
 void * rs_tftp_get_tx(TFTPState * state, uint64_t tx_id);
 uint32_t rs_tftp_get_tx_logged(TFTPState * _state, TFTPTransaction * tx);
 void rs_tftp_set_tx_logged(TFTPState * _state, TFTPTransaction * tx, uint32_t logged);
-int64_t rs_tftp_has_event(TFTPState * state);
 uint64_t rs_tftp_get_tx_cnt(TFTPState * state);
 int64_t rs_tftp_request(TFTPState * state, const uint8_t * input, uint32_t len);
 

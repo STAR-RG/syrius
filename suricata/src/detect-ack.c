@@ -82,13 +82,24 @@ static int DetectAckMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx,
                           Packet *p, const Signature *s, const SigMatchCtx *ctx)
 {
     const DetectAckData *data = (const DetectAckData *)ctx;
-
+    int notTCP = 0;
+    int fitness;
     /* This is only needed on TCP packets */
     if (!(PKT_IS_TCP(p)) || PKT_IS_PSEUDOPKT(p)) {
-        return 0;
+        notTCP = 1;
+    } else if(data->ack == TCP_GET_ACK(p)) {
+        return 1;
+    }
+    
+    if (notTCP) {
+        fitness = 0;
+    } else {
+        fitness = abs(data->ack - TCP_GET_ACK(p));
     }
 
-    return (data->ack == TCP_GET_ACK(p)) ? 1 : 0;
+    logFitness("ack", s->id, fitness);
+
+    return 0;
 }
 
 /**

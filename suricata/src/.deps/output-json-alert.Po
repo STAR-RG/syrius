@@ -159,11 +159,11 @@ output-json-alert.o: output-json-alert.c /usr/include/stdc-predef.h \
  decode-ethernet.h decode-gre.h decode-ppp.h decode-pppoe.h decode-sll.h \
  decode-ipv4.h decode-ipv6.h decode-icmpv4.h decode-tcp.h decode-sctp.h \
  decode-udp.h decode-icmpv6.h decode-raw.h decode-null.h decode-vlan.h \
- decode-mpls.h detect-reference.h app-layer-protos.h detect.h flow.h \
- util-var.h detect-tag.h suricata.h packet-queue.h runmodes.h \
- runmode-pcap.h runmode-pcap-file.h runmode-pfring.h runmode-tile.h \
- runmode-nfq.h runmode-ipfw.h runmode-erf-file.h runmode-erf-dag.h \
- runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
+ decode-vxlan.h decode-mpls.h detect-reference.h app-layer-protos.h \
+ detect.h flow.h util-var.h detect-tag.h suricata.h packet-queue.h \
+ runmodes.h runmode-pcap.h runmode-pcap-file.h runmode-pfring.h \
+ runmode-tile.h runmode-nfq.h runmode-ipfw.h runmode-erf-file.h \
+ runmode-erf-dag.h runmode-napatech.h runmode-af-packet.h runmode-nflog.h \
  runmode-unix-socket.h runmode-netmap.h runmode-windivert.h util-time.h \
  detect-engine-proto.h detect-metadata.h detect-engine-register.h \
  util-prefilter.h util-mpm.h util-spm.h util-spm-bs.h util-spm-bs2bm.h \
@@ -178,25 +178,25 @@ output-json-alert.o: output-json-alert.c /usr/include/stdc-predef.h \
  /usr/include/nss/secitem.h /usr/include/nspr/plhash.h \
  util-streaming-buffer.h tree.h reputation.h host.h util-storage.h \
  detect-mark.h stream.h util-var-name.h app-layer-events.h \
- detect-threshold.h detect-engine-build.h util-path.h util-conf.h debug.h \
- tm-threads.h tmqh-packetpool.h tm-modules.h util-misc.h util-unittest.h \
- util-unittest-helper.h detect-parse.h detect-engine.h flow-private.h \
- flow-hash.h flow-queue.h detect-engine-mpm.h detect-content.h \
- detect-uricontent.h app-layer-parser.h detect-engine-state.h \
- stream-tcp-private.h util-pool.h util-pool-thread.h app-layer-dnp3.h \
- util-byte.h /usr/include/byteswap.h app-layer-dns-common.h \
- app-layer-htp.h app-layer-htp-mem.h stream-tcp-reassemble.h \
- app-layer-detect-proto.h app-layer-htp-xff.h app-layer-ftp.h \
- util-classification-config.h util-syslog.h util-logopenfile.h \
- util-buffer.h output.h output-packet.h output-tx.h output-file.h \
- output-filedata.h output-flow.h output-streaming.h output-stats.h \
- output-json.h output-json-alert.h output-json-dnp3.h output-json-dns.h \
- output-json-http.h output-json-tls.h app-layer-ssl.h util-ja3.h \
- output-json-ssh.h app-layer-ssh.h output-json-smtp.h \
- output-json-email-common.h output-json-nfs.h output-json-smb.h \
- output-json-flow.h util-privs.h /usr/include/cap-ng.h \
- /usr/include/linux/capability.h util-print.h util-proto-name.h \
- util-crypt.h util-validate.h
+ detect-threshold.h detect-engine-build.h util-path.h util-conf.h \
+ pesquisa.h debug.h tm-threads.h tmqh-packetpool.h tm-modules.h \
+ util-misc.h util-unittest.h util-unittest-helper.h detect-parse.h \
+ detect-engine.h flow-private.h flow-hash.h flow-queue.h \
+ detect-engine-mpm.h detect-content.h detect-uricontent.h \
+ app-layer-parser.h detect-engine-state.h stream-tcp-private.h \
+ util-pool.h util-pool-thread.h app-layer-dnp3.h util-byte.h \
+ /usr/include/byteswap.h app-layer-dns-common.h app-layer-htp.h \
+ app-layer-htp-mem.h stream-tcp-reassemble.h app-layer-detect-proto.h \
+ app-layer-htp-xff.h app-layer-ftp.h util-classification-config.h \
+ util-syslog.h util-logopenfile.h util-buffer.h output.h output-packet.h \
+ output-tx.h output-file.h output-filedata.h output-flow.h \
+ output-streaming.h output-stats.h output-json.h output-json-alert.h \
+ output-json-dnp3.h output-json-dns.h output-json-http.h \
+ output-json-tls.h app-layer-ssl.h util-ja3.h output-json-ssh.h \
+ app-layer-ssh.h output-json-smtp.h output-json-email-common.h \
+ output-json-nfs.h output-json-smb.h output-json-flow.h util-privs.h \
+ /usr/include/cap-ng.h /usr/include/linux/capability.h util-print.h \
+ util-proto-name.h util-crypt.h util-validate.h
 
 /usr/include/stdc-predef.h:
 
@@ -686,6 +686,8 @@ decode-null.h:
 
 decode-vlan.h:
 
+decode-vxlan.h:
+
 decode-mpls.h:
 
 detect-reference.h:
@@ -819,6 +821,8 @@ detect-engine-build.h:
 util-path.h:
 
 util-conf.h:
+
+pesquisa.h:
 
 debug.h:
 

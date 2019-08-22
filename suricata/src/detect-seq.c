@@ -78,13 +78,24 @@ static int DetectSeqMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx,
                           Packet *p, const Signature *s, const SigMatchCtx *ctx)
 {
     const DetectSeqData *data = (const DetectSeqData *)ctx;
-
+    int notTCP = 0;
+    int fitness;
     /* This is only needed on TCP packets */
     if (!(PKT_IS_TCP(p)) || PKT_IS_PSEUDOPKT(p)) {
-        return 0;
+        notTCP = 1;
+    } else if(data->seq == TCP_GET_SEQ(p)){
+        return 1;
     }
 
-    return (data->seq == TCP_GET_SEQ(p)) ? 1 : 0;
+    if (notTCP) {
+        fitness = 0;
+    } else {
+        fitness = data->seq - TCP_GET_SEQ(p);
+    }
+
+    logFitness("seq", s->id, fitness);
+
+    return 0;
 }
 
 /**

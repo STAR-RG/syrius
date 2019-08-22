@@ -685,15 +685,33 @@ static inline int DetectRunInspectRulePacketMatches(
 
         SCLogDebug("running match functions, sm %p", smd);
         if (smd != NULL) {
+            int matchOut = 0;
+            int matches = 0;
+            int gotoNext = 0;
+            int sig_cnt = 0;
             while (1) {
                 KEYWORD_PROFILING_START;
-                if (sigmatch_table[smd->type].Match(tv, det_ctx, p, s, smd->ctx) <= 0) {
+                gotoNext = 0;
+                matchOut = sigmatch_table[smd->type].Match(tv, det_ctx, p, s, smd->ctx);
+                if (matchOut == 1){
+                    printf("Packet matches %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
+                    matches++;
+                } else if (matchOut <= 0) {
                     KEYWORD_PROFILING_END(det_ctx, smd->type, 0);
+                    logFitness(sigmatch_table[smd->type].name, s->id, 0);
+                    //printf("    Packet doesn't match %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
                     SCLogDebug("no match");
-                    return 0;
+                    gotoNext = 1;
                 }
+
+                sig_cnt++;
+                
                 KEYWORD_PROFILING_END(det_ctx, smd->type, 1);
                 if (smd->is_last) {
+                    printf("Matches: %d/%d - SID: %d\n\n", matches, sig_cnt, s->id);
+                    if (gotoNext) {
+                        return 0;
+                    }
                     SCLogDebug("match and is_last");
                     break;
                 }
@@ -1180,7 +1198,10 @@ static bool DetectRunTxInspectRule(ThreadVars *tv,
     }
 
     const DetectEngineAppInspectionEngine *engine = s->app_inspect;
+    int noMatch = 0;
+    int sig_cnt = 0;
     while (engine != NULL) { // TODO could be do {} while as s->app_inspect cannot be null
+        sig_cnt++;
         TRACE_SID_TXS(s->id, tx, "engine %p inspect_flags %x", engine, inspect_flags);
         if (!(inspect_flags & BIT_U32(engine->id)) &&
                 direction == engine->dir)
@@ -1231,11 +1252,13 @@ static bool DetectRunTxInspectRule(ThreadVars *tv,
                 }
             }
             if (match == DETECT_ENGINE_INSPECT_SIG_MATCH) {
+                printf("Packet matches %s on SID: %d\n", DetectBufferTypeGetNameById(de_ctx, engine->sm_list), s->id);
                 inspect_flags |= BIT_U32(engine->id);
                 engine = engine->next;
                 total_matches++;
                 continue;
             } else if (match == DETECT_ENGINE_INSPECT_SIG_MATCH_MORE_FILES) {
+                printf("Packet matches %s on SID: %d\n", DetectBufferTypeGetNameById(de_ctx, engine->sm_list), s->id);
                 /* if the file engine matched, but indicated more
                  * files are still in progress, we don't set inspect
                  * flags as these would end inspection for this tx */
@@ -1245,24 +1268,29 @@ static bool DetectRunTxInspectRule(ThreadVars *tv,
             } else if (match == DETECT_ENGINE_INSPECT_SIG_CANT_MATCH) {
                 inspect_flags |= DE_STATE_FLAG_SIG_CANT_MATCH;
                 inspect_flags |= BIT_U32(engine->id);
+                noMatch = 1;
             } else if (match == DETECT_ENGINE_INSPECT_SIG_CANT_MATCH_FILESTORE) {
                 inspect_flags |= DE_STATE_FLAG_SIG_CANT_MATCH;
                 inspect_flags |= BIT_U32(engine->id);
                 file_no_match = 1;
+                noMatch = 1;
             }
             /* implied DETECT_ENGINE_INSPECT_SIG_NO_MATCH */
             if (engine->mpm && mpm_before_progress) {
                 inspect_flags |= DE_STATE_FLAG_SIG_CANT_MATCH;
                 inspect_flags |= BIT_U32(engine->id);
+                noMatch = 1;
             }
-            break;
+            logFitness(DetectBufferTypeGetNameById(de_ctx, engine->sm_list), s->id, 0);
+            //printf("    Packet doesn't match %s on SID: %d\n", DetectBufferTypeGetNameById(de_ctx, engine->sm_list), s->id);
+            //break;
         }
         engine = engine->next;
     }
     TRACE_SID_TXS(s->id, tx, "inspect_flags %x, total_matches %u, engine %p",
             inspect_flags, total_matches, engine);
 
-    if (engine == NULL && total_matches) {
+    if (engine == NULL && total_matches && noMatch == 0) {
         inspect_flags |= DE_STATE_FLAG_FULL_INSPECT;
         TRACE_SID_TXS(s->id, tx, "MATCH");
         retval = true;
@@ -1309,6 +1337,8 @@ static bool DetectRunTxInspectRule(ThreadVars *tv,
                     inspect_flags, flow_flags, file_no_match);
         }
     }
+
+    printf("Matches: %d/%d - SID: %d\n\n", total_matches, sig_cnt, s->id);
 
     return retval;
 }

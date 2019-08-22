@@ -129,13 +129,13 @@ am__can_run_installinfo = \
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Cargo.toml.in $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing autoconf
-AUTOHEADER = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing autoheader
-AUTOMAKE = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing automake-1.15
+AUTOCONF = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing autoconf
+AUTOHEADER = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing autoheader
+AUTOMAKE = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing automake-1.15
 AWK = gawk
 CARGO = /usr/bin/cargo
 CARGO_HOME = /root/.cargo
@@ -173,7 +173,7 @@ HAVE_LLC =
 HAVE_PCAP_CONFIG = /usr/bin/pcap-config
 HAVE_PDFLATEX = /usr/bin/pdflatex
 HAVE_PKG_CONFIG = /usr/bin/pkg-config
-HAVE_PYTHON = /usr/bin/python3
+HAVE_PYTHON = /usr/bin/python
 HAVE_RUSTC = /usr/bin/rustc
 HAVE_SPHINXBUILD = no
 HAVE_WGET = /usr/bin/wget
@@ -211,7 +211,7 @@ LUAJIT_CFLAGS =
 LUAJIT_LIBS = 
 LUA_CFLAGS = 
 LUA_LIBS = 
-MAKEINFO = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/missing makeinfo
+MAKEINFO = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -224,10 +224,10 @@ OTOOL64 =
 PACKAGE = suricata
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = suricata
-PACKAGE_STRING = suricata 4.1.4
+PACKAGE_STRING = suricata 4.1.0-dev
 PACKAGE_TARNAME = suricata
 PACKAGE_URL = 
-PACKAGE_VERSION = 4.1.4
+PACKAGE_VERSION = 4.1.0-dev
 PATH_SEPARATOR = :
 PCAP_CFLAGS =  -I/usr/include
 PKG_CONFIG = /usr/bin/pkg-config
@@ -245,11 +245,11 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 SURICATA_UPDATE_DIR = 
-VERSION = 4.1.4
-abs_builddir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/rust
-abs_srcdir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/rust
-abs_top_builddir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4
-abs_top_srcdir = /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4
+VERSION = 4.1.0-dev
+abs_builddir = /home/lucas/Documents/Repositórios/GitHub/suricata/rust
+abs_srcdir = /home/lucas/Documents/Repositórios/GitHub/suricata/rust
+abs_top_builddir = /home/lucas/Documents/Repositórios/GitHub/suricata
+abs_top_srcdir = /home/lucas/Documents/Repositórios/GitHub/suricata
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
@@ -291,7 +291,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata-4.1.4/install-sh
+install_sh = ${SHELL} /home/lucas/Documents/Repositórios/GitHub/suricata/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libhs_CFLAGS = 
@@ -317,7 +317,7 @@ psdir = ${docdir}
 runstatedir = ${localstatedir}/run
 rust_config_comment = 
 rust_config_enabled = yes
-rust_vendor_comment = 
+rust_vendor_comment = # 
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
@@ -329,7 +329,7 @@ top_builddir = ..
 top_srcdir = ..
 EXTRA_DIST = Cargo.toml src .cargo/config.in gen-c-headers.py \
 	$(am__append_1) $(am__append_2) $(am__append_5)
-FROZEN = --frozen
+#FROZEN = --frozen
 RELEASE = --release
 all: all-am
 
@@ -443,8 +443,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-#distclean-local:
 #clean-local:
+#distclean-local:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am

@@ -34,6 +34,7 @@
 #define FALSE  0
 
 #define _GNU_SOURCE
+#define __USE_XOPEN
 #define __USE_GNU
 
 #if HAVE_CONFIG_H
@@ -459,6 +460,10 @@ typedef enum {
 #include <lualib.h>
 #include <lauxlib.h>
 #endif
+
+///////////////////////////////////////////////
+#include "pesquisa.h"
+///////////////////////////////////////////////
 
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *, const char *src, size_t siz);
