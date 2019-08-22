@@ -257,7 +257,7 @@ export_tx_set_detect_state!(
 #[no_mangle]
 pub extern "C" fn rs_template_probing_parser(
     _flow: *const Flow,
-    input: *const u8,
+    input: *const libc::uint8_t,
     input_len: u32,
 ) -> AppProto {
     // Need at least 2 bytes.
@@ -286,7 +286,7 @@ pub extern "C" fn rs_template_state_free(state: *mut libc::c_void) {
 #[no_mangle]
 pub extern "C" fn rs_template_state_tx_free(
     state: *mut libc::c_void,
-    tx_id: u64,
+    tx_id: libc::uint64_t,
 ) {
     let state = cast_pointer!(state, TemplateState);
     state.free_tx(tx_id);
@@ -297,7 +297,7 @@ pub extern "C" fn rs_template_parse_request(
     _flow: *const Flow,
     state: *mut libc::c_void,
     pstate: *mut libc::c_void,
-    input: *const u8,
+    input: *const libc::uint8_t,
     input_len: u32,
     _data: *const libc::c_void,
     _flags: u8,
@@ -327,7 +327,7 @@ pub extern "C" fn rs_template_parse_response(
     _flow: *const Flow,
     state: *mut libc::c_void,
     pstate: *mut libc::c_void,
-    input: *const u8,
+    input: *const libc::uint8_t,
     input_len: u32,
     _data: *const libc::c_void,
     _flags: u8,
@@ -350,7 +350,7 @@ pub extern "C" fn rs_template_parse_response(
 #[no_mangle]
 pub extern "C" fn rs_template_state_get_tx(
     state: *mut libc::c_void,
-    tx_id: u64,
+    tx_id: libc::uint64_t,
 ) -> *mut libc::c_void {
     let state = cast_pointer!(state, TemplateState);
     match state.get_tx(tx_id) {
@@ -366,14 +366,14 @@ pub extern "C" fn rs_template_state_get_tx(
 #[no_mangle]
 pub extern "C" fn rs_template_state_get_tx_count(
     state: *mut libc::c_void,
-) -> u64 {
+) -> libc::uint64_t {
     let state = cast_pointer!(state, TemplateState);
     return state.tx_id;
 }
 
 #[no_mangle]
 pub extern "C" fn rs_template_state_progress_completion_status(
-    _direction: u8,
+    _direction: libc::uint8_t,
 ) -> libc::c_int {
     // This parser uses 1 to signal transaction completion status.
     return 1;
@@ -382,7 +382,7 @@ pub extern "C" fn rs_template_state_progress_completion_status(
 #[no_mangle]
 pub extern "C" fn rs_template_tx_get_alstate_progress(
     tx: *mut libc::c_void,
-    _direction: u8,
+    _direction: libc::uint8_t,
 ) -> libc::c_int {
     let tx = cast_pointer!(tx, TemplateTransaction);
 
@@ -406,7 +406,7 @@ pub extern "C" fn rs_template_tx_get_logged(
 pub extern "C" fn rs_template_tx_set_logged(
     _state: *mut libc::c_void,
     tx: *mut libc::c_void,
-    logged: u32,
+    logged: libc::uint32_t,
 ) {
     let tx = cast_pointer!(tx, TemplateTransaction);
     tx.logged.set(logged);
@@ -415,7 +415,7 @@ pub extern "C" fn rs_template_tx_set_logged(
 #[no_mangle]
 pub extern "C" fn rs_template_state_get_events(
     state: *mut libc::c_void,
-    tx_id: u64,
+    tx_id: libc::uint64_t,
 ) -> *mut core::AppLayerDecoderEvents {
     let state = cast_pointer!(state, TemplateState);
     match state.get_tx(tx_id) {
@@ -435,12 +435,12 @@ pub extern "C" fn rs_template_state_get_event_info(
 
 #[no_mangle]
 pub extern "C" fn rs_template_state_get_tx_iterator(
-    _ipproto: u8,
+    _ipproto: libc::uint8_t,
     _alproto: AppProto,
     state: *mut libc::c_void,
-    min_tx_id: u64,
-    _max_tx_id: u64,
-    istate: &mut u64,
+    min_tx_id: libc::uint64_t,
+    _max_tx_id: libc::uint64_t,
+    istate: &mut libc::uint64_t,
 ) -> applayer::AppLayerGetTxIterTuple {
     let state = cast_pointer!(state, TemplateState);
     match state.tx_iterator(min_tx_id, istate) {
@@ -466,15 +466,15 @@ pub extern "C" fn rs_template_state_get_tx_iterator(
 #[no_mangle]
 pub extern "C" fn rs_template_get_request_buffer(
     tx: *mut libc::c_void,
-    buf: *mut *const u8,
-    len: *mut u32,
-) -> u8
+    buf: *mut *const libc::uint8_t,
+    len: *mut libc::uint32_t,
+) -> libc::uint8_t
 {
     let tx = cast_pointer!(tx, TemplateTransaction);
     if let Some(ref request) = tx.request {
         if request.len() > 0 {
             unsafe {
-                *len = request.len() as u32;
+                *len = request.len() as libc::uint32_t;
                 *buf = request.as_ptr();
             }
             return 1;
@@ -487,15 +487,15 @@ pub extern "C" fn rs_template_get_request_buffer(
 #[no_mangle]
 pub extern "C" fn rs_template_get_response_buffer(
     tx: *mut libc::c_void,
-    buf: *mut *const u8,
-    len: *mut u32,
-) -> u8
+    buf: *mut *const libc::uint8_t,
+    len: *mut libc::uint32_t,
+) -> libc::uint8_t
 {
     let tx = cast_pointer!(tx, TemplateTransaction);
     if let Some(ref response) = tx.response {
         if response.len() > 0 {
             unsafe {
-                *len = response.len() as u32;
+                *len = response.len() as libc::uint32_t;
                 *buf = response.as_ptr();
             }
             return 1;

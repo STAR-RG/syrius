@@ -450,7 +450,6 @@ void DecodeRegisterPerfCounters(DecodeThreadVars *dtv, ThreadVars *tv)
     dtv->counter_gre = StatsRegisterCounter("decoder.gre", tv);
     dtv->counter_vlan = StatsRegisterCounter("decoder.vlan", tv);
     dtv->counter_vlan_qinq = StatsRegisterCounter("decoder.vlan_qinq", tv);
-    dtv->counter_vxlan = StatsRegisterCounter("decoder.vxlan", tv);
     dtv->counter_ieee8021ah = StatsRegisterCounter("decoder.ieee8021ah", tv);
     dtv->counter_teredo = StatsRegisterCounter("decoder.teredo", tv);
     dtv->counter_ipv4inipv6 = StatsRegisterCounter("decoder.ipv4_in_ipv6", tv);
@@ -657,9 +656,6 @@ const char *PktSrcToString(enum PktSrcEnum pkt_src)
         case PKT_SRC_FFR:
             pkt_src_str = "stream (flow timeout)";
             break;
-        case PKT_SRC_DECODER_VXLAN:
-            pkt_src_str = "vxlan encapsulation";
-            break;
     }
     return pkt_src_str;
 }
@@ -688,7 +684,6 @@ void CaptureStatsSetup(ThreadVars *tv, CaptureStats *s)
 void DecodeGlobalConfig(void)
 {
     DecodeTeredoConfig();
-    DecodeVXLANConfig();
 }
 
 /**

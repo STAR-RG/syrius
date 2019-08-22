@@ -157,14 +157,13 @@ typedef struct SMTPState_ {
      *  handler */
     uint16_t cmds_idx;
 
-    /* HELO of HELO message content */
-    uint16_t helo_len;
-    uint8_t *helo;
-
     /* SMTP Mime decoding and file extraction */
     /** the list of files sent to the server */
     FileContainer *files_ts;
-    uint32_t file_track_id;
+
+    /* HELO of HELO message content */
+    uint8_t *helo;
+    uint16_t helo_len;
 } SMTPState;
 
 /* Create SMTP config structure */

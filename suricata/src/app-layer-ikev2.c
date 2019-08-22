@@ -41,6 +41,20 @@
 void RegisterIKEV2Parsers(void)
 {
     rs_register_ikev2_parser();
+
+#ifdef UNITTESTS
+    AppLayerParserRegisterProtocolUnittests(IPPROTO_UDP, ALPROTO_IKEV2,
+        IKEV2ParserRegisterTests);
+#endif
+}
+
+#ifdef UNITTESTS
+#endif
+
+void IKEV2ParserRegisterTests(void)
+{
+#ifdef UNITTESTS
+#endif
 }
 
 #else /* HAVE_RUST */

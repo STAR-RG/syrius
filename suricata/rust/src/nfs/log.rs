@@ -26,7 +26,7 @@ use crc::crc32;
 #[no_mangle]
 pub extern "C" fn rs_nfs_tx_logging_is_filtered(state: &mut NFSState,
                                                 tx: &mut NFSTransaction)
-                                                -> u8
+                                                -> libc::uint8_t
 {
     // TODO probably best to make this configurable
 

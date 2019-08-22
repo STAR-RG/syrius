@@ -1795,11 +1795,11 @@ pub extern "C" fn rs_smb_state_free(state: *mut libc::c_void) {
 pub extern "C" fn rs_smb_parse_request_tcp(_flow: *mut Flow,
                                        state: &mut SMBState,
                                        _pstate: *mut libc::c_void,
-                                       input: *mut u8,
-                                       input_len: u32,
+                                       input: *mut libc::uint8_t,
+                                       input_len: libc::uint32_t,
                                        _data: *mut libc::c_void,
                                        flags: u8)
-                                       -> i8
+                                       -> libc::int8_t
 {
     let buf = unsafe{std::slice::from_raw_parts(input, input_len as usize)};
     SCLogDebug!("parsing {} bytes of request data", input_len);
@@ -1819,8 +1819,8 @@ pub extern "C" fn rs_smb_parse_request_tcp(_flow: *mut Flow,
 #[no_mangle]
 pub extern "C" fn rs_smb_parse_request_tcp_gap(
                                         state: &mut SMBState,
-                                        input_len: u32)
-                                        -> i8
+                                        input_len: libc::uint32_t)
+                                        -> libc::int8_t
 {
     if state.parse_tcp_data_ts_gap(input_len as u32) == 0 {
         return 1;
@@ -1833,11 +1833,11 @@ pub extern "C" fn rs_smb_parse_request_tcp_gap(
 pub extern "C" fn rs_smb_parse_response_tcp(_flow: *mut Flow,
                                         state: &mut SMBState,
                                         _pstate: *mut libc::c_void,
-                                        input: *mut u8,
-                                        input_len: u32,
+                                        input: *mut libc::uint8_t,
+                                        input_len: libc::uint32_t,
                                         _data: *mut libc::c_void,
                                         flags: u8)
-                                        -> i8
+                                        -> libc::int8_t
 {
     SCLogDebug!("parsing {} bytes of response data", input_len);
     let buf = unsafe{std::slice::from_raw_parts(input, input_len as usize)};
@@ -1857,8 +1857,8 @@ pub extern "C" fn rs_smb_parse_response_tcp(_flow: *mut Flow,
 #[no_mangle]
 pub extern "C" fn rs_smb_parse_response_tcp_gap(
                                         state: &mut SMBState,
-                                        input_len: u32)
-                                        -> i8
+                                        input_len: libc::uint32_t)
+                                        -> libc::int8_t
 {
     if state.parse_tcp_data_tc_gap(input_len as u32) == 0 {
         return 1;
@@ -1869,7 +1869,8 @@ pub extern "C" fn rs_smb_parse_response_tcp_gap(
 // probing parser
 // return 1 if found, 0 is not found
 #[no_mangle]
-pub extern "C" fn rs_smb_probe_tcp(input: *const u8, len: u32) -> i8
+pub extern "C" fn rs_smb_probe_tcp(input: *const libc::uint8_t, len: libc::uint32_t)
+                               -> libc::int8_t
 {
     let slice = build_slice!(input, len as usize);
     match search_smb_record(slice) {
@@ -1899,7 +1900,7 @@ pub extern "C" fn rs_smb_probe_tcp(input: *const u8, len: u32) -> i8
 
 #[no_mangle]
 pub extern "C" fn rs_smb_state_get_tx_count(state: &mut SMBState)
-                                            -> u64
+                                            -> libc::uint64_t
 {
     SCLogDebug!("rs_smb_state_get_tx_count: returning {}", state.tx_id);
     return state.tx_id;
@@ -1907,7 +1908,7 @@ pub extern "C" fn rs_smb_state_get_tx_count(state: &mut SMBState)
 
 #[no_mangle]
 pub extern "C" fn rs_smb_state_get_tx(state: &mut SMBState,
-                                      tx_id: u64)
+                                      tx_id: libc::uint64_t)
                                       -> *mut SMBTransaction
 {
     match state.get_tx_by_id(tx_id) {
@@ -1924,8 +1925,8 @@ pub extern "C" fn rs_smb_state_get_tx(state: &mut SMBState,
 #[no_mangle]
 pub extern "C" fn rs_smb_state_get_tx_iterator(
                                       state: &mut SMBState,
-                                      min_tx_id: u64,
-                                      istate: &mut u64)
+                                      min_tx_id: libc::uint64_t,
+                                      istate: &mut libc::uint64_t)
                                       -> applayer::AppLayerGetTxIterTuple
 {
     match state.get_tx_iterator(min_tx_id, istate) {
@@ -1942,7 +1943,7 @@ pub extern "C" fn rs_smb_state_get_tx_iterator(
 
 #[no_mangle]
 pub extern "C" fn rs_smb_state_tx_free(state: &mut SMBState,
-                                       tx_id: u64)
+                                       tx_id: libc::uint64_t)
 {
     SCLogDebug!("freeing tx {}", tx_id as u64);
     state.free_tx(tx_id);
@@ -1950,7 +1951,7 @@ pub extern "C" fn rs_smb_state_tx_free(state: &mut SMBState,
 
 #[no_mangle]
 pub extern "C" fn rs_smb_state_progress_completion_status(
-    _direction: u8)
+    _direction: libc::uint8_t)
     -> libc::c_int
 {
     return 1;
@@ -1958,8 +1959,8 @@ pub extern "C" fn rs_smb_state_progress_completion_status(
 
 #[no_mangle]
 pub extern "C" fn rs_smb_tx_get_alstate_progress(tx: &mut SMBTransaction,
-                                                  direction: u8)
-                                                  -> u8
+                                                  direction: libc::uint8_t)
+                                                  -> libc::uint8_t
 {
     if direction == STREAM_TOSERVER && tx.request_done {
         SCLogDebug!("tx {} TOSERVER progress 1 => {:?}", tx.id, tx);
@@ -1976,7 +1977,7 @@ pub extern "C" fn rs_smb_tx_get_alstate_progress(tx: &mut SMBTransaction,
 #[no_mangle]
 pub extern "C" fn rs_smb_tx_set_logged(_state: &mut SMBState,
                                        tx: &mut SMBTransaction,
-                                       bits: u32)
+                                       bits: libc::uint32_t)
 {
     tx.logged.set(bits);
 }
@@ -1992,8 +1993,8 @@ pub extern "C" fn rs_smb_tx_get_logged(_state: &mut SMBState,
 #[no_mangle]
 pub extern "C" fn rs_smb_tx_set_detect_flags(
                                        tx: &mut SMBTransaction,
-                                       direction: u8,
-                                       flags: u64)
+                                       direction: libc::uint8_t,
+                                       flags: libc::uint64_t)
 {
     if (direction & STREAM_TOSERVER) != 0 {
         tx.detect_flags_ts = flags as u64;
@@ -2005,13 +2006,13 @@ pub extern "C" fn rs_smb_tx_set_detect_flags(
 #[no_mangle]
 pub extern "C" fn rs_smb_tx_get_detect_flags(
                                        tx: &mut SMBTransaction,
-                                       direction: u8)
-                                       -> u64
+                                       direction: libc::uint8_t)
+                                       -> libc::uint64_t
 {
     if (direction & STREAM_TOSERVER) != 0 {
-        return tx.detect_flags_ts as u64;
+        return tx.detect_flags_ts as libc::uint64_t;
     } else {
-        return tx.detect_flags_tc as u64;
+        return tx.detect_flags_tc as libc::uint64_t;
     }
 }
 
@@ -2041,7 +2042,7 @@ pub extern "C" fn rs_smb_state_get_tx_detect_state(
 #[no_mangle]
 pub extern "C" fn rs_smb_state_truncate(
         state: &mut SMBState,
-        direction: u8)
+        direction: libc::uint8_t)
 {
     if (direction & STREAM_TOSERVER) != 0 {
         state.trunc_ts();
@@ -2052,7 +2053,7 @@ pub extern "C" fn rs_smb_state_truncate(
 
 #[no_mangle]
 pub extern "C" fn rs_smb_state_get_events(state: &mut SMBState,
-                                          tx_id: u64)
+                                          tx_id: libc::uint64_t)
                                           -> *mut AppLayerDecoderEvents
 {
     match state.get_tx_by_id(tx_id) {

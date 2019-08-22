@@ -17,11 +17,13 @@
 
 // written by Pierre Chifflier  <chifflier@wzdftpd.net>
 
+use libc;
+
 use krb::krb5::KRB5Transaction;
 
 #[no_mangle]
 pub unsafe extern "C" fn rs_krb5_tx_get_msgtype(tx:  &mut KRB5Transaction,
-                                                ptr: *mut u32)
+                                                ptr: *mut libc::uint32_t)
 {
     *ptr = tx.msg_type.0;
 }
@@ -30,7 +32,7 @@ pub unsafe extern "C" fn rs_krb5_tx_get_msgtype(tx:  &mut KRB5Transaction,
 /// Return 0 if error code was filled, else 1
 #[no_mangle]
 pub unsafe extern "C" fn rs_krb5_tx_get_errcode(tx:  &mut KRB5Transaction,
-                                                ptr: *mut i32) -> u32
+                                                ptr: *mut libc::int32_t) -> u32
 {
     match tx.error_code {
         Some(ref e) => {
@@ -43,10 +45,10 @@ pub unsafe extern "C" fn rs_krb5_tx_get_errcode(tx:  &mut KRB5Transaction,
 
 #[no_mangle]
 pub unsafe extern "C" fn rs_krb5_tx_get_cname(tx:  &mut KRB5Transaction,
-                                              i: u16,
-                                              buffer: *mut *const u8,
-                                              buffer_len: *mut u32)
-                                              -> u8
+                                              i: libc::uint16_t,
+                                              buffer: *mut *const libc::uint8_t,
+                                              buffer_len: *mut libc::uint32_t)
+                                              -> libc::uint8_t
 {
     if let Some(ref s) = tx.cname {
         if (i as usize) < s.name_string.len() {
@@ -61,10 +63,10 @@ pub unsafe extern "C" fn rs_krb5_tx_get_cname(tx:  &mut KRB5Transaction,
 
 #[no_mangle]
 pub unsafe extern "C" fn rs_krb5_tx_get_sname(tx:  &mut KRB5Transaction,
-                                              i: u16,
-                                              buffer: *mut *const u8,
-                                              buffer_len: *mut u32)
-                                              -> u8
+                                              i: libc::uint16_t,
+                                              buffer: *mut *const libc::uint8_t,
+                                              buffer_len: *mut libc::uint32_t)
+                                              -> libc::uint8_t
 {
     if let Some(ref s) = tx.sname {
         if (i as usize) < s.name_string.len() {

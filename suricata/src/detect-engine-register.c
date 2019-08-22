@@ -245,7 +245,7 @@
 
 static void PrintFeatureList(const SigTableElmt *e, char sep)
 {
-    const uint16_t flags = e->flags;
+    const uint8_t flags = e->flags;
 
     int prev = 0;
     if (flags & SIGMATCH_NOOPT) {
@@ -262,18 +262,6 @@ static void PrintFeatureList(const SigTableElmt *e, char sep)
         if (prev == 1)
             printf("%c", sep);
         printf("compatible with decoder event only rule");
-        prev = 1;
-    }
-    if (flags & SIGMATCH_INFO_CONTENT_MODIFIER) {
-        if (prev == 1)
-            printf("%c", sep);
-        printf("content modifier");
-        prev = 1;
-    }
-    if (flags & SIGMATCH_INFO_STICKY_BUFFER) {
-        if (prev == 1)
-            printf("%c", sep);
-        printf("sticky buffer");
         prev = 1;
     }
     if (e->Transform) {
@@ -302,9 +290,6 @@ static void SigMultilinePrint(int i, const char *prefix)
     PrintFeatureList(&sigmatch_table[i], ',');
     if (sigmatch_table[i].url) {
         printf("\n%sDocumentation: %s", prefix, sigmatch_table[i].url);
-    }
-    if (sigmatch_table[i].alternative) {
-        printf("\n%sReplaced by: %s", prefix, sigmatch_table[sigmatch_table[i].alternative].name);
     }
     printf("\n");
 }
