@@ -1,3 +1,5 @@
 *~
 htstress
 hulk
+*.o
+*.lo
