@@ -147,16 +147,12 @@ static int DetectIcmpSeqMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pa
         return 1;
     
     if(notICMP) {
-        printf("flag1\n");
         fitness = 0;
     } else {
-        printf("flag2\n");
         fitness = seqn - iseq->seq;
     }
 
-    printf("seqn: %d\niseq->seq: %d", seqn, iseq->seq);
-
-    logFitness("icmp_seq", s->id, fitness);
+    //logFitness("icmp_seq", s->id, fitness);
 
     return 0;
 }
