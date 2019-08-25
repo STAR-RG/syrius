@@ -678,6 +678,10 @@ static inline int DetectRunInspectRulePacketMatches(
     const Flow *f,
     const Signature *s)
 {
+    FILE *fp = fopen("./rulesFitness.txt", "w+");
+    
+    fprintf(fp, "SID: %d", s->id);
+
     /* run the packet match functions */
     if (s->sm_arrays[DETECT_SM_LIST_MATCH] != NULL) {
         KEYWORD_PROFILING_SET_LIST(det_ctx, DETECT_SM_LIST_MATCH);
@@ -695,6 +699,7 @@ static inline int DetectRunInspectRulePacketMatches(
                 matchOut = sigmatch_table[smd->type].Match(tv, det_ctx, p, s, smd->ctx);
                 if (matchOut == 1){
                     printf("Packet matches %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
+                    
                     matches++;
                 } else if (matchOut <= 0) {
                     KEYWORD_PROFILING_END(det_ctx, smd->type, 0);
@@ -704,11 +709,17 @@ static inline int DetectRunInspectRulePacketMatches(
                     gotoNext = 1;
                 }
 
+                fprintf(fp, " - %s: %d", sigmatch_table[smd->type].name, matchOut);
+
                 sig_cnt++;
                 
                 KEYWORD_PROFILING_END(det_ctx, smd->type, 1);
                 if (smd->is_last) {
                     printf("Matches: %d/%d - SID: %d\n\n", matches, sig_cnt, s->id);
+
+                    fprintf(fp, "\n");
+
+                    fclose(fp);
                     if (gotoNext) {
                         return 0;
                     }
