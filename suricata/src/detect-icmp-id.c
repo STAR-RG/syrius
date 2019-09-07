@@ -133,12 +133,21 @@ static inline _Bool GetIcmpId(Packet *p, uint16_t *id)
 static int DetectIcmpIdMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Packet *p,
         const Signature *s, const SigMatchCtx *ctx)
 {
+    float fitness = 0;
     uint16_t pid;
 
-    if (GetIcmpId(p, &pid) == FALSE)
+    if (GetIcmpId(p, &pid) == FALSE){
+        logFitness("icmp_id", s->id, 0);
         return 0;
+    }
 
     const DetectIcmpIdData *iid = (const DetectIcmpIdData *)ctx;
+    
+    //printf("pid: %d iid->id: %d\n", pid, iid->id);
+    fitness = 1 - (float) abs(pid - iid->id)/65536;
+    //printf("icmp_id fitness: %f\n", fitness);
+    logFitness("icmp_id", s->id, fitness);
+    
     if (pid == iid->id)
         return 1;
 

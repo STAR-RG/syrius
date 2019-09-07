@@ -86,11 +86,15 @@ typedef struct DetectICodeData_ {
     uint8_t mode;
 } DetectICodeData;
 
-static inline int ICodeMatch(const uint8_t pcode, const uint8_t mode,
+static inline int ICodeMatch(const Signature *s, const uint8_t pcode, const uint8_t mode,
                              const uint8_t dcode1, const uint8_t dcode2)
 {
+    float fitness = 0;
     switch (mode) {
         case DETECT_ICODE_EQ:
+            fitness = 1 - (float) abs(pcode - dcode1)/256;
+            //printf("icode fitness: %f\n", fitness);
+            logFitness("icode", s->id, fitness);
             return (pcode == dcode1) ? 1 : 0;
 
         case DETECT_ICODE_LT:
@@ -133,7 +137,7 @@ static int DetectICodeMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
     }
 
     const DetectICodeData *icd = (const DetectICodeData *)ctx;
-    return ICodeMatch(picode, icd->mode, icd->code1, icd->code2);
+    return ICodeMatch(s, picode, icd->mode, icd->code1, icd->code2);
 }
 
 /**

@@ -682,6 +682,8 @@ static inline int DetectRunInspectRulePacketMatches(
     
     fprintf(fp, "SID: %d", s->id);
 
+    fclose(fp);
+
     /* run the packet match functions */
     if (s->sm_arrays[DETECT_SM_LIST_MATCH] != NULL) {
         KEYWORD_PROFILING_SET_LIST(det_ctx, DETECT_SM_LIST_MATCH);
@@ -698,28 +700,29 @@ static inline int DetectRunInspectRulePacketMatches(
                 gotoNext = 0;
                 matchOut = sigmatch_table[smd->type].Match(tv, det_ctx, p, s, smd->ctx);
                 if (matchOut == 1){
-                    printf("Packet matches %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
+                    //printf("Packet matches %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
                     
                     matches++;
                 } else if (matchOut <= 0) {
                     KEYWORD_PROFILING_END(det_ctx, smd->type, 0);
-                    logFitness(sigmatch_table[smd->type].name, s->id, 0);
+                    //logFitness(sigmatch_table[smd->type].name, s->id, 0);
                     //printf("    Packet doesn't match %s on SID: %d\n", sigmatch_table[smd->type].name, s->id);
                     SCLogDebug("no match");
                     gotoNext = 1;
                 }
 
-                fprintf(fp, " - %s: %d", sigmatch_table[smd->type].name, matchOut);
+                //fprintf(fp, " - %s: %d", sigmatch_table[smd->type].name, matchOut);
 
                 sig_cnt++;
                 
                 KEYWORD_PROFILING_END(det_ctx, smd->type, 1);
                 if (smd->is_last) {
-                    printf("Matches: %d/%d - SID: %d\n\n", matches, sig_cnt, s->id);
-
+                    printf("Matches: %d/%d - SID: %d %s\n\n", matches, sig_cnt, s->id, s->msg);
+                    FILE *fp = fopen("./rulesFitness.txt", "a");
                     fprintf(fp, "\n");
 
                     fclose(fp);
+
                     if (gotoNext) {
                         return 0;
                     }

@@ -136,24 +136,23 @@ static int DetectIcmpSeqMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pa
         const Signature *s, const SigMatchCtx *ctx)
 {
     uint16_t seqn;
-    int fitness;
-    int notICMP = 0;
+    float fitness;
 
-    if (GetIcmpSeq(p, &seqn) == FALSE)
-        notICMP = 1;
-
-    const DetectIcmpSeqData *iseq = (const DetectIcmpSeqData *)ctx;
-    if ((seqn == iseq->seq) && !notICMP)
-        return 1;
-    
-    if(notICMP) {
-        fitness = 0;
-    } else {
-        fitness = seqn - iseq->seq;
+    if (GetIcmpSeq(p, &seqn) == FALSE){
+        logFitness("icmp_seq", s->id, 0);
+        return 0;
     }
 
-    //logFitness("icmp_seq", s->id, fitness);
+    const DetectIcmpSeqData *iseq = (const DetectIcmpSeqData *)ctx;
 
+    //printf("seqn: %d iseq->seq: %d\n", seqn, iseq->seq);
+    fitness = 1 - (float) abs(seqn - iseq->seq)/65536;
+    //printf("icmp_seq fitness: %f\n", fitness);
+    logFitness("icmp_seq", s->id, fitness);
+
+    if (seqn == iseq->seq)
+        return 1;
+    
     return 0;
 }
 

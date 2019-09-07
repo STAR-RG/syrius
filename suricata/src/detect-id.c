@@ -96,24 +96,24 @@ static int DetectIdMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Packet 
     /**
      * To match a ipv4 packet with a "id" rule
      */
-    int notIP = 0;
-    int fitness;
+    //int notIP = 0;
+    //int fitness;
     
     if (!PKT_IS_IPV4(p) || PKT_IS_PSEUDOPKT(p)) {
-        notIP = 1;
+        //notIP = 1;
     } else if (id_d->id == IPV4_GET_IPID(p)) {
         SCLogDebug("IPV4 Proto and matched with ip_id: %u.\n",
                     id_d->id);
         return 1;
     }
 
-    if (notIP){
+    /*if (notIP){
         fitness = 0;
     }else {    
         fitness = abs((id_d->id) - IPV4_GET_IPID(p));
-    }
+    }*/
 
-    logFitness("id", s->id, fitness);
+    //logFitness("id", s->id, fitness);
 
     return 0;
 }

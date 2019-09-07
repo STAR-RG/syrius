@@ -86,11 +86,15 @@ typedef struct DetectITypeData_ {
     uint8_t mode;
 } DetectITypeData;
 
-static inline int ITypeMatch(const uint8_t ptype, const uint8_t mode,
+static inline int ITypeMatch(const Signature *s, const uint8_t ptype, const uint8_t mode,
                              const uint8_t dtype1, const uint8_t dtype2)
 {
+    float fitness = 0;
     switch (mode) {
         case DETECT_ITYPE_EQ:
+            fitness = 1 - (float) abs(ptype - dtype1)/256;
+            //printf("itype fitness: %f\n", fitness);
+            logFitness("itype", s->id, fitness);
             return (ptype == dtype1) ? 1 : 0;
 
         case DETECT_ITYPE_LT:
@@ -133,7 +137,7 @@ static int DetectITypeMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
     }
 
     const DetectITypeData *itd = (const DetectITypeData *)ctx;
-    return ITypeMatch(pitype, itd->mode, itd->type1, itd->type2);
+    return ITypeMatch(s, pitype, itd->mode, itd->type1, itd->type2);
 }
 
 /**

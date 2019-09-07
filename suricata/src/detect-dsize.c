@@ -82,39 +82,45 @@ void DetectDsizeRegister (void)
  */
 
 static inline int
-DsizeMatch(const uint16_t psize, const uint8_t mode,
+DsizeMatch(const Signature *s, const uint16_t psize, const uint8_t mode,
             const uint16_t dsize, const uint16_t dsize2)
 {
-    int retval = 0;
+    float fitness = 0;
     if (mode == DETECTDSIZE_EQ) {
+        fitness = 1 - (float) abs(dsize - psize)/1472;
+        logFitness("dsize", s->id, fitness);
         if (dsize == psize) {
-            retval = -1;
-        } else {
-            retval = abs(dsize - psize);
-        }
+            return 1;
+        } 
     } else if (mode == DETECTDSIZE_LT) {
+        fitness = 1 - (float) abs(dsize - psize)/1472;
+        logFitness("dsize", s->id, fitness);
         if (psize < dsize) {
-            retval = -1;
-        } else {
-            retval = abs(psize - dsize);
+            return 1;
         }
     } else if (mode == DETECTDSIZE_GT) {
+        fitness = 1 - (float) abs(dsize - psize)/1472;
+        logFitness("dsize", s->id, fitness);
         if (psize > dsize){
-            retval = -1;
-        } else {
-            retval = abs(psize - dsize);
+            return 1;
         }
     } else if (mode == DETECTDSIZE_RA) {
         if (psize > dsize && psize < dsize2) {
-            retval = -1;
+            logFitness("dsize", s->id, 1);
+            return 1;
         } else {
             int diff1 = abs(psize - dsize);
             int diff2 = abs(psize - dsize2);
-            retval = (diff1 < diff2) ? diff1 : diff2;
+            if (diff1 < diff2) {
+                fitness = 1 - (float) diff1/1472;
+            } else {
+                fitness = 1 - (float) diff2/1472;  
+            }
+            logFitness("dsize", s->id, fitness);
         }
     }
 
-    return retval;
+    return 0;
 }
 
 /**
@@ -135,24 +141,17 @@ static int DetectDsizeMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
 {
     SCEnter();
     int ret = 0;
-    int fitness;
 
     if (PKT_IS_PSEUDOPKT(p)) {
-        fitness = 0;
-        ret = 0;
-    } else {
-        const DetectDsizeData *dd = (const DetectDsizeData *)ctx;
-
-        SCLogDebug("p->payload_len %"PRIu16"", p->payload_len);
-
-        fitness = DsizeMatch(p->payload_len, dd->mode, dd->dsize, dd->dsize2);
-
-        ret = (fitness == -1) ? 1 : 0;
+        logFitness("dsize", s->id, 0);
+        SCReturnInt(0);
     }
 
-    if (!ret) {
-        logFitness("dsize", s->id, fitness);
-    }
+    const DetectDsizeData *dd = (const DetectDsizeData *)ctx;
+
+    SCLogDebug("p->payload_len %"PRIu16"", p->payload_len);
+
+    ret = DsizeMatch(s, p->payload_len, dd->mode, dd->dsize, dd->dsize2);
 
     SCReturnInt(ret);
 }
@@ -349,6 +348,7 @@ void DetectDsizeFree(void *de_ptr)
 static void
 PrefilterPacketDsizeMatch(DetectEngineThreadCtx *det_ctx, Packet *p, const void *pectx)
 {
+    printf("dsize");
     if (PKT_IS_PSEUDOPKT(p)) {
         SCReturn;
     }
@@ -358,7 +358,7 @@ PrefilterPacketDsizeMatch(DetectEngineThreadCtx *det_ctx, Packet *p, const void 
         return;
 
     const uint16_t dsize = p->payload_len;
-    if (DsizeMatch(dsize, ctx->v1.u8[0], ctx->v1.u16[1], ctx->v1.u16[2]))
+    if (DsizeMatch(NULL, dsize, ctx->v1.u8[0], ctx->v1.u16[1], ctx->v1.u16[2]))
     {
         SCLogDebug("packet matches dsize %u", dsize);
         PrefilterAddSids(&det_ctx->pmq, ctx->sigs_array, ctx->sigs_cnt);
