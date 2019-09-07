@@ -147,15 +147,24 @@ This paper makes the following contributions. \Fix{...}
 \section{Illustrative Example}
 \label{sec:suri-metas-coverage}
 
+This section 1) presents an example of a network attack, 2) shows an
+example rule of Suricata to detect this attack and alert system
+administrators about it, and 3) illustrates how \tname{} performs to
+synthesize the corresponding rule.
+
+Let us recall that the 3-way handshake protocol in TCP/IP to establish
+a TCP connection. First, a client sends a SYN packet to the server,
+requesting a connection. Second, the server responds with SYN-ACK
+packet to the client. Third, the client responds with an ACK message
+and the connection is established.
+
 Figure~\ref{fig:synflood-example} shows an
 example rule of Suricata~\cite{suricata}, a popular open-source
 \nids{}, maintained by the Open Information Security Foundation
 (OISF)~\cite{oisf}. This example shows how Suricata can be used to
-protect against SYN flood attacks. A TCP connection is typically
-established with a 3-way handshake. First, the client sends a SYN
-packet to the server, requesting a connection. Second, the server
-responds with SYN-ACK packet to the client. Third, the client responds
-with an ACK message and the connection is established. Aware of the
+protect against SYN flood attacks.\Fix{explain the structure of the rule.}
+
+Aware of the
 protocol, an attacker sends multiple SYN packets to different ports of
 a server, often using fake IP addresses. Without proper protection,
 the server accepts the connection requests and eventually legitimate
