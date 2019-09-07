@@ -153,17 +153,35 @@ example rule of Suricata to detect this attack and alert sys admins
 about it, and 3) illustrates how \tname{} performs to synthesize the
 corresponding rule.
 
+\Mar{Lucas/Guilherme, verifique se isto esta correto}
+Figure~\ref{fig:synflood-example} shows an example rule of
+Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
+the Open Information Security Foundation (OISF)~\cite{oisf}. This
+example shows how Suricata can be used to protect organizations
+against one kind of attack. The rule is divided in three
+parts~\cite{suri-rule-format}--action, header, and rule options. The
+action part always appears as the first word in the rule. In this
+case, \CodeIn{alert}. An action denotes the task that needs to be
+executed if the rule pattern is satisfied. So, in this case, a message
+will be sent to sys admins if the rule pattern is satisfied. The
+header comes after the action in the rule description. It restricts
+the information flow covered by the rule. For this rule, the header is
+\CodeIn{tcp \$HOME\_NET any -> \$EXTERNAL\_NET any} indicating that
+the rule inspects \CodeIn{tcp} traffic flowing from any port in the
+home network to any other address outside the home network. The rule
+options come after the header. It is a semi-colon-separated sequence
+of key-value pairs characterizing the pattern of attack. For example,
+\Mar{Lucas/Guilherme (IMP): explique o que cada propriedade faz...}
+
+\Mar{------------------------------ parei aqui}
+
 Let us recall that the 3-way handshake protocol in TCP/IP to establish
 a TCP connection. First, a client sends a SYN packet to the server,
 requesting a connection. Second, the server responds with SYN-ACK
 packet to the client. Third, the client responds with an ACK message
 and the connection is established.
 
-Figure~\ref{fig:synflood-example} shows an
-example rule of Suricata~\cite{suricata}, a popular open-source
-\nids{}, maintained by the Open Information Security Foundation
-(OISF)~\cite{oisf}. This example shows how Suricata can be used to
-protect against SYN flood attacks.\Fix{explain the structure of the rule.}
+
 
 Aware of the
 protocol, an attacker sends multiple SYN packets to different ports of
@@ -178,18 +196,14 @@ connection requests cannot be satisfied due to resource exhaustion.
   \label{fig:synflood-example}
 \end{figure}
 
-\Mar{Lucas/Guilherme (CRI): por favor, explique o formato de uma regra do
-  Suricata e, em seguida, explique esta regra, detalhando o
-  significado de cada propriedade/campo.}
-
 \section{Approach}
 
 \Fix{...}
 
 \section{Evaluation}
 
-\Mar{Lucas/Guilherme (CRI): vcs. precisam dar pontape inicial (bom
-  exercicio) propondo perguntas de pesquisa. Eu faco ajustes em seguida.}
+\Mar{Lucas/Guilherme (CRI): precisamos dar pontape inicial propondo
+  perguntas de pesquisa. Eu faco ajustes em seguida.}
 
 \section{Threats to Validity}
 
