@@ -1,1 +1,0 @@
-./startSuricata.sh wlp2s0 & ./run-web-server & ((sleep 7 && ./run-traffic-gen) & (sleep 10 && ./run-attacks))
