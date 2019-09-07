@@ -4,6 +4,7 @@
 % footnote. If that is unneeded, please comment it out.
 
 \usepackage{booktabs}
+\usepackage{cite}
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{tikz}
@@ -92,13 +93,11 @@
 \maketitle
 
 \begin{abstract}
-This document is a model and instructions for \LaTeX.
-This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
-or Math in Paper Title or Abstract.
+...
 \end{abstract}
 
 \begin{IEEEkeywords}
-component, formatting, style, styling, insert
+NIDS, synthesis, search
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -115,85 +114,33 @@ today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
 exist on the Internet today.
 
-%% The
-%% hypothesis of anomaly-based \nids\ is that attack manifestations
-%% produces traffic that deviates from regular benign traffic that has
-%% been already observed by the network and that deviation is
-%% noticeable. 
-
 \sloppy \nids{} are typically categorized in two
 groups~\cite{kumar2007survey}: 1)~rule-based and 2)~anomaly-based. A
 rule-based \nids{} (\aka\ signature-based NIDS) checks if the network
 traffic matches a fixed set of
 rules. Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
-prescribes a method to capture SYN flood
-attacks~\cite{Douligeris:2004:DAD:987153.987158} that can result in
-denial of service of a server. Rule-based \nids{} focuses on known
-attacks whereas anomaly-based \nids{} focuses on suspicious
-unanticipated network traffic, referred to as anomalies. Anomaly-based
-\nids{}, specially those that use machine learning, have shown useful
-specially for detecting denial of service
-attacks~\cite{cordy-etal-issta19}. In that scenario, determining the right
-threshold on the rate/volume of network accesses that should trigger
-an alarm is challenging.
+prescribes a method to capture SYN flood attacks to a
+server~\cite{Douligeris:2004:DAD:987153.987158} that can result in
+denial of service. Rule-based \nids{} focuses on known attacks whereas
+anomaly-based \nids{} focuses on unanticipated attacks that could be
+observed through suspicious network
+traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}.
 
 Rule-based and Anomaly-based NIDS are complementary. This paper
-proposes a synthesis technique, dubbed \tname{}, to automatically
-create rules from positive and negative examples (\ie{}, benign and
-malicious traffic) provided as input. The main scenario of application
-is one where anomaly-based NIDS identify abnormal traffic and signals
-that to \tname{} to craft rules that can be used by rule-based
-NIDS. It is worth noting that attackers are very productive in
-creating ways to circumvent existing protections and manual creation
-of rules is tedious and time-consuming.\Mar{Lucas/Guilherme: (IMP) supporting data?}
-Consequently, synthesis of rules can circumvent those issues.
+proposes a technique, dubbed \tname{}, to automatically synthesize
+rules from positive and negative examples (\ie{}, benign and malicious
+traffic). The main scenario of application is one where an
+anomaly-based NIDS identifies abnormal traffic and signals that
+traffic to \tname{} to craft rules that can be used by rule-based
+NIDS. The core motivation is that attackers are productive in creating
+new ways to circumvent existing protections and manual creation of
+rules is tedious and time-consuming.\Mar{Lucas/Guilherme: (IMP) do we
+  have data to support this?} For those reasons, synthesizing rules to
+circumvent those issues is an important problem.
 
 \Mar{--------------------------------- parei aqui}
 
-focuses on rule-based \nids{}, which are already very
-popular both in industry and academia. Our analysis focuses on
-Suricata, but it applies to any other rule-based \nids{}.
-
-
-%Despite the great success of rule-based \nids{},
-
-Mantaining \nids{} rules can be a daunting activity. Although the
-\nids{} typically provides a set of pre-defined rules, such ruleset is
-neither necessary nor sufficient. More precisely:
-
-\begin{enumerate}
-\item enabling all possible rules is not practical;
-\item rules not in the original rule set may need to be added in a
-  given setup.
-\end{enumerate}
-
-The first statement is consequential of the inherent physical
-limitation of rule-based \nids{}. The cost of checking rules is
-proportional to the traffic load and the number of enabled rules. If
-system capacity is insufficient to support the load, the intrusion
-detector can miss packets and attacks\Fix{I guess we have some
-  reference for this.}. To cope with that issue, system administrators
-block certain protocols on the firewall and configure the \nids{} to
-use a selection of rules that apply to the authorized traffic.  The
-task of selecting rules that are applicable can be non-trivial as it
-depends on the set of firewall rules enabled on the network.
-
-The second statement is supported by the observation that
-\numundetected{} of the attacks produced by
-Metasploit~\cite{metasploit}, a popular open-source penetration
-testing tool, are undetected by \suri{}. For example,
-\Fix{...}. (Section~\ref{sec:suri-metas-coverage} provides more
-details.) Unfortunately, manually creating those rules from scratch
-can be time-consuming and error-prone. Figure~\Fix{...}  shows an
-example rule illustrating the complexity of the Suricata rule
-language\footnote{Suricata extends the language used by
-  Snort~\cite{snort}.}.  In addition, looking for rules from untrusted
-sources (say, the internet) is unreliable. Collectively, these issues
-suggest that synthesizing \nids{} rules is an important aid for system
-administrators.
-
-\Fix{why is that challenging (worth of research)?}
 
 This paper makes the following contributions. \Fix{...}
 

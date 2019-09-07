@@ -1,0 +1,43 @@
+focuses on rule-based \nids{}, which are already very
+popular both in industry and academia. Our analysis focuses on
+Suricata, but it applies to any other rule-based \nids{}.
+
+
+%Despite the great success of rule-based \nids{},
+
+Mantaining \nids{} rules can be a daunting activity. Although the
+\nids{} typically provides a set of pre-defined rules, such ruleset is
+neither necessary nor sufficient. More precisely:
+
+\begin{enumerate}
+\item enabling all possible rules is not practical;
+\item rules not in the original rule set may need to be added in a
+  given setup.
+\end{enumerate}
+
+The first statement is consequential of the inherent physical
+limitation of rule-based \nids{}. The cost of checking rules is
+proportional to the traffic load and the number of enabled rules. If
+system capacity is insufficient to support the load, the intrusion
+detector can miss packets and attacks\Fix{I guess we have some
+  reference for this.}. To cope with that issue, system administrators
+block certain protocols on the firewall and configure the \nids{} to
+use a selection of rules that apply to the authorized traffic.  The
+task of selecting rules that are applicable can be non-trivial as it
+depends on the set of firewall rules enabled on the network.
+
+The second statement is supported by the observation that
+\numundetected{} of the attacks produced by
+Metasploit~\cite{metasploit}, a popular open-source penetration
+testing tool, are undetected by \suri{}. For example,
+\Fix{...}. (Section~\ref{sec:suri-metas-coverage} provides more
+details.) Unfortunately, manually creating those rules from scratch
+can be time-consuming and error-prone. Figure~\Fix{...}  shows an
+example rule illustrating the complexity of the Suricata rule
+language\footnote{Suricata extends the language used by
+  Snort~\cite{snort}.}.  In addition, looking for rules from untrusted
+sources (say, the internet) is unreliable. Collectively, these issues
+suggest that synthesizing \nids{} rules is an important aid for system
+administrators.
+
+\Fix{why is that challenging (worth of research)?}
