@@ -678,7 +678,7 @@ static inline int DetectRunInspectRulePacketMatches(
     const Flow *f,
     const Signature *s)
 {
-    FILE *fp = fopen("./rulesFitness.txt", "w+");
+    FILE *fp = fopen("./rulesFitness.txt", "a+");
     
     fprintf(fp, "SID: %d", s->id);
 
