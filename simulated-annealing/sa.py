@@ -1,5 +1,6 @@
 import subprocess
 import time
+import copy
 
 keys_by_proto = {}
 keys_by_proto["icmp"] = {"itype":255, "icode":255, "icmp_seq":65525, "icmp_id":65535, "dsize":1480}
@@ -33,18 +34,7 @@ def getLocalIp():
 def sendPacket(local_ip):
     subprocess.Popen(["sh", "sendPacket.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
 
-def evalRule(rule):
-    writeRuleOnFile(rule)
-    reloadSuricataRules(getSuricataPid())    
-    sendPacket(getLocalIp())    
-
-    fitnessFile_path = "../suricata/rulesFitness.txt"
-    fitnessFile = open(fitnessFile_path, "r")
-
-    line = (fitnessFile.readline()).rstrip('\n')
-    print(line)
-    keywords = line.split("-")
-
+def getRuleFitness(keywords):
     for i in range(0, len(keywords)):
         keywords[i] = keywords[i].split(" ")
         while '' in keywords[i]:
@@ -56,7 +46,60 @@ def evalRule(rule):
     for i in range(1, len(keywords)):
         fitness = fitness + float(keywords[i][1])
     
-    return (fitness/(len(keywords)-1))
+    fitness = fitness/(len(keywords)-1)
+
+    return fitness
+
+def evalRule(rule):
+    subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
+    writeRuleOnFile(rule)
+    reloadSuricataRules(getSuricataPid())    
+    sendPacket(getLocalIp())    
+
+    fitnessFile_path = "../suricata/rulesFitness.txt"
+
+    try:
+        fitnessFile = open(fitnessFile_path, "r")
+    except IOError:
+        return 0
+    
+    lines = fitnessFile.readlines()
+    last_line = lines[len(lines)-1].rstrip('\n')
+    print(last_line)
+    keywords = last_line.split("-")
+
+    fitness = getRuleFitness(keywords)    
+    
+    return fitness
+
+def sendGoodTraffic(local_ip):
+    #subprocess.Popen(["sh", "setDstAddr.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh"], stdout=subprocess.DEVNULL).wait()
+    time.sleep(11)
+
+
+def evalFalsePositive(rule):
+    fitnessFile_path = "../suricata/rulesFitness.txt"
+    subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
+    writeRuleOnFile(rule)
+    reloadSuricataRules(getSuricataPid()) 
+    sendGoodTraffic(getLocalIp())
+
+    fitnessFile = open(fitnessFile_path, "r")
+
+    lines = fitnessFile.readlines()
+
+    best_fitness = 0
+    for line in lines:
+        line = line.rstrip('\n')
+
+        keywords = line.split("-")
+        fitness = getRuleFitness(keywords)
+
+        if fitness > best_fitness:
+            best_fitness = fitness
+    
+    return best_fitness
 
 class Rule:    
     def __init__(self, action, protocol, header, message, sid):
@@ -114,3 +157,20 @@ for keyword in rule.options:
 evalRule(rule)
 
 print(rule)
+
+print()
+
+new_rule = copy.deepcopy(rule)
+for keyword in rule.options:
+    del new_rule.options[keyword]
+    print(str(new_rule))
+
+    fitness = evalFalsePositive(new_rule)
+    print(fitness)
+    if fitness >= 1.0:
+        new_rule.options[keyword] = rule.options[keyword]
+    
+    #print(str(new_rule))
+
+
+print(new_rule)
