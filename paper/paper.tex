@@ -212,29 +212,65 @@ volume of such packets should be requested in a short period of time.
 
 \section{Approach}
 
-\tname{} is a search-based algorithm that uses positive and negative
-examples to synthesize signature-based NIDS rules, such as those from
-Snort and Suricata. \tname{} synthesizes rules in two steps. First, it
-produces a potentially overspecified rule that captures the negative
-example provided as input. Then, it uses positive examples to
-eliminate unecessary options from the rule. The goal is to create a
-rule that captures only the negative traffic.
+\tname{} is a search-based approach that uses positive and negative
+network traffic examples to synthesize signature-based NIDS rules,
+such as those from Snort and Suricata. \tname{} synthesizes rules in
+two steps. First, it produces a potentially overspecified rule that
+captures the negative example that is provided as input. Then, it uses
+positive examples to eliminate unecessary options from the rule. The
+goal is to create a rule that captures only the negative traffic.
 
 \subsection{Problem Characterization}
 
-\tname{} uses an abstract representations of a Suricata rule that
-reflects the concrete representation of the rule. The concrete rule
-representation is the one actually used by Suricata whereas the
-abstract representation is the one \tname{} uses to run the
-search. The abstract representation encodes the rule options segment
-(see Section~\ref{sec:example-suricata-rules}) of a Suricata rule as a
+Search-based algorithms need to characterize the problem (\ie{}, a
+solution candidate) in some way. In this case, the problem is the
+rule.  \tname\ encodes the rule options segment (see
+Section~\ref{sec:example-suricata-rules}) of a Suricata rule as a
 vector of Option objects. For example, \tname{} models the option
-\CodeIn{flags} from the example on Figure~\ref{fig:synflood-example},
+\CodeIn{flags} from the example on Figure~\ref{fig:synflood-example}
 with a data structure storing two fields, one of character type and
 another of integer type. This enables \tname{} to mutate each element
 separately.\Mar{Lucas, por favor, confirme.}
 
+%% \tname{}
+%% uses an abstract representation of a Suricata rule that reflects the
+%% concrete representation of the rule. The concrete rule representation
+%% is the one actually used by Suricata whereas the abstract
+%% representation is the one \tname{} uses to run the search.
+
 \subsection{Fitness Functions}
+
+The fitness value of a candidate solution $c$, modelling the rule
+options $o_1, \dots, o_n$ is given by $f(c)=1-\Sigma{d(o_i,m)}/n$,
+where $i$ ranges from 1 to $n$ and $m$ denotes the negative
+traffic. The higher the fitness value the better, \ie{}, the fitter
+the candidate solution $c$ will be.  The value of the expression
+$d(o_i,m)$, associated with option $o_i$, ranges over
+0-1. Consequently, the value of the expression $\Sigma{d(o_i,m)}/n$
+itself is in the 0-1 range, as there are $n$ options, and the range of
+the function is 0-1.
+
+As usual, we used customized distance functions to compute $d(o_i,
+m)$. For example, let us consider the \CodeIn{flags} option, discussed
+on Figure~\ref{fig:synflood-example}. Recall that this option
+identifies the SYN packet in the tcp protocol and that its encoding in
+\tname{} stores two attributes---one categorical and one
+numerical. The value of $d(o_i, m)$, in this case, is obtained by
+computing the normalized Euclidian distance in the two-dimensional
+space. Considering that each of the two dimensions has cardinality of
+ten, the distance of a candidate solution holding the option
+\CodeIn{flags(S,13)} to the solution will be 0.22
+(=$1/\sqrt{20}$). Note that the smaller the distance the better.
+
+\tname{} uses a modified version of Suricata to measure distance. It
+updates the rule set that the modified version of Suricata analyses,
+injects the traffic on the network, and monitors the execution. Each
+rule option has an associated \CodeIn{eval} function in code. \tname{}
+monitors the execution of these functions to identify how far it is
+from returning true, which indicates it is closer to trigger the
+action associated with the rule. For the example above,
+\Fix{Lucas/Guilherme, it would be good to show how this looks like in
+  code}
 
 \subsection{Search}
 
