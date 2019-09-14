@@ -159,37 +159,42 @@ synthesize the rule that would capture the attack.
 Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
 the Open Information Security Foundation (OISF)~\cite{oisf}. A
-Suricata rule is divided in three
-parts---action, header, and rule options~\cite{suri-rule-format}. The
-action part appears as the first word in the rule description. In this
-case, \CodeIn{alert}. An action denotes the task that needs to be
-executed if the rule pattern is satisfied. In this case, a message
-will be sent to sys admins if the rule pattern is satisfied. Other
-options of actions include pass, drop, and reject. The
-header comes after the action in the rule description. It restricts
-the information flow covered by the rule. For this rule, the header is
-\CodeIn{tcp \$HOME\_NET any -> \$EXTERNAL\_NET any}, which instructs Suricata
-to inspect \CodeIn{tcp} traffic flowing from any port in the
-home network to any other address outside the home network. The
-variables \CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are configurable. The rule
-options come after the header. It is a semi-colon-separated sequence
-of key-value pairs characterizing the attack pattern. For example,
-\Mar{Lucas/Guilherme (IMP): explique o que cada propriedade faz...}
+Suricata rule is divided in three parts---action, header, and rule
+options~\cite{suri-rule-format}. The action part appears as the first
+word in the rule description. In this case, \CodeIn{alert}. An action
+denotes the task that needs to be executed if the rule pattern is
+satisfied. In this case, a message will be sent to sys admins if the
+rule pattern is satisfied. Other options of actions include pass,
+drop, and reject. The header comes after the action in the rule
+description. It restricts the information flow covered by the
+rule. For this rule, the header is \CodeIn{tcp \$HOME\_NET any ->
+  \$EXTERNAL\_NET any}, which instructs Suricata to inspect
+\CodeIn{tcp} traffic flowing from any port in the home network to any
+other address outside the home network. The variables
+\CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are
+configurable. The rule options come after the header. It is a
+semi-colon-separated sequence of properties\Mar{should we call it an
+  option or property?}, where each property is a key-value pair
+describing a distinct characteristic of the attack.
 
 \subsection{SYN Flood Attack}
 
 The SYN Flood attack exploits a vulnerability in the TCP/IP handshake
 to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
 works as follows. First, a client sends a SYN packet to the server,
-requesting a connection. Second, the server responds with SYN-ACK
+requesting a connection. Second, the server responds with a SYN-ACK
 packet to the client. Third, the client responds with an ACK message
-and the connection is established.
+and the connection is established. Aware of the protocol, an attacker
+sends multiple SYN packets to different ports of a server, often using
+fake IP addresses. Without proper protection, the server accepts the
+connection requests and eventually legitimate connection requests
+cannot be satisfied due to resource exhaustion.
 
-Aware of the
-protocol, an attacker sends multiple SYN packets to different ports of
-a server, often using fake IP addresses. Without proper protection,
-the server accepts the connection requests and eventually legitimate
-connection requests cannot be satisfied due to resource exhaustion.
+Figure~\ref{fig:synflood-example} shows a Suricata rule to capture
+this attack. The critical parts are the option \CodeIn{flags: S,12},
+which identifies a SYN packet and the option \CodeIn{threshold: type
+  both, track by\_dst, count 5000, seconds 5}, indicating that a high
+volume of such packets should be requested in a short period of time.
 
 \begin{figure}[t]
   \lstinputlisting[language=C,numbers=none]{synflood.suricata}
@@ -206,7 +211,19 @@ connection requests cannot be satisfied due to resource exhaustion.
 
 \section{Approach}
 
-\Fix{...}
+\tname{} is a search-based algorithm that uses positive and negative
+examples to synthesize signature-based rules, such as those from Snort
+and Suricata. \tname{} synthesizes rules in two steps. First, it
+produces an overspecified rule to capture the negative example
+provided as input. Then, it uses positive examples to eliminate
+unecessary options from the rule. The goal is to create a rule that
+captures only the negative traffic.
+
+\subsection{Problem Characterization}
+
+\subsection{Fitness Functions}
+
+\subsection{Search}
 
 \section{Evaluation}
 
