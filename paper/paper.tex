@@ -154,6 +154,7 @@ a network attack, and 3) illustrates how \tname{} performs to
 synthesize the rule that would capture the attack.
 
 \subsection{Suricata Rules}
+\label{sec:example-suricata-rules}
 
 \Mar{Lucas/Guilherme, verifique se isto esta correto}
 Figure~\ref{fig:synflood-example} shows an example rule of
@@ -212,18 +213,32 @@ volume of such packets should be requested in a short period of time.
 \section{Approach}
 
 \tname{} is a search-based algorithm that uses positive and negative
-examples to synthesize signature-based rules, such as those from Snort
-and Suricata. \tname{} synthesizes rules in two steps. First, it
-produces an overspecified rule to capture the negative example
-provided as input. Then, it uses positive examples to eliminate
-unecessary options from the rule. The goal is to create a rule that
-captures only the negative traffic.
+examples to synthesize signature-based NIDS rules, such as those from
+Snort and Suricata. \tname{} synthesizes rules in two steps. First, it
+produces a potentially overspecified rule that captures the negative
+example provided as input. Then, it uses positive examples to
+eliminate unecessary options from the rule. The goal is to create a
+rule that captures only the negative traffic.
 
 \subsection{Problem Characterization}
+
+\tname{} uses an abstract representations of a Suricata rule that
+reflects the concrete representation of the rule. The concrete rule
+representation is the one actually used by Suricata whereas the
+abstract representation is the one \tname{} uses to run the
+search. The abstract representation encodes the rule options segment
+(see Section~\ref{sec:example-suricata-rules}) of a Suricata rule as a
+vector of Option objects. For example, \tname{} models the option
+\CodeIn{flags} from the example on Figure~\ref{fig:synflood-example},
+with a data structure storing two fields, one of character type and
+another of integer type. This enables \tname{} to mutate each element
+separately.\Mar{Lucas, por favor, confirme.}
 
 \subsection{Fitness Functions}
 
 \subsection{Search}
+
+\tname{} is a single-individual hill-climbing like search.
 
 \section{Evaluation}
 
