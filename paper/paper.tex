@@ -7,6 +7,7 @@
 \usepackage{cite}
 \usepackage{url}
 \usepackage{multirow}
+\usepackage{pgfplots}
 \usepackage{tikz}
 \usetikzlibrary{matrix,fit,shapes,calc,positioning,shadows,arrows,shapes,backgrounds,decorations.markings,fadings}
 \usepackage{listings}
@@ -222,15 +223,58 @@ goal is to create a rule that captures only the negative traffic.
 
 \subsection{Problem Characterization}
 
-Search-based algorithms need to characterize the problem (\ie{}, a
-solution candidate) in some way. In this case, the problem is the
-rule.  \tname\ encodes the rule options segment (see
-Section~\ref{sec:example-suricata-rules}) of a Suricata rule as a
-vector of Option objects. For example, \tname{} models the option
-\CodeIn{flags} from the example on Figure~\ref{fig:synflood-example}
-with a data structure storing two fields, one of character type and
-another of integer type. This enables \tname{} to mutate each element
-separately.\Mar{Lucas, por favor, confirme.}
+One important step in search-based optimization is to characterize a
+candidate solution to the target problem. Candidate solutions are the
+objects that the search tries to optimize. In this case, a rule is a
+candidate solution.  \tname\ encodes the rule options segment of a
+Suricata rule (see Section~\ref{sec:example-suricata-rules}) as a
+vector of Option objects. Some options are discarded as they only
+serve for documentation. For example, the options \CodeIn{msg},
+\CodeIn{classtype}, and \CodeIn{miscactivity} have no influence in
+triggering the action of rules. The option \CodeIn{flags}, appearing
+in the example on Figure~\ref{fig:synflood-example}, is relevant to
+trigger the action. \tname{} models that option with a data structure
+storing two fields, one of character type and another of integer
+type. This enables \tname{} to mutate each element
+separately.
+
+Options can be specific to a given protocol or general and they can be
+influential on triggering an action or
+not. Figure~\ref{fig:distribution-rules-protocol} shows the
+distributions of these options per protocol and their relevance for
+triggering rule actions.
+
+\pgfplotsset{width=6cm,compat=1.8}
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        ybar stacked,
+        enlargelimits=0.15,
+        legend style={at={(0.5,-0.15)},
+          anchor=north,legend columns=-1},
+        ylabel={\#rules},
+        symbolic x coords={gen, http, icmp, udp, tcp},
+        xtick=data,
+        nodes near coords,
+        nodes near coords align={vertical},
+      ]
+      \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
+      \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
+      \legend{relevant, irrelevant}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{\label{fig:distribution-rules-protocol}Distribution of
+    rules per protocol and relevance for triggering action.}
+\end{figure}
+
+To bootstrap the search, \tname{} needs to select an initial
+solution. When creating such candidate solution, \tname{} first looks
+for the protocol related to the malicious input traffic. Then, it
+selects the relevant options for that protocol and initializes the
+option vector with default values. \Mar{Suricata define valores
+  default?  Vcs. definiram?  Isto foi baseado em popularidade ou o
+  que?}
 
 %% \tname{}
 %% uses an abstract representation of a Suricata rule that reflects the
