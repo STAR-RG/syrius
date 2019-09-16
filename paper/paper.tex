@@ -218,25 +218,31 @@ network traffic examples to synthesize signature-based NIDS rules,
 such as those from Snort and Suricata. \tname{} synthesizes rules in
 two steps. First, it produces a potentially overspecified rule that
 captures the negative example that is provided as input. Then, it uses
-positive examples to eliminate unecessary options from the rule. The
-goal is to create a rule that captures only the negative traffic.
+positive examples to eliminate unnecessary options from the rule. The
+goal of \tname\ is to create a rule that captures only the negative traffic.
 
 \subsection{Problem Characterization}
 
 One important step in search-based optimization is to characterize a
 candidate solution to the target problem. Candidate solutions are the
-objects that the search tries to optimize. In this case, a rule is a
-candidate solution.  \tname\ encodes the rule options segment of a
-Suricata rule (see Section~\ref{sec:example-suricata-rules}) as a
-vector of Option objects. Some options are discarded as they only
-serve for documentation. For example, the options \CodeIn{msg},
-\CodeIn{classtype}, and \CodeIn{miscactivity} have no influence in
-triggering the action of rules. The option \CodeIn{flags}, appearing
-in the example on Figure~\ref{fig:synflood-example}, is relevant to
-trigger the action. \tname{} models that option with a data structure
-storing two fields, one of character type and another of integer
-type. This enables \tname{} to mutate each element
-separately.
+objects that the search optimize towards solutions. In this case, a a
+candidate solution is an encoding of a Suricata rule.  \tname\ encodes
+the rule options segment of a Suricata rule (see
+Section~\ref{sec:example-suricata-rules}) as a vector of Option
+objects. Some options are discarded as they only serve for
+documentation. For example, the options \CodeIn{msg},
+\CodeIn{classtype}, and \CodeIn{misc-activity}, appearing in the
+example on Figure~\ref{fig:synflood-example}, have no influence in
+triggering the actions associated with rules. The option
+\CodeIn{flags}, however, is relevant to trigger the action. \tname{}
+models that option with a data structure storing two fields, one of
+character type and another of integer type. This enables \tname{} to
+mutate each element separately. Similar encodings are used in modeling
+the other relevant options. We found what is (ir)relevant by
+inspecting Suricata code for the presence of \CodeIn{eval} functions,
+which are invoked from a main look to process every Suricata rule. The
+presence of such a function for a given option indicates that it is
+relevant for triggering some action of some rule.
 
 Options can be specific to a given protocol or general and they can be
 influential on triggering an action or
@@ -244,7 +250,7 @@ not. Figure~\ref{fig:distribution-rules-protocol} shows the
 distributions of these options per protocol and their relevance for
 triggering rule actions.
 
-\pgfplotsset{width=6cm,compat=1.8}
+\pgfplotsset{width=5.5cm,compat=1.8}
 \begin{figure}[h!]
   \centering
   \begin{tikzpicture}
@@ -268,6 +274,8 @@ triggering rule actions.
     rules per protocol and relevance for triggering action.}
 \end{figure}
 
+\subsection{Initial State}
+
 To bootstrap the search, \tname{} needs to select an initial
 solution. When creating such candidate solution, \tname{} first looks
 for the protocol related to the malicious input traffic. Then, it
@@ -284,7 +292,7 @@ option vector with default values. \Mar{Suricata define valores
 
 \subsection{Fitness Functions}
 
-The fitness value of a candidate solution $c$, modelling the rule
+The fitness value of a candidate solution $c$, modeling the rule
 options $o_1, \dots, o_n$ is given by $f(c)=1-\Sigma{d(o_i,m)}/n$,
 where $i$ ranges from 1 to $n$ and $m$ denotes the negative
 traffic. The higher the fitness value the better, \ie{}, the fitter
@@ -300,7 +308,7 @@ on Figure~\ref{fig:synflood-example}. Recall that this option
 identifies the SYN packet in the tcp protocol and that its encoding in
 \tname{} stores two attributes---one categorical and one
 numerical. The value of $d(o_i, m)$, in this case, is obtained by
-computing the normalized Euclidian distance in the two-dimensional
+computing the normalized Euclidean distance in the two-dimensional
 space. Considering that each of the two dimensions has cardinality of
 ten, the distance of a candidate solution holding the option
 \CodeIn{flags(S,13)} to the solution will be 0.22
@@ -340,4 +348,5 @@ External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
 
 \end{document}
 
-%%  LocalWords:  Suricata SolarWinds QRadar NIDS OISF TCP ACK
+%%  LocalWords:  Suricata SolarWinds QRadar NIDS OISF TCP ACK msg tcp
+%%  LocalWords:  encodings eval cardinality
