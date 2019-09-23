@@ -211,7 +211,7 @@ requesting a connection. Second, the server responds with a SYN-ACK
 packet to the client. Third, the client responds with an ACK message
 and the connection is established. Aware of the protocol, an attacker
 sends multiple SYN packets to different ports of a server, often using
-fake IP addresses.\Mar{Are you saying that there is no timer that the
+fake IP addresses. \Luc{Then, after the server responds with the usual SYN-ACK packet, the client sends another SYN to avoid the connection time out.} \Mar{Are you saying that there is no timer that the
   server starts when it sends a SYN-ACK message?} Without proper protection, the server accepts the
 connection requests and eventually legitimate connection requests
 cannot be satisfied due to resource exhaustion.
