@@ -173,11 +173,10 @@ This paper makes the following contributions. \Fix{...}
   \label{fig:synflood-example}
 \end{figure}
 
-
-This section 1) shows an example rule of Suricata and briefly explains
-the format of Suricata rules, 2) presents an example of
-a network attack, and 3) illustrates how \tname{} performs to
-synthesize the rule that would capture the attack.
+This section 1)~shows an example rule of Suricata, 2)~briefly explains
+the format of Suricata rules, 3) presents an example of a network
+attack, and 4) illustrates how \tname{} performs to synthesize the
+rule that would capture the attack.
 
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
@@ -191,18 +190,17 @@ options~\cite{suri-rule-format}. The action part appears as the first
 word in the rule description. In this case, \CodeIn{alert}. An action
 denotes the task that needs to be executed if the rule pattern is
 satisfied. In this case, a message will be sent to sys admins if the
-rule pattern is satisfied. Other options of actions include pass,
-drop, and reject. The header comes after the action in the rule
-description. It restricts the information flow covered by the
-rule. For this rule, the header is \CodeIn{tcp \$HOME\_NET any ->
-  \$EXTERNAL\_NET any}, which instructs Suricata to inspect
-\CodeIn{tcp} traffic flowing from any port in the home network to any
-other address outside the home network. The variables
-\CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are
-configurable. The rule options come after the header. It is a
-semi-colon-separated sequence of properties\Mar{should we call it an
-  option or property?}, where each property is a key-value pair
-describing a distinct characteristic of the attack.
+rule pattern is satisfied. Other actions include pass, drop, and
+reject. The header comes after the action in the rule description. It
+restricts the information flow covered by the rule. For this rule, the
+header is \CodeIn{tcp \$HOME\_NET any -> \$EXTERNAL\_NET any}, which
+instructs Suricata to inspect \CodeIn{tcp} traffic flowing from any
+port in the home network to any other address outside the home
+network. The variables \CodeIn{\$HOME\_NET} and
+\CodeIn{\$EXTERNAL\_NET} are configurable. The rule options come after
+the header. It is a semi-colon-separated sequence of options, where
+each property is a key-value pair describing a distinct characteristic
+of the attack.
 
 \subsection{SYN Flood Attack}
 
@@ -213,7 +211,8 @@ requesting a connection. Second, the server responds with a SYN-ACK
 packet to the client. Third, the client responds with an ACK message
 and the connection is established. Aware of the protocol, an attacker
 sends multiple SYN packets to different ports of a server, often using
-fake IP addresses. Without proper protection, the server accepts the
+fake IP addresses.\Mar{Are you saying that there is no timer that the
+  server starts when it sends a SYN-ACK message?} Without proper protection, the server accepts the
 connection requests and eventually legitimate connection requests
 cannot be satisfied due to resource exhaustion.
 
@@ -221,13 +220,14 @@ Figure~\ref{fig:synflood-example} shows a Suricata rule to capture
 this attack. The critical parts are the option \CodeIn{flags: S,12},
 which identifies a SYN packet and the option \CodeIn{threshold: type
   both, track by\_dst, count 5000, seconds 5}, indicating that a high
-volume of such packets should be requested in a short period of time.
+volume of such packets should be requested in a short period of
+time.\Mar{please, explain the other fields}
 
 \subsection{\tname\ on SYN Flood Attack}
 
 \Mar{Guilherme/Lucas (CRI): we need to show how \tname{} works on this
   example. What is the input? How long does it take to generate the
-  rule? Is the rule generate exactly the same?}
+  rule? Is the rule generated exactly the same? Please explain...}
 
 \section{Approach}
 
