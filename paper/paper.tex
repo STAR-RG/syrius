@@ -231,13 +231,34 @@ time.\Mar{please, explain the other fields}
 
 \section{Approach}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[trim=60 400 65 0,clip,width=0.7\textwidth]{figs/nids-workflow}
+\caption{\tname workflow. The first step initializes the encoding of
+  randomly initializes the rule encoding. Only options associated with
+  the protocol usd in the negative traffic are included in the
+  encoding. This step mutates the values associated with rule options
+  until \suri\ is able to capture the attack.  Note that any subset of
+  options in the rule reported in this step captures the negative
+  traffic. The second step is initialized with a configuration that
+  captures the negative traffic but could also capture benign
+  traffic. It discards options from the rule encoding until no
+  positive traffic is captured.}
+\label{fig:overview}
+\end{figure*}
+
 \tname{} is a search-based approach that uses positive and negative
 network traffic examples to synthesize signature-based NIDS rules,
-such as those from Snort and Suricata. \tname{} synthesizes rules in
-two steps. First, it produces a potentially overspecified rule that
-captures the negative example that is provided as input. Then, it uses
-positive examples to eliminate unnecessary options from the rule. The
-goal of \tname\ is to create a rule that captures only the negative traffic.
+such as those from Snort and Suricata.
+
+Figure~\ref{fig:overview} shows the workflow of \tname{}.  The
+technique synthesizes rules in two steps. First, it produces a
+potentially overspecified rule that captures the negative example that
+is provided as input. Then, it uses positive examples to eliminate
+unnecessary options from the rule. The goal of \tname\ is to create a
+rule that only captures the negative traffic.
+
+\Fix{describes negative and positive traffic}
 
 \subsection{Problem Characterization}
 
