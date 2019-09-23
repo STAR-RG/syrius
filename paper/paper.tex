@@ -121,24 +121,40 @@ rule-based \nids{} (\aka\ signature-based NIDS) checks if the network
 traffic matches a fixed set of
 rules. Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
-prescribes a method to capture SYN flood attacks to a
-server~\cite{Douligeris:2004:DAD:987153.987158} that can result in
-denial of service. Rule-based \nids{} focuses on known attacks whereas
+prescribes a method to capture a denial-of-service attack to a
+server~\cite{Douligeris:2004:DAD:987153.987158}. Rule-based \nids{} focuses on known attacks whereas
 anomaly-based \nids{} focuses on unanticipated attacks that could be
 observed through suspicious network
 traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}.
 
-Rule-based and Anomaly-based NIDS are complementary. This paper
-proposes a technique, dubbed \tname{}, to automatically synthesize
-rules from positive and negative examples (\ie{}, benign and malicious
-traffic). The main scenario of application is one where an
-anomaly-based NIDS identifies abnormal traffic and signals that
+These intrusion detection mechanisms are complementary. Rule-based
+NIDS are very popular in industry (it is clear to system
+administrators what rules will do), but attacker are creating in
+evading the current set of rules, and writing these rules is tedious
+and error-prone. Anomaly-based NIDS are not restricted to a fixed set
+of rules; they learn common behaviors and dynamically detect uncommon
+behavior. The often use some machine learning algorithm to model
+sequence of events~\cite{7579764}. Unfortunately, anomaly-based NIDS
+can raise false alarms as behavior models are fundamentally
+imprecise. To sum up, both approaches have positive and negative
+aspects.
+
+%% This paper focuses on the
+%% problem of discovering new rules by using anomaly-based NIDS.
+
+This paper proposes a technique, dubbed \tname{}, to automatically
+synthesize rules from positive and negative examples (\ie{}, benign
+and malicious traffic). The main scenario of application is one where
+an anomaly-based NIDS identifies abnormal traffic and signals that
 traffic to \tname{} to craft rules that can be used by rule-based
-NIDS. The core motivation is that attackers are productive in creating
-new ways to circumvent existing protections and manual creation of
-rules is tedious and time-consuming.\Mar{Lucas/Guilherme: (IMP) do we
-  have data to support this?} For those reasons, synthesizing rules to
-circumvent those issues is an important problem.
+NIDS. Those rules can be distributed to rule databases. The core
+motivation is that 1) attackers are productive in creating new ways to
+circumvent existing protections and 2) manual creation of rules is
+tedious and time-consuming.  Note that anomaly-based NIDS are evolving
+pretty quick with the advances in machine learning, but rule-based
+NIDS are still extremely popular. Our goal is to harden rule-based
+NIDS by automatically creating rules from suspicious behavior detected
+by anomaly-based NIDS.
 
 \Fix{summarize how the technique works}
 
@@ -148,6 +164,13 @@ This paper makes the following contributions. \Fix{...}
 
 \section{Illustrative Example}
 \label{sec:suri-metas-coverage}
+
+\begin{figure}[t]
+  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
+  \caption{Suricata rule for SYN Flood Attacks.}
+  \label{fig:synflood-example}
+\end{figure}
+
 
 This section 1) shows an example rule of Suricata and briefly explains
 the format of Suricata rules, 2) presents an example of
@@ -197,13 +220,6 @@ this attack. The critical parts are the option \CodeIn{flags: S,12},
 which identifies a SYN packet and the option \CodeIn{threshold: type
   both, track by\_dst, count 5000, seconds 5}, indicating that a high
 volume of such packets should be requested in a short period of time.
-
-\begin{figure}[t]
-  \lstinputlisting[language=C,numbers=none]{synflood.suricata}
-  \caption{Suricata rule for SYN Flood Attacks.\Mar{colocar
-      propriedades em negrito}}
-  \label{fig:synflood-example}
-\end{figure}
 
 \subsection{\tname\ on SYN Flood Attack}
 
