@@ -122,22 +122,24 @@ traffic matches a fixed set of
 rules. Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
 prescribes a method to capture a denial-of-service attack to a
-server~\cite{Douligeris:2004:DAD:987153.987158}. Rule-based \nids{} focuses on known attacks whereas
-anomaly-based \nids{} focuses on unanticipated attacks that could be
+server~\cite{Douligeris:2004:DAD:987153.987158}. Rule-based \nids{} focus on known attacks whereas
+anomaly-based \nids{} focus on unanticipated attacks that could be
 observed through suspicious network
 traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}.
 
 These intrusion detection mechanisms are complementary. Rule-based
-NIDS are very popular in industry (it is clear to system
-administrators what rules will do), but attacker are creating in
-evading the current set of rules, and writing these rules is tedious
-and error-prone. Anomaly-based NIDS are not restricted to a fixed set
-of rules; they learn common behaviors and dynamically detect uncommon
-behavior. The often use some machine learning algorithm to model
-sequence of events~\cite{7579764}. Unfortunately, anomaly-based NIDS
-can raise false alarms as behavior models are fundamentally
-imprecise. To sum up, both approaches have positive and negative
-aspects.
+NIDS are restricted to a fixed set of rules and not all rules are
+simulneteously enabled (for efficiency). Attackers constantly create
+new attacks, and manually writing rules is tedious and
+error-prone. However, the semantics of the specification language of
+rules is clear making it easy for system administrator to understand
+them. As such, rule-based systems are very popular in industry.
+Anomaly-based NIDS are not restricted to a fixed set of rules; they
+learn common behaviors and dynamically detect uncommon behavior. They
+typically use machine learning algorithm to model event
+sequences~\cite{7579764}. Unfortunately, anomaly-based NIDS can raise
+false alarms as behavior models are fundamentally imprecise. To sum
+up, both approaches have positive and negative aspects.
 
 %% This paper focuses on the
 %% problem of discovering new rules by using anomaly-based NIDS.
