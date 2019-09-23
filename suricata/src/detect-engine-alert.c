@@ -245,6 +245,8 @@ void PacketAlertFinalize(DetectEngineCtx *de_ctx, DetectEngineThreadCtx *det_ctx
         const Signature *s = de_ctx->sig_array[p->alerts.alerts[i].num];
 
         int res = PacketAlertHandle(de_ctx, det_ctx, s, p, &p->alerts.alerts[i]);
+        int fitness = (res == 1) ? 1 : 0;
+        logFitness("threshold", s->id, fitness);
         if (res > 0) {
             /* Now, if we have an alert, we have to check if we want
              * to tag this session or src/dst host */

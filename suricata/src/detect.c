@@ -680,7 +680,7 @@ static inline int DetectRunInspectRulePacketMatches(
 {
     FILE *fp = fopen("./rulesFitness.txt", "a+");
     
-    fprintf(fp, "SID: %d", s->id);
+    fprintf(fp, "\nSID: %d", s->id);
 
     fclose(fp);
 
@@ -719,7 +719,7 @@ static inline int DetectRunInspectRulePacketMatches(
                 if (smd->is_last) {
                     printf("Matches: %d/%d - SID: %d %s\n\n", matches, sig_cnt, s->id, s->msg);
                     FILE *fp = fopen("./rulesFitness.txt", "a");
-                    fprintf(fp, "\n");
+                    //fprintf(fp, "\n");
 
                     fclose(fp);
 

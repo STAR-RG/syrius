@@ -3,8 +3,9 @@ import time
 import copy
 
 keys_by_proto = {}
-keys_by_proto["icmp"] = {"itype":255, "icode":255, "icmp_seq":65525, "icmp_id":65535, "dsize":1480}
+keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255, "icmp_seq":65525}#, "icmp_id":65535}
 # keys_by_proto["tcp"] = ["flow", "flags", "flowbits", "byte_test", "threshold", "seq", "ack", "window"]
+threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
@@ -31,6 +32,10 @@ def getSuricataPid():
 def getLocalIp():
     return subprocess.Popen(["sh", "getLocalIp.sh"], stdout=subprocess.PIPE, encoding="utf-8").communicate()[0].rstrip()
 
+def sendFlood(local_ip):
+    subprocess.Popen(["sh", "sendFlood.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
+    time.sleep(0.1)
+
 def sendPacket(local_ip):
     subprocess.Popen(["sh", "sendPacket.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
 
@@ -54,23 +59,34 @@ def evalRule(rule):
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
     reloadSuricataRules(getSuricataPid())    
-    sendPacket(getLocalIp())    
-
+    #sendPacket(getLocalIp())    
+    sendFlood(getLocalIp())
     fitnessFile_path = "../suricata/rulesFitness.txt"
 
     try:
         fitnessFile = open(fitnessFile_path, "r")
     except IOError:
-        return 0
+        return 0, 0
     
     lines = fitnessFile.readlines()
-    last_line = lines[len(lines)-1].rstrip('\n')
-    print(last_line)
-    keywords = last_line.split("-")
+    fitness = 0
+    matches = 0
+    for line in lines:
+        line = line.rstrip('\n')
+        keywords = line.split("-")
+        if rule.threshold == {}:
+            for key in keywords:
+                if "threshold" in key:
+                    keywords = keywords[:-1]
+                    break
+        #print(keywords)
+        if keywords != ['']:
+            fitness = getRuleFitness(keywords)
 
-    fitness = getRuleFitness(keywords)    
+        if fitness == 1:
+            matches += 1 
     
-    return fitness
+    return fitness, matches
 
 def sendGoodTraffic(local_ip):
     #subprocess.Popen(["sh", "setDstAddr.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
@@ -109,12 +125,14 @@ class Rule:
         self.message = message
         self.sid = sid
         self.fitness = 0
+        self.threshold = {}
 
         rule_options = {}
         for keyword in keys_by_proto[protocol]:
             self.options = {}
             self.options[keyword] = 0
 
+            print(str(self))
             fitness1 = evalRule(self)
             fitness2 = evalRule(self)
 
@@ -128,38 +146,64 @@ class Rule:
         for option in self.options:
             str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
 
+        if self.threshold != {}:
+            str_options = str_options + ' ' + "threshold:"
+            for option in self.threshold:
+                str_options = str_options + ' ' + str(option) + ' ' + str(self.threshold[option]) + ','
+            str_options = str_options[:-1] + ';'
         str_options = str_options + ' ' + "sid:" + str(self.sid) + ';'
 
         return (str(self.action) + ' ' + str(self.protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
 
-rule = Rule(default_rule_action, "icmp", default_rule_header, default_rule_message, default_rule_sid)
+def evolveRuleSinglePacket(rule):
+    init_fitness, _ = evalRule(rule)
+    print("initial fitness: " + str(init_fitness))
 
-print("rule: " + str(rule))
+    prev_fitness = init_fitness
+    for keyword in rule.options:
+        while rule.options[keyword] < keys_by_proto[rule.protocol][keyword]:
+            rule.options[keyword] = rule.options[keyword]+1
+            print(str(rule))
 
-init_fitness = evalRule(rule)
-print("initial: fitness: " + str(init_fitness))
+            new_fitness, _ = evalRule(rule)
+            print("rule fitness: " + str(new_fitness))
 
-prev_fitness = init_fitness
-for keyword in rule.options:
-    while rule.options[keyword] < keys_by_proto[rule.protocol][keyword]:
-        rule.options[keyword] = rule.options[keyword]+1
-        print(str(rule))
+            if new_fitness < prev_fitness:
+                rule.options[keyword] = rule.options[keyword]-1
+                break
+            else:
+                prev_fitness = new_fitness
+    
+    return rule  
 
-        new_fitness = evalRule(rule)
-        print("rule fitness: " + str(new_fitness))
+def evolveRuleFlood(rule):
+    init_fitness, matches = evalRule(rule)          
+    print("initial fitness: " + str(init_fitness) + " initial matches: " + str(matches))
 
-        if new_fitness < prev_fitness:
-            rule.options[keyword] = rule.options[keyword]-1
-            break
-        else:
-            prev_fitness = new_fitness
+    new_rule = evolveRuleSinglePacket(rule)
 
-evalRule(rule)
+    new_rule.threshold = {"type": "threshold", "track": "by_dst", "count": 1, "seconds": 1}
 
-print(rule)
+    new_fitness, matches = evalRule(new_rule)
+    
+    while new_fitness != 1 and matches != 1:
+        print("????????????????")
+        new_rule.threshold["count"] += 1
+        new_fitness, matches = evalRule(new_rule)
+    
+    return new_rule
+
+init_rule = Rule(default_rule_action, "icmp", default_rule_header, default_rule_message, default_rule_sid)
+#init_rule.threshold = {"type": "both", "track": "by_dst", "count": 1, "seconds": 1}
+print("initial rule: " + str(init_rule))
+
+#final_rule = evolveRuleSinglePacket(init_rule)
+final_rule = evolveRuleFlood(init_rule)
+print("final rule: " + str(final_rule))
 
 print()
 
+"""
 new_rule = copy.deepcopy(rule)
 for keyword in rule.options:
     del new_rule.options[keyword]
@@ -174,3 +218,4 @@ for keyword in rule.options:
 
 
 print(new_rule)
+"""
