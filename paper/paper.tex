@@ -211,10 +211,11 @@ requesting a connection. Second, the server responds with a SYN-ACK
 packet to the client. Third, the client responds with an ACK message
 and the connection is established. Aware of the protocol, an attacker
 sends multiple SYN packets to different ports of a server, often using
-fake IP addresses. \Luc{Then, after the server responds with the usual SYN-ACK packet, the client sends another SYN to avoid the connection time out.} \Mar{Are you saying that there is no timer that the
-  server starts when it sends a SYN-ACK message?} Without proper protection, the server accepts the
-connection requests and eventually legitimate connection requests
-cannot be satisfied due to resource exhaustion.
+fake IP addresses. Then, after the server responds with a SYN-ACK
+packet, the client sends another SYN to avoid the connection to time
+out. Without proper protection, the server accepts the connection
+requests and eventually legitimate connection requests cannot be
+satisfied due to resource exhaustion.
 
 Figure~\ref{fig:synflood-example} shows a Suricata rule to capture
 this attack. The critical parts are the option \CodeIn{flags: S,12},
@@ -234,29 +235,33 @@ time.\Mar{please, explain the other fields}
 \begin{figure*}[t]
 \centering
 \includegraphics[trim=60 400 65 0,clip,width=0.7\textwidth]{figs/nids-workflow}
-\caption{\tname workflow. The first step initializes the encoding of
-  randomly initializes the rule encoding. Only options associated with
-  the protocol usd in the negative traffic are included in the
-  encoding. This step mutates the values associated with rule options
-  until \suri\ is able to capture the attack.  Note that any subset of
-  options in the rule reported in this step captures the negative
-  traffic. The second step is initialized with a configuration that
-  captures the negative traffic but could also capture benign
-  traffic. It discards options from the rule encoding until no
-  positive traffic is captured.}
+\caption{\tname\ workflow.}
 \label{fig:overview}
 \end{figure*}
 
 \tname{} is a search-based approach that uses positive and negative
-network traffic examples to synthesize signature-based NIDS rules,
-such as those from Snort and Suricata.
+network examples to synthesize signature-based NIDS rules, such as
+those from Snort and Suricata.
 
-Figure~\ref{fig:overview} shows the workflow of \tname{}.  The
-technique synthesizes rules in two steps. First, it produces a
+The technique synthesizes rules in two steps. First, it produces a
 potentially overspecified rule that captures the negative example that
 is provided as input. Then, it uses positive examples to eliminate
 unnecessary options from the rule. The goal of \tname\ is to create a
 rule that only captures the negative traffic.
+
+Figure~\ref{fig:overview} shows the workflow of \tname{} as a pipeline
+of two components, each implementing one of the steps mentioned above.
+The goal of the first component is to produce a rule that captures the
+negative traffic.  First, it initializes the rule encoding with random
+values. Only options associated with the used protocol are included in
+the encoding. Then, \tname\ optimizes the rule options until \suri\ is
+able to capture the attack.  Note that, as all options need to be
+satisfied for the traffic to be captured, at this point, any subset of
+options would capture the negative traffic. The second component of
+the pipeline is initialized with the rule produced in the previous
+step. That rule captures the negative traffic but could also capture
+benign traffic. This component systematically discards options from
+the rule encoding until no positive traffic is captured.
 
 \Fix{describes negative and positive traffic}
 
