@@ -129,7 +129,7 @@ traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta
 
 These intrusion detection mechanisms are complementary. Rule-based
 NIDS are restricted to a fixed set of rules and not all rules are
-simulneteously enabled (for efficiency). Attackers constantly create
+simultaneously enabled (for efficiency). Attackers constantly create
 new attacks, and manually writing rules is tedious and
 error-prone. However, the semantics of the specification language of
 rules is clear making it easy for system administrator to understand
@@ -162,7 +162,7 @@ by anomaly-based NIDS.
 
 \Fix{summarize results}
 
-This paper makes the following contributions. \Fix{...}
+This paper makes the following contributions.
 
 \section{Illustrative Example}
 \label{sec:suri-metas-coverage}
@@ -206,16 +206,16 @@ of the attack.
 
 The SYN Flood attack exploits a vulnerability in the TCP/IP handshake
 to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
-works as follows. First, a client sends a SYN packet to the server,
-requesting a connection. Second, the server responds with a SYN-ACK
-packet to the client. Third, the client responds with an ACK message
-and the connection is established. Aware of the protocol, an attacker
-sends multiple SYN packets to different ports of a server, often using
-fake IP addresses. Then, after the server responds with a SYN-ACK
-packet, the client sends another SYN to avoid the connection to time
-out. Without proper protection, the server accepts the connection
-requests and eventually legitimate connection requests cannot be
-satisfied due to resource exhaustion.
+works as follows in normal circumstances. First, a client sends a SYN
+packet to the server, requesting a connection. Second, the server
+responds with a SYN-ACK packet to the client. Third, the client
+responds with an ACK message and the connection is established. Aware
+of the protocol, an attacker sends multiple SYN packets to different
+ports of a server, often using fake IP addresses. Then, after the
+server responds with a SYN-ACK packet, the client keeps sending other
+SYN to avoid the connection to time out. Without proper protection,
+the server accepts these malicious requests and eventually legitimate
+requests cannot be satisfied due to resource exhaustion.
 
 Figure~\ref{fig:synflood-example} shows a Suricata rule to capture
 this attack. The critical parts are the option \CodeIn{flags: S,12},
@@ -234,7 +234,7 @@ time.\Mar{please, explain the other fields}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[trim=60 400 65 0,clip,width=0.7\textwidth]{figs/nids-workflow}
+\includegraphics[trim=10 360 182 130,clip,width=0.7\textwidth]{figs/nids-workflow}
 \caption{\tname\ workflow.}
 \label{fig:overview}
 \end{figure*}
@@ -244,26 +244,34 @@ network examples to synthesize signature-based NIDS rules, such as
 those from Snort and Suricata.
 
 The technique synthesizes rules in two steps. First, it produces a
-potentially overspecified rule that captures the negative example that
-is provided as input. Then, it uses positive examples to eliminate
+potentially overspecified rule that captures the negative example
+provided on input. Then, it uses positive examples to eliminate
 unnecessary options from the rule. The goal of \tname\ is to create a
 rule that only captures the negative traffic.
 
 Figure~\ref{fig:overview} shows the workflow of \tname{} as a pipeline
-of two components, each implementing one of the steps mentioned above.
-The goal of the first component is to produce a rule that captures the
-negative traffic.  First, it initializes the rule encoding with random
-values. Only options associated with the used protocol are included in
-the encoding. Then, \tname\ optimizes the rule options until \suri\ is
-able to capture the attack.  Note that, as all options need to be
-satisfied for the traffic to be captured, at this point, any subset of
-options would capture the negative traffic. The second component of
-the pipeline is initialized with the rule produced in the previous
-step. That rule captures the negative traffic but could also capture
-benign traffic. This component systematically discards options from
-the rule encoding until no positive traffic is captured.
+of two components, appearing numbered in the figure. Each component
+implements one of the steps mentioned above. The goal of the first
+component is to produce a rule that captures the negative traffic.
+First, it initializes the rule with random values. Only options
+associated with the used protocol are included in the rule
+representation. Then, \tname\ optimizes the rule options until
+\suri\ is able to capture the attack associated with the negative
+traffic.  \tname\ unsuccessfully terminates at this point if it cannot
+capture the attack. The second component takes as input the rule
+produced by the first component and tries to minimize that rule. Note
+that any subset of options would capture the negative traffic---as all
+options in the rule need to be satisfied for the negative traffic to
+be captured---but it can also capture positive traffic. This component
+systematically discards options from the rule encoding until no
+positive traffic is captured.
 
-\Fix{describes negative and positive traffic}
+\subsection{Positive Traffic}
+
+Note from the figure that the negative traffic is an input to the
+technique. The positive traffic, in contrast, is not. \tname{} uses
+public databases storing different kinds of positive traffic for all
+protocols covered by Suricata. \Fix{what databases?}
 
 \subsection{Problem Characterization}
 
