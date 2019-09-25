@@ -114,50 +114,61 @@ Suricata~\cite{suricata}) and commercial implementations (\eg{},
 SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar}) exist
 today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
-exist on the Internet today.
+exist on the Internet.
 
 \sloppy \nids{} are typically categorized in two
-groups~\cite{kumar2007survey}: 1)~rule-based and 2)~anomaly-based. A
-rule-based \nids{} (\aka\ signature-based NIDS) checks if the network
-traffic matches a fixed set of
+groups~\cite{kumar2007survey}: rule-based and anomaly-based \nids. A
+rule-based intrusion detector\footnote{\aka\ signature-based intrusion
+  detector.} checks if the network traffic matches a fixed set of
 rules. Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
-prescribes a method to capture a denial-of-service attack to a
-server~\cite{Douligeris:2004:DAD:987153.987158}. Rule-based \nids{} focus on known attacks whereas
-anomaly-based \nids{} focus on unanticipated attacks that could be
-observed through suspicious network
+prescribes a method to capture a denial-of-service
+attack~\cite{understanding-dos} to a server by matching specific
+conditions about the network traffic. Relevant conditions appear in
+bold. Rule-based \nids{} focus on known attacks whereas anomaly-based
+\nids{} focus on unknown attacks that could be observed by first
+learning the regular traffic and then capturing suspicious
 traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}.
 
-These intrusion detection mechanisms are complementary. Rule-based
-NIDS are restricted to a fixed set of rules and not all rules are
-simultaneously enabled (for efficiency). Attackers constantly create
-new attacks, and manually writing rules is tedious and
-error-prone. However, the semantics of the specification language of
-rules is clear making it easy for system administrator to understand
-them. As such, rule-based systems are very popular in industry.
-Anomaly-based NIDS are not restricted to a fixed set of rules; they
-learn common behaviors and dynamically detect uncommon behavior. They
-typically use machine learning algorithm to model event
-sequences~\cite{7579764}. Unfortunately, anomaly-based NIDS can raise
-false alarms as behavior models are fundamentally imprecise. To sum
-up, both approaches have positive and negative aspects.
+These two kinds of intrusion detection mechanisms are
+complementary. Conceptually, rule-based NIDS could miss attacks (as
+rulesets can become outdated) whereas anomaly-based NIDS can raise
+false alarms (as the detection algorithms use are approximate).
+Rule-based NIDS are restricted to a fixed set of rules and attackers
+constantly create new strategies. Furthermore, manually writing rules
+to capture those attacks is tedious and error-prone. As consequence,
+IT-security companies advertize paid rulesets for consumers to
+buy~\cite{proofpoint-etpro,snort-rule-subscriptions}.  Despite this
+fundamental issue, rule-based systems are tremendously popular in
+industry today~\Fix{cite}. Anomaly-based NIDS, in contrast, are not
+restricted to a fixed set of rules. They learn usage behavior from
+positive traffic and, based on that, alert uncommon
+behavior~\cite{7579764}. Unfortunately, anomaly-based NIDS are
+fundamentally imprecise. To sum up, both approaches have positive and
+negative aspects.
 
 %% This paper focuses on the
 %% problem of discovering new rules by using anomaly-based NIDS.
 
-This paper proposes a technique, dubbed \tname{}, to automatically
-synthesize rules from positive and negative examples (\ie{}, benign
-and malicious traffic). The main scenario of application is one where
-an anomaly-based NIDS identifies abnormal traffic and signals that
+This paper proposes a technique, dubbed \tname{}, to close the gap
+between these two strategies. \tname{} automatically synthesizes rules
+from positive and negative examples (\ie{}, benign and malicious
+traffic). A scenario of application of \tname{} is one where an
+anomaly-based NIDS identifies abnormal traffic and signals that
 traffic to \tname{} to craft rules that can be used by rule-based
-NIDS. Those rules can be distributed to rule databases. The core
-motivation is that 1) attackers are productive in creating new ways to
-circumvent existing protections and 2) manual creation of rules is
-tedious and time-consuming.  Note that anomaly-based NIDS are evolving
-pretty quick with the advances in machine learning, but rule-based
-NIDS are still extremely popular. Our goal is to harden rule-based
-NIDS by automatically creating rules from suspicious behavior detected
-by anomaly-based NIDS.
+NIDS. Note that anomaly-based NIDS are evolving pretty quick with the
+advances in machine learning, but rule-based NIDS are still extremely
+popular.  \tname{} could also leverage existing databases of malicious
+traffic to synthesize rules.  Regardless of how the negative traffic
+is produced (out of scope of this paper), those rules can be
+distributed to rule databases for free. Our goal is to harden the
+protection of NIDS by automatically synthesizing rules from negative
+examples.
+
+%%  The
+%% core motivation is that 1) attackers are productive in creating new
+%% ways to circumvent existing protections and 2) manual creation of
+%% rules is tedious and time-consuming.  
 
 \Fix{summarize how the technique works}
 
@@ -271,7 +282,7 @@ positive traffic is captured.
 
 One important step in search-based optimization is to characterize a
 candidate solution to the target problem. Candidate solutions are the
-objects that the search optimize towards solutions. In this case, a a
+objects that the search optimize towards solutions. In this case, a 
 candidate solution is an encoding of a Suricata rule.  \tname\ encodes
 the rule options segment of a Suricata rule (see
 Section~\ref{sec:example-suricata-rules}) as a vector of Option
@@ -279,20 +290,20 @@ objects. Some options are discarded as they only serve for
 documentation. For example, the options \CodeIn{msg},
 \CodeIn{classtype}, and \CodeIn{misc-activity}, appearing in the
 example on Figure~\ref{fig:synflood-example}, have no influence in
-triggering the actions associated with rules. The option
+triggering the actions associated with the rule. The option
 \CodeIn{flags}, however, is relevant to trigger the action. \tname{}
 models that option with a data structure storing two fields, one of
 character type and another of integer type. This enables \tname{} to
 mutate each element separately. Similar encodings are used in modeling
-the other relevant options. We found what is (ir)relevant by
+the other relevant options. We found what options are (ir)relevant by
 inspecting Suricata code for the presence of \CodeIn{eval} functions,
-which are invoked from a main look to process every Suricata rule. The
+which are invoked from a main loop to process each action rule. The
 presence of such a function for a given option indicates that it is
 relevant for triggering some action of some rule.
 
-Options can be specific to a given protocol or general and they can be
-influential on triggering an action or
-not. Figure~\ref{fig:distribution-rules-protocol} shows the
+Options can be specific to a given protocol or general and they can
+influence or not triggering an
+action. Figure~\ref{fig:distribution-rules-protocol} shows the
 distributions of these options per protocol and their relevance for
 triggering rule actions.
 
