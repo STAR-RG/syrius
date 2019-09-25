@@ -3,6 +3,7 @@
 % The preceding line is only needed to identify funding in the first
 % footnote. If that is unneeded, please comment it out.
 
+
 \usepackage{booktabs}
 \usepackage{cite}
 \usepackage{url}
@@ -266,13 +267,6 @@ be captured---but it can also capture positive traffic. This component
 systematically discards options from the rule encoding until no
 positive traffic is captured.
 
-\subsection{Positive Traffic}
-
-Note from the figure that the negative traffic is an input to the
-technique. The positive traffic, in contrast, is not. \tname{} uses
-public databases storing different kinds of positive traffic for all
-protocols covered by Suricata. \Fix{what databases?}
-
 \subsection{Problem Characterization}
 
 One important step in search-based optimization is to characterize a
@@ -380,27 +374,76 @@ action associated with the rule. For the example above,
 
 \tname{} is a single-individual hill-climbing like search.
 
-\section{Evaluation}
-\Luc{Atualmente estamos considerando os seguintes ataques:
-\subsection{Ping Scan}
-Utilizado para descobrir hosts ativos na rede - pacote individual - protocolo ICMP
-\subsection{Port Scan TCP}
-Utilizado para descobrir portas abertas em um host - pacote individual - protocolo TCP
-\subsection{Port Scan UDP}
-Utilizado para descobrir portas abertas em um host - pacote individual - protocolo UDP
-\subsection{SYN Flood}
-DoS TCP
-\subsection{Black Nurse}
-DoS ICMP
-\subsection{Ping Flood}
-DoS ICMP
-\subsection{GET/POST Flood}
-DoS HTTP
-\
-}
 
-\Mar{Lucas/Guilherme (CRI): precisamos dar pontape inicial propondo
-  perguntas de pesquisa. Eu faco ajustes em seguida.}
+\subsection{Limitations}
+
+\Fix{...}
+
+\section{Evaluation}
+
+%% \renewcommand{\labelitemi}{}
+%% \setitemize[0]{leftmargin=20pt,itemindent=-20pt}
+%% \begin{itemize}
+%% \end{itemize}
+
+%% \renewcommand{\labelitemi}{}
+%% \setitemize[0]{leftmargin=0pt,itemindent=0pt}
+%% \begin{itemize}
+%%   \item{\textbf{RQ1.}~How precise is \tname?}
+%%   \item{\textbf{RQ2.}~How efficient is \tname?}
+%% \end{itemize}
+
+This section reports precision and efficiency of \tname.
+
+
+\subsection{Objects of Analysis}
+
+We evaluated \tname{} on a set of attacks covering each of the four
+protocols supported by Suricata and attacks with different
+characteristics. Table~\ref{table:attacks} shows the attacks we
+analyzed and the rule of Suricata that captures the attack. Column
+``Name'' shows the name of the attack, column ``\#'' indicates whether
+single or multiple messages are required to manifest the attack,
+column ``Protocol'' shows the protocol name, column ``Description''
+summarizes the effect of the attack, if successfull, and column
+``Golden Rule'' shows the relevant parts in the options section of the
+Suricata rule that captures the attack.
+
+\begin{table*}[t!]
+  \caption{\label{table:attacks}Characterization of attacks analyzed
+    and Golden Rule of Suricata (reference) to capture it.}  
+  \centering
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Protocol} & \multicolumn{1}{c}{Description} & \multicolumn{1}{c}{Golden Rule} \\
+    \midrule
+    GET/POST Flood & multiple & HTTP & Denial of Service & - \\      
+    Ping Scan & single & ICMP & Discovers active hosts in a network &  - \\
+    Black Nurse & multiple & ICMP & Denial of Service & - \\
+    Ping Flood  & multiple & ICMP & Denial of Service & - \\  
+    Port Scan TCP & single & TCP & Discovers open ports in a host & -  \\
+    SYN Flood & multiple & TCP & Denial of Service & - \\
+    Port Scan UDP & single & UDP & Discovers open ports in a host & - \\        
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{Setup}
+
+Note from the figure that the negative traffic is an input to the
+technique. The positive traffic, in contrast, is not. \tname{} uses
+public databases storing different kinds of positive traffic for all
+protocols covered by Suricata. \Fix{what databases?}
+
+\Fix{any other detail we should consider?}
+
+\subsection{Precision}
+
+\Fix{...}
+
+\subsection{Efficiency}
+
+\Fix{...}
 
 \section{Threats to Validity}
 
