@@ -160,20 +160,24 @@ def evolveRuleSinglePacket(rule):
     print("initial fitness: " + str(init_fitness))
 
     prev_fitness = init_fitness
-    for keyword in rule.options:
+    rule_options = list(rule.options.keys())
+    for keyword in rule_options:
         while rule.options[keyword] < keys_by_proto[rule.protocol][keyword]:
             rule.options[keyword] = rule.options[keyword]+1
             print(str(rule))
 
-            new_fitness, _ = evalRule(rule)
-            print("rule fitness: " + str(new_fitness))
+            new_fitness, new_matches = evalRule(rule)
+            print("rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
+            
+            if new_fitness < 1 and new_matches > 0:
+                del rule.options[keyword]
+                break
 
             if new_fitness < prev_fitness:
                 rule.options[keyword] = rule.options[keyword]-1
                 break
             else:
                 prev_fitness = new_fitness
-    
     return rule  
 
 def evolveRuleFlood(rule):
@@ -185,11 +189,16 @@ def evolveRuleFlood(rule):
     new_rule.threshold = {"type": "threshold", "track": "by_dst", "count": 1, "seconds": 1}
 
     new_fitness, matches = evalRule(new_rule)
+    print("rule fitness: " + str(new_fitness) + " matches: " + str(matches))
     
-    while new_fitness != 1 and matches != 1:
-        print("????????????????")
+    while 1:
         new_rule.threshold["count"] += 1
         new_fitness, matches = evalRule(new_rule)
+        print(str(rule))
+        print("rule fitness: " + str(new_fitness) + " matches: " + str(matches))
+
+        if new_fitness == 1 and matches == 1:
+            break
     
     return new_rule
 
