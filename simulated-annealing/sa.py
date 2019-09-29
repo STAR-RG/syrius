@@ -40,6 +40,9 @@ def sendPacket(local_ip):
     subprocess.Popen(["sh", "sendPacket.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
 
 def getRuleFitness(keywords):
+    if len(keywords) <= 1:
+        return 0
+    
     for i in range(0, len(keywords)):
         keywords[i] = keywords[i].split(" ")
         while '' in keywords[i]:
@@ -93,7 +96,6 @@ def sendGoodTraffic(local_ip):
     subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh"], stdout=subprocess.DEVNULL).wait()
     time.sleep(11)
 
-
 def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
@@ -101,8 +103,11 @@ def evalFalsePositive(rule):
     reloadSuricataRules(getSuricataPid()) 
     sendGoodTraffic(getLocalIp())
 
-    fitnessFile = open(fitnessFile_path, "r")
-
+    try:
+        fitnessFile = open(fitnessFile_path, "r")
+    except IOError:
+        return 0
+    
     lines = fitnessFile.readlines()
 
     best_fitness = 0
@@ -180,11 +185,25 @@ def evolveRuleSinglePacket(rule):
                 prev_fitness = new_fitness
     return rule  
 
+def optimizeRule(rule):
+    new_rule = copy.deepcopy(rule)
+    for keyword in rule.options:
+        del new_rule.options[keyword]
+        print(str(new_rule))
+
+        fitness = evalFalsePositive(new_rule)
+        print(fitness)
+        if fitness >= 1.0:
+            new_rule.options[keyword] = rule.options[keyword]
+    
+    return new_rule
+
 def evolveRuleFlood(rule):
     init_fitness, matches = evalRule(rule)          
     print("initial fitness: " + str(init_fitness) + " initial matches: " + str(matches))
 
     new_rule = evolveRuleSinglePacket(rule)
+    new_rule = optimizeRule(new_rule)
 
     new_rule.threshold = {"type": "threshold", "track": "by_dst", "count": 1, "seconds": 1}
 
@@ -194,7 +213,7 @@ def evolveRuleFlood(rule):
     while 1:
         new_rule.threshold["count"] += 1
         new_fitness, matches = evalRule(new_rule)
-        print(str(rule))
+        print(str(new_rule))
         print("rule fitness: " + str(new_fitness) + " matches: " + str(matches))
 
         if new_fitness == 1 and matches == 1:
@@ -207,24 +226,12 @@ init_rule = Rule(default_rule_action, "icmp", default_rule_header, default_rule_
 print("initial rule: " + str(init_rule))
 
 #final_rule = evolveRuleSinglePacket(init_rule)
+#final_rule = optimizeRule(final_rule)
 final_rule = evolveRuleFlood(init_rule)
+
+if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
+    final_rule.threshold = {} 
+
 print("final rule: " + str(final_rule))
 
 print()
-
-"""
-new_rule = copy.deepcopy(rule)
-for keyword in rule.options:
-    del new_rule.options[keyword]
-    print(str(new_rule))
-
-    fitness = evalFalsePositive(new_rule)
-    print(fitness)
-    if fitness >= 1.0:
-        new_rule.options[keyword] = rule.options[keyword]
-    
-    #print(str(new_rule))
-
-
-print(new_rule)
-"""
