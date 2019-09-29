@@ -42,7 +42,10 @@ def sendPacket(local_ip):
 def getRuleFitness(keywords):
     if len(keywords) <= 1:
         return 0
-    
+
+    if ' ' in keywords:
+        keywords.remove(' ')
+
     for i in range(0, len(keywords)):
         keywords[i] = keywords[i].split(" ")
         while '' in keywords[i]:
@@ -54,7 +57,8 @@ def getRuleFitness(keywords):
     for i in range(1, len(keywords)):
         fitness = fitness + float(keywords[i][1])
     
-    fitness = fitness/(len(keywords)-1)
+    if len(keywords) > 1:
+        fitness = fitness/(len(keywords)-1)
 
     return fitness
 
