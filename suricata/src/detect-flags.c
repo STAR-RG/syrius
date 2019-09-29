@@ -159,9 +159,7 @@ static int DetectFlagsMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
         retval = FlagsMatch(flags, de->modifier, de->flags, de->ignored_flags);
     }
 
-    if (!retval) {
-        logFitness("flags", s->id, retval);
-    }
+    logFitness("flags", s->id, retval);
 
     return retval;
 }
