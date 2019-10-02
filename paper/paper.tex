@@ -422,7 +422,9 @@ Suricata rule that captures the attack.
 
 \begin{table*}[t!]
   \caption{\label{table:attacks}Characterization of attacks analyzed
-    and Golden Rule of Suricata (reference) to capture it.}  
+    and Golden Rule of Suricata (reference) to capture it.\Mar{please,
+  show me the Golden Rule, \ie{} the part that is relevant of each rule (for
+  capturing the negative traffic precisely)}}  
   \centering
   \begin{tabular}{lllll}
     \toprule
@@ -441,13 +443,22 @@ Suricata rule that captures the attack.
 
 \subsection{Setup}
 
-Note from the figure that the negative traffic is an input to the
-technique. The positive traffic, in contrast, is not. \tname{} uses
-public databases storing different kinds of positive traffic for all
-protocols covered by Suricata. \Fix{what databases?}
+Note from Figure~\ref{fig:overview} that the negative traffic is an
+input to the technique. The positive (non malicious) traffic, in
+contrast, is not. \tname{} uses public databases storing different
+kinds of positive traffic for all protocols covered by Suricata. We
+used two datasets of positive traffic. The Bigflows.pcap dataset is
+part of the TcpReplay~\cite{tcpreplay} open source project. This
+dataset includes real network traffic on a busy private network access
+point to the Internet. According to the TcpReplay web site ``This
+capture is much larger and has a smaller average packet size than the
+previous capture (smallFlows.pcap). It also has many more flows and
+different applications.''. In addition to the Bigflows.pcap dataset,
+we also used datasets of normal traffic made available by Stratosphere
+Lab~\cite{stratosphere-normal}.
 
-\Gui{We are using the bigflows.pcap provided by tcpreplay on http://tcpreplay.appneta.com/wiki/captures.html "This is a capture of real network traffic on a busy private network’s access point to the Internet"
-We also used normal pcaps from Stratosphere Lab on https://www.stratosphereips.org/datasets-normal to verify if Suricata's ET rules weren't catching positive flow. }
+%% \Gui{We are using the bigflows.pcap provided by tcpreplay on http://tcpreplay.appneta.com/wiki/captures.html "This is a capture of real network traffic on a busy private network’s access point to the Internet"
+%%  }
 
 \Fix{any other detail we should consider?}
 
