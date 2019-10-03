@@ -241,6 +241,11 @@ time.\Mar{please, explain the other fields}
 \Mar{Guilherme/Lucas (CRI): we need to show how \tname{} works on this
   example. What is the input? How long does it take to generate the
   rule? Is the rule generated exactly the same? Please explain...}
+  
+\Luc{entrada: conjunto de 20 pacotes SYN que representam o flood.
+tempo para gerar a regra: ~1m30s
+no caso do syn flood, geramos a mesma regra.
+}
 
 \section{Approach}
 
@@ -377,7 +382,7 @@ injects the traffic on the network, and monitors the execution. Each
 rule option has an associated \CodeIn{eval} function in code. \tname{}
 monitors the execution of these functions to identify how far it is
 from returning true, which indicates it is closer to trigger the
-action associated with the rule. For the example above,
+action associated with the rule. \Luc{Para opções cujos valores são numéricos, o suricata apenas verifica se o valor da opção no pacote é igual/maior/menor ao valor especificado na regra, retornando um booleano indicando isso. Alteramos o codigo fonte para obter a diferença entre o valor da opção no pacote e o valor da opção na regra.}
 \Fix{Lucas/Guilherme, it would be good to show how this looks like in
   code}
 
