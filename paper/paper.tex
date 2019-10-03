@@ -382,7 +382,8 @@ injects the traffic on the network, and monitors the execution. Each
 rule option has an associated \CodeIn{eval} function in code. \tname{}
 monitors the execution of these functions to identify how far it is
 from returning true, which indicates it is closer to trigger the
-action associated with the rule. \Luc{Para opções cujos valores são numéricos, o suricata apenas verifica se o valor da opção no pacote é igual/maior/menor ao valor especificado na regra, retornando um booleano indicando isso. Alteramos o codigo fonte para obter a diferença entre o valor da opção no pacote e o valor da opção na regra.}
+action associated with the rule. 
+\Luc{Originalmente, o suricata interrompe a checagem de uma regra quando alguma das opções não dá match com o pacote analisado. O código fonte foi alterado para que as regras sempre tenham todas as suas opções verificadas. A função de verificação de uma opção retorna um booleano indicando se o valor da opção na regra corresponde ou não ao valor da opção no pacote. Para opções cujos valores são numéricos, alteramos o código fonte para obter a diferença entre os valores da opção na regra e no pacote.}
 \Fix{Lucas/Guilherme, it would be good to show how this looks like in
   code}
 
