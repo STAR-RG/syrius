@@ -246,23 +246,6 @@ time.\Mar{please, explain the other fields}
 \texttt{\# hping3 -d 80 -w 64 -S -p 80 --flood --rand-source 192.138.1.115} \\*
 que envia pacotes de 120 bytes (-d 120), com a flag SYN habilitada (-S), tamanho de janela de 64 bytes (-w 64), direcionados a porta 80 (-p 80). A flag --flood indica q o hping3 vai enviar os pacotes o mais rápido possível. a flag --rand-source indica que cada pacote vai ter um ip de origem aleatorio. 192.138.1.115 é o alvo.\\*
 O trafego armazenado contem 40 mil pacotes SYN, enviados no intervalo de 1 segundo,  pegamos uma amostra de 20 desses pacotes para representar o flood e servir como entrada.\\*
-
-\begin{table*}[t!]
-  \caption{\label{table:rules}Rule evolution}  
-  \centering
-  \begin{tabular}{llllllllllll}
-    \toprule
-    \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Protocol} & \multicolumn{1}{c}{Description} & \multicolumn{1}{c}{Golden Rule} \\
-    \midrule     
-    Ping Scan & single & ICMP & Discovers active hosts in a network &  dsize:0; itype:8; \\
-    Black Nurse & multiple & ICMP & Denial of Service & itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;\\
-    Ping Flood  & multiple & ICMP & Denial of Service & itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;\\  
-    Port Scan TCP & single & TCP & Discovers open ports in a host & flags: A; ack: 0;  \\
-    SYN Flood & multiple & TCP & Denial of Service & threshold: type both, track by\_dst, count 5000, seconds 5;\\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
 regra inicial: -\\*
 regra intermediaria: -\\*
 regra final: -\\*
