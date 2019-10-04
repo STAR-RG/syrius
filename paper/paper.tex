@@ -464,8 +464,9 @@ Suricata rule that captures the attack.
     Ping Scan & single & ICMP & Discovers active hosts in a network &  dsize:0; itype:8; \\
     Black Nurse & multiple & ICMP & Denial of Service & itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;\\
     Ping Flood  & multiple & ICMP & Denial of Service & itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;\\  
-    Port Scan TCP & single & TCP & Discovers open ports in a host & flags: A; ack: 0;  \\
-    SYN Flood & multiple & TCP & Denial of Service & threshold: type both, track by\_dst, count 5000, seconds 5;\\
+    Port Scan TCP & single & TCP & Discovers open ports in a host & flags: A; ack: 0;dsize: 0; \\
+    SYN Flood & multiple & TCP & Denial of Service & flags: S,12; threshold: type both, track by\_dst, count 5000, seconds 5;\\
+    UDP Flood & multiple & UDP & Denial of Service & fragbits:M; threshold: type both, track by_dst, count 5000, seconds 5; \\
     \bottomrule
   \end{tabular}
 \end{table*}
