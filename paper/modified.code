@@ -1,0 +1,9 @@
+ICodeMatch(...){
+    float fitness = 0;
+    switch (mode) {
+        case DETECT_ICODE_EQ:
+            fitness = 1 - (float) abs(pcode - dcode1)/256;
+            logFitness("icode", s->id, fitness);
+            return (pcode == dcode1) ? 1 : 0;
+    ...
+}
