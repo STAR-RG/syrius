@@ -244,12 +244,31 @@ time.\Mar{please, explain the other fields}
   
 \Luc{entrada: utilizamos a ferramenta hping3 para executar o ataque em um alvo arbitrario dentro da rede (n ha necessidade de haver um alvo real para executar o hping3) e capturamos o trafego gerado com o wireshark. o comando utilizado foi:\\*
 \texttt{\# hping3 -d 80 -w 64 -S -p 80 --flood --rand-source 192.138.1.115} \\*
-que envia pacotes de 120 bytes (-d 120), com a flag SYN habilitada (-S), tamanho de janela de 64 bytes (-w 64), direcionados a porta 80 (-p 80). A flag --flood indica q o hping3 vai enviar os pacotes o mais rápido possível. a flag --rand-source indica que cada pacote vai ter um ip de origem aleatorio. 192.138.1.115 é o alvo.\\*
+que envia pacotes de 80 bytes (-d 80), com a flag SYN habilitada (-S), tamanho de janela de 64 bytes (-w 64), direcionados a porta 80 (-p 80). A flag --flood indica q o hping3 vai enviar os pacotes o mais rápido possível. a flag --rand-source indica que cada pacote vai ter um ip de origem aleatorio. 192.138.1.115 é o alvo.\\*
 O trafego armazenado contem 40 mil pacotes SYN, enviados no intervalo de 1 segundo,  pegamos uma amostra de 20 desses pacotes para representar o flood e servir como entrada.\\*
-regra inicial: -\\*
-regra intermediaria: -\\*
-regra final: -\\*
-iterações para gerar a regra: -
+O wireshark armazena os pacotes no formato pcap, utilizamos a ferramenta tcpreplay para reproduzir o trafego com o comando:\\*
+\texttt{\# tcpreplay --pps 200 --intf1=wlp2s0 Datasets/syn-flood-sample.pcap}\\*
+Nesse caso, estamos enviando os pacotes armazenados em \texttt{Datasets/syn-flood-sample.pcap} a uma taxa de 200 pacotes por segundo (\texttt{-pps 200}) utilizando a interface wlp2s0 (\texttt{--intf1 wlp2s0})\\* 
+Há diferenças entre os pacotes na opção ack.\\* 
+Por que 20? Apenas para gerar a regra mais rapidamente, poderia ser qualquer valor maior ou menor. No final, o parâmetro \texttt{count} da opção \texttt{threshold} vai ser alterado pelo adm da rede.\\*
+Intervalo de reprodução: 0.005 segundo
+
+
+\begin{table}[h]
+  \caption{\label{table:rules}Rule evolution}  
+  \centering
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
+    \midrule     
+    0 & (ack:0; seq:0; window:0; flags:F;)\\
+    5 & (window:0; flags:F;)\\
+    68 & (window:64; flags:F;)\\
+    73 & (window:64; flags:S,12;)\\
+    94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 }
 
