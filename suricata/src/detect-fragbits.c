@@ -139,6 +139,7 @@ FragBitsMatch(const uint8_t pbits, const uint8_t modifier,
 static int DetectFragBitsMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx,
         Packet *p, const Signature *s, const SigMatchCtx *ctx)
 {
+    int fitness = 0;
     if (!ctx || !PKT_IS_IPV4(p) || PKT_IS_PSEUDOPKT(p))
         return 0;
 
@@ -151,7 +152,9 @@ static int DetectFragBitsMatch (ThreadVars *t, DetectEngineThreadCtx *det_ctx,
     if(IPV4_GET_RF(p))
         fragbits |= FRAGBITS_HAVE_RF;
 
-    return FragBitsMatch(fragbits, de->modifier, de->fragbits);
+    fitness = FragBitsMatch(fragbits, de->modifier, de->fragbits);
+    logFitness("fragbits", s->id, fitness);
+    return fitness;
 }
 
 /**

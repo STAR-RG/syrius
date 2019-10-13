@@ -720,7 +720,7 @@ static inline int DetectRunInspectRulePacketMatches(
                     printf("Matches: %d/%d - SID: %d %s\n\n", matches, sig_cnt, s->id, s->msg);
                     FILE *fp = fopen("./rulesFitness.txt", "a");
                     //fprintf(fp, "\n");
-
+                    fflush(fp);
                     fclose(fp);
 
                     if (gotoNext) {

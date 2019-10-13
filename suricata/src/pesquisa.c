@@ -1,17 +1,20 @@
 #include "pesquisa.h"
 #include "string.h"
 
-void logFitness(void *key, int signatureID, float fitness){
+void logFitness(void *key, int signatureID, double fitness){
     FILE *fp = fopen("./rulesFitness.txt", "a");
 
     char *keyword = (char *) key;
     //fitness = abs(fitness);
 
+    fprintf(fp, " - %s: %lf", keyword, fitness);
+
     if(strcmp(keyword, "threshold") == 0){
-        fseek(fp, -2, SEEK_END);
+        //fprintf(fp, "\n");
     }
 
-    fprintf(fp, " - %s: %f", keyword, fitness);
+    fflush(fp);
+
     fclose(fp);
-    printf("SID: %d - %s keyword fitness: %f\n", signatureID, keyword, fitness);
+    printf("SID: %d - %s keyword fitness: %lf\n", signatureID, keyword, fitness);
 }

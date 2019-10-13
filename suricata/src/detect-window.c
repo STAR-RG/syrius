@@ -90,6 +90,7 @@ static int DetectWindowMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
     if ( !(PKT_IS_TCP(p)) || wd == NULL || PKT_IS_PSEUDOPKT(p)) {
         notTCP = 1;
     } else if ( (!wd->negated && wd->size == TCP_GET_WINDOW(p)) || (wd->negated && wd->size != TCP_GET_WINDOW(p))) {
+        logFitness("ack", s->id, 1);
         return 1;
     }
 
@@ -101,6 +102,8 @@ static int DetectWindowMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx, Pack
             fitness = -1;
         }
     }
+
+    fitness = fitness/65525;
     
     logFitness("window", s->id, fitness);
     

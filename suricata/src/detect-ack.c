@@ -83,19 +83,26 @@ static int DetectAckMatch(ThreadVars *t, DetectEngineThreadCtx *det_ctx,
 {
     const DetectAckData *data = (const DetectAckData *)ctx;
     int notTCP = 0;
-    int fitness;
+    double fitness;
     /* This is only needed on TCP packets */
     if (!(PKT_IS_TCP(p)) || PKT_IS_PSEUDOPKT(p)) {
         notTCP = 1;
     } else if(data->ack == TCP_GET_ACK(p)) {
+        logFitness("ack", s->id, 1);
         return 1;
     }
     
     if (notTCP) {
         fitness = 0;
     } else {
-        fitness = abs(data->ack - TCP_GET_ACK(p));
+        if (data->ack >= TCP_GET_ACK(p)){
+            fitness = data->ack - TCP_GET_ACK(p);
+        } else {
+            fitness = TCP_GET_ACK(p) - data->ack;
+        }
     }
+
+    fitness = fitness/4294967295;
 
     logFitness("ack", s->id, fitness);
 
