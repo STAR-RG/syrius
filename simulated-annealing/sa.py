@@ -5,7 +5,8 @@ from itertools import combinations
 
 keys_by_proto = {}
 keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255, "icmp_seq":65525}#, "icmp_id":65535}
-keys_by_proto["tcp"] = {"flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}
+keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}#"ack":4294967295, "seq":4294967295}
+keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
 
 default_rule_action = "alert"
@@ -35,7 +36,7 @@ def getLocalIp():
 
 def sendFlood(local_ip):
     subprocess.Popen(["sh", "sendFlood.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.1)
+    time.sleep(0.2)
 
 def sendPacket(local_ip):
     subprocess.Popen(["sh", "sendPacket.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
@@ -78,9 +79,12 @@ def evalRule(rule):
     
     lines = fitnessFile.readlines()
     fitness = 0
+    prev_fitness = 0
+    prev_matches = 0
     matches = 0
     for line in lines:
         line = line.rstrip('\n')
+        #print(line)
         keywords = line.split("-")
         if rule.threshold == {}:
             for key in keywords:
@@ -89,17 +93,24 @@ def evalRule(rule):
                     break
         #print(keywords)
         if keywords != ['']:
+            prev_fitness = fitness
+            prev_matches = matches
             fitness = getRuleFitness(keywords)
 
         if fitness == 1:
-            matches += 1 
+            matches += 1
+        
+    print()
+    
+    if rule.protocol == "udp" and "fragbits" in rule.options:
+        return prev_fitness, prev_matches
     
     return fitness, matches
 
 def sendGoodTraffic(local_ip):
     #subprocess.Popen(["sh", "setDstAddr.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
     subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh"], stdout=subprocess.DEVNULL).wait()
-    time.sleep(11)
+    time.sleep(12)
 
 def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
@@ -150,9 +161,10 @@ class Rule:
             print(self.options)
 
             print(str(self))
-            fitness1 = evalRule(self)
-            fitness2 = evalRule(self)
-
+            fitness1, _ = evalRule(self)
+            fitness2, _ = evalRule(self)
+            print(fitness1)
+            print(fitness2)
             if fitness1 == fitness2:
                 rule_options[keyword] = self.options[keyword]
 
@@ -185,7 +197,7 @@ def evolveRuleSinglePacket(rule):
                 print(str(rule))
 
                 new_fitness, new_matches = evalRule(rule)
-                print("rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
+                print("#1 - rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
                 
                 if new_fitness < 1 and new_matches > 0:
                     del rule.options[keyword]
@@ -198,40 +210,59 @@ def evolveRuleSinglePacket(rule):
                     prev_fitness = new_fitness
         else:
             if rule.protocol == "tcp" and keyword == "flags":
-                print("flags:")
+                #print("flags:")
                 all_v1 = []
                 for flag in keys_by_proto[rule.protocol][keyword][:-3]:
                     all_v1.append(flag)
 
-            #for i in range(2, len(keys_by_proto[rule.protocol][keyword])):
-                """tuple_list = list(combinations(keys_by_proto[rule.protocol][keyword][:-3], 2))
-                for elem in tuple_list:
-                    str_elem = ""
-                    for j in elem:
-                        str_elem = str_elem + str(j)
-                    #str_elem = str_elem[:-1] 
-                    all_v1.append(str_elem)
-                """
-                print(all_v1)
-                prev_option = all_v1[0] + ", CE"
-                for v1 in all_v1:
-                    rule.options[keyword] = str(v1) + ", CE"
+                all_v2 = ["", ", 12"]
+                prev_option = all_v1[0]
+                x = 0
+                for v1 in all_v1: 
+                    for v2 in all_v2:
+                        rule.options[keyword] = str(v1) + str(v2)
+                        print("rule:" + str(rule), end='')
+
+                        new_fitness, new_matches = evalRule(rule)
+                        print("#2 - rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
+                        print()
+                        
+                        if new_fitness < 1 and new_matches > 0:
+                            del rule.options[keyword]
+                            break
+                        
+                        print("PREV FITNESS: " + str(prev_fitness))
+                        if new_fitness < prev_fitness:
+                            rule.options[keyword] = prev_option
+                            x=1
+                            break
+                        else:
+                            prev_fitness = new_fitness
+                    
+                        prev_option = rule.options[keyword]
+                    
+                    if x == 1:
+                        break
+            if rule.protocol == "udp" and keyword == "fragbits":
+                prev_matches = 0
+                prev_option = keys_by_proto[rule.protocol][keyword][0]
+                for v1 in keys_by_proto[rule.protocol][keyword]:
+                    rule.options[keyword] = v1
                     print("rule:" + str(rule))
 
                     new_fitness, new_matches = evalRule(rule)
-                    print("rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
-                    
+                    print("#3 - rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
+
                     if new_fitness < 1 and new_matches > 0:
                         del rule.options[keyword]
                         break
 
                     if new_fitness < prev_fitness:
-                        rule.options[keyword] = prev_option
+                        rule.options[keyword] = rule.options[keyword]-1
                         break
                     else:
                         prev_fitness = new_fitness
 
-                    prev_option = rule.options[keyword]
     
     print("rule return:", rule)
                             
@@ -242,11 +273,13 @@ def optimizeRule(rule):
     #print("len options:", len(rule.options))
     if len(rule.options) > 1:
         for keyword in rule.options:
+            if len(new_rule.options) == 1:
+                break
             del new_rule.options[keyword]
             print(str(new_rule))
 
             fitness = evalFalsePositive(new_rule)
-            print(fitness)
+            print("#4 - rule fitness: " + str(fitness))
             if fitness >= 1.0:
                 new_rule.options[keyword] = rule.options[keyword]
     
@@ -262,20 +295,20 @@ def evolveRuleFlood(rule):
     new_rule.threshold = {"type": "threshold", "track": "by_dst", "count": 1, "seconds": 1}
 
     new_fitness, matches = evalRule(new_rule)
-    print("rule fitness: " + str(new_fitness) + " matches: " + str(matches))
+    print("#5 - rule fitness: " + str(new_fitness) + " matches: " + str(matches))
     
     while 1:
         new_rule.threshold["count"] += 1
-        new_fitness, matches = evalRule(new_rule)
         print(str(new_rule))
-        print("rule fitness: " + str(new_fitness) + " matches: " + str(matches))
+        new_fitness, matches = evalRule(new_rule)
+        print("#6 - rule fitness: " + str(new_fitness) + " matches: " + str(matches))
 
         if new_fitness == 1 and matches == 1:
             break
     
     return new_rule
 
-init_rule = Rule(default_rule_action, "tcp", default_rule_header, default_rule_message, default_rule_sid)
+init_rule = Rule(default_rule_action, "udp", default_rule_header, default_rule_message, default_rule_sid)
 #init_rule.threshold = {"type": "both", "track": "by_dst", "count": 1, "seconds": 1}
 print("initial rule: " + str(init_rule))
 
