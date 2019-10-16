@@ -1,9 +1,10 @@
-\documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first
-% footnote. If that is unneeded, please comment it out.
-
-
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{cite}
 \usepackage{url}
@@ -39,69 +40,41 @@
 
 \input{macros}
 
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
 
-%% \usepackage{cite}
-%% \usepackage{amsmath,amssymb,amsfonts}
-%% \usepackage{algorithmic}
-%% \usepackage{graphicx}
-%% \usepackage{textcomp}
-%% \usepackage{xcolor}
-
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-
-\title{Search-based Synthesis of Network Intrusion Detection Rules}
-
-%%%%%%%%%%% Anonymized
-
-%% \author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% \and
-%% \IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% \and
-%% \IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% \and
-%% \IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% \and
-%% \IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% \and
-%% \IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
-%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%% \textit{name of organization (of Aff.)}\\
-%% City, Country \\
-%% email address}
-%% }
-
-\maketitle
-
+%
+\title{Synthesis of Network Intrusion Detection Rules}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Lucas Alcantara\inst{1}\Comment{\orcidID{0000-1111-2222-3333}} \and
+Guilherme Padilha\inst{1}\Comment{\orcidID{1111-2222-3333-4444}} \and
+Marcelo d'Amorim\inst{1}\Comment{\orcidID{0000-0002-1323-8769}}}
+%
+\authorrunning{Alcantara et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Federal University of Pernambuco (UFPE), Recife, Brazil\\
+\email{\{lama,ghps,damorim\}@cin.ufpe.br}}
+%
+\maketitle              % typeset the header of the contribution
+%
 \begin{abstract}
 ...
+\keywords{NIDS, synthesis, search}
 \end{abstract}
-
-\begin{IEEEkeywords}
-NIDS, synthesis, search
-\end{IEEEkeywords}
-
+%
+%
+%
 \section{Introduction}
 
 Network Intrusion Detection Systems (\nids{}) are software systems
@@ -110,7 +83,7 @@ accordingly by blocking messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
 not block. Various open-source (\eg{}, Snort~\cite{snort} and
-Suricata~\cite{suricata}) and commercial implementations (\eg{},
+Suricata~\cite{suricata}) and commercial NIDS implementations (\eg{},
 SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar}) exist
 today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
@@ -124,51 +97,56 @@ rules. Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
 prescribes a method to capture a denial-of-service
 attack~\cite{understanding-dos} to a server by matching specific
-conditions about the network traffic. Relevant conditions appear in
-bold. Rule-based \nids{} focus on known attacks whereas anomaly-based
-\nids{} focus on unknown attacks that could be observed by first
-learning the regular traffic and then capturing suspicious
-traffic~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}.
+conditions about the network traffic. Relevant properties about the
+traffic of interest appear in bold (see
+Section~\ref{sec:suri-metas-coverage}). Rule-based \nids{} focus on
+known attacks whereas anomaly-based \nids{} focus on unknown attacks
+that could be observed by first learning the regular traffic and then
+acting
+properly~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}. These
+two kinds of intrusion detection mechanisms are
+complementary. Rule-based NIDS could miss attacks (as rulesets can
+become outdated) whereas anomaly-based NIDS can raise false alarms (as
+detection algorithms are approximate).
 
-These two kinds of intrusion detection mechanisms are
-complementary. Conceptually, rule-based NIDS could miss attacks (as
-rulesets can become outdated) whereas anomaly-based NIDS can raise
-false alarms (as the detection algorithms use are approximate).
-Rule-based NIDS are restricted to a fixed set of rules and attackers
-constantly create new strategies. Furthermore, manually writing rules
-to capture those attacks is tedious and error-prone. As consequence,
-IT-security companies advertize paid rulesets for consumers to
-buy~\cite{proofpoint-etpro,snort-rule-subscriptions}.  Despite this
+Rule-based NIDS are restricted to a fixed set of rules defined by the
+network system administrator. Manually writing these rules is tedious,
+error-prone, but important as attackers constantly create new
+strategies to circumvent existing rules. IT-security companies
+capitalize on this phenomena and put rulesets on the market for
+sale~\cite{proofpoint-etpro,snort-rule-subscriptions}.  Despite this
 fundamental issue, rule-based systems are tremendously popular in
-industry today~\Fix{cite}. Anomaly-based NIDS, in contrast, are not
-restricted to a fixed set of rules. They learn usage behavior from
-positive traffic and, based on that, alert uncommon
-behavior~\cite{7579764}. Unfortunately, anomaly-based NIDS are
-fundamentally imprecise. To sum up, both approaches have positive and
-negative aspects.
+industry today. Anomaly-based NIDS are not restricted to a fixed set
+of rules. They learn usage behavior from positive traffic and, based
+on that, alert uncommon behavior~\cite{7579764}. Unfortunately,
+anomaly-based NIDS are fundamentally imprecise. To sum up, rule-based
+NIDS are precise but incomplete whereas anomaly-based NIDS are (more)
+complete but imprecise.
 
 %% This paper focuses on the
 %% problem of discovering new rules by using anomaly-based NIDS.
 
-This paper proposes a technique, dubbed \tname{}, to close the gap
-between these two strategies. \tname{} automatically synthesizes rules
-from positive and negative examples (\ie{}, benign and malicious
-traffic). A scenario of application of \tname{} is one where an
-anomaly-based NIDS identifies abnormal traffic and signals that
-traffic to \tname{} to craft rules that can be used by rule-based
-NIDS. Note that anomaly-based NIDS are evolving pretty quick with the
-advances in machine learning, but rule-based NIDS are still extremely
-popular.  \tname{} could also leverage existing databases of malicious
-traffic to synthesize rules.  Regardless of how the negative traffic
-is produced (out of scope of this paper), those rules can be
-distributed to rule databases for free. Our goal is to harden the
-protection of NIDS by automatically synthesizing rules from negative
-examples.
+This paper proposes \tname{}, a technique that uses machine
+intelligence to automatically synthesize rules for rule-based
+\nids. Our general goal is to harden the protection of NIDS by
+improving the creation process of rules. One scenario of application
+of \tname{} is one where an anomaly-based NIDS identifies abnormal
+traffic and signals that traffic to \tname{} to create and distribute
+the rules.
 
+%% Note that anomaly-based NIDS are evolving pretty quick with the
+%% advances in machine learning, but rule-based NIDS are still extremely
+%% popular.  \tname{} could also leverage existing databases of malicious
+%% traffic to synthesize rules.  Regardless of how the negative traffic
+%% is produced (out of scope of this paper), those rules can be
+%% distributed to rule databases for free.
 %%  The
 %% core motivation is that 1) attackers are productive in creating new
 %% ways to circumvent existing protections and 2) manual creation of
 %% rules is tedious and time-consuming.  
+
+\tname{} synthesizes rules from positive and negative examples, \ie{},
+malicious and benign traffic.
 
 \Fix{summarize how the technique works}
 
@@ -276,7 +254,7 @@ Intervalo de reprodução: 0.005 segundo
 
 \begin{figure*}[t]
 \centering
-\includegraphics[trim=10 360 182 130,clip,width=0.7\textwidth]{figs/nids-workflow}
+\includegraphics[trim=10 360 182 130,clip,width=0.95\textwidth]{figs/nids-workflow}
 \caption{\tname\ workflow.}
 \label{fig:overview}
 \end{figure*}
@@ -526,13 +504,14 @@ External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
 \section{Related Work}
 
 \Fix{...}
-
-\balance
-%\vspace*{-2\baselineskip}
-\bibliographystyle{IEEEtran}
+%
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+\bibliographystyle{splncs04}
 \bibliography{references}
+%
 
 \end{document}
-
-%%  LocalWords:  Suricata SolarWinds QRadar NIDS OISF TCP ACK msg tcp
-%%  LocalWords:  encodings eval cardinality
