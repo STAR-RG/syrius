@@ -49,7 +49,7 @@
 
 \begin{document}
 %
-\title{Synthesis of Network Intrusion Detection Rules}
+\title{Synthesis of Rules for Network Intrusion Detection}
 %
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
@@ -69,7 +69,22 @@ Marcelo d'Amorim\inst{1}\Comment{\orcidID{0000-0002-1323-8769}}}
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-...
+Network Intrusion Detection Systems (\nids{}) are a popular defense
+mechanism against network attacks today. These systems monitor the
+network traffic and flag suspicious network behavior. Signature-based
+\nids\ do that by checking the network traffic against a pre-defined
+set of rules, which can become obsolete due to the adaptation of
+attackers to existing rules. This paper proposes \tname{}, a technique
+to synthesize rules for \nids; \tname{} uses previously-classified
+positive and negative examples (\ie{}, malicious and benign traffic)
+to identify the constraints that distiguish positive and negative
+examples. In a nutshell, \tname{} bootstraps the search with a
+candidate solution that uses data from the payload of the malicious
+message, optimizes the candidate solution to capture the positive
+example and, and then optimizes the candidate solution to avoid
+capturing the negative traffic. Results indicate that \Fix{...}
+
+
 \keywords{NIDS, synthesis, search}
 \end{abstract}
 %
