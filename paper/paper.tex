@@ -69,20 +69,26 @@ Marcelo d'Amorim\inst{1}\Comment{\orcidID{0000-0002-1323-8769}}}
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Network Intrusion Detection Systems (\nids{}) are a popular defense
-mechanism against network attacks today. These systems monitor the
-network traffic and flag suspicious network behavior. Signature-based
-\nids\ do that by checking the network traffic against a pre-defined
-set of rules, which can become obsolete due to the adaptation of
-attackers to existing rules. This paper proposes \tname{}, a technique
-to synthesize rules for \nids; \tname{} uses previously-classified
-positive and negative examples (\ie{}, malicious and benign traffic)
-to identify the constraints that distiguish positive and negative
-examples. In a nutshell, \tname{} bootstraps the search with a
-candidate solution that uses data from the payload of the malicious
-message, optimizes the candidate solution to capture the positive
-example and, and then optimizes the candidate solution to avoid
-capturing the negative traffic. Results indicate that \Fix{...}
+Network Intrusion Detection Systems (\nids{}) are a popular mechanism
+used by system administrators to defend against network attacks. These
+systems monitor the network traffic and flag suspicious network
+behavior. Signature-based \nids\ do that by checking the network
+traffic against a pre-defined set of rules, which can become obsolete
+as attackers learn new strategies to circumvent existing defenses.
+This paper proposes \tname{}, a technique that automatically
+synthesizes \nids\ rules from positive and negative examples (\ie{},
+malicious and benign traffic). \tname{} formulates synthesis as an
+optimization problem whose candidate solutions are rules that
+maximizes the captured the positive traffic and minimizes the captured
+negative traffic. \tname{} bootstraps the search with candidate
+solutions that use data from the payload of the malicious message and
+produces optimal rule candidates on output. We evaluated \tname{} on a
+diverse set of attacks. Results indicate that \Fix{...}
+
+%% optimizes the
+%% candidate solution to capture the positive example and, and then
+%% optimizes the candidate solution to avoid capturing the negative
+%% traffic. 
 
 
 \keywords{NIDS, synthesis, search}
