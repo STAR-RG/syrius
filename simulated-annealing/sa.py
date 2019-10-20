@@ -1,10 +1,11 @@
 import subprocess
 import time
 import copy
+import pyshark
 from itertools import combinations
 
 keys_by_proto = {}
-keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255, "icmp_seq":65525}#, "icmp_id":65535}
+keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255}#,"icmp_seq":65525, "icmp_id":65535}
 keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}#"ack":4294967295, "seq":4294967295}
 keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
@@ -17,6 +18,12 @@ default_rule_sid = 1
 
 #subprocess.Popen(["sudo", "suricata", "-c", "../suricata/suricata.yaml", "-i", "wlp2s0"])
 
+pcap = "Datasets/attack.pcap"
+pkts = pyshark.FileCapture(pcap)
+pkts.load_packets()
+print(len(pkts._packets))
+rule_protocol = str(pkts[0].highest_layer).lower()
+
 def writeRuleOnFile(rule):
     ruleFile_path = "../suricata/pesquisa/individual.rules"
     ruleFile = open(ruleFile_path, 'w+')
@@ -24,22 +31,18 @@ def writeRuleOnFile(rule):
     ruleFile.close()
     time.sleep(0.050)
 
-def reloadSuricataRules(suricata_pid):
-    subprocess.Popen(["sudo", "kill", "-USR2", str(suricata_pid)])
+def reloadSuricataRules():
+    subprocess.Popen(["sudo", "kill", "-USR2", str(getSuricataPid())])
     time.sleep(0.200)
 
 def getSuricataPid():
-    return int(subprocess.Popen(["pidof", "suricata"], stdout=subprocess.PIPE, encoding="utf-8").communicate()[0])
+    return subprocess.Popen(["pidof", "suricata"], stdout=subprocess.PIPE, encoding="utf-8").communicate()[0].rstrip()
 
 def getLocalIp():
     return subprocess.Popen(["sh", "getLocalIp.sh"], stdout=subprocess.PIPE, encoding="utf-8").communicate()[0].rstrip()
 
-def sendFlood(local_ip):
-    subprocess.Popen(["sh", "sendFlood.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.2)
-
-def sendPacket(local_ip):
-    subprocess.Popen(["sh", "sendPacket.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
+def sendAttack():
+    subprocess.Popen(["sh", "sendAttack.sh", pcap], stdout=subprocess.DEVNULL).wait()
 
 def getRuleFitness(keywords):
     if len(keywords) <= 1:
@@ -67,9 +70,8 @@ def getRuleFitness(keywords):
 def evalRule(rule):
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
-    reloadSuricataRules(getSuricataPid())    
-    #sendPacket(getLocalIp())    
-    sendFlood(getLocalIp())
+    reloadSuricataRules()  
+    sendAttack()
     fitnessFile_path = "../suricata/rulesFitness.txt"
 
     try:
@@ -84,14 +86,14 @@ def evalRule(rule):
     matches = 0
     for line in lines:
         line = line.rstrip('\n')
-        #print(line)
         keywords = line.split("-")
+        
         if rule.threshold == {}:
             for key in keywords:
                 if "threshold" in key:
                     keywords = keywords[:-1]
                     break
-        #print(keywords)
+
         if keywords != ['']:
             prev_fitness = fitness
             prev_matches = matches
@@ -99,8 +101,6 @@ def evalRule(rule):
 
         if fitness == 1:
             matches += 1
-        
-    print()
     
     if rule.protocol == "udp" and "fragbits" in rule.options:
         return prev_fitness, prev_matches
@@ -108,7 +108,6 @@ def evalRule(rule):
     return fitness, matches
 
 def sendGoodTraffic(local_ip):
-    #subprocess.Popen(["sh", "setDstAddr.sh", str(local_ip)], stdout=subprocess.DEVNULL).wait()
     subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh"], stdout=subprocess.DEVNULL).wait()
     time.sleep(12)
 
@@ -116,7 +115,7 @@ def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
-    reloadSuricataRules(getSuricataPid()) 
+    reloadSuricataRules() 
     sendGoodTraffic(getLocalIp())
 
     try:
@@ -221,7 +220,7 @@ def evolveRuleSinglePacket(rule):
                 for v1 in all_v1: 
                     for v2 in all_v2:
                         rule.options[keyword] = str(v1) + str(v2)
-                        print("rule:" + str(rule), end='')
+                        print("rule:" + str(rule))
 
                         new_fitness, new_matches = evalRule(rule)
                         print("#2 - rule fitness: " + str(new_fitness) + " matches: " + str(new_matches))
@@ -295,6 +294,7 @@ def evolveRuleFlood(rule):
     new_rule.threshold = {"type": "threshold", "track": "by_dst", "count": 1, "seconds": 1}
 
     new_fitness, matches = evalRule(new_rule)
+    print(str(new_rule))
     print("#5 - rule fitness: " + str(new_fitness) + " matches: " + str(matches))
     
     while 1:
@@ -308,7 +308,7 @@ def evolveRuleFlood(rule):
     
     return new_rule
 
-init_rule = Rule(default_rule_action, "udp", default_rule_header, default_rule_message, default_rule_sid)
+init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
 #init_rule.threshold = {"type": "both", "track": "by_dst", "count": 1, "seconds": 1}
 print("initial rule: " + str(init_rule))
 
