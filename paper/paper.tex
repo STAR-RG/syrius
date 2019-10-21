@@ -49,7 +49,7 @@
 
 \begin{document}
 %
-\title{Synthesis of Rules for Network Intrusion Detection}
+\title{Synthesis of Rules for Network Intrusion Detectors}
 %
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
@@ -175,19 +175,11 @@ malicious and benign traffic.
 
 This paper makes the following contributions.
 
-\section{Illustrative Example}
-\label{sec:suri-metas-coverage}
+\section{Background}
 
-\begin{figure}[t]
-  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
-  \caption{Suricata rule for SYN Flood Attacks.}
-  \label{fig:synflood-example}
-\end{figure}
-
-This section 1)~shows an example rule of Suricata, 2)~briefly explains
-the format of Suricata rules, 3) presents an example of a network
-attack, and 4) illustrates how \tname{} performs to synthesize the
-rule that would capture the attack.
+This paper focuses on signature-based \nids, Suricata, in
+particular. But the principles we use are general to any other
+signature-based \nids~(\eg{}, Snort~\cite{snort}).
 
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
@@ -215,6 +207,21 @@ and ``content''). The main challenge in synthesizing rules is to
 discover the set of options that make a rule to capture the malicious
 traffic, but ignore the benign traffic.
 
+\Fix{tabulate some important rules that we support}
+
+
+\section{Illustrative Examples}
+\label{sec:suri-metas-coverage}
+
+\begin{figure}[t]
+  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
+  \caption{Suricata rule for SYN Flood Attacks.}
+  \label{fig:synflood-example}
+\end{figure}
+
+This section briefly presents examples of attacks and rules that are
+synthesized with \tname{} to capture those attacks.
+
 \subsection{SYN Flood Attack}
 
 The SYN Flood attack exploits a vulnerability in the TCP/IP handshake
@@ -238,14 +245,93 @@ short period of time.
 
 %\Mar{please, explain the other fields}
 
-\subsection{\tname\ on SYN Flood Attack}
+\subsubsection{\tname\ on SYN Flood Attack}
 
 \Mar{Guilherme/Lucas (CRI): we need to show how \tname{} works on this
   example. What is the input? How long does it take to generate the
   rule? Is the rule generated exactly the same? Please explain...}
+
+
+\Fix{repeat this for two other attacks. one non-dos/flood non-content}
   
 
 \section{Technique}
+
+\tname{} is a technique that uses positive and negative examples to
+synthesize signature-based NIDS rules, such as those from Snort and
+Suricata. The goal of \tname\ is to create a rule that \emph{only}
+captures the positive traffic, \ie{}, the malicious sequence of
+messages. 
+
+\vspace{1ex}
+\noindent\textbf{Overview.}~\tname{} synthesizes rules in two
+steps. First, it produces a potentially overspecified rule that
+captures the malicious traffic provided on input. In this step,
+\tname\ \emph{maximizes} the number of options in the rule that
+captures the positive traffic. It extracts tokens from the malicious
+message and use them to define the initial rule. Furthermore, it
+searches for additional rule option (\eg, \Fix{xxx}) that are not
+found in the message data but are satisfied by the traffic. We say
+that this rule overfits the problem as it clearly satisfy the success
+criterion of only capturing the positive traffic, however it is unable
+to generalize to other attacks of the same kind with different
+data. In the second step, \tname{} uses negative examples to
+\emph{minimize} the rule, discarding unnecessary options. Note that
+any subset of options in the rule obtained in this stage captures the
+positive traffic by construction. \Fix{...elaborate...}
+
+\subsection{Step 1: Rule Maximization}
+\pgfplotsset{width=5.5cm,compat=1.8}
+
+The goal of the first step is to synthesize a rule with the maximum
+number of options that satisfy the malicious traffic. A rule is
+maximal if no other option can be added without making it miss the
+traffic.
+
+\begin{wrapfigure}[14]{r}{0.5\textwidth}
+  \centering
+  \vspace{-5ex}  
+  \begin{tikzpicture}
+    \begin{axis}[
+        ybar stacked,
+        enlargelimits=0.15,
+        legend style={at={(0.5,-0.15)},
+          anchor=north,legend columns=-1},
+        ylabel={\#rules},
+        symbolic x coords={gen, http, icmp, udp, tcp},
+        xtick=data,
+        nodes near coords,
+        nodes near coords align={vertical},
+      ]
+      \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
+      \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
+      \legend{relevant, irrelevant}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{\label{fig:distribution-rules-protocol}Distribution of
+    rules per protocol and relevance for triggering action.}
+\end{wrapfigure}
+It is important to note that options can be specific to a given
+protocol or general and they can influence or not triggering an
+action. Figure~\ref{fig:distribution-rules-protocol} shows the
+distributions of these options per protocol and their relevance for
+triggering rule actions. This plot indicates that the problem search
+space is defined based on the protocol of the malicious traffic. For
+instance, if \tname{} detects that the attack involves \CodeIn{http}
+traffic, then 34 different rule options will be considered in the
+creation of the rule.
+
+\Fix{describe extraction...}
+
+\subsection{Step 2: Rule Minimization}
+
+Any rule created from a subset of rule options still captures the
+traffic as every rule option we infer in this step is independent and
+satisfied by the traffic.
+
+
+
+\Fix{...............estou aqui}
 
 \begin{figure*}[t]
 \centering
@@ -253,27 +339,6 @@ short period of time.
 \caption{\tname\ workflow.}
 \label{fig:overview}
 \end{figure*}
-
-\tname{} is a search-based approach that uses positive and negative
-examples to synthesize signature-based NIDS rules, such as those from
-Snort and Suricata. The technique synthesizes rules in two
-steps. First, \tname{} produces a potentially overspecified rule that
-captures the malicious traffic provided on input. The rule obtained in
-this stage can also capture benign traffic. In this step,
-\tname\ \emph{maximizes} the number of properties in the rule that
-captures the positive traffic. It extracts the tokens from the payload
-of the positive traffic (\ie{}, malicious traffic) and add them as
-content properties (see Section \Fix{xxx}). Furthermore, it searches
-for additional properties satisfied by the positive traffic. Any
-subset of properties found in this stage, by construction, captures
-the positive traffic. In the second step, \tname{} uses negative
-examples to \emph{minimize} the rule, discarding unnecessary
-options. The goal of \tname\ is to create a rule that only captures
-the positive traffic. The search is optimal (\ie{}, we reach this
-goal) if no benign message is captured during the minimization step.
-
-\Fix{...............estou aqui}
-
 
 Figure~\ref{fig:overview} shows the workflow of \tname{} as a pipeline
 of two components, appearing numbered in the figure. Each component
@@ -314,36 +379,6 @@ inspecting Suricata code for the presence of \CodeIn{eval} functions,
 which are invoked from a main loop to process each action rule. The
 presence of such a function for a given option indicates that it is
 relevant for triggering some action of some rule.
-
-Options can be specific to a given protocol or general and they can
-influence or not triggering an
-action. Figure~\ref{fig:distribution-rules-protocol} shows the
-distributions of these options per protocol and their relevance for
-triggering rule actions.
-
-\pgfplotsset{width=5.5cm,compat=1.8}
-\begin{figure}[h!]
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-        ybar stacked,
-        enlargelimits=0.15,
-        legend style={at={(0.5,-0.15)},
-          anchor=north,legend columns=-1},
-        ylabel={\#rules},
-        symbolic x coords={gen, http, icmp, udp, tcp},
-        xtick=data,
-        nodes near coords,
-        nodes near coords align={vertical},
-      ]
-      \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
-      \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
-      \legend{relevant, irrelevant}
-    \end{axis}
-  \end{tikzpicture}
-  \caption{\label{fig:distribution-rules-protocol}Distribution of
-    rules per protocol and relevance for triggering action.}
-\end{figure}
 
 \subsection{Initial State}
 
