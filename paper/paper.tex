@@ -301,6 +301,7 @@ traffic.
         symbolic x coords={gen, http, icmp, udp, tcp},
         xtick=data,
         nodes near coords,
+        every node near coord/.append style={font=\scriptsize},        
         nodes near coords align={vertical},
       ]
       \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
@@ -313,7 +314,10 @@ traffic.
 \end{wrapfigure}
 It is important to note that options can be specific to a given
 protocol or general and they can influence or not triggering an
-action. Figure~\ref{fig:distribution-rules-protocol} shows the
+action. The purpose of rule options \CodeIn{msg}, for instance, is to
+print on the output an informative message indicating what kind of
+intrusion has been
+observed. Figure~\ref{fig:distribution-rules-protocol} shows the
 distributions of these options per protocol and their relevance for
 triggering rule actions. This plot indicates that the problem search
 space is defined based on the protocol of the malicious traffic. For
@@ -321,7 +325,52 @@ instance, if \tname{} detects that the attack involves \CodeIn{http}
 traffic, then 34 different rule options will be considered in the
 creation of the rule.
 
-\Fix{describe extraction...}
+To infer options, \tname{} parses the protocol message, looking for
+fields in the message associated with options. For example, fields
+\Fix{...and...}  can be used to determine the option
+\Fix{...}. Unfortunately, inferring options at the field granularity
+level is insufficient to capture content options (see
+Section~\ref{sec:example-suricata-rules}), which refer to parts of the
+payload of the message and cannot be directly extracted directly from
+the fields. Handling this case is critically important as most rules
+contain content options. Figure~\ref{fig:distribution-contents} shows
+the histogram of number of content options per rule (up to 10) for the
+Suricata public rule database \Fix{cite}. Rules without content
+options is an exception and half of the rules contain at least two
+content options.
+\begin{wrapfigure}[12]{r}{0.5\textwidth}
+  \centering
+  \vspace{-5ex}  
+  \begin{tikzpicture}
+    \begin{axis}[
+        bar width=8pt,
+        scaled ticks=false,
+        tick label style={/pgf/number format/fixed},
+        ybar stacked,
+        enlargelimits=0.1,
+        legend style={at={(0.5,-0.15)},
+          anchor=north,legend columns=-1},
+        symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+        xtick=data,
+        nodes near coords,
+        every node near coord/.append style={font=\tiny},
+        nodes near coords align={vertical},
+      ]
+      \addplot coordinates {(0,25) (1,10222) (2,4956) (3,5589)
+        (4,1651) (5,1457) (6, 729) (7, 471) (8, 313) (9, 137) (10, 126)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{\label{fig:distribution-contents}Histogram of number of
+    content options per rule (up to 10).}
+\end{wrapfigure}
+To find the values associated with these options, \tname{} splits the
+payload of the malicious message in tokens using natural language
+delimiters, such as $\backslash$t, $\backslash$n, $\backslash$r, and
+spaces. The rationale for this decision is that we observed, by
+inspecting existing rules, that content options typically refer to
+sequence of characters in the payload of messages separated by these
+delimiters. \Fix{describe extraction of options not in the
+  message. give examples! search only makes sense if this exists!}
 
 \subsection{Step 2: Rule Minimization}
 
@@ -333,12 +382,12 @@ satisfied by the traffic.
 
 \Fix{...............estou aqui}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[trim=10 360 182 130,clip,width=0.95\textwidth]{figs/nids-workflow}
-\caption{\tname\ workflow.}
-\label{fig:overview}
-\end{figure*}
+%% \begin{figure*}[t]
+%% \centering
+%% \includegraphics[trim=10 360 182 130,clip,width=0.95\textwidth]{figs/nids-workflow}
+%% \caption{\tname\ workflow.}
+%% \label{fig:overview}
+%% \end{figure*}
 
 Figure~\ref{fig:overview} shows the workflow of \tname{} as a pipeline
 of two components, appearing numbered in the figure. Each component
