@@ -281,36 +281,39 @@ any subset of options in the rule obtained in this stage captures the
 positive traffic by construction. \Fix{...elaborate...}
 
 \subsection{Step 1: Rule Maximization}
-\pgfplotsset{width=5.5cm,compat=1.8}
+\pgfplotsset{width=6cm,compat=1.8}
+\pgfplotsset{every tick label/.append style={font=\tiny}}
 
 The goal of the first step is to synthesize a rule with the maximum
 number of options that satisfy the malicious traffic. A rule is
-maximal if no other option can be added without making it miss the
+maximal if no other option can be added without missing the malicious
 traffic.
 
-\begin{wrapfigure}[14]{r}{0.5\textwidth}
+\begin{wrapfigure}[16]{r}{0.5\textwidth}
   \centering
-  \vspace{-5ex}  
-  \begin{tikzpicture}
-    \begin{axis}[
-        ybar stacked,
-        enlargelimits=0.15,
-        legend style={at={(0.5,-0.15)},
-          anchor=north,legend columns=-1},
-        ylabel={\#rules},
-        symbolic x coords={gen, http, icmp, udp, tcp},
-        xtick=data,
-        nodes near coords,
-        every node near coord/.append style={font=\scriptsize},        
-        nodes near coords align={vertical},
-      ]
-      \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
-      \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
-      \legend{relevant, irrelevant}
-    \end{axis}
-  \end{tikzpicture}
+  \vspace{-5ex}
+  \scalebox{1.05}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+%          ylabel={\#rules},
+          symbolic x coords={gen, http, icmp, udp, tcp},
+          xtick=data,
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},        
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
+        \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
+        \legend{relevant, irrelevant}
+      \end{axis}
+    \end{tikzpicture}
+  }
   \caption{\label{fig:distribution-rules-protocol}Distribution of
-    rules per protocol and relevance for triggering action.}
+    number of rules per protocol and relevance for triggering action.}
 \end{wrapfigure}
 It is important to note that options can be specific to a given
 protocol or general and they can influence or not triggering an
@@ -319,9 +322,11 @@ print on the output an informative message indicating what kind of
 intrusion has been
 observed. Figure~\ref{fig:distribution-rules-protocol} shows the
 distributions of these options per protocol and their relevance for
-triggering rule actions. This plot indicates that the problem search
+triggering rule actions. We obtained this information
+by\Fix{...explicar como...} \Fix{eh um pouco suspeito ter tantas regras
+  irrelevantes...}This plot indicates that the problem search
 space is defined based on the protocol of the malicious traffic. For
-instance, if \tname{} detects that the attack involves \CodeIn{http}
+instance, if \tname{} detects by analyzing the format of network packets that the attack involves \CodeIn{http}
 traffic, then 34 different rule options will be considered in the
 creation of the rule.
 
@@ -329,55 +334,73 @@ To infer options, \tname{} parses the protocol message, looking for
 fields in the message associated with options. For example, fields
 \Fix{...and...}  can be used to determine the option
 \Fix{...}. Unfortunately, inferring options at the field granularity
-level is insufficient to capture content options (see
+level is insufficient to capture \CodeIn{content} options (see
 Section~\ref{sec:example-suricata-rules}), which refer to parts of the
 payload of the message and cannot be directly extracted directly from
 the fields. Handling this case is critically important as most rules
-contain content options. Figure~\ref{fig:distribution-contents} shows
-the histogram of number of content options per rule (up to 10) for the
-Suricata public rule database \Fix{cite}. Rules without content
+contain \CodeIn{content} options. Figure~\ref{fig:distribution-contents} shows
+the histogram of number of these options per rule (up to 10) for the
+Suricata public rule database \Fix{cite}. Rules without \CodeIn{content}
 options is an exception and half of the rules contain at least two
-content options.
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
+\CodeIn{content} options.
+\begin{wrapfigure}[14]{r}{0.56\textwidth}
   \centering
-  \vspace{-5ex}  
-  \begin{tikzpicture}
-    \begin{axis}[
-        bar width=8pt,
-        scaled ticks=false,
-        tick label style={/pgf/number format/fixed},
-        ybar stacked,
-        enlargelimits=0.1,
-        legend style={at={(0.5,-0.15)},
-          anchor=north,legend columns=-1},
-        symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-        xtick=data,
-        nodes near coords,
-        every node near coord/.append style={font=\tiny},
-        nodes near coords align={vertical},
-      ]
-      \addplot coordinates {(0,25) (1,10222) (2,4956) (3,5589)
-        (4,1651) (5,1457) (6, 729) (7, 471) (8, 313) (9, 137) (10, 126)};
-    \end{axis}
-  \end{tikzpicture}
+  \vspace{-3ex}
+  \scalebox{1.2}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          xtick=data,
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(0,25) (1,10222) (2,4956) (3,5589)
+          (4,1651) (5,1457) (6, 729) (7, 471) (8, 313) (9, 137) (10, 126)};
+      \end{axis}
+    \end{tikzpicture}
+  }
   \caption{\label{fig:distribution-contents}Histogram of number of
-    content options per rule (up to 10).}
+    \CodeIn{content} options per rule (up to 10).}
 \end{wrapfigure}
 To find the values associated with these options, \tname{} splits the
 payload of the malicious message in tokens using natural language
 delimiters, such as $\backslash$t, $\backslash$n, $\backslash$r, and
 spaces. The rationale for this decision is that we observed, by
-inspecting existing rules, that content options typically refer to
+inspecting existing rules, that \CodeIn{content} options typically refer to
 sequence of characters in the payload of messages separated by these
 delimiters. \Fix{describe extraction of options not in the
   message. give examples! search only makes sense if this exists!}
 
 \subsection{Step 2: Rule Minimization}
 
-Any rule created from a subset of rule options still captures the
-traffic as every rule option we infer in this step is independent and
-satisfied by the traffic.
+The rule reported by the first step satisfies the criterion to only
+capture positive traffic, however it is ``too'' specific---it is
+unable to capture different manifestations of the same attack as the
+rule would unlikely match exactly the options we found for the input
+message. Some options added to the rule during the first step are
+irrelevant for determining the attack and should be removed.
 
+The goal of this step is to create a \emph{minimal} rule that captures
+\emph{only} the positive malicious traffic. A rule is minimal if
+discarding any option results in capturing negative (\ie{}, benign)
+traffic. Recall that the previous maximization step produces a rule
+that captures the positive traffic and all options are satisifed by
+the positive traffic. Consequently, any subset of these options also
+captures the positive traffic. The minimization procedure we propose
+in this step builds on that observation. It iteratively discards
+options from the candidate rule until no other options can be
+removed. The procedure uses negative traffic to guide the
+search. Public databases of negative traffic with \Fix{thousands} of
+messages exist \Fix{cite cite} and can be used to increase the
+accuracy of the minimization.
 
 
 \Fix{...............estou aqui}
