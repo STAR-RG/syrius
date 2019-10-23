@@ -297,6 +297,7 @@ administrator would know how to modify the constant parts.
 from the initial set of options appearing below.
 
 \Fix{atualize isto para o valor correto, por favor. $\rightarrow$}
+
 \begin{figure}[h!]
   \vspace{-3ex}
   \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{synflood.suricata.synth}
@@ -407,8 +408,8 @@ traffic.
           every node near coord/.append style={font=\scriptsize},        
           nodes near coords align={vertical},
         ]
-        \addplot coordinates {(gen,70) (http,34) (icmp,94) (udp,84) (tcp,43)};
-        \addplot coordinates {(gen,50) (http,20) (icmp,134) (udp,90) (tcp,123)};    
+        \addplot coordinates {(http,20) (icmp,18) (udp,18) (tcp,32)};
+        \addplot coordinates {(http,142) (icmp,144) (udp,144) (tcp,130)};    
         \legend{relevant, irrelevant}
       \end{axis}
     \end{tikzpicture}
