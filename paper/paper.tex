@@ -177,8 +177,8 @@ This paper makes the following contributions.
 
 \section{Background}
 
-This paper focuses on signature-based \nids, Suricata, in
-particular. But the principles we use are general to any other
+This paper focuses on signature-based \nids. Although we focused on
+the Suricata \nids, the principles we used are general to any other
 signature-based \nids~(\eg{}, Snort~\cite{snort}).
 
 \subsection{Suricata Rules}
@@ -200,33 +200,47 @@ traffic flowing from any port in the home network to any other address
 outside the home network. The variables \CodeIn{\$HOME\_NET} and
 \CodeIn{\$EXTERNAL\_NET} are configurable. The rule options come after
 the header. It is a semi-colon-separated sequence of key-value
-pairs. Some options serve to document the analyzed traffic (\eg{},
-``msg'', ``classtype'', and ``sid'') whereas the remaining properties
-describe characteristics of the attack (\eg, ``flags'', ``threshold'',
-and ``content''). The main challenge in synthesizing rules is to
-discover the set of options that make a rule to capture the malicious
-traffic, but ignore the benign traffic.
+pairs. Options serve to 1) document the analyzed traffic (\eg{},
+``msg'', ``classtype'', and ``sid'') and to 2) describe
+characteristics of the attack (\eg, ``flags'', ``threshold'', and
+``content''). \tname{} produces options of the second kind, which are
+\emph{relevant} to capturing the attack.
+
+Suricata supports a total of \totoptions\ options covering
+\numproto\ distinct protocols. Of these total of options,
+\totoptionsrelevant\ are relevant to capture traffic (see
+Figure~\ref{fig:distribution-rules-protocol}). Table~\ref{table:rules}
+shows a sample of the relevant options of Suricata. Column ``\#''
+shows the option number, column ``Name'' shows the name of the
+option, column ``\#~Params'' shows the number of additional parameters
+associated with a given option, and column ``Description'' presents a
+short description of the option purpose.
 
 \begin{table}[h]
-  \caption{\label{table:rules}Supported options}  
+  \caption{\label{table:rules}Example options.}  
   \centering
-  \begin{tabular}{lllll}
+  \begin{tabular}{p{0.5cm}lrp{8cm}}
     \toprule
-    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Option} &  \multicolumn{1}{c}{Description}\\
+    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &
+    \multicolumn{1}{c}{\# Params} &  \multicolumn{1}{c}{Description}\\
     \midrule     
-    1 & dsize & matches on the size of the packet payload\\
-    2 & itype & matches on a specific ICMP type\\
-    3 & icode & matches on a specific ICMP code\\
-    4 & icmp\_seq & checks a ICMP sequence number\\
-    5 & icmp\_id & matches on specific ICMP id-values\\
-    6 & window & check for a specific TCP window size\\
-    7 & flags & matches on TCP flags\\
-    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
-    9 & threshold & used to control the rule’s alert frequency\\
-    10 & content & matches on bytes of the payload\\
+    1 & dsize & - & matches on the size of the packet payload\\
+    2 & itype & - & matches on a specific ICMP type\\
+    3 & icode & - & matches on a specific ICMP code\\
+    4 & icmp\_seq & - & checks a ICMP sequence number\\
+    5 & icmp\_id & - & matches on specific ICMP id-values\\
+    6 & window & - & checks the size of the TCP window\\
+    7 & flags & - & matches on TCP flags\\
+    8 & fragbits & - & checks if the fragmentation or reserved bits are set in the IP header\\
+    9 & threshold & - & controls the rule’s alert frequency\\
+    10 & content & - & matches on bytes of the payload\\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\subsection{Rules and Packets}
+
+\Fix{Illustrate how information is extracted from packets}
 
 
 \section{Illustrative Examples}
@@ -241,9 +255,22 @@ traffic, but ignore the benign traffic.
 This section briefly presents examples of attacks and rules that are
 synthesized with \tname{} to capture those attacks.
 
-\subsection{SYN Flood Attack}
+\subsection{Active Reconnaissance}
 
-The SYN Flood attack exploits a vulnerability in the TCP/IP handshake
+Active reconnaissance is a method used by malicious individuals to
+gather information about vulnerabilities from a computing system. The
+most common approach is to ``scan'' open ports to discover
+vulnerabilities. Active reconnaissance is a preliminary step towards
+an attack that actually exploits the system. A Ping Scan is a very
+common type of port scan based on the ICMP
+protocol. \Fix{...explain this attack...}
+
+\Fix{...explain how \tname\ works on it...}
+
+
+\subsection{Denial-of-Service}
+
+The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
 to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
 works as follows in normal circumstances. First, a client sends a SYN
 packet to the server, requesting a connection. Second, the server
@@ -255,24 +282,53 @@ server responds with a SYN-ACK packet, the client keeps sending other
 SYN packets to avoid the connection to time out. Without proper
 protection, the server accepts these malicious requests and eventually
 legitimate requests cannot be satisfied due to resource exhaustion.
-Figure~\ref{fig:synflood-example} shows a Suricata rule to capture
-this attack. The critical parts appear in bold---the option
-\CodeIn{flags: S,12}, which identifies a SYN packet and the option
-\CodeIn{threshold: type both, track by\_dst, count 5000, seconds 5},
-indicating that a high volume of such packets should be requested in a
-short period of time.
+Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
+this attack. This rule was obtained from the \Fix{...what source...}
+The relevant options in the rule appear in bold---the option
+\CodeIn{flags: S,12}, identifies a SYN packet in a TCP packet and the
+option \CodeIn{threshold: type both, track by\_dst, count 5000,
+  seconds 5} indicates that a high volume of such packets should be
+requested in a short period of time.
 
-%\Mar{please, explain the other fields}
+%% Explain how \tname\ behaves on this attack
 
-\subsubsection{\tname\ on SYN Flood Attack}
+The main challenge in synthesizing rules is to discover the set of
+options that makes a rule to capture the malicious traffic, but
+ignores the benign traffic.
+
+
+\tname{} synthesizes rules with the action header fixed to
+\CodeIn{alert} and with the header \CodeIn{<proto> any any -> any
+  any}, indicating that it infers the target protocol and uses the
+most general flow description possible, \ie{}, the rule applies to the
+traffic flowing from/to any address and port. The rule that \tname{}
+synthesizes for the SYN Flood denial-of-service attack is as follows.
+
+\begin{figure}[h!]
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{synflood.suricata.synth}
+%  \caption{Suricata rule for SYN Flood Attacks.}
+%  \label{fig:synflood-example-synt}
+\end{figure}
 
 \Mar{Guilherme/Lucas (CRI): we need to show how \tname{} works on this
   example. What is the input? How long does it take to generate the
   rule? Is the rule generated exactly the same? Please explain...}
 
-
-\Fix{repeat this for two other attacks. one non-dos/flood non-content}
-  
+\begin{table}[h]
+  \caption{\label{table:rules}Rule evolution}  
+  \centering
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
+    \midrule     
+    0 & (ack:0; seq:0; window:0; flags:F;)\\
+    5 & (window:0; flags:F;)\\
+    68 & (window:64; flags:F;)\\
+    73 & (window:64; flags:S,12;)\\
+    94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Technique}
 
@@ -448,102 +504,6 @@ be captured---but it can also capture positive traffic. This component
 systematically discards options from the rule encoding until no
 positive traffic is captured.
 
-\subsection{Problem Characterization}
-
-One important step in search-based optimization is to characterize a
-candidate solution to the target problem. Candidate solutions are the
-objects that the search optimize towards solutions. In this case, a 
-candidate solution is an encoding of a Suricata rule.  \tname\ encodes
-the rule options segment of a Suricata rule (see
-Section~\ref{sec:example-suricata-rules}) as a vector of Option
-objects. Some options are discarded as they only serve for
-documentation. For example, the options \CodeIn{msg},
-\CodeIn{classtype}, and \CodeIn{misc-activity}, appearing in the
-example on Figure~\ref{fig:synflood-example}, have no influence in
-triggering the actions associated with the rule. The option
-\CodeIn{flags}, however, is relevant to trigger the action. \tname{}
-models that option with a data structure storing two fields, one of
-character type and another of integer type. This enables \tname{} to
-mutate each element separately. Similar encodings are used in modeling
-the other relevant options. We found what options are (ir)relevant by
-inspecting Suricata code for the presence of \CodeIn{eval} functions,
-which are invoked from a main loop to process each action rule. The
-presence of such a function for a given option indicates that it is
-relevant for triggering some action of some rule.
-
-\subsection{Initial State}
-
-To bootstrap the search, \tname{} needs to select an initial
-solution. When creating such candidate solution, \tname{} first looks
-for the protocol related to the malicious input traffic. Then, it
-selects the relevant options for that protocol and initializes the
-option vector with default values. \Mar{Suricata define valores
-  default?  Vcs. definiram?  Isto foi baseado em popularidade ou o
-  que?}
-
-%% \tname{}
-%% uses an abstract representation of a Suricata rule that reflects the
-%% concrete representation of the rule. The concrete rule representation
-%% is the one actually used by Suricata whereas the abstract
-%% representation is the one \tname{} uses to run the search.
-
-\subsection{Fitness Functions}
-
-The fitness value of a candidate solution $c$, modeling the rule
-options $o_1, \dots, o_n$ is given by $f(c)=1-\Sigma{d(o_i,m)}/n$,
-where $i$ ranges from 1 to $n$ and $m$ denotes the negative
-traffic. The higher the fitness value the better, \ie{}, the fitter
-the candidate solution $c$ will be.  The value of the expression
-$d(o_i,m)$, associated with option $o_i$, ranges over
-0-1. Consequently, the value of the expression $\Sigma{d(o_i,m)}/n$
-itself is in the 0-1 range, as there are $n$ options, and the range of
-the function is 0-1.
-
-As usual, we used customized distance functions to compute $d(o_i,
-m)$. For example, let us consider the \CodeIn{flags} option, discussed
-on Figure~\ref{fig:synflood-example}. Recall that this option
-identifies the SYN packet in the tcp protocol and that its encoding in
-\tname{} stores two attributes---one categorical and one
-numerical. The value of $d(o_i, m)$, in this case, is obtained by
-computing the normalized Euclidean distance in the two-dimensional
-space. Considering that each of the two dimensions has cardinality of
-ten, the distance of a candidate solution holding the option
-\CodeIn{flags(S,13)} to the solution will be 0.22
-(=$1/\sqrt{20}$). Note that the smaller the distance the better.
-
-\tname{} uses a modified version of Suricata to measure distance. It
-updates the rule set that the modified version of Suricata analyses,
-injects the traffic on the network, and monitors the execution. Each
-rule option has an associated \CodeIn{eval} function in code. \tname{}
-monitors the execution of these functions to identify how far it is
-from returning true, which indicates it is closer to trigger the
-action associated with the rule. 
-\Luc{Originalmente, o suricata interrompe a checagem de uma regra quando alguma das opções não dá match com o pacote analisado. O código fonte foi alterado para que as regras sempre tenham todas as suas opções verificadas. A função de verificação de uma opção retorna um booleano indicando se o valor da opção na regra corresponde ou não ao valor da opção no pacote. Para opções cujos valores são numéricos, alteramos o código fonte para obter a diferença entre os valores da opção na regra e no pacote.
-\\*
-Exemplo trecho de código original opção "icode":
-
-\begin{figure}[h]
-  \lstinputlisting[language=C,numbers=none,keywords={}]{original.code}
-  \caption{Original source code.}
-  \label{fig:original-code}
-\end{figure}
-
-Trecho modificado:
-
-\begin{figure}[h]
-  \lstinputlisting[language=C,numbers=none,keywords={}]{modified.code}
-  \caption{Modified source code.}
-  \label{fig:modified-code}
-\end{figure}
-    
-}
-
-\Fix{Lucas/Guilherme, it would be good to show how this looks like in
-  code}
-
-\subsection{Search}
-
-\tname{} is a single-individual hill-climbing like search.
 
 
 \subsection{Limitations}
@@ -629,23 +589,6 @@ Nesse caso, estamos enviando os pacotes armazenados em \texttt{Datasets/syn-floo
 Há diferenças entre os pacotes na opção ack.\\* 
 Por que 20? Apenas para gerar a regra mais rapidamente, poderia ser qualquer valor maior ou menor. No final, o parâmetro \texttt{count} da opção \texttt{threshold} vai ser alterado pelo adm da rede.\\*
 Intervalo de reprodução: 0.005 segundo
-
-
-\begin{table}[h]
-  \caption{\label{table:rules}Rule evolution}  
-  \centering
-  \begin{tabular}{lllll}
-    \toprule
-    \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
-    \midrule     
-    0 & (ack:0; seq:0; window:0; flags:F;)\\
-    5 & (window:0; flags:F;)\\
-    68 & (window:64; flags:F;)\\
-    73 & (window:64; flags:S,12;)\\
-    94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 }
 

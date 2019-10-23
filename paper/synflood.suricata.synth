@@ -1,0 +1,1 @@
+alert tcp any any -> any any (flags: S,12; threshold: type both, track by_dst, count 5000, seconds 5;)
