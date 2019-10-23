@@ -219,21 +219,20 @@ short description of the option purpose.
 \begin{table}[h]
   \caption{\label{table:rules}Example options.}  
   \centering
-  \begin{tabular}{p{0.5cm}lrp{8cm}}
+  \begin{tabular}{p{0.35cm}ll}
     \toprule
-    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &
-    \multicolumn{1}{c}{\# Params} &  \multicolumn{1}{c}{Description}\\
+    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &  \multicolumn{1}{c}{Description}\\
     \midrule     
-    1 & dsize & - & matches on the size of the packet payload\\
-    2 & itype & - & matches on a specific ICMP type\\
-    3 & icode & - & matches on a specific ICMP code\\
-    4 & icmp\_seq & - & checks a ICMP sequence number\\
-    5 & icmp\_id & - & matches on specific ICMP id-values\\
-    6 & window & - & checks the size of the TCP window\\
-    7 & flags & - & matches on TCP flags\\
-    8 & fragbits & - & checks if the fragmentation or reserved bits are set in the IP header\\
-    9 & threshold & - & controls the rule’s alert frequency\\
-    10 & content & - & matches on bytes of the payload\\
+    1 & dsize & matches on the size of the packet payload\\
+    2 & itype &  matches on a specific ICMP type\\
+    3 & icode & matches on a specific ICMP code\\
+    4 & icmp\_seq  & checks a ICMP sequence number\\
+    5 & icmp\_id & matches on specific ICMP id-values\\
+    6 & window & checks the size of the TCP window\\
+    7 & flags & matches on TCP flags\\
+    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
+    9 & threshold & controls the rule’s alert frequency\\
+    10 & content & matches on bytes of the payload\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -254,18 +253,6 @@ short description of the option purpose.
 
 This section briefly presents examples of attacks and rules that are
 synthesized with \tname{} to capture those attacks.
-
-\subsection{Active Reconnaissance}
-
-Active reconnaissance is a method used by malicious individuals to
-gather information about vulnerabilities from a computing system. The
-most common approach is to ``scan'' open ports to discover
-vulnerabilities. Active reconnaissance is a preliminary step towards
-an attack that actually exploits the system. A Ping Scan is a very
-common type of port scan based on the ICMP
-protocol. \Fix{...explain this attack...}
-
-\Fix{...explain how \tname\ works on it...}
 
 
 \subsection{Denial-of-Service}
@@ -292,45 +279,84 @@ requested in a short period of time.
 
 %% Explain how \tname\ behaves on this attack
 
-The main challenge in synthesizing rules is to discover the set of
-options that makes a rule to capture the malicious traffic, but
-ignores the benign traffic.
 
 
-\tname{} synthesizes rules with the action header fixed to
-\CodeIn{alert} and with the header \CodeIn{<proto> any any -> any
-  any}, indicating that it infers the target protocol and uses the
-most general flow description possible, \ie{}, the rule applies to the
-traffic flowing from/to any address and port. The rule that \tname{}
-synthesizes for the SYN Flood denial-of-service attack is as follows.
+In the following, we illustrate how \tname{} proceeds for obtaining
+the rule for the SYN Flood attack. The main challenge in synthesizing
+rules is to discover the set of options that enables the \nids\ to
+capture the malicious traffic, but ignore the benign traffic.  The
+other parts of the rule (\ie{}, the action and the header) are either
+inferred or left constant. \tname{} sets the action header to
+\CodeIn{alert} and sets the header to \CodeIn{<proto> any any -> any
+  any}, indicating that it infers the target protocol, and it uses the
+most general flow description possible, \ie{}, analyzing the traffic
+flowing from/to any address and port.  We conjecture that the system
+administrator would know how to modify the constant parts.
 
+\tname{} starts the search for rule options for the SYN Flood attack
+from the initial set of options appearing below.
+
+\Fix{atualize isto para o valor correto, por favor. $\rightarrow$}
 \begin{figure}[h!]
+  \vspace{-3ex}
   \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{synflood.suricata.synth}
 %  \caption{Suricata rule for SYN Flood Attacks.}
-%  \label{fig:synflood-example-synt}
+  %  \label{fig:synflood-example-synt}
+  \vspace{-3ex}  
 \end{figure}
 
-\Mar{Guilherme/Lucas (CRI): we need to show how \tname{} works on this
-  example. What is the input? How long does it take to generate the
-  rule? Is the rule generated exactly the same? Please explain...}
+This set is based on an analysis of the packets from the positive
+traffic. Consequently, a rule that uses this set of options would
+capture the positive traffic by construction. Unfortunately, such rule
+would be overspecified, \ie{}, the rule would unlikely capture the
+same attacks as the traffic data would not be the same and \tname{}
+includes in the set all possible options that can be inferred from the
+data. To address that, \tname{} minimizes the rule with the goal of
+finding the minimal set of rules that only captures the positive
+traffic, hence mitigating the overfitting problem. \tname{}
+potentially finds several minimal rules. The list below shows the
+options for the five shortest rules it produces for this attack.
 
-\begin{table}[h]
-  \caption{\label{table:rules}Rule evolution}  
-  \centering
-  \begin{tabular}{lllll}
-    \toprule
-    \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
-    \midrule     
-    0 & (ack:0; seq:0; window:0; flags:F;)\\
-    5 & (window:0; flags:F;)\\
-    68 & (window:64; flags:F;)\\
-    73 & (window:64; flags:S,12;)\\
-    94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\Fix{...elaborate...}
+
+\subsection{Active Reconnaissance}
+
+Active reconnaissance is a method used by malicious individuals to
+gather information about vulnerabilities from a computing system. The
+most common approach is to ``scan'' open ports to discover
+vulnerabilities. Active reconnaissance is a preliminary step towards
+an attack that actually exploits the system. A Ping Scan is a very
+common type of port scan based on the ICMP
+protocol. \Fix{...explain this attack...}
+
+\Fix{...explain how \tname\ works on it...}
+
+
+\subsection{\Fix{...some other with contents...}}
+
+\Fix{...elaborate...}
+
+
+%% \begin{table}[h]
+%%   \caption{\label{table:rules}Rule evolution}  
+%%   \centering
+%%   \begin{tabular}{lllll}
+%%     \toprule
+%%     \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
+%%     \midrule     
+%%     0 & (ack:0; seq:0; window:0; flags:F;)\\
+%%     5 & (window:0; flags:F;)\\
+%%     68 & (window:64; flags:F;)\\
+%%     73 & (window:64; flags:S,12;)\\
+%%     94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
+%%     \bottomrule
+%%   \end{tabular}
+%% \end{table}
 
 \section{Technique}
+
+\Fix{---------------------------------------------------
+  estou aqui}
 
 \tname{} is a technique that uses positive and negative examples to
 synthesize signature-based NIDS rules, such as those from Snort and
