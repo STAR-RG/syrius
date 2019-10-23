@@ -207,7 +207,26 @@ and ``content''). The main challenge in synthesizing rules is to
 discover the set of options that make a rule to capture the malicious
 traffic, but ignore the benign traffic.
 
-\Fix{tabulate some important rules that we support}
+\begin{table}[h]
+  \caption{\label{table:rules}Supported options}  
+  \centering
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Option} &  \multicolumn{1}{c}{Description}\\
+    \midrule     
+    1 & dsize & matches on the size of the packet payload\\
+    2 & itype & matches on a specific ICMP type\\
+    3 & icode & matches on a specific ICMP code\\
+    4 & icmp\_seq & checks a ICMP sequence number\\
+    5 & icmp\_id & matches on specific ICMP id-values\\
+    6 & window & check for a specific TCP window size\\
+    7 & flags & matches on TCP flags\\
+    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
+    9 & threshold & used to control the rule’s alert frequency\\
+    10 & content & matches on bytes of the payload\\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 \section{Illustrative Examples}
