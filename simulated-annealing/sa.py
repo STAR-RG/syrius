@@ -1,14 +1,20 @@
+import os
 import subprocess
 import time
 import copy
 import pyshark
+import random
 from itertools import combinations
 
 keys_by_proto = {}
 keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255}#,"icmp_seq":65525, "icmp_id":65535}
 keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}#"ack":4294967295, "seq":4294967295}
 keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
+keys_by_proto["http"] = {}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
+#contents = {'GET ':[], '/cron':[], '.php?include_path=':[], 'http:':[], '/':[], '/cirt':[], '.net':[], '/rfiinc':[], '.txt?? ':[], 'HTTP':[], '/1':[], 'Connection:':[], 'Keep-':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00 ':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None) ':[], '(Test:':[], 'Host:':[], '192':[], '.168':[], '.1':[]}
+contents = {"GET ":[], "/dbmodules":[], "/DB_adodb":[], ".class":[], ".php?PHPOF_INCLUDE_PATH=":[], "http:":[], "/":[], "/cirt":[], ".net":[], "/rfiinc":[], ".txt? ":[], "HTTP":[], "/1":[], "Host:":[], "192":[], ".168":[], ".1":[], "Connection:":[], "Keep-":[], "User-":[], "Agent:":[], "Mozilla":[], "/5":[], ".00 ":[], "(Nikto":[], "/2":[], ".1":[], ".5) ":[], "(Evasions:":[], "None) ":[], "(Test:":[]}
+#contents = [['GET '], ['/cron'], ['.php?include_path='], ['http:'], ['/'], ['/cirt'], ['.net'], ['/rfiinc'], ['.txt?? '], ['HTTP'], ['/1'], ['Connection:'], ['Keep-'], ['User-'], ['Agent:'], ['Mozilla'], ['/5'], ['.00 '], ['(Nikto'], ['/2'], ['.1'], ['.5) '], ['(Evasions:'], ['None) '], ['(Test:'], ['Host:'], ['192'], ['.168'], ['.1']]
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
@@ -24,8 +30,10 @@ pkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
 
+#print(rule_protocol)
+
 def writeRuleOnFile(rule):
-    ruleFile_path = "../suricata/pesquisa/individual.rules"
+    ruleFile_path = "/etc/suricata/rules/individual.rules"
     ruleFile = open(ruleFile_path, 'w+')
     ruleFile.write(str(rule))
     ruleFile.close()
@@ -70,7 +78,7 @@ def getRuleFitness(keywords):
 def evalRule(rule):
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
-    reloadSuricataRules()  
+    #reloadSuricataRules()  
     sendAttack()
     fitnessFile_path = "../suricata/rulesFitness.txt"
 
@@ -107,16 +115,45 @@ def evalRule(rule):
     
     return fitness, matches
 
-def sendGoodTraffic(local_ip):
+def sendGoodTraffic():
     subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh"], stdout=subprocess.DEVNULL).wait()
-    time.sleep(12)
+
+def isEmpty(fpath):
+    result=False
+    fpath.seek(0)
+    firstchar=fpath.read(1)
+    if firstchar:
+        result=True
+        fpath.seek(0)
+        #print("capturado")
+    return result
+
+def evalContents(rule):
+    fitnessFile_path = "/var/log/suricata/fast.log"
+    open('/var/log/suricata/fast.log', 'w').close()
+    writeRuleOnFile(rule)
+    #reloadSuricataRules() 
+    sendGoodTraffic()
+
+    try:
+        fitnessFile = open(fitnessFile_path, "r")
+    except IOError:
+        return 0
+
+    best_fitness = 0
+
+    if isEmpty(fitnessFile):
+        best_fitness=1.0
+        print("CAPTUROU")
+    
+    return best_fitness
 
 def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
     subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
     reloadSuricataRules() 
-    sendGoodTraffic(getLocalIp())
+    sendGoodTraffic()
 
     try:
         fitnessFile = open(fitnessFile_path, "r")
@@ -172,7 +209,17 @@ class Rule:
     def __str__(self):
         str_options = ""
         for option in self.options:
-            str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
+            if option == "content":
+                contents = self.options[option]
+                str_content = ""
+                for content in contents:
+                    str_content = str_content + ' ' + str(option) + ':' + ' \"' + str(content) + '\"' + ';'
+                    if len(contents[content]) > 0:
+                        for i in range(0, len(contents[content])):
+                            str_content = str_content + ' ' + ' \"' + str(content[i]) + '\"' + ';'
+                str_options = str_options + ' ' + str_content
+            else:
+                str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
 
         if self.threshold != {}:
             str_options = str_options + ' ' + "threshold:"
@@ -180,8 +227,12 @@ class Rule:
                 str_options = str_options + ' ' + str(option) + ' ' + str(self.threshold[option]) + ','
             str_options = str_options[:-1] + ';'
         str_options = str_options + ' ' + "sid:" + str(self.sid) + ';'
+        
+        str_protocol = str(self.protocol)
+        if str_protocol == "http":
+            str_protocol = "tcp"
 
-        return (str(self.action) + ' ' + str(self.protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
+        return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
 
 def evolveRuleSinglePacket(rule):
     init_fitness, _ = evalRule(rule)
@@ -272,16 +323,50 @@ def optimizeRule(rule):
     #print("len options:", len(rule.options))
     if len(rule.options) > 1:
         for keyword in rule.options:
-            if len(new_rule.options) == 1:
-                break
-            del new_rule.options[keyword]
-            print(str(new_rule))
+            if keyword != "content":
+                if len(new_rule.options) == 1:
+                    break
+                del new_rule.options[keyword]
+                print(str(new_rule))
 
-            fitness = evalFalsePositive(new_rule)
-            print("#4 - rule fitness: " + str(fitness))
-            if fitness >= 1.0:
-                new_rule.options[keyword] = rule.options[keyword]
+                fitness = evalFalsePositive(new_rule)
+                print("#4 - rule fitness: " + str(fitness))
+                if fitness >= 1.0:
+                    new_rule.options[keyword] = rule.options[keyword]
     
+    if "content" in rule.options:
+        new_rule = copy.deepcopy(rule)
+        rule_list = []
+        timeout = 5
+        start_time = time.time()   #inicia contador do timeout
+
+        while time.time() - start_time < timeout:
+            if len(new_rule.options["content"]) == 0:
+                break
+        
+            elem = random.choice(list(new_rule.options["content"].keys()))
+            del new_rule.options["content"][elem]
+
+            fitness = evalContents(new_rule)
+            #print("aqui auqi auiq")
+            if fitness >= 1.0:
+                new_rule.options["content"][elem] = rule.options["content"][elem]
+                print("{} -> {} -> REJEITADO".format(str(elem),time.time()-start_time))
+                print(list(new_rule.options["content"].keys()))
+            else:
+                rule_list.append(new_rule)
+                print("{}->{}->{}".format(str(elem),str(new_rule), time.time()-start_time))
+                start_time=time.time()
+        
+        #print(rule_list)
+        #enquanto não timeout
+            #se |contents| > 1
+                #remove um content aleatorio
+                #avalia falso positivo
+                    #se falso positivo, devolve o content
+        
+        #escolhe a regra com menor numero de contents
+
     return new_rule
 
 def evolveRuleFlood(rule):
@@ -308,13 +393,17 @@ def evolveRuleFlood(rule):
     
     return new_rule
 
-init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
+init_rule = Rule(default_rule_action, "http", default_rule_header, default_rule_message, default_rule_sid)
 #init_rule.threshold = {"type": "both", "track": "by_dst", "count": 1, "seconds": 1}
 print("initial rule: " + str(init_rule))
-
-#final_rule = evolveRuleSinglePacket(init_rule)
-#final_rule = optimizeRule(final_rule)
-final_rule = evolveRuleFlood(init_rule)
+final_rule = init_rule
+if len(pkts._packets) > 1:
+    final_rule = evolveRuleFlood(init_rule)
+else:
+    #final_rule = evolveRuleSinglePacket(init_rule)
+    final_rule.options["content"] = contents
+    print(final_rule)
+    final_rule = optimizeRule(final_rule)
 
 if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
     final_rule.threshold = {} 
