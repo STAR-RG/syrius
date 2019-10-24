@@ -4,7 +4,12 @@
 %
 \documentclass[runningheads]{llncs}
 %
+%\usepackage[margin=1in]{geometry}% http://ctan.org/pkg/geometry
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+\usepackage{algorithm}% http://ctan.org/pkg/algorithm
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{graphicx}
+\usepackage[compatibility=false]{caption}% http://ctan.org/pkg/caption
 \usepackage{booktabs}
 \usepackage{cite}
 \usepackage{url}
@@ -55,9 +60,9 @@
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{Lucas Alcantara\Comment{\inst{1}}\Comment{\orcidID{0000-1111-2222-3333}} \and
-Guilherme Padilha\Comment{\inst{1}}\Comment{\orcidID{1111-2222-3333-4444}} \and
-Marcelo d'Amorim\Comment{\orcidID{0000-0002-1323-8769}}}
+\author{Lucas Alcantara\MyComment{\inst{1}}\MyComment{\orcidID{0000-1111-2222-3333}} \and
+Guilherme Padilha\MyComment{\inst{1}}\MyComment{\orcidID{1111-2222-3333-4444}} \and
+Marcelo d'Amorim\MyComment{\orcidID{0000-0002-1323-8769}}}
 %
 \authorrunning{Alcantara et al.}
 % First names are abbreviated in the running head.
@@ -238,7 +243,7 @@ documentation.
   \caption{\label{fig:distribution-rules-protocol}Number of relevant
     options per protocol supported by Suricata.}
 \end{wrapfigure}
-\Comment{For instance, the purpose of rule option \CodeIn{msg} is to print on
+\MyComment{For instance, the purpose of rule option \CodeIn{msg} is to print on
 the output an informative message indicating what kind of intrusion
 has been observed.} Figure~\ref{fig:distribution-rules-protocol} shows
 the distributions of these options per protocol. The sum of
@@ -520,28 +525,55 @@ Section~\ref{sec:content-example}, \tname{} produces a total of
 
 \subsection{Step 2: Rule Minimization}
 
-\Fix{--------------------------- estou aqui}
+The rule reported in the first step satisfies the criterion to only
+capture positive traffic. Unfortunately, the rule produced in the
+first step is overconstrained---it is unable to capture different
+manifestations of the same attack as the rule matches all options that
+\tname\ found for the input message.
 
-The rule reported by the first step satisfies the criterion to only
-capture positive traffic, however it is ``too'' specific---it is
-unable to capture different manifestations of the same attack as the
-rule would unlikely match exactly the options we found for the input
-message. Some options added to the rule during the first step are
-irrelevant for determining the attack and should be removed.
+%%  Some options added to the rule
+%% during the first step are irrelevant for determining the attack and
+%% should be removed to obtain more general rules. 
 
-The goal of this step is to create a \emph{minimal} rule that captures
-\emph{only} the positive malicious traffic. A rule is minimal if
-discarding any option results in capturing negative (\ie{}, benign)
-traffic. Recall that the previous maximization step produces a rule
-that captures the positive traffic and all options are satisifed by
-the positive traffic. Consequently, any subset of these options also
-captures the positive traffic. The minimization procedure we propose
-in this step builds on that observation. It iteratively discards
-options from the candidate rule until no other options can be
-removed. The procedure uses negative traffic to guide the
-search. Public databases of negative traffic with \Fix{thousands} of
-messages exist \Fix{cite cite} and can be used to increase the
-accuracy of the minimization.
+\tname{} leverages public datasets\Fix{cite cite} of negative traffic
+to guide a search for more general rules, hence addressing the
+overffiting issue. The goal of this step is to create rules that
+captures traffic similar to the input malicious traffic. To achieve
+that goal, \tname{} \emph{minimizes} the rules produced in the
+previous step, preserving the invariant of \emph{only} capturing the
+positive malicious traffic. A rule is minimal if discarding any option
+results in capturing negative (\ie{}, benign) traffic.  The
+minimization procedure we propose in this step builds on the
+observation that all options from the rule produced in the previous
+step are satisifed by the positive traffic. Consequently, any subset
+of these options also captures the positive traffic. The procedure
+iteratively discards options from the candidate rule until it detects
+that the rule is minimal, \ie{}, it finds that no other options can be
+removed. The procedure uses negative traffic to guide the search.
+
+\begin{algorithm}[t!]
+\textbf{INPUT:} overconstrained rule $or$ \\
+\textbf{OUTPUT:} Set of minimal rules $R$\\
+\vspace{-3ex}
+%\noindent\begin{minipage}{\textwidth}
+\captionof{algorithm}{Minimization algorithm}\label{algo1}
+\begin{algorithmic}[1]
+%  \Procedure{MinRule}{$or$}\Comment{The g.c.d. of a and b}
+    \State $r\gets a\bmod b$
+    \While{$r\not=0$}\Comment{We have the answer if r is 0}
+      \State $a\gets b$
+      \State $b\gets r$
+      \State $r\gets a\bmod b$
+    \EndWhile
+    \State \textbf{return} $b$\Comment{The gcd is b}
+%  \EndProcedure
+\end{algorithmic}
+%\end{minipage}%
+\end{algorithm}
+
+%% Public databases of negative traffic with
+%% \Fix{thousands} of messages exist  and can be used to
+%% increase the accuracy of the minimization.
 
 \subsection{Limitations}
 
