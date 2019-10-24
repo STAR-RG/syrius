@@ -287,7 +287,16 @@ elsewhere~\cite{suri-rule-format}.
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-\Fix{Illustrate how information is extracted from packets}
+\begin{figure*}[h!]
+\centering
+\includegraphics[scale=0.3]{figs/ICMP-packet-structure.png}
+\caption{ICMP Packet Structure}
+\label{fig:overview}
+\end{figure*}
+
+\Luc{Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
+Os campos, Time to Live, Type e Code recebem diretamente o valor que está no pacote. Por exemplo, se o campo Type no pacote possuir valor 8, na regra ele vai aparecer como itype:8.\\
+O campo Flags é intepretado como um vetor de bits, onde cada posição representa uma flag. Na regra, o valor do campo Flags é traduzido em caracteres que representam cada flag presente no pacote. Por exemplo: se o campo Flags possuir o valor 1010, na regra aparecerá fragbits:RM, pois os caracteres R e M indicam a presença do quarto e segundo bits.}
 
 
 \section{Illustrative Examples}
@@ -321,7 +330,7 @@ legitimate requests cannot be satisfied due to resource exhaustion.
 
 
 Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
-this attack. This rule was obtained from the \Fix{...what source...}
+this attack. This rule was obtained from the \Luc{Emerging Threats Open Ruleset}.
 The relevant options in the rule appear in bold---the option
 \CodeIn{flags: S,12}, identifies a SYN packet in a TCP packet and the
 option \CodeIn{threshold: type both, track by\_dst, count 5000,
@@ -351,7 +360,6 @@ attack. First, it analyzes the positive traffic and extracts options
 expressed in that traffic. For this example, it finds the following
 set of options:
 
-\Fix{atualize isto para o valor correto, por favor. $\rightarrow$}
 \begin{figure}[h]
   \vspace{-3ex}
   \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{synflood.suricata.synth}
@@ -509,8 +517,7 @@ payload of the message and cannot be directly extracted directly from
 the fields. Handling this case is critically important as most rules
 contain \CodeIn{content}
 options. Figure~\ref{fig:distribution-contents} shows the histogram of
-number of these options per rule (up to 10) for the Suricata public
-rule database \Fix{cite}. Rules without \CodeIn{content} options is an
+number of these options per rule (up to 10) for the \Luc{Emerging Threats Open Ruleset}. Rules without \CodeIn{content} options is an
 exception and half of the rules contain at least two \CodeIn{content}
 options.  To find the values associated with these options, \tname{}
 splits the payload of the malicious message in tokens using natural
