@@ -97,7 +97,7 @@ diverse set of attacks. Results indicate that \Fix{...}
 %% traffic. 
 
 
-\keywords{NIDS, synthesis, search}
+\keywords{\nids, synthesis, search}
 \end{abstract}
 %
 %
@@ -110,7 +110,7 @@ accordingly by blocking messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
 not block. Various open-source (\eg{}, Snort~\cite{snort} and
-Suricata~\cite{suricata}) and commercial NIDS implementations (\eg{},
+Suricata~\cite{suricata}) and commercial \nids implementations (\eg{},
 SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar}) exist
 today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
@@ -132,37 +132,37 @@ that could be observed by first learning the regular traffic and then
 acting
 properly~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}. These
 two kinds of intrusion detection mechanisms are
-complementary. Rule-based NIDS could miss attacks (as rulesets can
-become outdated) whereas anomaly-based NIDS can raise false alarms (as
+complementary. Rule-based \nids could miss attacks (as rulesets can
+become outdated) whereas anomaly-based \nids can raise false alarms (as
 detection algorithms are approximate).
 
-Rule-based NIDS are restricted to a fixed set of rules defined by the
+Rule-based \nids are restricted to a fixed set of rules defined by the
 network system administrator. Manually writing these rules is tedious,
 error-prone, but important as attackers constantly create new
 strategies to circumvent existing rules. IT-security companies
 capitalize on this phenomena and put rulesets on the market for
 sale~\cite{proofpoint-etpro,snort-rule-subscriptions}.  Despite this
 fundamental issue, rule-based systems are tremendously popular in
-industry today. Anomaly-based NIDS are not restricted to a fixed set
+industry today. Anomaly-based \nids are not restricted to a fixed set
 of rules. They learn usage behavior from positive traffic and, based
 on that, alert uncommon behavior~\cite{7579764}. Unfortunately,
-anomaly-based NIDS are fundamentally imprecise. To sum up, rule-based
-NIDS are precise but incomplete whereas anomaly-based NIDS are (more)
+anomaly-based \nids are fundamentally imprecise. To sum up, rule-based
+\nids are precise but incomplete whereas anomaly-based \nids are (more)
 complete but imprecise.
 
 %% This paper focuses on the
-%% problem of discovering new rules by using anomaly-based NIDS.
+%% problem of discovering new rules by using anomaly-based \nids.
 
 This paper proposes \tname{}, a technique that uses machine
 intelligence to automatically synthesize rules for rule-based
-\nids. Our general goal is to harden the protection of NIDS by
+\nids. Our general goal is to harden the protection of \nids by
 improving the creation process of rules. One scenario of application
-of \tname{} is one where an anomaly-based NIDS identifies abnormal
+of \tname{} is one where an anomaly-based \nids identifies abnormal
 traffic and signals that traffic to \tname{} to create and distribute
 the rules.
 
-%% Note that anomaly-based NIDS are evolving pretty quick with the
-%% advances in machine learning, but rule-based NIDS are still extremely
+%% Note that anomaly-based \nids are evolving pretty quick with the
+%% advances in machine learning, but rule-based \nids are still extremely
 %% popular.  \tname{} could also leverage existing databases of malicious
 %% traffic to synthesize rules.  Regardless of how the negative traffic
 %% is produced (out of scope of this paper), those rules can be
@@ -212,12 +212,9 @@ characteristics of the attack (\eg, ``flags'', ``threshold'', and
 ``content''). \tname{} produces options of the second kind, which are
 \emph{relevant} to capturing the attack.
 
-Suricata supports a total of \totoptions\ distinct options covering
-\numproto\ distinct protocols. A total of 9 of these options are for
-documentation.
-\begin{wrapfigure}[15]{r}{0.5\textwidth}
+\begin{wrapfigure}[14]{r}{0.5\textwidth}
   \centering
-  \vspace{-5ex}
+  \vspace{-7ex}
   \scalebox{0.7}{
     \begin{tikzpicture}
       \begin{axis}[
@@ -239,11 +236,13 @@ documentation.
       \end{axis}
     \end{tikzpicture}
   }
-  \vspace{-1ex}
+  \vspace{-2ex}
   \caption{\label{fig:distribution-rules-protocol}Number of relevant
     options per protocol supported by Suricata.}
 \end{wrapfigure}
-\MyComment{For instance, the purpose of rule option \CodeIn{msg} is to print on
+Suricata supports a total of \totoptions\ distinct options covering
+\numproto\ distinct protocols. A total of 9 of these options are for
+documentation.\MyComment{For instance, the purpose of rule option \CodeIn{msg} is to print on
 the output an informative message indicating what kind of intrusion
 has been observed.} Figure~\ref{fig:distribution-rules-protocol} shows
 the distributions of these options per protocol. The sum of
@@ -252,8 +251,7 @@ options is shared across different protocols.
 
 Table~\ref{table:rules} shows a sample of the options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
-the name of the option, column ``\#~Params'' shows the number of
-additional parameters associated with a given option, and column
+the name of the option, and column
 ``Description'' presents a short description of the option purpose. We
 found that the option \CodeIn{content} is particularly prevalent in
 rules from public databases (see
@@ -263,7 +261,7 @@ if that sequence is present in the payload of the message. Detailed
 description of the Suricata rules can be found
 elsewhere~\cite{suri-rule-format}.
 
-\begin{table}[h]
+\begin{table}[t!]
   \caption{\label{table:rules}Example options of Suricata.}  
   \centering
   \begin{tabular}{p{0.35cm}ll}
@@ -290,21 +288,46 @@ elsewhere~\cite{suri-rule-format}.
 \begin{figure*}[h!]
 \centering
 \includegraphics[scale=0.3]{figs/ICMP-packet-structure.png}
-\caption{ICMP Packet Structure}
-\label{fig:overview}
+\caption{Layout of an ICMP packet.}
+\label{fig:icmp-packet-layout}
 \end{figure*}
 
-\Luc{Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
-Os campos, Time to Live, Type e Code recebem diretamente o valor que está no pacote. Por exemplo, se o campo Type no pacote possuir valor 8, na regra ele vai aparecer como itype:8.\\
-O campo Flags é intepretado como um vetor de bits, onde cada posição representa uma flag. Na regra, o valor do campo Flags é traduzido em caracteres que representam cada flag presente no pacote. Por exemplo: se o campo Flags possuir o valor 1010, na regra aparecerá fragbits:RM, pois os caracteres R e M indicam a presença do quarto e segundo bits.}
+There exists a correspondence between network packets and most rule
+options. Let's consider the ICMP protocol as an
+example. Figure~\ref{fig:icmp-packet-layout} shows the layout of an
+ICMP packet. The packet fields ``Flags'' and ``Time to Live'',
+declared in the IP header, are mapped to the options \CodeIn{flagbits}
+and \CodeIn{ttl}, respectively. Likewise, the fields ``Type'' and
+``Code'', declared in the ICMP header, are mapped to the options
+\CodeIn{itype} and \CodeIn{icode}. (Table~\ref{table:rules} lists some
+example rule options.) The values of the options ``ttl'', ``itype'',
+and ``icode'' are the same as the value of the corresponding fields in
+the ICMP packet. For the field ``Flags'' the value of the
+corresponding option is encoded in its bitvector. For example, if the
+``Flags'' field stores the value 1010, the corresponding rule option
+will be \CodeIn{flagbits:RM}, as each position of the vector encodes a
+different character in the option \CodeIn{flagbits}.
+
+The value of most options can be obtained through transformation
+functions, as those described above. However, this is not the case for
+the option \CodeIn{threshold}, which is typically used in
+denial-of-service attacks. Conceptually, that option operates over
+sequence of messages as opposed to a single message. More precisely,
+to trigger an action on a rule containing that option the \nids\ tool
+needs to monitor several messages.
+
+%% \Luc{
+%%   Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
+%% Os campos, Time to Live, Type e Code recebem diretamente o valor que está no pacote. Por exemplo, se o campo Type no pacote possuir valor 8, na regra ele vai aparecer como itype:8.\\
+%% O campo Flags é intepretado como um vetor de bits, onde cada posição representa uma flag. Na regra, o valor do campo Flags é traduzido em caracteres que representam cada flag presente no pacote. Por exemplo: se o campo Flags possuir o valor 1010, na regra aparecerá fragbits:RM, pois os caracteres R e M indicam a presença do quarto e segundo bits.}
 
 
 \section{Illustrative Examples}
 \label{sec:suri-metas-coverage}
 
 
-This section briefly presents examples of attacks and rules that are
-synthesized with \tname{} to capture those attacks.
+This section briefly presents examples of attacks and illustrates the
+rules that \tname{} synthesizes to capture those attacks.
 
 
 \subsection{Denial-of-Service}
@@ -330,12 +353,12 @@ legitimate requests cannot be satisfied due to resource exhaustion.
 
 
 Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
-this attack. This rule was obtained from the \Luc{Emerging Threats Open Ruleset}.
-The relevant options in the rule appear in bold---the option
-\CodeIn{flags: S,12}, identifies a SYN packet in a TCP packet and the
-option \CodeIn{threshold: type both, track by\_dst, count 5000,
-  seconds 5} indicates that a high volume of such packets should be
-requested in a short period of time.
+this attack. This rule was obtained from the Emerging Threats Open
+Ruleset~\cite{emerging-threats-open}. The relevant options in the
+rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
+SYN packet in a TCP packet and the option \CodeIn{threshold: type
+  both, track by\_dst, count 5000, seconds 5} indicates that a high
+volume of such packets should be requested in a short period of time.
 
 %% Explain how \tname\ behaves on this attack
 
@@ -419,7 +442,7 @@ protocol. \Fix{...explain this attack...}
 \section{Technique}
 
 \tname{} is a technique that uses positive and negative examples to
-synthesize signature-based NIDS rules, such as those from Snort and
+synthesize signature-based \nids rules, such as those from Snort and
 Suricata. The goal of \tname\ is to create a rule that \emph{only}
 captures the positive traffic, \ie{}, the malicious sequence of
 messages.
@@ -477,10 +500,24 @@ gradient descent-like search to generate minimal solutions.
 \subsection{Step 1: Reverse Engineering}
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
-
-\begin{wrapfigure}[14]{r}{0.56\textwidth}
+The goal of the first step is to extract options from the positive
+traffic. For that, \tname{} parses the protocol message, looking for
+fields in the message associated with options (see
+Section~\ref{sec:rules-and-packets}).
+Unfortunately, inferring options at the field granularity
+level is insufficient to capture \CodeIn{content} options (see
+Section~\ref{sec:example-suricata-rules}), which refer to parts of the
+payload of the message and cannot be directly extracted directly from
+the fields. Handling this case is critically important as most rules
+contain \CodeIn{content}
+options. Figure~\ref{fig:distribution-contents} shows the histogram of
+number of these options per rule (up to 10) obtained from a public
+ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
+rules. Rules without \CodeIn{content} options is an exception and half
+of the rules contain at least two \CodeIn{content} options.  To find
+\begin{wrapfigure}[15]{r}{0.56\textwidth}
   \centering
-  \vspace{-8ex}
+  \vspace{-4ex}
   \scalebox{1.2}{  
     \begin{tikzpicture}
       \begin{axis}[
@@ -505,30 +542,16 @@ gradient descent-like search to generate minimal solutions.
   \caption{\label{fig:distribution-contents}Histogram of number of
     \CodeIn{content} options per rule (up to 10).}
 \end{wrapfigure}
-The goal of the first step is to extract options from the positive
-traffic. For that, \tname{} parses the protocol message, looking for
-fields in the message associated with options (see
-Section~\ref{sec:rules-and-packets}). For example, fields
-\Fix{...and...}  can be used to determine the option
-\Fix{zzz}. Unfortunately, inferring options at the field granularity
-level is insufficient to capture \CodeIn{content} options (see
-Section~\ref{sec:example-suricata-rules}), which refer to parts of the
-payload of the message and cannot be directly extracted directly from
-the fields. Handling this case is critically important as most rules
-contain \CodeIn{content}
-options. Figure~\ref{fig:distribution-contents} shows the histogram of
-number of these options per rule (up to 10) for the \Luc{Emerging Threats Open Ruleset}. Rules without \CodeIn{content} options is an
-exception and half of the rules contain at least two \CodeIn{content}
-options.  To find the values associated with these options, \tname{}
-splits the payload of the malicious message in tokens using natural
-language delimiters, such as $\backslash$t, $\backslash$n,
-$\backslash$r, and spaces. The rationale for this decision is that we
-observed, by inspecting existing rules, that \CodeIn{content} options
-typically refer to sequence of characters in the payload of messages
-separated by these delimiters. This tokenization step can generate
-dozens of options. For the example from
-Section~\ref{sec:content-example}, \tname{} produces a total of
-\Fix{xx} content options.
+the values associated with these options, \tname{} splits the payload
+of the malicious message in tokens using natural language delimiters,
+such as $\backslash$t, $\backslash$n, $\backslash$r, and spaces. The
+rationale for this decision is that we observed, by inspecting
+existing rules, that \CodeIn{content} options typically refer to
+sequence of characters in the payload of messages separated by these
+delimiters. This tokenization step can generate dozens of options. For
+the example from Section~\ref{sec:content-example}, \tname{} produces
+a total of \Fix{xx} content options.
+
 
 \subsection{Step 2: Rule Minimization}
 
