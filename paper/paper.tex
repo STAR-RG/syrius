@@ -578,7 +578,7 @@ observation that all options from the rule produced in the previous
 step are satisifed by the positive traffic. Consequently, any subset
 of these options also captures the positive traffic. The procedure
 iteratively discards options from the candidate rule until it detects
-that the rule is minimal, \ie{}, it finds that no other options can be
+that the rule is minimal, \ie{}, it finds that no other option can be
 removed. The procedure uses negative traffic to guide the search.
 
 
@@ -599,16 +599,16 @@ removed. The procedure uses negative traffic to guide the search.
       \State $\mathcal R' \gets \emptyset$\Comment{starting new
         iteration. new generation should be empty.}\label{init-rprime}
       \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate individual/rule separately.}\label{start-foreach}
-           \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}
+           \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}\label{start-for}
                \State $r \gets copy(ro)$      
                \State $j\gets \mathit{rand}(0,\mathit{len}(r))$
                \State $r[j]\gets 0$\Comment{discard option $j$ of rule
-                 $r$, acopy of the original rule $\mathit{ro}$}
+                 $r$, a copy of the original rule $\mathit{ro}$}
                \If{$\mathit{isnew}(r)$ \And $\mathit{isfit}(r)$}
                    \State $\mathcal R' \cup\gets \{r\}$\Comment{$r$
                      can lead to a plausible candidate solution.}\label{line-progress}
                \EndIf
-           \EndFor
+           \EndFor\label{end-for}
        \EndFor\label{end-foreach}
        \State $\mathcal R \gets R'$\Comment{update new generation}
   \doWhile{$\mathcal R'\not= \{\}$}\Comment{repeat until reaching a fixpoint}\label{end-do-while}
@@ -645,11 +645,44 @@ creates a copy of the bitvector of a rule, function $\mathit{len}$
 returns the length of the vector, and function $\mathit{rand}$
 randomly chooses one index of the vector.
 
+\begin{theorem}
+  The minimization algorithm computes rules that capture only
+  the positive traffic.
+\end{theorem}
+~
+\begin{proof}
+  Every rule created during the search captures the positive traffic
+  as every rule contains a proper subset of the option from the
+  original rule and all those options are satisfied by the positive
+  traffic. By definition of function $\mathit{isfit}$, these rules
+  also capture \emph{only} the positive traffic. If some negative
+  traffic was captured, a rule would not be added to $\mathcal
+  R'$.\qed
+\end{proof}
+
+\begin{proposition}
+  The minimization algorithm may not produce minimal rules.
+\end{proposition}
+
+The output of the minimization algorithm may contain rules that are
+not minimal given the non-determinism of the algorithm. It is possible
+that options that could be discarded are not selected in the loop from
+lines~\ref{start-for}--\ref{end-for}. However, we found empirically
+that a small value of $N$ suffices to produce minimal rules.
+
 %% Public databases of negative traffic with
 %% \Fix{thousands} of messages exist  and can be used to
 %% increase the accuracy of the minimization.
 %\subsection{Limitations}
 %\Fix{...}
+
+\vspace{1ex}
+\noindent\textbf{Limitation.} It is worth noting that although
+\tname{} is accurate for generating rules that discrimate positive and
+negative traffic, the quality of these rules is limited by the quality
+of the training data it uses. For the positive traffic, \tname{} only
+requires one sample, but can benefit of several samples. For the
+negative traffic, \tname{} can use public datasets available online.
 
 
 
