@@ -75,7 +75,8 @@ systems monitor the network traffic and flag suspicious network
 behavior. Signature-based \nids\ do that by checking the network
 traffic against a pre-defined set of rules, which can become obsolete
 as attackers learn new strategies to circumvent existing defenses.
-This paper proposes \tname{}, a technique that automatically
+This paper proposes \tname{}\footnote{Abbreviation of \textbf{Sy}nthesis of
+  Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a technique that automatically
 synthesizes \nids\ rules from positive and negative examples (\ie{},
 malicious and benign traffic). \tname{} formulates synthesis as an
 optimization problem whose candidate solutions are rules that
@@ -333,13 +334,17 @@ capture the malicious traffic, but ignore the benign traffic.  The
 other parts of the rule (\ie{}, the action and the header) are either
 inferred or left constant. \tname{} sets the action header to
 \CodeIn{alert} and sets the header to \CodeIn{<proto> any any -> any
-  any}, indicating that it infers the target protocol, and it uses the
-most general flow description possible, \ie{}, analyzing the traffic
-flowing from/to any address and port.  We conjecture that the system
-administrator would know how to modify the constant parts.
+  any}, indicating that it infers the target protocol and uses the
+most general flow description possible, \ie{}, it instructs the
+\nids\ to analyze the traffic flowing from/to any address and port.
+We understand that this is domain-specific information and conjecture
+that the system administrator would know how to modify the constant
+parts.
 
-\tname{} starts the search for rule options for the SYN Flood attack
-from the initial set of options appearing below.
+\tname{} proceeds as follows to synthesize rules for the SYN Flood
+attack. First, it analyzes the positive traffic and extracts options
+expressed in that traffic. For this example, it finds the following
+set of options:
 
 \Fix{atualize isto para o valor correto, por favor. $\rightarrow$}
 \begin{figure}[h]
@@ -350,18 +355,16 @@ from the initial set of options appearing below.
   \vspace{-3ex}  
 \end{figure}
 
-This set is based on an analysis of the packets from the positive
-traffic. Consequently, a rule that uses this set of options would
-capture the positive traffic by construction. Unfortunately, such rule
-would be overspecified. It would unlikely capture different
-manifestations of the same attack. Informally, the rule includes ``too
-many'' characteristics of the malicious traffic used to define it, but
-new attacks may not use the same data. To address that, \tname{}
-minimizes the rule with the goal of finding the minimal set of rules
-that only captures the positive traffic, hence mitigating the
-overfitting problem. \tname{} potentially finds several minimal
-rules. The list below shows the options for the five shortest rules it
-produces for this attack.
+Note that a rule that uses this set of options would capture the
+positive traffic as these options originated from the positive
+traffic. Unfortunately, such rule would be overspecified. It would
+unlikely capture different manifestations of the same
+attack. Informally, the rule includes ``too many'' characteristics of
+the malicious traffic used to define it. To address this overfitting
+issue, \tname{} minimizes the rule preserving the invariant that
+plausible rules should only capture the positive traffic. \tname{}
+potentially finds several minimal rules. The list below shows the
+options for the five shortest rules it produces for this attack.
 
 \Fix{...elaborate...}
 
