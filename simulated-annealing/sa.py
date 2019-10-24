@@ -14,6 +14,7 @@ keys_by_proto["http"] = {}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
 #contents = {'GET ':[], '/cron':[], '.php?include_path=':[], 'http:':[], '/':[], '/cirt':[], '.net':[], '/rfiinc':[], '.txt?? ':[], 'HTTP':[], '/1':[], 'Connection:':[], 'Keep-':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00 ':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None) ':[], '(Test:':[], 'Host:':[], '192':[], '.168':[], '.1':[]}
 contents = {"GET ":[], "/dbmodules":[], "/DB_adodb":[], ".class":[], ".php?PHPOF_INCLUDE_PATH=":[], "http:":[], "/":[], "/cirt":[], ".net":[], "/rfiinc":[], ".txt? ":[], "HTTP":[], "/1":[], "Host:":[], "192":[], ".168":[], ".1":[], "Connection:":[], "Keep-":[], "User-":[], "Agent:":[], "Mozilla":[], "/5":[], ".00 ":[], "(Nikto":[], "/2":[], ".1":[], ".5) ":[], "(Evasions:":[], "None) ":[], "(Test:":[]}
+#contents = {"GET ":[], "POST ":[], "http":[], "net":[], "HTTP":[], "1":[], "Keep-":[], "Host:":[], "eusoquerodormir":[], "Nikto":[]}
 #contents = [['GET '], ['/cron'], ['.php?include_path='], ['http:'], ['/'], ['/cirt'], ['.net'], ['/rfiinc'], ['.txt?? '], ['HTTP'], ['/1'], ['Connection:'], ['Keep-'], ['User-'], ['Agent:'], ['Mozilla'], ['/5'], ['.00 '], ['(Nikto'], ['/2'], ['.1'], ['.5) '], ['(Evasions:'], ['None) '], ['(Test:'], ['Host:'], ['192'], ['.168'], ['.1']]
 
 default_rule_action = "alert"
@@ -32,10 +33,16 @@ rule_protocol = str(pkts[0].highest_layer).lower()
 
 #print(rule_protocol)
 
-def writeRuleOnFile(rule):
+def writeRuleOnFile(rules):
     ruleFile_path = "/etc/suricata/rules/individual.rules"
+    open(ruleFile_path, 'w').close()
     ruleFile = open(ruleFile_path, 'w+')
-    ruleFile.write(str(rule))
+    ruleFile.seek(0)
+    ruleFile.truncate()
+    for rule in rules:
+        #print("CCCCCCCCCCCCCCCCCCCC")
+        #print(str(rule))
+        ruleFile.write(str(rule) + "\n" + "\n")
     ruleFile.close()
     time.sleep(0.050)
 
@@ -134,19 +141,23 @@ def evalContents(rule):
     writeRuleOnFile(rule)
     #reloadSuricataRules() 
     sendGoodTraffic()
+    output= []
 
-    try:
-        fitnessFile = open(fitnessFile_path, "r")
-    except IOError:
-        return 0
+    for i in range(len(rule)):
+        output.append(0)
 
-    best_fitness = 0
-
-    if isEmpty(fitnessFile):
-        best_fitness=1.0
-        print("CAPTUROU")
+    with open(fitnessFile_path, "r") as fitnessFile:
+        fitnessFile = fitnessFile.readlines()
     
-    return best_fitness
+    for i in range(len(rule)):
+        for lines in fitnessFile:
+            s="Testing rule {}".format(i)
+            if s in lines:
+                output[i]=1
+                #print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+                break
+    #print(output)
+    return output
 
 def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
@@ -191,7 +202,7 @@ class Rule:
                 self.options[keyword] = 0
             else:                
                 rule_option = keys_by_proto[protocol][keyword][0]
-                
+                message
                 self.options[keyword] = rule_option 
 
             print(self.options)
@@ -336,27 +347,72 @@ def optimizeRule(rule):
     
     if "content" in rule.options:
         new_rule = copy.deepcopy(rule)
-        rule_list = []
-        timeout = 5
+        rule_list = [new_rule]
+        aux = []
+        aux2 =[]
+        timeout = 6000
         start_time = time.time()   #inicia contador do timeout
 
         while time.time() - start_time < timeout:
-            if len(new_rule.options["content"]) == 0:
-                break
-        
-            elem = random.choice(list(new_rule.options["content"].keys()))
-            del new_rule.options["content"][elem]
 
-            fitness = evalContents(new_rule)
+            if not rule_list:
+                break
+            
+            counter=0
+            for rules in rule_list:
+                tam=2
+                if len(list(rules.options["content"].keys())) == 1:
+                    tam=1
+                elem = random.sample(list(rules.options["content"].keys()),tam)
+
+                for i in range(tam):
+                    new_sid=0
+                    checker=False
+                    temp = copy.deepcopy(rules)
+                    del temp.options["content"][elem[i]]
+
+                    for z in temp.options["content"]:
+                        for g in z:
+                            new_sid+=int(ord(g))
+
+                    temp.message = "msg:\"Testing rule {}\";".format(counter)
+                    if new_sid>0:
+                        temp.sid=new_sid
+                    else:
+                        temp.sid=counter+1
+                    if not aux:
+                        aux.append(temp)
+                        #print("AAAAAAAA:")
+                        counter+=1
+                    else:
+                        for z in aux:
+                            if z.sid==new_sid:
+                                checker=True
+                                break
+                            else:
+                                checker=False
+                        if not checker:       
+                            aux.append(temp)
+                            #print("REGRA UNICA")
+                            counter+=1
+            print(len(aux))
+            fitness_list = evalContents(aux)
             #print("aqui auqi auiq")
-            if fitness >= 1.0:
-                new_rule.options["content"][elem] = rule.options["content"][elem]
-                print("{} -> {} -> REJEITADO".format(str(elem),time.time()-start_time))
-                print(list(new_rule.options["content"].keys()))
+
+            #rule_list.clear()
+            for i, fitness in enumerate(fitness_list):
+                if fitness < 1.0:
+                    aux2.append(aux[i])
+                    #print("{} : {}".format(aux[i], fitness))
+
+            if not aux2:
+                #print(rule_list)
+                break
             else:
-                rule_list.append(new_rule)
-                print("{}->{}->{}".format(str(elem),str(new_rule), time.time()-start_time))
-                start_time=time.time()
+                rule_list.clear()
+                rule_list=aux2.copy()
+                aux2.clear()
+                aux.clear()
         
         #print(rule_list)
         #enquanto não timeout
@@ -366,8 +422,11 @@ def optimizeRule(rule):
                     #se falso positivo, devolve o content
         
         #escolhe a regra com menor numero de contents
-
-    return new_rule
+    with open("regras_output.txt", "w+") as writer:
+        for x in rule_list:
+            writer.write(str(x) + "\n")
+    print(time.time() - start_time)
+    return rule_list[0]
 
 def evolveRuleFlood(rule):
     init_fitness, matches = evalRule(rule)          
