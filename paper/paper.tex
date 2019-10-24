@@ -89,7 +89,7 @@ maximizes the captured the positive traffic and minimizes the captured
 negative traffic. \tname{} bootstraps the search with candidate
 solutions that use data from the payload of the malicious message and
 produces optimal rule candidates on output. We evaluated \tname{} on a
-diverse set of attacks. Results indicate that \Fix{...}
+diverse set of attacks. Results indica te that \Fix{...}
 
 %% optimizes the
 %% candidate solution to capture the positive example and, and then
@@ -442,7 +442,7 @@ protocol. \Luc{The attacker sends a set of ICMP Echo requests to a network of ma
 \section{Technique}
 
 \tname{} is a technique that uses positive and negative examples to
-synthesize signature-based \nids rules, such as those from Snort and
+synthesize signature-based \nids\ rules, such as those from Snort and
 Suricata. The goal of \tname\ is to create a rule that \emph{only}
 captures the positive traffic, \ie{}, the malicious sequence of
 messages.
@@ -565,8 +565,8 @@ manifestations of the same attack as the rule matches all options that
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-\tname{} leverages public datasets\Fix{cite cite} of negative traffic
-to guide a search for more general rules, hence addressing the
+\tname{} leverages public datasets\cite{tcpreplay} of negative traffic
+to guide the search for more general rules, hence addressing the
 overffiting issue. The goal of this step is to create rules that
 captures traffic similar to the input malicious traffic. To achieve
 that goal, \tname{} \emph{minimizes} the rules produced in the
@@ -581,33 +581,77 @@ iteratively discards options from the candidate rule until it detects
 that the rule is minimal, \ie{}, it finds that no other options can be
 removed. The procedure uses negative traffic to guide the search.
 
+
+
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\algnewcommand\And{\textbf{and} }
 \begin{algorithm}[t!]
 \textbf{INPUT:} overconstrained rule $or$ \\
-\textbf{OUTPUT:} Set of minimal rules $R$\\
+\textbf{OUTPUT:} Set of minimal rules $\mathcal R$\\
 \vspace{-3ex}
-%\noindent\begin{minipage}{\textwidth}
 \captionof{algorithm}{Minimization algorithm}\label{algo1}
 \begin{algorithmic}[1]
-%  \Procedure{MinRule}{$or$}\Comment{The g.c.d. of a and b}
-    \State $r\gets a\bmod b$
-    \While{$r\not=0$}\Comment{We have the answer if r is 0}
-      \State $a\gets b$
-      \State $b\gets r$
-      \State $r\gets a\bmod b$
-    \EndWhile
-    \State \textbf{return} $b$\Comment{The gcd is b}
-%  \EndProcedure
+  \State $\mathcal R \gets \{\mathit{or}\}$\Comment{initial population
+    of candidate solutions contains only the input rule.}\label{line-init}
+  \Do\label{start-do-while}
+      \State $\mathcal R' \gets \emptyset$\Comment{starting new
+        iteration. new generation should be empty.}\label{init-rprime}
+      \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate individual/rule separately.}\label{start-foreach}
+           \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}
+               \State $r \gets copy(ro)$      
+               \State $j\gets \mathit{rand}(0,\mathit{len}(r))$
+               \State $r[j]\gets 0$\Comment{discard option $j$ of rule
+                 $r$, acopy of the original rule $\mathit{ro}$}
+               \If{$\mathit{isnew}(r)$ \And $\mathit{isfit}(r)$}
+                   \State $\mathcal R' \cup\gets \{r\}$\Comment{$r$
+                     can lead to a plausible candidate solution.}\label{line-progress}
+               \EndIf
+           \EndFor
+       \EndFor\label{end-foreach}
+       \State $\mathcal R \gets R'$\Comment{update new generation}
+  \doWhile{$\mathcal R'\not= \{\}$}\Comment{repeat until reaching a fixpoint}\label{end-do-while}
 \end{algorithmic}
-%\end{minipage}%
 \end{algorithm}
+
+Algorithm~\ref{algo1} shows the pseudocode of the \tname{}
+minimization algorithm. The algorithm takes as input the
+overconstrained rule produced by the reverse engineering step and
+produces a set $\mathcal R$ of rules that are minimal and only
+captures the positive traffic. Line~\ref{line-init} initializes the
+set $\mathcal{R}$ of candidate solutions with the input rule $or$. We
+encode a rule as a bitvector where each index in the vector represents
+one option; the value assigned at a given position indicates whether
+or not the option is present in the rule. Each iteration of the outer
+loop (lines~\ref{start-do-while}-\ref{end-do-while}) represents one
+generation of the population of individuals produced by the
+search. The algorithm terminates when no rule in the current
+generation of individuals could be further reduced without violating
+the property that a candidate solution should only capture positive
+traffic. This means that execution has not reached
+line~\ref{line-progress} as to augment the set $\mathcal{R'}$ and that
+set will be empty at the end of one iteration of the outer
+loop. Line~\ref{init-rprime} initializes the new generation of
+candidate rules. The loop from
+lines~\ref{start-foreach}--\ref{end-foreach} iterates through each
+candidate rule in $\mathcal R$. Note that these rules have been found
+in the previous generation. The algorithm mutates each of these rules
+for $N$ times, discarding one option of the rule each time. The call
+to $\mathit{isNew}$ checks if $r$ has not been previously generated
+through another path whereas the call to $\mathit{isfit}$ checks if
+the rule only captures positive traffic. Function $\mathit{copy}$
+creates a copy of the bitvector of a rule, function $\mathit{len}$
+returns the length of the vector, and function $\mathit{rand}$
+randomly chooses one index of the vector.
 
 %% Public databases of negative traffic with
 %% \Fix{thousands} of messages exist  and can be used to
 %% increase the accuracy of the minimization.
+%\subsection{Limitations}
+%\Fix{...}
 
-\subsection{Limitations}
 
-\Fix{...}
 
 \section{Evaluation}
 
@@ -708,6 +752,11 @@ External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
 \section{Related Work}
 
 \Fix{...}
+
+\section*{Acknowledgments}
+This work is partially supported by RNP grant number 002951.
+
+
 %
 % ---- Bibliography ----
 %
