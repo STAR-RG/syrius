@@ -669,7 +669,6 @@ randomly chooses one index of the vector.
   The minimization algorithm computes rules that capture only
   the positive traffic.
 \end{theorem}
-~
 \begin{proof}
   Every rule created during the search captures the positive traffic
   as every rule contains a proper subset of the option from the
@@ -696,7 +695,7 @@ that a small value of $N$ suffices to produce minimal rules.
 %\subsection{Limitations}
 %\Fix{...}
 
-\vspace{1ex}
+\vspace{2ex}
 \noindent\textbf{Limitation.} It is worth noting that although
 \tname{} is accurate for generating rules that discrimate positive and
 negative traffic, the quality of these rules is limited by the quality
@@ -704,8 +703,15 @@ of the training data it uses. For the positive traffic, \tname{} only
 requires one sample, but can benefit of several samples. For the
 negative traffic, \tname{} can use public datasets available online.
 
-\vspace{1ex}
-\noindent\textbf{Implementation details.} \Fix{discuss function isFit}
+\vspace{2ex}
+\noindent\textbf{Implementation details.} We implemented function
+\emph{isFit} by 1)~updating Suricata to only use the informed rule,
+2)~replaying the negative traffic (see
+Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
+check if any benign message was captured by the rule. It is worth
+noting that the benign traffic is stored in ``pcap'' files~\cite{pcap}
+and Suricata can process those files very efficiently compared to
+analyzing network messages directly.
 
 \section{Evaluation}
 
@@ -742,6 +748,7 @@ rule that captures the attack.
 \end{table*}
 
 \subsection{Dataset of Benign Traffic}
+\label{sec:dataset-benign}
 
 Note from Figure~\ref{fig:overview} that the positive traffic is an
 input to the technique. The negative non-malicious traffic, however,
@@ -798,13 +805,19 @@ tool~\cite{hping3} using the following command \CodeIn{hping3 -d 80 -w
 
 \subsection{Precision}
 
+\Fix{}
+
 \subsection{Efficiency}
 
-\section{Threats to Validity}
+\subsection{Threats to Validity}
 
 External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
 
 \section{Related Work}
+
+\Fix{...}
+
+\section{Conclusions}
 
 \Fix{...}
 
