@@ -412,9 +412,28 @@ most common approach is to ``scan'' open ports to discover
 vulnerabilities. Active reconnaissance is a preliminary step towards
 an attack that actually exploits the system. A Ping Scan is a very
 common type of port scan based on the ICMP
-protocol. \Luc{The attacker sends a set of ICMP Echo requests to a network of machines and sees which one responds to the request. This allow the attacker to know which machines are active in the network, then it can choose one of them to attack.}
+protocol. \Luc{To scan a network, an attacker sends a set of ICMP Echo requests addresed to a range of IP addresses in the network and sees which one responds to the request. This allow the attacker to know which machines are active in the network, then it can choose one of them to attack.}
 
-\Fix{...explain how \tname\ works on it...}
+\begin{figure}[h!]
+  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
+  \caption{Suricata rule for Ping Scan.}
+  \label{fig:synflood-example}
+\end{figure}
+
+\Luc{Figure 4 shows a Suricata rule that capture a ping scan performed by the NMAP Tool. The relevant options are in bold---the option \CodeIn{dsize: 0}, indicates that the packet has no bytes in the payload. \CodeIn{itype: 8} identifies the packet as a ICMP Echo request.}
+
+\Luc{To synthesize rules for a Ping Scan, \tname{} analyzes the positive traffic and extract the following set of options:}
+
+\begin{figure}[h]
+\vspace{-3ex} \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{pingscan.suricata.synth}
+%  \caption{Suricata rule for SYN Flood Attacks.}
+  %  \label{fig:synflood-example-synt}
+\vspace{-3ex}  
+\end{figure}
+
+\Luc{Again, a rule with this options would capture the positive traffic, but it would be overspecified. So, \tname{} tries to minimize the rule... After the minimization, it produces the following rule:}
+\Luc{}
+
 
 
 \subsection{\Fix{...some other with contents...}}
