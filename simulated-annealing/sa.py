@@ -4,6 +4,7 @@ import time
 import copy
 import pyshark
 import random
+import re
 from itertools import combinations
 
 keys_by_proto = {}
@@ -12,10 +13,12 @@ keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 
 keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
 keys_by_proto["http"] = {}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
-#contents = {'GET ':[], '/cron':[], '.php?include_path=':[], 'http:':[], '/':[], '/cirt':[], '.net':[], '/rfiinc':[], '.txt?? ':[], 'HTTP':[], '/1':[], 'Connection:':[], 'Keep-':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00 ':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None) ':[], '(Test:':[], 'Host:':[], '192':[], '.168':[], '.1':[]}
-contents = {"GET ":[], "/dbmodules":[], "/DB_adodb":[], ".class":[], ".php?PHPOF_INCLUDE_PATH=":[], "http:":[], "/":[], "/cirt":[], ".net":[], "/rfiinc":[], ".txt? ":[], "HTTP":[], "/1":[], "Host:":[], "192":[], ".168":[], ".1":[], "Connection:":[], "Keep-":[], "User-":[], "Agent:":[], "Mozilla":[], "/5":[], ".00 ":[], "(Nikto":[], "/2":[], ".1":[], ".5) ":[], "(Evasions:":[], "None) ":[], "(Test:":[]}
+contents = {'GET ':[], '/cron':[], '.php?include_path=':[], 'http:':[], '/':[], '/cirt':[], '.net':[], '/rfiinc':[], '.txt?? ':[], 'HTTP':[], '/1':[], 'Connection:':[], 'Keep-':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00 ':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None) ':[], '(Test:':[], 'Host:':[], '192':[], '.168':[], '.1':[]}
+#contents = {"GET ":[], "/dbmodules":[], "/DB_adodb":[], ".class":[], ".php?PHPOF_INCLUDE_PATH=":[], "http:":[], "/":[], "/cirt":[], ".net":[], "/rfiinc":[], ".txt? ":[], "HTTP":[], "/1":[], "Host:":[], "192":[], ".168":[], ".1":[], "Connection:":[], "Keep-":[], "User-":[], "Agent:":[], "Mozilla":[], "/5":[], ".00 ":[], "(Nikto":[], "/2":[], ".1":[], ".5) ":[], "(Evasions:":[], "None) ":[], "(Test:":[]}
 #contents = {"GET ":[], "POST ":[], "http":[], "net":[], "HTTP":[], "1":[], "Keep-":[], "Host:":[], "eusoquerodormir":[], "Nikto":[]}
 #contents = [['GET '], ['/cron'], ['.php?include_path='], ['http:'], ['/'], ['/cirt'], ['.net'], ['/rfiinc'], ['.txt?? '], ['HTTP'], ['/1'], ['Connection:'], ['Keep-'], ['User-'], ['Agent:'], ['Mozilla'], ['/5'], ['.00 '], ['(Nikto'], ['/2'], ['.1'], ['.5) '], ['(Evasions:'], ['None) '], ['(Test:'], ['Host:'], ['192'], ['.168'], ['.1']]
+
+keyword_list=("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
@@ -33,8 +36,152 @@ rule_protocol = str(pkts[0].highest_layer).lower()
 
 #print(rule_protocol)
 
+def getStats():
+    rule_file = open("Datasets/all_rules.txt", "r")
+
+    output_file_path = "data.csv"
+    output_file = open(output_file_path, 'w+')
+
+    max_content=0
+    max_options=0
+    rule_count = 0
+    output_file.write("sid,protocol,options,contents\n")
+    contents_dict={}
+    rare_contents_per_rule_size = {1:{1:0}}
+    max_rare_contents=0
+    rare_contents_freq={}
+    rules_per_size = {}
+    rules_per_contents = {}
+    for line in rule_file:
+        if line == "\n":
+            continue
+        rule_size = 0
+        line = line.strip()
+        rare_contents_count = 0
+
+        for keyword in keyword_list:
+            keyword = ' ' + keyword + str(":")
+            rule_size += line.count(keyword)
+
+        contents = re.findall(r'content:\"(.+?)\"\;',line)
+
+        for content in contents:
+            if content in contents_dict:
+                contents_dict[content] += 1
+            else:
+                contents_dict[content] = 1
+        
+        if " content:" in line:
+            for content in contents:
+                if contents_dict[content] < 10:
+                    rare_contents_count+=1
+            
+            if rare_contents_count in rare_contents_freq:
+                rare_contents_freq[rare_contents_count] += 1
+            else:
+                rare_contents_freq[rare_contents_count] = 1
+
+            if rare_contents_count>max_rare_contents:
+                max_rare_contents=rare_contents_count
+
+        for i in range(1, 11):
+            for content in contents:
+                if contents_dict[content] == i:
+                    if rule_size not in rare_contents_per_rule_size:
+                        rare_contents_per_rule_size[rule_size] = {1:0}
+                    
+                    if i in rare_contents_per_rule_size[rule_size]:
+                        rare_contents_per_rule_size[rule_size][i] += 1
+                    else:
+                        rare_contents_per_rule_size[rule_size][i] = 1
+
+        content_count = line.count(" content:")
+        #content_count += line.count(" content: ")
+        proto = line.split("alert ")[1].split(' ')[0]
+        sid = line.split("sid:")[1].split(";")[0]
+        output_file.write(str(sid) + "," + str(proto) + "," + str(rule_size) + "," + str(content_count)+'\n')
+        if content_count>max_content:
+            max_content = content_count
+        if rule_size>max_options:
+            max_options = rule_size
+        
+        if content_count in rules_per_contents:
+            rules_per_contents[content_count] += 1
+        else:
+            rules_per_contents[content_count] = 1
+
+        if rule_size in rules_per_size:
+            rules_per_size[rule_size] += 1
+        else:
+            rules_per_size[rule_size] = 1
+        rule_count += 1
+
+    """tmp_list = []
+    for i in sorted(list(rules_per_size)):
+        tmp_list.append(rules_per_size[i])
+
+    rules_per_size = tmp_list
+
+    tmp_list = []
+    for i in sorted(list(rules_per_contents)):
+        tmp_list.append(rules_per_contents[i])
+
+    rules_per_contents = tmp_list
+    """
+    print(rule_count)
+    print(rules_per_contents)
+    print(rules_per_size)
+
+    """x=0
+    while 1:
+        x=1
+    """
+    frequent_contents=0
+
+    for key, value in contents_dict.items():
+        if value >= 10:
+            #print(key)
+            frequent_contents+=1
+
+    output_file.close()
+
+    return rules_per_size, rules_per_contents
+
+def ruleSizeFitness(rule):
+    rules_per_size = {5: 5353, 3: 3662, 1: 1301, 6: 2911, 12: 323, 4: 3250, 7: 1337, 8: 1246, 9: 763, 10: 495, 2: 4910, 13: 463, 11: 437, 14: 266, 18: 74, 16: 162, 15: 146, 17: 81, 25: 31, 20: 61, 29: 39, 30: 29, 32: 4, 19: 68, 37: 3, 36: 30, 31: 30, 27: 24, 48: 1, 47: 1, 21: 41, 22: 35, 28: 72, 26: 9, 23: 16, 24: 25, 40: 1, 34: 44, 46: 1, 66: 1, 43: 1, 33: 43, 0: 11, 51: 1, 42: 1, 50: 1, 35: 20, 38: 8, 41: 1}
+
+    rule_count=27833
+
+    rule_size = 0
+
+    for keyword in keyword_list:
+        keyword = ' ' + keyword + str(":")
+        rule_size += str(rule).count(keyword)
+    fitness = 0
+    if rule_size in rules_per_size:
+        fitness = rules_per_size[rule_size]/rule_count
+    else:
+        fitness = 0
+
+    return fitness
+
+def ruleContentsFitness(rule):
+    rules_per_contents = {0: 2134, 3: 5841, 5: 1622, 2: 5103, 6: 805, 1: 9164, 4: 1987, 8: 340, 7: 535, 10: 53, 11: 40, 9: 154, 12: 20, 17: 4, 13: 12, 14: 6, 16: 7, 15: 4, 22: 1, 20: 1}
+
+    rule_count=27833
+
+    content_count = str(rule).count(" content:")
+    fitness = 0
+
+    if content_count in rules_per_contents:
+        fitness = rules_per_contents[content_count]/rule_count
+    else:
+        fitness = 0
+    
+    return fitness
+
 def writeRuleOnFile(rules):
-    ruleFile_path = "/etc/suricata/rules/individual.rules"
+    ruleFile_path = "../suricata/pesquisa/individual.rules"
     open(ruleFile_path, 'w').close()
     ruleFile = open(ruleFile_path, 'w+')
     ruleFile.seek(0)
@@ -136,8 +283,8 @@ def isEmpty(fpath):
     return result
 
 def evalContents(rule):
-    fitnessFile_path = "/var/log/suricata/fast.log"
-    open('/var/log/suricata/fast.log', 'w').close()
+    fitnessFile_path = "/usr/local/var/log/suricata/fast.log"
+    open(fitnessFile_path, 'w').close()
     writeRuleOnFile(rule)
     #reloadSuricataRules() 
     sendGoodTraffic()
@@ -148,7 +295,6 @@ def evalContents(rule):
 
     with open(fitnessFile_path, "r") as fitnessFile:
         fitnessFile = fitnessFile.readlines()
-    
     for i in range(len(rule)):
         for lines in fitnessFile:
             s="Testing rule {}".format(i)
@@ -329,7 +475,15 @@ def evolveRuleSinglePacket(rule):
                             
     return rule  
 
+def newRuleFitness(rule):
+    fit1 = ruleSizeFitness(rule)
+    fit2 = ruleContentsFitness(rule)
+    return (fit1+fit2)
+
+
 def optimizeRule(rule):
+    #getStats()
+    all_rule_list = []
     new_rule = copy.deepcopy(rule)
     #print("len options:", len(rule.options))
     if len(rule.options) > 1:
@@ -361,9 +515,14 @@ def optimizeRule(rule):
             counter=0
             for rules in rule_list:
                 tam=2
+
                 if len(list(rules.options["content"].keys())) == 1:
                     tam=1
-                elem = random.sample(list(rules.options["content"].keys()),tam)
+                try:
+                    elem = random.sample(list(rules.options["content"].keys()),tam)
+                except:
+                    print("len:", len(list(rules.options["content"].keys())))
+                    print("tam:", tam)
 
                 for i in range(tam):
                     new_sid=0
@@ -404,6 +563,7 @@ def optimizeRule(rule):
                 if fitness < 1.0:
                     aux2.append(aux[i])
                     #print("{} : {}".format(aux[i], fitness))
+                    all_rule_list.append(aux[i])
 
             if not aux2:
                 #print(rule_list)
@@ -415,17 +575,25 @@ def optimizeRule(rule):
                 aux.clear()
         
         #print(rule_list)
-        #enquanto não timeout
-            #se |contents| > 1
-                #remove um content aleatorio
-                #avalia falso positivo
-                    #se falso positivo, devolve o content
-        
-        #escolhe a regra com menor numero de contents
+
     with open("regras_output.txt", "w+") as writer:
         for x in rule_list:
             writer.write(str(x) + "\n")
     print(time.time() - start_time)
+
+    for rule in all_rule_list:
+        print(str(rule))
+    print("all rule len:", len(all_rule_list))
+    
+    all_rule_list = sorted(all_rule_list, key=newRuleFitness)
+
+    for rule in all_rule_list:
+        print(str(rule))
+    print("all rule len:", len(all_rule_list))
+
+    for rule in rule_list:
+        print(str(rule))
+    print("rule list len:", len(rule_list))
     return rule_list[0]
 
 def evolveRuleFlood(rule):
