@@ -7,13 +7,25 @@ import random
 import re
 from itertools import combinations
 
+time_begin = time.time()
+
 keys_by_proto = {}
 keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255}#,"icmp_seq":65525, "icmp_id":65535}
 keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}#"ack":4294967295, "seq":4294967295}
 keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
 keys_by_proto["http"] = {}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
-contents = {'GET ':[], '/cron.php?':[], 'include_path=':[], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt?? ':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'User-':[], 'Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5) ':[], '(Evasions:':[], 'None) ':[], '(Test':[], '004603)':[], 'Host:':[]}
+#contents = {'GET':[], '/cron.php?':[], 'include_path=':[], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt?? ':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'User-':[], 'Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5) ':[], '(Evasions:':[], 'None) ':[], '(Test':[], '004603)':[], 'Host:':[]}
+
+#contents = {'GET':[], '/Ud3uMSnb':[], '.htaccess':[], 'HTTP':[], '/1.1':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None)':[], '(Test:':[], 'map_codes)':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'Host:':[]}
+
+#contents = {'GET':[], '/postnuke':[], '/modules.php?':[], 'op=':[], 'modload&':[], 'name=':[], 'Web_Links&':[], 'file=':[], 'index&':[], 'req=':[], 'viewlinkdetails&':[], 'lid=':[], '666&':[], 'ttitle=':[], 'Mocosoft':[], '/script>':[], 'HTTP':[], '/1':[], '.1':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00':[], '(Nikto':[], '/2':[], '.1':[], '.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '000804)':[], 'Host:':[]}
+
+#contents = {'GET':[], '/examples':[], '/jsp/snp/':[], 'anything':[], '.snp':[], 'HTTP':[], '/1':[], '.1':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00 ':[], '(Nikto':[], '/2':[], '.1':[], '.5) ':[], '(Evasions:':[], 'None) ':[], '(Test:':[], '001001)':[], 'Content-':[], 'Length:':[], '1':[], 'Content-':[], 'Type:':[], 'application':[], '/x-':[], 'www-':[], 'form-':[], 'urlencoded':[], 'Host:':[], 'Connection:':[], 'Keep-':[], 'Alive':[]}
+
+#contents = {'GET':[], '/CFIDE/administrator':[], '/index':[], '.cfm':[], 'HTTP':[], '/1':[], '.1':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00':[], '(Nikto':[], '/2':[], '.1':[], '.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003067)':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'Host:':[]}
+
+contents = {'GET':[], '/jmx-console':[], '/HtmlAdaptor':["http_uri", "nocase"], 'action=inspect':["http_uri", "nocase"], 'M':[], 'bean':["http_uri", "nocase"], 'name=':["http_uri"], 'Catalina%3Atype%3DServer':[], 'HTTP':[], '/1':[], '.1':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00':[], '(Nikto':[], '/2':[], '.1':[], '.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003846)':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'Host:':[]}
 
 keyword_list=("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
 
@@ -25,7 +37,7 @@ default_rule_sid = 1
 
 #subprocess.Popen(["sudo", "suricata", "-c", "../suricata/suricata.yaml", "-i", "wlp2s0"])
 
-pcap = "Datasets/attack.pcap"
+pcap = "Datasets/nikto-phpnuke.pcap"
 pkts = pyshark.FileCapture(pcap)
 pkts.load_packets()
 print(len(pkts._packets))
@@ -42,6 +54,7 @@ def getStats():
     max_content=0
     max_options=0
     rule_count = 0
+    keywords_freq = {}
     output_file.write("sid,protocol,options,contents\n")
     contents_dict={}
     rare_contents_per_rule_size = {1:{1:0}}
@@ -60,6 +73,12 @@ def getStats():
 
             for keyword in keyword_list:
                 keyword = ' ' + keyword + str(":")
+                
+                if keyword in keywords_freq:
+                    keywords_freq[keyword] += line.count(keyword)
+                else:
+                    keywords_freq[keyword] = line.count(keyword)
+                
                 rule_size += line.count(keyword)
 
             contents = re.findall(r'content:\"(.+?)\"\;',line)
@@ -391,10 +410,15 @@ class Rule:
                 contents = self.options[option]
                 str_content = ""
                 for content in contents:
+                    """if content == "/HtmlAdaptor" or content == "action=inspect" or content == "bean" or content == "name=":
+                        str_content = str_content + ' ' + str(option) + ':' + ' \"' + str(content) + '\"' + "; http_uri; nocase" + ';'
+                    else:
+                        str_content = str_content + ' ' + str(option) + ':' + ' \"' + str(content) + '\"' + ';'
+                    """
                     str_content = str_content + ' ' + str(option) + ':' + ' \"' + str(content) + '\"' + ';'
                     if len(contents[content]) > 0:
                         for i in range(0, len(contents[content])):
-                            str_content = str_content + ' ' + ' \"' + str(content[i]) + '\"' + ';'
+                            str_content = str_content + ' ' + str(contents[content][i]) + ';'
                 str_options = str_options + ' ' + str_content
             else:
                 str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
@@ -615,7 +639,12 @@ def optimizeRule(rule):
     """
     golden_rule = copy.deepcopy(all_rule_list[0])
     golden_rule.sid= 1099019
-    golden_rule.options["content"] = {'GET ':[], '/cron.php?':[], 'include_path=':[], '../':[]}
+    #golden_rule.options["content"] = {'GET':[], '/cron.php?':[], 'include_path=':[], '../':[]} # cron.php
+    #golden_rule.options["content"] = {'.htaccess':[]}
+    #golden_rule.options["content"] = {'/modules.php?':[], 'name=':[], 'UNION':[], 'SELECT':[]}
+    #golden_rule.options["content"] = {'/jsp/snp/':[], '.snp':[]}
+    #golden_rule.options["content"] = {'GET':[], '/CFIDE/administrator':[]}
+    golden_rule.options["content"] = {'/HtmlAdaptor':[], 'action=inspect':[], 'bean':[], 'name=':[]}
     print(golden_rule)
     print(newRuleFitness(golden_rule))
     all_rule_list.append(golden_rule)
@@ -627,7 +656,7 @@ def optimizeRule(rule):
             golden_rule_pos = all_rule_list.index(rule)
         print(str(rule))
 
-    print(len(all_rule_list)-golden_rule_pos, '/', len(all_rule_list))
+    print(str(len(all_rule_list)-golden_rule_pos) + ',' + str(len(all_rule_list)))
 
     return rule_list[0]
 
@@ -669,3 +698,7 @@ else:
 
 if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
     final_rule.threshold = {} 
+
+time_end = time.time()
+
+print("Exec time:", time_end - time_begin)
