@@ -32,7 +32,7 @@ contents_dict["htaccess"] = {'GET':[], '/Ud3uMSnb':[], '.htaccess':[], 'HTTP':[]
 
 contents_dict["jsp"] = {'GET':[], '/examples':[], '/jsp/snp/':[], 'anything':[], '.snp':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '001001)':[], 'Content-Length:':[], '1':[], 'Content-Type:':[], 'application':[], '/x-':[], 'www-':[], 'form-':[], 'urlencoded':[], 'Host:':[], '192.168.1.108': [], 'Connection:':[], 'Keep-Alive':[]}
 
-contents_dict["coldfusion"] = {'GET':[], '/CFIDE/administrator':[], '/index':[], '.cfm':[], 'HTTP':[], '/1':[], '.1':[], 'User-':[], 'Agent:':[], 'Mozilla':[], '/5':[], '.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003067)':[], 'Connection:':[], 'Keep-':[], 'Alive':[], 'Host:':[], '192.168.1.108': []}
+contents_dict["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"], '/index':[], '.cfm':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003067)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
 contents_dict["adaptor"] = {'GET':[], '/jmx-console':[], '/HtmlAdaptor':["http_uri", "nocase"], 'action=inspect':["http_uri", "nocase"], 'M':[], 'bean':["http_uri", "nocase"], 'name=':["http_uri"], 'Catalina%3Atype%3DServer':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003846)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
@@ -251,7 +251,6 @@ def getStats():
                 else:
                     keywords_freq[modifier] = line.count(aux_modifier)
 
-
             contents = re.findall(r'content:\"(.+?)\"\;',line)
 
             for content in contents:
@@ -348,9 +347,32 @@ def getStats():
 
 rules_per_size, rules_per_contents, contents_dict, keywords_freq = getStats()
 _, pkt_content_modifiers = getTokens()
+
+aux_key_freq = {}
+for mod in list(pkt_content_modifiers.keys()):
+    if mod in keywords_freq:
+        aux_key_freq[mod] = keywords_freq[mod]
+
+
 print("keyword_freq:", keywords_freq)
 print()
 print("pkt_content_modifiers", pkt_content_modifiers)
+print()
+print("aux_key_freq:", aux_key_freq)
+print()
+low_case_contents_dict = {}
+
+for k, v in contents_dict.items():
+    if k.lower() in low_case_contents_dict:
+        low_case_contents_dict[k.lower()] += v
+    else:
+        low_case_contents_dict[k.lower()] = v
+
+#low_case_contents_dict = dict((k.lower(), v) for k,v in contents_dict.items())
+#print("low_case_contents_dict:", contents_dict)
+lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
+#print("lower_case_pkt_content_modifiers:", lower_case_pkt_content_modifiers)
+print()
 """print()
 print(getTokens())
 print()
@@ -384,12 +406,20 @@ def ruleContentsFitness(rule):
 
 def rareContentsFitness(rule):
     global contents_dict
+    global low_case_contents_dict
     fitness = 0
     count = 0
+    
     for content in rule.options["content"]:
-        if content in contents_dict:
-            count += 1
-            fitness += contents_dict[content]/max(contents_dict.values())
+        if "nocase" in rule.options["content"][content]:
+            lower_content = content.lower()
+            if lower_content in low_case_contents_dict:
+                count += 1
+                fitness += low_case_contents_dict[lower_content]/max(low_case_contents_dict.values())
+        else:
+            if content in contents_dict:
+                count += 1
+                fitness += contents_dict[content]/max(contents_dict.values())
 
     if count > 0:
         fitness = fitness/count
@@ -401,6 +431,8 @@ def rareContentsFitness(rule):
 def ruleContentsModifiersFitness(rule):
     global keywords_freq
     global pkt_content_modifiers
+    global aux_key_freq
+    global lower_case_pkt_content_modifiers
     fitness = 0
 
     if "content" in rule.options:
@@ -411,18 +443,17 @@ def ruleContentsModifiersFitness(rule):
     #print("rule_contents:", list(rule_contents.keys()))
     #print()
     count = 0
-    aux_key_freq = {}
-    for mod in list(pkt_content_modifiers.keys()):
-        if mod in keywords_freq:
-            aux_key_freq[mod] = keywords_freq[mod]
-
-    #print(aux_key_freq)
-
-    for content in list(rule_contents.keys()):
+    
+    for content in rule_contents:
         for keyword in pkt_content_modifiers:
-            if content in pkt_content_modifiers[keyword]:
-                count += 1
-                fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
+            if "nocase" in rule_contents[content]:
+                if content.lower() in lower_case_pkt_content_modifiers[keyword]:
+                    count += 1
+                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))    
+            else:
+                if content in pkt_content_modifiers[keyword]:
+                    count += 1
+                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
     
     if count == 0:
         return 0
@@ -758,8 +789,11 @@ def newRuleFitness(rule):
     if fit4 > max_fit4:
         max_fit4 = fit4
 
+    if fit4 >= 0.16:
+        print("max_fit4:", fit4, rule)
+
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
-    return (fit1+fit2+fit3+2*fit4)/4
+    return (fit1+fit2+fit3+fit4)/4
 
 
 def optimizeRule(rule):
@@ -867,14 +901,15 @@ def optimizeRule(rule):
     """
     golden_rule = copy.deepcopy(all_rule_list[0])
     golden_rule.sid= 1099019
-    #golden_rule.options["content"] = {'GET':[], '/cron.php?':[], 'include_path=':[], '../':[]} # cron.php
-    #golden_rule.options["content"] = {'.htaccess':[]}
-    #golden_rule.options["content"] = {'/modules.php?':[], 'name=':[], 'UNION':[], 'SELECT':[]}
-    #golden_rule.options["content"] = {'/jsp/snp/':[], '.snp':[]}
-    #golden_rule.options["content"] = {'GET':[], '/CFIDE/administrator':[]}
-    golden_rule.options["content"] = {'/HtmlAdaptor':[], 'action=inspect':[], 'bean':[], 'name=':[]}
+    golden_content = {}
+    golden_content["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], '../':[]} # cron.php
+    golden_content["htaccess"] = {'.htaccess':["nocase", "http_uri"]}
+    golden_content["jsp"] = {'/jsp/snp/':["http_uri"], '.snp':["http_uri"]}
+    golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
+    golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
+    golden_rule.options["content"] = golden_content[args.attack]
     print(golden_rule)
-    print(newRuleFitness(golden_rule))
+    print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.append(golden_rule)
     golden_rule_pos = 0
     all_rule_list = sorted(all_rule_list, key=newRuleFitness)
@@ -914,17 +949,17 @@ def evolveRuleFlood(rule):
 
 init_rule = Rule(default_rule_action, "http", default_rule_header, default_rule_message, default_rule_sid)
 #init_rule.threshold = {"type": "both", "track": "by_dst", "count": 1, "seconds": 1}
-print("initial rule: " + str(init_rule))
+#print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
     final_rule = evolveRuleFlood(init_rule)
 else:
     #final_rule = evolveRuleSinglePacket(init_rule)
-    #final_rule.options["content"] = {'/HtmlAdaptor':[], 'action=inspect':[], 'bean':[], 'name=':[]}
+    #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
     final_rule.options["content"] = contents
-    #print(newRuleFitness(final_rule))
-    #quit()
     print(final_rule)
+    #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
+    #quit()
     final_rule = optimizeRule(final_rule)
 
 if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
