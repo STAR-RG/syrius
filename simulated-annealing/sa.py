@@ -14,7 +14,7 @@ parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
 ruleFile_path = "../suricata/pesquisa/attacks/" + str(args.attack) + ".rules"
-fitnessFile_path = "suricata-logs/" + str(args.attack) + ".log"
+fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
 
@@ -26,11 +26,11 @@ keys_by_proto["http"] = {}
 threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
 
 contents_dict = {}
-contents_dict["cron"] = {'GET':[], '/cron.php?':[], 'include_path=':[], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
+contents_dict["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
 
-contents_dict["htaccess"] = {'GET':[], '/Ud3uMSnb':[], '.htaccess':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], 'map_codes)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[]}
+contents_dict["htaccess"] = {'GET':[], '/Ud3uMSnb':[], '.htaccess':["http_uri", "nocase"], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], 'map_codes)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[]}
 
-contents_dict["jsp"] = {'GET':[], '/examples':[], '/jsp/snp/':[], 'anything':[], '.snp':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '001001)':[], 'Content-Length:':[], '1':[], 'Content-Type:':[], 'application':[], '/x-':[], 'www-':[], 'form-':[], 'urlencoded':[], 'Host:':[], '192.168.1.108': [], 'Connection:':[], 'Keep-Alive':[]}
+contents_dict["jsp"] = {'GET':[], '/examples':[], '/jsp/snp/':["http_uri"], 'anything':[], '.snp':["http_uri"], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '001001)':[], 'Content-Length:':[], '1':[], 'Content-Type:':[], 'application':[], '/x-':[], 'www-':[], 'form-':[], 'urlencoded':[], 'Host:':[], '192.168.1.108': [], 'Connection:':[], 'Keep-Alive':[]}
 
 contents_dict["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"], '/index':[], '.cfm':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003067)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
@@ -510,7 +510,7 @@ def getRuleFitness(keywords):
     return fitness
 
 def evalRule(rule):
-    subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen(["rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
     #reloadSuricataRules()  
     sendAttack()
@@ -550,7 +550,7 @@ def evalRule(rule):
     return fitness, matches
 
 def sendGoodTraffic(attack):
-    subprocess.Popen(["sudo", "sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
 
 def isEmpty(fpath):
     result=False
@@ -588,7 +588,7 @@ def evalContents(rule):
 
 def evalFalsePositive(rule):
     fitnessFile_path = "../suricata/rulesFitness.txt"
-    subprocess.Popen(["sudo", "rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen(["rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
     writeRuleOnFile(rule)
     reloadSuricataRules() 
     sendGoodTraffic()
@@ -776,24 +776,27 @@ def newRuleFitness(rule):
     global max_fit2
     global max_fit3
     global max_fit4
-    fit1 = ruleSizeFitness(rule)
+    """fit1 = ruleSizeFitness(rule)
     if fit1 > max_fit1:
         max_fit1 = fit1
-    fit2 = ruleContentsFitness(rule)
+    """
+    """fit2 = ruleContentsFitness(rule)
     if fit2 > max_fit2:
         max_fit2 = fit2
-    fit3 = rareContentsFitness(rule)
+    """
+    """fit3 = rareContentsFitness(rule)
     if fit3 > max_fit3:
         max_fit3 = fit3
+    """
     fit4 = ruleContentsModifiersFitness(rule)
     if fit4 > max_fit4:
         max_fit4 = fit4
 
     if fit4 >= 0.16:
         print("max_fit4:", fit4, rule)
-
+    
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
-    return (fit1+fit2+fit3+fit4)/4
+    return fit4
 
 
 def optimizeRule(rule):

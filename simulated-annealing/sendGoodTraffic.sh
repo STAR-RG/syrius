@@ -1,2 +1,2 @@
-tcpreplay -p 400 --pps-multi=1 --intf1=wlp2s0 Datasets/positive-icmp.pcap
-
+suricata -c inputs/suricata-$1.yaml -r Datasets/positive-http.pcap
+#sudo suricata -c inputs/suricata-$1.yaml -r Datasets/nikto-without-$1.pcap
