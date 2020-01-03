@@ -9,6 +9,8 @@ import binascii
 import argparse
 from itertools import combinations
 
+open("bad.rules", 'w').close()
+
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
@@ -471,6 +473,7 @@ def writeRuleOnFile(rules):
 
 def sendGoodTraffic(attack):
     subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
+    time.sleep(0.05)
 
 def isEmpty(fpath):
     result=False
@@ -482,21 +485,52 @@ def isEmpty(fpath):
         #print("capturado")
     return result
 
-def evalContents(rule):
+def sendAttackVariation(attack):
+    subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
+    time.sleep(0.05)
+
+def checkFalseNegative(rules):
+    global fitnessFile_path
+    global args
+    variation_packets = 4
+
+    open(fitnessFile_path, 'w').close()
+    writeRuleOnFile(rules)
+    sendAttackVariation(args.attack)
+    
+    output = []
+
+    for i in range(len(rules)):
+        output.append(0)
+
+    with open(fitnessFile_path, "r") as fitnessFile:
+        fitnessFile = fitnessFile.read()
+    
+    for i in range(len(rules)):
+        if fitnessFile.count(':'+str(rules[i].sid)+':') >= variation_packets:
+            output[i] = 1
+        else:
+            print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
+            print("False negative rule:", rules[i])
+            print(fitnessFile)
+
+    return output
+
+def evalContents(rules):
     global fitnessFile_path
     global args
     open(fitnessFile_path, 'w').close()
-    writeRuleOnFile(rule)
+    writeRuleOnFile(rules)
     #reloadSuricataRules() 
     sendGoodTraffic(args.attack)
     output= []
 
-    for i in range(len(rule)):
+    for i in range(len(rules)):
         output.append(0)
 
     with open(fitnessFile_path, "r") as fitnessFile:
         fitnessFile = fitnessFile.readlines()
-    for i in range(len(rule)):
+    for i in range(len(rules)):
         for lines in fitnessFile:
             s="Testing rule {}".format(i)
             if s in lines:
@@ -646,7 +680,8 @@ def optimizeRule(rule):
         new_rule = copy.deepcopy(rule)
         rule_list = [new_rule]
         aux = []
-        aux2 =[]
+        aux2 = []
+        aux3 = []
         timeout = 6000
         start_time = time.time()   #inicia contador do timeout
 
@@ -698,6 +733,18 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
+            all_bad_rules_list = checkFalseNegative(aux)
+            bad_rule_list = []
+            for i, fitness in enumerate(all_bad_rules_list):
+                if fitness == 0:
+                    aux3.append(aux[i])
+                    #print("{} : {}".format(aux[i], fitness))
+                    bad_rule_list.append(aux[i])
+            
+            with open("bad.rules", "a+") as writer:
+                for x in bad_rule_list:
+                    writer.write(str(x) + "\n")
+
             fitness_list = evalContents(aux)
             #print("aqui auqi auiq")
 
