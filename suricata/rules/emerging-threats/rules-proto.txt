@@ -1,0 +1,11 @@
+14815 http
+7696 tcp
+2153 dns
+1343 tls
+923 udp
+541 ip
+158 icmp
+99 ftp
+53 smtp
+37 smb
+10 ssh

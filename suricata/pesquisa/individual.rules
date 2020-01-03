@@ -1,0 +1,1 @@
+alert http $EXTERNAL_NET any -> any any (msg:"GPL WEB_SERVER .htaccess access"; content:".htaccess"; nocase; http_uri; classtype:attempted-recon; sid:2101129; rev:8; metadata:created_at 2010_09_23, updated_at 2010_09_23;)

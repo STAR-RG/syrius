@@ -12,14 +12,15 @@
 vars:
   # more specific is better for alert accuracy and performance
   address-groups:
-    HOME_NET: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
-    #HOME_NET: "[192.168.0.0/16]"
+    #HOME_NET: "[192.168.1.0/24, 172.22.43.0/24]"
+    #HOME_NET: "[172.22.68.0/28]"
+    HOME_NET: "[192.168.1.0/24]"
     #HOME_NET: "[10.0.0.0/8]"
     #HOME_NET: "[172.16.0.0/12]"
     #HOME_NET: "any"
 
-    EXTERNAL_NET: "!$HOME_NET"
-    #EXTERNAL_NET: "any"
+    #EXTERNAL_NET: "!$HOME_NET"
+    EXTERNAL_NET: "any"
 
     HTTP_SERVERS: "$HOME_NET"
     SMTP_SERVERS: "$HOME_NET"
@@ -392,7 +393,7 @@ outputs:
   # a full alerts log containing much information for signature writers
   # or for investigating suspected false positives.
   - alert-debug:
-      enabled: no
+      #enabled: yes
       filename: alert-debug.log
       append: yes
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
@@ -1180,7 +1181,9 @@ host-os-policy:
   bsd: []
   bsd-right: []
   old-linux: []
-  linux: []
+  # linux: [172.22.43.0/24]
+  # linux: [192.168.1.0/24]
+  linux: [192.168.1.0/24]
   old-solaris: []
   solaris: []
   hpux10: []
@@ -1363,6 +1366,7 @@ stream:
   memcap: 64mb
   checksum-validation: yes      # reject wrong csums
   inline: auto                  # auto will use inline mode in IPS mode, yes or no set it statically
+  midstream: true
   reassembly:
     memcap: 256mb
     depth: 1mb                  # reassemble 1mb into a stream
@@ -1870,60 +1874,67 @@ mpipe:
 ## installed with Suricata.
 ##
 
-default-rule-path: /usr/local/etc/suricata/rules
+#default-rule-path: /usr/local/etc/suricata/rules
+default-rule-path: /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/suricata/pesquisa
+#default-rule-path: rules/emerging-threats/
+
 
 rule-files:
- - botcc.rules
- # - botcc.portgrouped.rules
- - ciarmy.rules
- - compromised.rules
- - drop.rules
- - dshield.rules
+#- nikto.rules
+- individual.rules
+#- nocontent.rules
+# - test.rules
+# - botcc.rules
+# - botcc.portgrouped.rules
+# - ciarmy.rules
+# - compromised.rules
+# - drop.rules
+# - dshield.rules
 # - emerging-activex.rules
- - emerging-attack_response.rules
- - emerging-chat.rules
- - emerging-current_events.rules
- - emerging-dns.rules
- - emerging-dos.rules
- - emerging-exploit.rules
- - emerging-ftp.rules
+# - emerging-attack_response.rules
+# - emerging-chat.rules
+# - emerging-current_events.rules
+# - emerging-dns.rules
+# - emerging-dos.rules
+# - emerging-exploit.rules
+# - emerging-ftp.rules
 # - emerging-games.rules
 # - emerging-icmp_info.rules
 # - emerging-icmp.rules
- - emerging-imap.rules
+# - emerging-imap.rules
 # - emerging-inappropriate.rules
 # - emerging-info.rules
- - emerging-malware.rules
- - emerging-misc.rules
- - emerging-mobile_malware.rules
- - emerging-netbios.rules
- - emerging-p2p.rules
- - emerging-policy.rules
- - emerging-pop3.rules
- - emerging-rpc.rules
+# - emerging-malware.rules
+# - emerging-misc.rules
+# - emerging-mobile_malware.rules
+# - emerging-netbios.rules
+# - emerging-p2p.rules
+# - emerging-policy.rules
+# - emerging-pop3.rules
+# - emerging-rpc.rules
 # - emerging-scada.rules
 # - emerging-scada_special.rules
- - emerging-scan.rules
+# - emerging-scan.rules
 # - emerging-shellcode.rules
- - emerging-smtp.rules
- - emerging-snmp.rules
- - emerging-sql.rules
- - emerging-telnet.rules
- - emerging-tftp.rules
- - emerging-trojan.rules
- - emerging-user_agents.rules
- - emerging-voip.rules
- - emerging-web_client.rules
- - emerging-web_server.rules
+# - emerging-smtp.rules
+# - emerging-snmp.rules
+# - emerging-sql.rules
+# - emerging-telnet.rules
+# - emerging-tftp.rules
+# - emerging-trojan.rules
+# - emerging-user_agents.rules
+# - emerging-voip.rules
+# - emerging-web_client.rules
+# - emerging-web_server.rules
 # - emerging-web_specific_apps.rules
- - emerging-worm.rules
- - tor.rules
+# - emerging-worm.rules
+# - tor.rules
 # - decoder-events.rules # available in suricata sources under rules dir
 # - stream-events.rules  # available in suricata sources under rules dir
- - http-events.rules    # available in suricata sources under rules dir
- - smtp-events.rules    # available in suricata sources under rules dir
- - dns-events.rules     # available in suricata sources under rules dir
- - tls-events.rules     # available in suricata sources under rules dir
+# - http-events.rules    # available in suricata sources under rules dir
+# - smtp-events.rules    # available in suricata sources under rules dir
+# - dns-events.rules     # available in suricata sources under rules dir
+# - tls-events.rules     # available in suricata sources under rules dir
 # - modbus-events.rules  # available in suricata sources under rules dir
 # - app-layer-events.rules  # available in suricata sources under rules dir
 # - dnp3-events.rules       # available in suricata sources under rules dir

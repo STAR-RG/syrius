@@ -1,0 +1,1 @@
+alert ftp $EXTERNAL_NET any -> $HOME_NET any (msg:"GPL FTP command overflow attempt"; flow:to_server,established,no_stream; dsize:>100; reference:bugtraq,4638; reference:cve,2002-0606; classtype:protocol-command-decode; sid:2101748; rev:10; metadata:created_at 2010_09_23, updated_at 2010_09_23;)
