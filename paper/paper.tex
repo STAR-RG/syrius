@@ -1,17 +1,37 @@
-% This is samplepaper.tex, a sample chapter demonstrating the
-% LLNCS macro package for Springer Computer Science proceedings;
-% Version 2.20 of 2017/10/04
-%
-\documentclass[runningheads]{llncs}
-%
-%\usepackage[margin=1in]{geometry}% http://ctan.org/pkg/geometry
+%%
+%% This is file `sample-sigconf.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `sigconf')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigconf.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+\documentclass[sigconf,anonymous]{acmart}
+
+\usepackage{libertine}
 \usepackage{lipsum}% http://ctan.org/pkg/lipsum
 \usepackage{algorithm}% http://ctan.org/pkg/algorithm
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{graphicx}
 \usepackage[compatibility=false]{caption}% http://ctan.org/pkg/caption
 \usepackage{booktabs}
-\usepackage{cite}
+%% \usepackage{cite}
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{pgfplots}
@@ -19,7 +39,6 @@
 \usetikzlibrary{matrix,fit,shapes,calc,positioning,shadows,arrows,shapes,backgrounds,decorations.markings,fadings}
 \usepackage{listings}
 \usepackage[caption=false, font=footnotesize]{subfig}
-%%%%%%%%%%%%% code listing
 \renewcommand{\ttdefault}{pcr}
 \lstset{
   basicstyle=\scriptsize\ttfamily,
@@ -43,36 +62,142 @@
 \usepackage{color, colortbl}
 \definecolor{Gray}{gray}{0.9}
 
+%% 
 \input{macros}
 
-% Used for displaying a sample figure. If possible, figure files should
-% be included in EPS format.
-%
-% If you use the hyperref package, please uncomment the following line
-% to display URLs in blue roman font according to Springer's eBook style:
-% \renewcommand\UrlFont{\color{blue}\rmfamily}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
 
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2018}
+\acmYear{2018}
+\acmDOI{10.1145/1122445.1122456}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[Woodstock '18]{Woodstock '18: ACM Symposium on Neural
+  Gaze Detection}{June 03--05, 2018}{Woodstock, NY}
+\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+  June 03--05, 2018, Woodstock, NY}
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
 \begin{document}
-%
-\title{Synthesis of Rules for Network Intrusion Detectors}
-%
-%\titlerunning{Abbreviated paper title}
-% If the paper title is too long for the running head, you can set
-% an abbreviated paper title here
-%
-\author{Lucas Alcantara\MyComment{\inst{1}}\MyComment{\orcidID{0000-1111-2222-3333}} \and
-Guilherme Padilha\MyComment{\inst{1}}\MyComment{\orcidID{1111-2222-3333-4444}} \and
-Marcelo d'Amorim\MyComment{\orcidID{0000-0002-1323-8769}}}
-%
-\authorrunning{Alcantara et al.}
-% First names are abbreviated in the running head.
-% If there are more than two authors, 'et al.' is used.
-%
-\institute{Federal University of Pernambuco (UFPE), Recife, Brazil\\
-\email{\{lama,ghps,damorim\}@cin.ufpe.br}}
-%
-\maketitle              % typeset the header of the contribution
-%
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Learning to Synthesize Rules for Network Intrusion Detectors}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Ben Trovato}
+\authornote{Both authors contributed equally to this research.}
+\email{trovato@corporation.com}
+\orcid{1234-5678-9012}
+\author{G.K.M. Tobin}
+\authornotemark[1]
+\email{webmaster@marysville-ohio.com}
+\affiliation{%
+  \institution{Institute for Clarity in Documentation}
+  \streetaddress{P.O. Box 1212}
+  \city{Dublin}
+  \state{Ohio}
+  \postcode{43017-6221}
+}
+
+\author{Lars Th{\o}rv{\"a}ld}
+\affiliation{%
+  \institution{The Th{\o}rv{\"a}ld Group}
+  \streetaddress{1 Th{\o}rv{\"a}ld Circle}
+  \city{Hekla}
+  \country{Iceland}}
+\email{larst@affiliation.org}
+
+\author{Valerie B\'eranger}
+\affiliation{%
+  \institution{Inria Paris-Rocquencourt}
+  \city{Rocquencourt}
+  \country{France}
+}
+
+\author{Aparna Patel}
+\affiliation{%
+ \institution{Rajiv Gandhi University}
+ \streetaddress{Rono-Hills}
+ \city{Doimukh}
+ \state{Arunachal Pradesh}
+ \country{India}}
+
+\author{Huifen Chan}
+\affiliation{%
+  \institution{Tsinghua University}
+  \streetaddress{30 Shuangqing Rd}
+  \city{Haidian Qu}
+  \state{Beijing Shi}
+  \country{China}}
+
+\author{Charles Palmer}
+\affiliation{%
+  \institution{Palmer Research Laboratories}
+  \streetaddress{8600 Datapoint Drive}
+  \city{San Antonio}
+  \state{Texas}
+  \postcode{78229}}
+\email{cpalmer@prl.com}
+
+\author{John Smith}
+\affiliation{\institution{The Th{\o}rv{\"a}ld Group}}
+\email{jsmith@affiliation.org}
+
+\author{Julius P. Kumquat}
+\affiliation{\institution{The Kumquat Consortium}}
+\email{jpkumquat@consortium.net}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
 \begin{abstract}
 Network Intrusion Detection Systems (\nids{}) are a popular mechanism
 used by system administrators to defend against network attacks. These
@@ -80,29 +205,62 @@ systems monitor the network traffic and flag suspicious network
 behavior. Signature-based \nids\ do that by checking the network
 traffic against a pre-defined set of rules, which can become obsolete
 as attackers learn new strategies to circumvent existing defenses.
-This paper proposes \tname{}\footnote{Abbreviation of \textbf{Sy}nthesis of
-  Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a technique that automatically
-synthesizes \nids\ rules from positive and negative examples (\ie{},
-malicious and benign traffic). \tname{} formulates synthesis as an
-optimization problem whose candidate solutions are rules that
-maximizes the captured the positive traffic and minimizes the captured
-negative traffic. \tname{} bootstraps the search with candidate
-solutions that use data from the payload of the malicious message and
-produces optimal rule candidates on output. We evaluated \tname{} on a
-diverse set of attacks. Results indica te that \Fix{...}
-
-%% optimizes the
-%% candidate solution to capture the positive example and, and then
-%% optimizes the candidate solution to avoid capturing the negative
-%% traffic. 
-
-
-\keywords{\nids, synthesis, search}
+This paper proposes \tname{}, a technique that automatically
+synthesizes \nids\ rules from positive and negative examples, \ie{},
+malicious and benign traffic. \tname{} formulates synthesis as an
+optimization problem whose candidate solutions are rules that maximize
+the capture of positive traffic and minimize the capture of negative
+traffic. \tname{} bootstraps the search with candidate solutions that
+use data from the payload of the malicious message and produces
+optimal rule candidates on output. We evaluated \tname{} on a diverse
+set of attacks. Results indicate that \Fix{...}
 \end{abstract}
-%
-%
-%
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10010520.10010553.10010562</concept_id>
+  <concept_desc>Computer systems organization~Embedded systems</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010520.10010575.10010755</concept_id>
+  <concept_desc>Computer systems organization~Redundancy</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010520.10010553.10010554</concept_id>
+  <concept_desc>Computer systems organization~Robotics</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10003033.10003083.10003095</concept_id>
+  <concept_desc>Networks~Network reliability</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computer systems organization~Embedded systems}
+\ccsdesc[300]{Computer systems organization~Redundancy}
+\ccsdesc{Computer systems organization~Robotics}
+\ccsdesc[100]{Networks~Network reliability}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{\nids, synthesis, search}
+
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
 \section{Introduction}
+\label{sec:intro}
 
 Network Intrusion Detection Systems (\nids{}) are software systems
 that monitor the network traffic for malicious behavior and act
@@ -110,56 +268,37 @@ accordingly by blocking messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
 not block. Various open-source (\eg{}, Snort~\cite{snort} and
-Suricata~\cite{suricata}) and commercial \nids implementations (\eg{},
+Suricata~\cite{suricata}) and commercial \nids\ implementations (\eg{},
 SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar}) exist
 today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
 exist on the Internet.
 
-\sloppy \nids{} are typically categorized in two
-groups~\cite{kumar2007survey}: rule-based and anomaly-based \nids. A
-rule-based intrusion detector\footnote{\aka\ signature-based intrusion
-  detector.} checks if the network traffic matches a fixed set of
-rules. Figure~\ref{fig:synflood-example} shows an example rule of
-Suricata~\cite{suricata}, a popular open-source \nids{}. This rule
-prescribes a method to capture a denial-of-service
-attack~\cite{understanding-dos} to a server by matching specific
-conditions about the network traffic. Relevant properties about the
-traffic of interest appear in bold (see
-Section~\ref{sec:suri-metas-coverage}). Rule-based \nids{} focus on
-known attacks whereas anomaly-based \nids{} focus on unknown attacks
-that could be observed by first learning the regular traffic and then
-acting
-properly~\cite{kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}. These
-two kinds of intrusion detection mechanisms are
-complementary. Rule-based \nids could miss attacks (as rulesets can
-become outdated) whereas anomaly-based \nids can raise false alarms (as
-detection algorithms are approximate).
+This paper focuses on rule-based \nids{}, which is a very popular kind
+of NIDS used in industry (see Section~\ref{sec:background}). A
+\emph{rule-based intrusion detector}\footnote{\aka\ signature-based
+  intrusion detector.} checks if the network traffic matches a fixed
+set of rules. Figure~\ref{fig:synflood-example} shows an example rule
+of Suricata~\cite{suricata}, a popular open-source \nids{}. This
+particular rule prescribes a method to capture a denial-of-service
+attack to a server by matching specific conditions about the network
+traffic~\cite{understanding-dos}. Relevant properties about the
+traffic of interest appear in bold in this rule (see
+Section~\ref{sec:suri-metas-coverage}). Deployments of rule-based
+\nids\ are restricted to a fixed set of rules defined by the network
+system administrator. Updating these rules is tedious and error-prone,
+but it is important as attackers constantly create new strategies to
+circumvent existing rules. IT-security companies capitalize on this
+phenomena and offer rulesets on the
+market~\cite{proofpoint-etpro,snort-rule-subscriptions}.
 
-Rule-based \nids are restricted to a fixed set of rules defined by the
-network system administrator. Manually writing these rules is tedious,
-error-prone, but important as attackers constantly create new
-strategies to circumvent existing rules. IT-security companies
-capitalize on this phenomena and put rulesets on the market for
-sale~\cite{proofpoint-etpro,snort-rule-subscriptions}.  Despite this
-fundamental issue, rule-based systems are tremendously popular in
-industry today. Anomaly-based \nids are not restricted to a fixed set
-of rules. They learn usage behavior from positive traffic and, based
-on that, alert uncommon behavior~\cite{7579764}. Unfortunately,
-anomaly-based \nids are fundamentally imprecise. To sum up, rule-based
-\nids are precise but incomplete whereas anomaly-based \nids are (more)
-complete but imprecise.
-
-%% This paper focuses on the
-%% problem of discovering new rules by using anomaly-based \nids.
-
-This paper proposes \tname{}, a technique that uses machine
-intelligence to automatically synthesize rules for rule-based
-\nids. Our general goal is to harden the protection of \nids by
-improving the creation process of rules. One scenario of application
-of \tname{} is one where an anomaly-based \nids identifies abnormal
-traffic and signals that traffic to \tname{} to create and distribute
-the rules.
+This paper proposes \tname{}\footnote{Abbreviation for
+  \textbf{Sy}nthesis of Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a
+technique that uses machine intelligence to automatically synthesize
+rules for rule-based \nids. Our goal is to facilitate the creation
+process of rules and, consequently, harden the protection of \nids\ to
+network attacks. \tname{} synthesizes rules from malicious and benign
+traffic and from examples of correct rules.
 
 %% Note that anomaly-based \nids are evolving pretty quick with the
 %% advances in machine learning, but rule-based \nids are still extremely
@@ -172,20 +311,39 @@ the rules.
 %% ways to circumvent existing protections and 2) manual creation of
 %% rules is tedious and time-consuming.  
 
-\tname{} synthesizes rules from positive and negative examples, \ie{},
-malicious and benign traffic.
-
 \Fix{summarize how the technique works}
 
 \Fix{summarize results}
 
 This paper makes the following contributions.
 
-\section{Background}
+\section{Network Intrusion Detection Systems (\nids)}
+\label{sec:background}
 
-This paper focuses on signature-based \nids. Although we focused on
-the Suricata \nids, the principles we used are general to any other
-signature-based \nids~(\eg{}, Snort~\cite{snort}).
+\subsection{Rule-based and Anomaly-based \nids}
+
+\sloppy \nids{} are typically categorized in two
+groups~\cite{kumar2007survey}: rule-based (see
+Section~\ref{sec:intro}) and anomaly-based \nids. An
+\emph{anomaly-based intrusion detector} learn usage behavior from
+benign traffic and, based on that, alert uncommon
+behavior~\cite{7579764,kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}. More
+precisely, an anomaly-based \nids{} flags an attack when the network
+traffic manifests different characteristics compared to those of the
+benign traffic.
+
+Rule-based \nids\ can miss attacks as rulesets can become outdated
+whereas anomaly-based \nids\ can report false alarms as learning
+algorithms that generalize observations from bening traffic are
+approximate. To sum up, rule-based \nids{} and anomaly-based \nids{}
+are complementary---a rule-based \nids{} focuses on known attacks
+whereas anomaly-based \nids{} focuses on unknown potential attacks.
+This paper focuses on rule-based \nids\ for its tremendous popularity
+in industry. Although we focused on the Suricata \nids, the principles
+we used are general to any other signature-based \nids~(\eg{},
+Snort~\cite{snort}).
+
+\Mar{estou aqui-----------------}
 
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
@@ -212,10 +370,11 @@ characteristics of the attack (\eg, ``flags'', ``threshold'', and
 ``content''). \tname{} produces options of the second kind, which are
 \emph{relevant} to capturing the attack.
 
-\begin{wrapfigure}[14]{r}{0.5\textwidth}
+%\begin{wrapfigure}[14]{r}{0.5\textwidth}
+\begin{figure}[t!]
   \centering
-  \vspace{-7ex}
-  \scalebox{0.7}{
+%  \vspace{-7ex}
+  \scalebox{0.85}{
     \begin{tikzpicture}
       \begin{axis}[
           ybar stacked,
@@ -239,7 +398,9 @@ characteristics of the attack (\eg, ``flags'', ``threshold'', and
   \vspace{-2ex}
   \caption{\label{fig:distribution-rules-protocol}Number of relevant
     options per protocol supported by Suricata.}
-\end{wrapfigure}
+%\end{wrapfigure}
+\end{figure}
+  
 Suricata supports a total of \totoptions\ distinct options covering
 \numproto\ distinct protocols. A total of 9 of these options are for
 documentation.\MyComment{For instance, the purpose of rule option \CodeIn{msg} is to print on
@@ -264,7 +425,7 @@ elsewhere~\cite{suri-rule-format}.
 \begin{table}[t!]
   \caption{\label{table:rules}Example options of Suricata.}  
   \centering
-  \begin{tabular}{p{0.35cm}ll}
+  \begin{tabular}{clp{5.5cm}}
     \toprule
     \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &  \multicolumn{1}{c}{Description}\\
     \midrule     
@@ -517,24 +678,15 @@ gradient descent-like search to generate minimal solutions.
 
 
 \subsection{Step 1: Reverse Engineering}
+
+
+
+
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
-The goal of the first step is to extract options from the positive
-traffic. For that, \tname{} parses the protocol message, looking for
-fields in the message associated with options (see
-Section~\ref{sec:rules-and-packets}).
-Unfortunately, inferring options at the field granularity
-level is insufficient to capture \CodeIn{content} options (see
-Section~\ref{sec:example-suricata-rules}), which refer to parts of the
-payload of the message and cannot be directly extracted directly from
-the fields. Handling this case is critically important as most rules
-contain \CodeIn{content}
-options. Figure~\ref{fig:distribution-contents} shows the histogram of
-number of these options per rule (up to 10) obtained from a public
-ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
-rules. Rules without \CodeIn{content} options is an exception and half
-of the rules contain at least two \CodeIn{content} options.  To find
-\begin{wrapfigure}[15]{r}{0.56\textwidth}
+
+%\begin{wrapfigure}[15]{r}{0.56\textwidth}
+\begin{figure}[t!]
   \centering
   \vspace{-4ex}
   \scalebox{1.2}{  
@@ -560,7 +712,26 @@ of the rules contain at least two \CodeIn{content} options.  To find
   }
   \caption{\label{fig:distribution-contents}Histogram of number of
     \CodeIn{content} options per rule (up to 10).}
-\end{wrapfigure}
+%\end{wrapfigure}
+\end{figure}  
+
+
+
+The goal of the first step is to extract options from the positive
+traffic. For that, \tname{} parses the protocol message, looking for
+fields in the message associated with options (see
+Section~\ref{sec:rules-and-packets}).
+Unfortunately, inferring options at the field granularity
+level is insufficient to capture \CodeIn{content} options (see
+Section~\ref{sec:example-suricata-rules}), which refer to parts of the
+payload of the message and cannot be directly extracted directly from
+the fields. Handling this case is critically important as most rules
+contain \CodeIn{content}
+options. Figure~\ref{fig:distribution-contents} shows the histogram of
+number of these options per rule (up to 10) obtained from a public
+ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
+rules. Rules without \CodeIn{content} options is an exception and half
+of the rules contain at least two \CodeIn{content} options.  To find
 the values associated with these options, \tname{} splits the payload
 of the malicious message in tokens using natural language delimiters,
 such as $\backslash$t, $\backslash$n, $\backslash$r, and spaces. The
@@ -608,15 +779,17 @@ removed. The procedure uses negative traffic to guide the search.
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
 \algnewcommand\And{\textbf{and} }
 \begin{algorithm}[t!]
-\textbf{INPUT:} overconstrained rule $or$ \\
-\textbf{OUTPUT:} Set of minimal rules $\mathcal R$\\
-\vspace{-3ex}
+  \noindent\hspace{-31ex}
+  \textbf{INPUT:} overconstrained rule $or$ \\
+  \noindent\hspace{-30ex} 
+  \textbf{OUTPUT:} Set of minimal rules $\mathcal R$\\
+%\vspace{-3ex}
 \captionof{algorithm}{Minimization algorithm}\label{algo1}
 \begin{algorithmic}[1]
   \State $\mathcal R \gets \{\mathit{or}\}$\Comment{initial population
     of candidate solutions contains only the input rule.}\label{line-init}
   \Do\label{start-do-while}
-      \State $\mathcal R' \gets \emptyset$\Comment{starting new
+      \State $\mathcal R' \gets \emptyset$ \Comment{starting new
         iteration. new generation should be empty.}\label{init-rprime}
       \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate individual/rule separately.}\label{start-foreach}
            \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}\label{start-for}
@@ -624,7 +797,7 @@ removed. The procedure uses negative traffic to guide the search.
                \State $j\gets \mathit{rand}(0,\mathit{len}(r))$
                \State $r[j]\gets 0$\Comment{discard option $j$ of rule
                  $r$, a copy of the original rule $\mathit{ro}$}
-               \If{$\mathit{isnew}(r)$ \And $\mathit{isfit}(r)$}
+               \If{$\mathit{isnew(r)} \And \mathit{isfit}(r)$} 
                    \State $\mathcal R' \cup\gets \{r\}$\Comment{$r$
                      can lead to a plausible candidate solution.}\label{line-progress}
                \EndIf
@@ -821,18 +994,14 @@ External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
 
 \Fix{...}
 
-\section*{Acknowledgments}
-This work is partially supported by RNP grant number 002951.
+%% \section*{Acknowledgments}
+%% This work is partially supported by RNP grant number 002951.
 
 
-%
-% ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-%
-\bibliographystyle{splncs04}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
-%
 
 \end{document}
+\endinput
+%%
+%% End of file `sample-sigconf.tex'.
