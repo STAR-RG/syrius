@@ -343,7 +343,6 @@ in industry. Although we focused on the Suricata \nids, the principles
 we used are general to any other signature-based \nids~(\eg{},
 Snort~\cite{snort}).
 
-\Mar{estou aqui-----------------}
 
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
@@ -364,11 +363,55 @@ traffic flowing from any port in the home network to any other address
 outside the home network. The variables \CodeIn{\$HOME\_NET} and
 \CodeIn{\$EXTERNAL\_NET} are configurable. The rule options come after
 the header. It is a semi-colon-separated sequence of key-value
-pairs. Options serve to 1) document the analyzed traffic (\eg{},
-``msg'', ``classtype'', and ``sid'') and to 2) describe
-characteristics of the attack (\eg, ``flags'', ``threshold'', and
-``content''). \tname{} produces options of the second kind, which are
-\emph{relevant} to capturing the attack.
+pairs. Rule options serve to document the analyzed traffic (\eg{},
+``msg'', ``classtype'', and ``sid'') and to characterize the attack
+pattern (\eg, ``flags'', ``threshold'', and ``content''). \tname{}
+produces options of the second kind, which are \emph{relevant} to
+capturing the attack.
+
+\begin{table}[t!]
+  \caption{\label{table:rules}Example options of Suricata.}  
+  \centering
+  \begin{tabular}{clp{5.5cm}}
+    \toprule
+    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &  \multicolumn{1}{c}{Description}\\
+    \midrule     
+    1 & dsize & matches on the size of the packet payload\\
+    2 & itype &  matches on a specific ICMP type\\
+    3 & icode & matches on a specific ICMP code\\
+    4 & icmp\_seq  & checks a ICMP sequence number\\
+    5 & icmp\_id & matches on specific ICMP id-values\\
+    6 & window & checks the size of the TCP window\\
+    7 & flags & matches on TCP flags\\
+    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
+    9 & threshold & controls the rule’s alert frequency\\
+    10 & content & checks if argument is present on the payload\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+
+Table~\ref{table:rules} shows a sample of the options of
+Suricata. Column ``\#'' shows the option number, column ``Name'' shows
+the name of the option, and column ``Description'' presents a short
+description of the option purpose. We found that the option
+\CodeIn{content} is particularly prevalent in rules from public
+databases\MyComment{ (see Figure~\ref{fig:distribution-contents})}. This
+option takes a sequence of bytes as argument (\eg{},
+\CodeIn{content:''SELECT ''}) and checks if that sequence is present
+in the payload of the message. Detailed description of the Suricata
+rules can be found elsewhere~\cite{suri-rule-format}. It is worth
+noting that Suricata supports a total of \totoptions\ distinct options
+covering \numproto\ distinct protocols. A total of 9 of these options
+are for documentation.\MyComment{For instance, the purpose of rule
+  option \CodeIn{msg} is to print on the output an informative message
+  indicating what kind of intrusion has been observed.}
+Figure~\ref{fig:distribution-rules-protocol} shows the distributions
+of these options per protocol. The sum of the number of protocol
+options is higher than \totoptions\ as some options are shared across
+different protocols. \tname{} does not make distinction among protocols.
+
 
 %\begin{wrapfigure}[14]{r}{0.5\textwidth}
 \begin{figure}[t!]
@@ -401,60 +444,19 @@ characteristics of the attack (\eg, ``flags'', ``threshold'', and
 %\end{wrapfigure}
 \end{figure}
   
-Suricata supports a total of \totoptions\ distinct options covering
-\numproto\ distinct protocols. A total of 9 of these options are for
-documentation.\MyComment{For instance, the purpose of rule option \CodeIn{msg} is to print on
-the output an informative message indicating what kind of intrusion
-has been observed.} Figure~\ref{fig:distribution-rules-protocol} shows
-the distributions of these options per protocol. The sum of
-the number of protocol options is higher than \totoptions\ as some
-options is shared across different protocols.
-
-Table~\ref{table:rules} shows a sample of the options of
-Suricata. Column ``\#'' shows the option number, column ``Name'' shows
-the name of the option, and column
-``Description'' presents a short description of the option purpose. We
-found that the option \CodeIn{content} is particularly prevalent in
-rules from public databases (see
-Figure~\ref{fig:distribution-contents}). This option takes a sequence
-of bytes as argument (\eg{}, \CodeIn{content:''SELECT ''}) and checks
-if that sequence is present in the payload of the message. Detailed
-description of the Suricata rules can be found
-elsewhere~\cite{suri-rule-format}.
-
-\begin{table}[t!]
-  \caption{\label{table:rules}Example options of Suricata.}  
-  \centering
-  \begin{tabular}{clp{5.5cm}}
-    \toprule
-    \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &  \multicolumn{1}{c}{Description}\\
-    \midrule     
-    1 & dsize & matches on the size of the packet payload\\
-    2 & itype &  matches on a specific ICMP type\\
-    3 & icode & matches on a specific ICMP code\\
-    4 & icmp\_seq  & checks a ICMP sequence number\\
-    5 & icmp\_id & matches on specific ICMP id-values\\
-    6 & window & checks the size of the TCP window\\
-    7 & flags & matches on TCP flags\\
-    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
-    9 & threshold & controls the rule’s alert frequency\\
-    10 & content & checks if argument is present on the payload\\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-\begin{figure*}[h!]
+\begin{figure}[h!]
 \centering
-\includegraphics[scale=0.3]{figs/ICMP-packet-structure.png}
+\includegraphics[scale=0.28]{figs/ICMP-packet-structure.png}
 \caption{Layout of an ICMP packet.}
 \label{fig:icmp-packet-layout}
-\end{figure*}
+\end{figure}
 
-There exists a correspondence between network packets and most rule
-options. Let's consider the ICMP protocol as an
+Rule options are often associated with specific fields of network
+packets. Let's consider the ICMP protocol as an
 example. Figure~\ref{fig:icmp-packet-layout} shows the layout of an
 ICMP packet. The packet fields ``Flags'' and ``Time to Live'',
 declared in the IP header, are mapped to the options \CodeIn{flagbits}
@@ -464,18 +466,18 @@ and \CodeIn{ttl}, respectively. Likewise, the fields ``Type'' and
 example rule options.) The values of the options ``ttl'', ``itype'',
 and ``icode'' are the same as the value of the corresponding fields in
 the ICMP packet. For the field ``Flags'' the value of the
-corresponding option is encoded in its bitvector. For example, if the
+corresponding option is encoded in the bitvector. For example, if the
 ``Flags'' field stores the value 1010, the corresponding rule option
 will be \CodeIn{flagbits:RM}, as each position of the vector encodes a
-different character in the option \CodeIn{flagbits}.
-
-The value of most options can be obtained through transformation
-functions, as those described above. However, this is not the case for
-the option \CodeIn{threshold}, which is typically used in
-denial-of-service attacks. Conceptually, that option operates over
-sequence of messages as opposed to a single message. More precisely,
-to trigger an action on a rule containing that option the \nids\ tool
-needs to monitor several messages.
+different character in the \CodeIn{flagbits} rule option. The value of
+several options can be determined through transformation functions, as
+those described above. One expection to this is the option
+\CodeIn{threshold}, which is typically used in denial-of-service
+attacks. That option operates over sequence of messages as opposed to
+a single message. Consequently, it is not possible to determined its
+values from a single message. More precisely, to trigger an action on
+a rule containing that option a \nids\ tool needs to monitor several
+messages.
 
 %% \Luc{
 %%   Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
@@ -485,6 +487,8 @@ needs to monitor several messages.
 
 \section{Illustrative Examples}
 \label{sec:suri-metas-coverage}
+
+\Mar{----------------- estou aqui}
 
 
 This section briefly presents examples of attacks and illustrates the
@@ -521,14 +525,10 @@ SYN packet in a TCP packet and the option \CodeIn{threshold: type
   both, track by\_dst, count 5000, seconds 5} indicates that a high
 volume of such packets should be requested in a short period of time.
 
-%% Explain how \tname\ behaves on this attack
-
-
-
 In the following, we illustrate how \tname{} proceeds for obtaining
-the rule for the SYN Flood attack. The main challenge in synthesizing
-rules is to discover the set of options that enables the \nids\ to
-capture the malicious traffic, but ignore the benign traffic.  The
+the rule for the SYN Flood attack. One challenge in synthesizing
+rules is to discover the set of options in a rule that makes the \nids\ to
+capture the malicious traffic, but allow the benign traffic to go through.  The
 other parts of the rule (\ie{}, the action and the header) are either
 inferred or left constant. \tname{} sets the action header to
 \CodeIn{alert} and sets the header to \CodeIn{<proto> any any -> any
@@ -536,10 +536,9 @@ inferred or left constant. \tname{} sets the action header to
 most general flow description possible, \ie{}, it instructs the
 \nids\ to analyze the traffic flowing from/to any address and port.
 We understand that this is domain-specific information and conjecture
-that the system administrator would know how to modify the constant
-parts.
+that the system administrator would know how to customize.
 
-\tname{} proceeds as follows to synthesize rules for the SYN Flood
+\tname{} proceeds as follows to synthesize rules for this
 attack. First, it analyzes the positive traffic and extracts options
 expressed in that traffic. For this example, it finds the following
 set of options:
@@ -552,9 +551,13 @@ set of options:
   \vspace{-3ex}  
 \end{figure}
 
-Note that a rule that uses this set of options would capture the
-positive traffic as these options originated from the positive
-traffic. Unfortunately, such rule would be overspecified. It would
+\Mar{<~ Lucas/Guilheme, logo acima a gente falou que threshold nao
+  poderia ser inferido a partir de uma unica mensagem e aqui a gente
+  fala isto. Vcs. podem explicar o que realmente acontece?}
+
+Note that, by construction, a rule that uses this set of options
+captures the positive traffic as these options originated from the
+positive traffic. Unfortunately, this rule is overspecified. It would
 unlikely capture different manifestations of the same
 attack. Informally, the rule includes ``too many'' characteristics of
 the malicious traffic used to define it. To address this overfitting
@@ -563,9 +566,11 @@ plausible rules should only capture the positive traffic. \tname{}
 potentially finds several minimal rules. The list below shows the
 options for the five shortest rules it produces for this attack.
 
-\Fix{...elaborate...}
+\Mar{<~ Lucas/Guilheme, vcs. podem atualizar esta informacao?}
 
 \subsection{Active Reconnaissance}
+
+\Mar{------------------------------- estou aqui}
 
 Active reconnaissance is a method used by malicious individuals to
 gather information about vulnerabilities from a computing system. The
