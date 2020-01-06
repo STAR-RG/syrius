@@ -551,6 +551,7 @@ set of options:
 \Mar{<~ Lucas/Guilheme, logo acima a gente falou que threshold nao
   poderia ser inferido a partir de uma unica mensagem e aqui a gente
   fala isto. Vcs. podem explicar o que realmente acontece?}
+\Luc{O input considerado para ataques de flood eh um conjunto de pacotes e não apenas um pacote unico, nesse caso um conjunto com 20 pacotes. A opção de threshold é incluida na regra quando o input contem mais de um pacote, o parametro count recebe o valor da quantidade de pacotes do conjunto de entrada.}
 
 Note that, by construction, a rule that uses this set of options
 captures the positive traffic as these options originated from the
@@ -564,6 +565,7 @@ potentially finds several minimal rules. The list below shows the
 options for the five shortest rules it produces for this attack.
 
 \Mar{<~ Lucas/Guilheme, vcs. podem atualizar esta informacao?}
+\Gui{}
 
 \subsection{Active Reconnaissance}
 
