@@ -680,25 +680,29 @@ the output appear at the right. \tname\ takes on input malicious and
 benign traffic and a set of rules from public rulesets and produces on
 output a list of plausible rules to isolate the malicious traffic.
 
-\Mar{------------------ estou aqui}
-
-First, it produces a
-potentially overspecified rule that captures the malicious traffic
-provided on input. In this step, \tname\ finds options by
-\emph{reverse engineering} the positive traffic. It extracts tokens
-from the malicious message and uses them to define the initial
-rule. We say that this rule overfits the problem as it satisfies the
-success criterion of only capturing the positive traffic, however it
-is unlikely that it will be able to generalize to other attacks,
-\ie{}, attacks of the same kind, but with different data. The reason
-is that many options added to the rule are unimportant for
-discriminating the attack. In the second step, \tname{} uses negative
-examples to \emph{minimize} the rule, discarding unnecessary
-options. Note that any subset of the original set of options captures
-the positive traffic. The minimization step uses a population-based
-gradient descent-like search to generate minimal solutions.
-
-
+\tname\ works as follows. First, it produces a potentially
+overspecified rule that captures the malicious traffic, provided on
+input in the form of pcap files~\cite{pcap}. In this step,
+\tname\ detects rule options in correspondence with the input messages
+(see Section~\ref{sec:rules-and-packets}). It is worth noting that the
+rule produced in this step can include more options than the golden
+rule (see Section~\ref{sec:suri-metas-coverage}). Consequently, the
+use of that rule could lead, in principle, to false negatives as not
+all manifestations of the same attack are identical, \ie{}, the
+content of messages for two instantiations of a given attack may
+differ. Second, \tname{} generates plausible rules similar to the one
+produced in the previous step. It is worth noting that any subset of
+the original set of options captures the malicious traffic. As the
+generation procedure discards options from the initial rule, it
+satisfies the invariant of capturing malicious traffic by
+construction. However, the goal of \tname\ is to produce rules that
+capture \emph{only} malicious traffic. To achieve that goal, \tname{}
+uses benign traffic from public databases to check that the
+\nids\ instantiated with a given rule does not capture benign
+traffic. The minimization step uses a population-based gradient
+descent-like search to find all plausible rules, which are derived
+from the rule obtained in the previous step. Third,
+\Fix{...elaborate...}
 
 
 
