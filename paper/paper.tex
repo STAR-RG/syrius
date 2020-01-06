@@ -558,17 +558,8 @@ messages. \tname{} finds the following set of options at this stage:
 
 \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
-  respondam isto logo.}  \Gui{O window:64 seria removido sim. Na documentação do Snort tem isso:
-       
-The reserved bits can be used to detect unusual behavior, such as IP stack fingerprinting attempts or other suspicious activity. 
-
-O que realmente caracteriza o ataque eh apenas a flag S e o numero elevado de pacotes, os bits reservados 12 auxiliam na deteccao desse ataque.
-
-Alem disso, tem mais:
-
- The reserved bits '1' and '2' have been replaced with 'C' and 'E', respectively, to match RFC 3168
- 
- O 12 ainda funcionam no programa, mas nao sao mais utilizados.}
+  respondam isto logo.}  \Gui{O window:64 seria removido sim.}
+  \Luc{O segundo campo da opção flags define flags que serão ignoradas. Nesse caso a regra procura por pacotes onde apenas a flag S está 'setada', independentemente do valor das flags 1 e 2. Portanto a regra gerada pode capturar coisas diferentes da regra original. A inferencia do "12" n pode ser feita apenas a partir do pacote de entrada, precisariamos tratar isso.}
 
 
 \tname{} only reports a rule if the \nids\ (\ie{}, Suricata)
@@ -604,7 +595,8 @@ an actual attack. The most popular technique is to ``scan'' open ports
 in a host. A Ping Scan is a very common type of port scan based and it
 is based on the ICMP protocol. \Mar{@Lucas, acima falamos de
   porta. Abaixo nao falamos de porta, apenas de maquina. Vc. pode ser
-  mais especifico? ->}To scan a network, an attacker sends a several
+  mais especifico? ->}
+  \Luc{De fato estamos falando de duas coisas diferentes, mas ambas são exemplos de 'active reconnaissance'. Primeiramente citamos o port scanning, q tem o objetivo de encontrar portas abertas em uma maquina especifica. Depois falamos do ping scan, q tem o objetivo de encontrar ip's ativos numa rede.} To scan a network, an attacker sends a several
 ICMP Echo requests addressed to a range of IP addresses in the network
 and checks which ones respond to the requests. This allow the attacker
 to know which machines are active in the network, then it can choose
