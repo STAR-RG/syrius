@@ -607,10 +607,11 @@ one of them to attack.
 \end{figure}
 
 Figure 4 shows a Suricata rule that captures a ping scan implemented
-with the NMAP Tool~\cite{netmap}. The relevant options are in
-bold---the option \CodeIn{dsize: 0} indicates that the packet has no
-bytes in the payload and the option \CodeIn{itype: 8} indicates that
-the packet to be captured are ICMP Echo requests.
+with NMAP~\cite{netmap}, a network discovery and security auditing
+open-source tool. The relevant options are in bold---the option
+\CodeIn{dsize: 0} indicates that the packet has no bytes in the
+payload and the option \CodeIn{itype: 8} indicates that the packet to
+be captured are ICMP Echo requests.
 
 Again, to synthesize rules for a Ping Scan, \tname{} analyzes the
 positive traffic and extracts the following rule options:
@@ -655,13 +656,15 @@ ranking after minimization and ranking.
 
 \section{Technique}
 
-\Mar{----------------------------------- estou aqui}
-
-\tname{} is a technique that uses positive and negative examples to
-synthesize signature-based \nids\ rules, such as those from Snort and
-Suricata. The goal of \tname\ is to create a rule that \emph{only}
-captures the positive traffic, \ie{}, the malicious sequence of
+\tname{} is a technique that uses (1) benign and malicious network
+traffic and (2) existing signature-based \nids\ rules to synthesize
+new rules. The goal of \tname\ is to create plausible rules that
+\emph{only} captures the positive traffic, \ie{}, the malicious
 messages.
+
+
+\Mar{----------------------------------- estou aqui}
+  
 
 \begin{figure*}[t]
 \centering
