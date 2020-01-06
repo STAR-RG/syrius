@@ -656,15 +656,10 @@ ranking after minimization and ranking.
 
 \section{Technique}
 
-\tname{} is a technique that uses (1) benign and malicious network
-traffic and (2) existing signature-based \nids\ rules to synthesize
-new rules. The goal of \tname\ is to create plausible rules that
-\emph{only} captures the positive traffic, \ie{}, the malicious
-messages.
-
-
-\Mar{----------------------------------- estou aqui}
-  
+\tname{} is a technique to synthesize signature-based rules for
+\nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
+goal of \tname\ is to create rules that captures \emph{only} the
+malicious messages. 
 
 \begin{figure*}[t]
 \centering
@@ -674,12 +669,18 @@ messages.
 \end{figure*}
 
 \vspace{1ex}
-\noindent\textbf{Overview.}~ The input of the technique is the
-positive traffic whereas the output is a list of minimized rules
-capturing only the positive, malicious,
-traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
-pipeline of two components, which appear numbered in the figure.
-\tname{} synthesizes rules in two steps. First, it produces a
+\noindent\textbf{Overview.}~To create rules, \tname\ leverages (1)
+benign and malicious network traffic and (2) rules from public
+rulesets. Figure~\ref{fig:overview} shows the workflow of \tname{} as
+a pipeline of three components, which appear numbered in the figure.
+The inputs of the technique appear at the bottom of the figure whereas
+the output appear at the right. \tname\ takes on input malicious and
+benign traffic and a set of rules from public rulesets and produces on
+output a list of plausible rules to isolate the malicious traffic.
+
+\Mar{------------------ estou aqui}
+
+First, it produces a
 potentially overspecified rule that captures the malicious traffic
 provided on input. In this step, \tname\ finds options by
 \emph{reverse engineering} the positive traffic. It extracts tokens
