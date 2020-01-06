@@ -555,6 +555,12 @@ messages. \tname{} finds the following set of options at this stage:
 %%   fala isto. Vcs. podem explicar o que realmente acontece?}
 %% \Luc{O input considerado para ataques de flood eh um conjunto de pacotes e não apenas um pacote unico, nesse caso um conjunto com 20 pacotes. A opção de threshold é incluida na regra quando o input contem mais de um pacote, o parametro count recebe o valor da quantidade de pacotes do conjunto de entrada.}
 
+
+\Mar{<~ Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
+  Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
+  respondam isto logo.}  \Gui{}
+
+
 \tname{} only reports a rule if the \nids\ (\ie{}, Suricata)
 instantiated with that rule is able to capture the traffic passed on
 input. Consequently, by construction, a rule that uses this set of
@@ -571,13 +577,13 @@ the search.
 
 Finally, \tname{} ranks the inferred rules according to heuristics
 extracted from a database of existing \tname{} rules. One example
-heuristic is \Fix{...}. Instead of traffic, this step looks for the
+heuristic is \Fix{...informa um exemplo concreto que
+  vc. usaram...}. Instead of traffic, this step looks for the
 structure of existing rules. The list below shows the rule options for
-the five shortest rules \tname{} produces for this attack.
+the top-5 rules \tname{} produces for this attack.
 
-\Mar{<~ Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
-  Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
-  respondam isto logo.}  \Gui{}
+\Mar{listem 5 primeira regras neste caso}
+
 
 \subsection{Active Reconnaissance}
 
