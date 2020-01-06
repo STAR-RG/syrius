@@ -558,7 +558,17 @@ messages. \tname{} finds the following set of options at this stage:
 
 \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
-  respondam isto logo.}  \Gui{}
+  respondam isto logo.}  \Gui{O window:64 seria removido sim. Na documentação do Snort tem isso:
+       
+The reserved bits can be used to detect unusual behavior, such as IP stack fingerprinting attempts or other suspicious activity. 
+
+O que realmente caracteriza o ataque eh apenas a flag S e o numero elevado de pacotes, os bits reservados 12 auxiliam na deteccao desse ataque.
+
+Alem disso, tem mais:
+
+ The reserved bits '1' and '2' have been replaced with 'C' and 'E', respectively, to match RFC 3168
+ 
+ O 12 ainda funcionam no programa, mas nao sao mais utilizados.}
 
 
 \tname{} only reports a rule if the \nids\ (\ie{}, Suricata)
