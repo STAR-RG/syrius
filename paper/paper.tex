@@ -585,7 +585,7 @@ the top-5 rules \tname{} produces for this attack.
 \Mar{listem 5 primeira regras neste caso}
 
 
-\subsection{Active Recnnaissance}
+\subsection{Active Reconnaissance}
 
 Active reconnaissance is a method used by malicious individuals to
 collection information about a computing system to determine potential
@@ -600,34 +600,41 @@ and checks which ones respond to the requests. This allow the attacker
 to know which machines are active in the network, then it can choose
 one of them to attack.
 
-\Mar{------------------------------- estou aqui}
-
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
   \caption{Suricata rule for Ping Scan.}
   \label{fig:synflood-example}
 \end{figure}
 
-\Luc{Figure 4 shows a Suricata rule that capture a ping scan performed by the NMAP Tool. The relevant options are in bold---the option \CodeIn{dsize: 0}, indicates that the packet has no bytes in the payload. \CodeIn{itype: 8} identifies the packet as a ICMP Echo request.}
+Figure 4 shows a Suricata rule that captures a ping scan implemented
+with the NMAP Tool~\cite{netmap}. The relevant options are in
+bold---the option \CodeIn{dsize: 0} indicates that the packet has no
+bytes in the payload and the option \CodeIn{itype: 8} indicates that
+the packet to be captured are ICMP Echo requests.
 
-\Luc{To synthesize rules for a Ping Scan, \tname{} analyzes the positive traffic and extract the following set of options:}
+Again, to synthesize rules for a Ping Scan, \tname{} analyzes the
+positive traffic and extracts the following rule options:
+
 
 \begin{figure}[h]
-\vspace{-3ex} \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold}]{pingscan.suricata.synth}
-%  \caption{Suricata rule for SYN Flood Attacks.}
-  %  \label{fig:synflood-example-synt}
-\vspace{-3ex}  
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype}]{pingscan.suricata.synth}
+  \vspace{-3ex}  
 \end{figure}
 
-\Luc{Again, a rule with this options would capture the positive traffic, but it would be overspecified. So, \tname{} tries to minimize the rule... After the minimization, it produces the following rule:}
-\Luc{}
 
+Again, note that rule \CodeIn{icode} was not present in the original
+rule.  \tname{} produces the following five rules at the top of the
+ranking after minimization and ranking.
 
+\Fix{...show rules...}
 
-\subsection{\Fix{...some other with contents...}}
+\subsection{\Fix{Name of attack ***with content***}}
 \label{sec:content-example}
 
-\Fix{...elaborate...}
+\Fix{...please elaborate. We need on example that shows that the
+  search can be non-trivial. In the examples above, we had to discard
+  only one rule option!}
 
 
 %% \begin{table}[h]
@@ -647,6 +654,8 @@ one of them to attack.
 %% \end{table}
 
 \section{Technique}
+
+\Mar{----------------------------------- estou aqui}
 
 \tname{} is a technique that uses positive and negative examples to
 synthesize signature-based \nids\ rules, such as those from Snort and
