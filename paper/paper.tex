@@ -616,7 +616,40 @@ subsets of the options from the seed rule.
 
 Finally, \tname{} ranks the inferred rules according to heuristics
 extracted from a database of existing rules. One example heuristic
-function we used to rank the generated rules was \Fix{...informa um
+function we used to rank the generated rules was
+\Luc{
+%\begin{wrapfigure}[14]{r}{0.5\textwidth}
+\begin{figure}[H]
+  \centering
+%  \vspace{-7ex}
+  \scalebox{0.85}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          %          ylabel={\#rules},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},        
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+%        \legend{relevant, irrelevant}
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-2ex}
+  \caption{\label{fig:distribution-rules-protocol}Number of rules per number of contents.}
+%\end{wrapfigure}
+\end{figure}
+
+}
+
+ \Fix{...informa um
   exemplo concreto que vc. usaram...}. The list below shows the rule
 options for the top-5 rules \tname{} produces for this attack.
 
