@@ -565,61 +565,68 @@ messages. \tname{} finds the following set of options at this stage:
   %%   disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
 
 \noindent
-\tname{} only reports a rule if the \nids\ (\eg{}, Suricata)
-instantiated with that rule is able to capture the traffic passed on
-input. Consequently, by construction, a rule that uses this set of
-options captures the malicious traffic. Unfortunately, this rule is
-potentially overspecified. Informally, the rule includes ``too many''
-characteristics of the malicious traffic used to define it and could
-potentially result in false negatives. In this particular case, note
-that the option \CodeIn{windows: 64} is not included in the golden
-rule.
+\tname{} only reports a rule if the \nids\ instantiated with that rule
+is able to capture the traffic passed on input. Consequently, by
+construction, a rule that uses this set of options captures the
+malicious traffic. Unfortunately, this rule is potentially
+overspecified. Informally, the rule includes ``too specific''
+characteristics of the malicious traffic and could potentially result
+in false negatives. For example, in this particular case, note that
+the option \CodeIn{windows: 64} is not included in the golden rule
+from Figure~\ref{fig:synflood-example}.
 
-Second, \tname{} uses negative (\ie{}, benign) traffic to address the
-overfitting issue. \tname{} searches for alternative rules that
-preserves the invariant that a rule should capture the positive
-traffic but not capture the negative traffic. It uses the rule
-obtained in the previous step to bootstrap the search and generates
-various rules containing subsets of these three options.
+Second, \tname{} uses negative (\ie{}, benign) traffic to mitigate the
+overfitting issue. In this step, \tname{} searches for alternative
+rules that preserves the invarianxt that a rule should capture the
+positive traffic but not capture the negative traffic. It uses the
+rule obtained in the previous step, containing three options, to
+bootstrap the search for rules. The search generates rules containing
+subsets of the options from the seed rule.
+
+ 
+%% \Luc{Ataque "JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit"
+%% . O payload do pacote é o seguinte:
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-rule.suricata}
+%%   \label{fig:rule-example}
+%% \end{figure}
+
+%% A partir disso produzimos uma regra com os seguintes contents:
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-contents-splitted.suricata}
+%%   \label{fig:rule-example}
+%% \end{figure}
+
+%% Depois da etapa da minimização, as top 5 regras são:
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-top5-rules.suricata}
+%%   \label{fig:rule-example}
+%% \end{figure}
+
+%% A regra de ouro é:
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-golden-rule.suricata}
+%%   \label{fig:rule-example}
+%% \end{figure}
+
+%% }
 
 Finally, \tname{} ranks the inferred rules according to heuristics
-extracted from a database of existing \tname{} rules. One example
-heuristic is \Luc{Ataque "JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit"
-. O payload do pacote é o seguinte:
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-rule.suricata}
-  \label{fig:rule-example}
-\end{figure}
-
-A partir disso produzimos uma regra com os seguintes contents:
-
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-contents-splitted.suricata}
-  \label{fig:rule-example}
-\end{figure}
-
-Depois da etapa da minimização, as top 5 regras são:
-
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-top5-rules.suricata}
-  \label{fig:rule-example}
-\end{figure}
-
-A regra de ouro é:
-
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-golden-rule.suricata}
-  \label{fig:rule-example}
-\end{figure}
-
-}
-
-\Fix{...informa um exemplo concreto que
-  vc. usaram...}. Instead of traffic, this step looks for the
-structure of existing rules. The list below shows the rule options for
-the top-5 rules \tname{} produces for this attack.
+extracted from a database of existing rules. One example heuristic
+function we used to rank the generated rules was \Fix{...informa um
+  exemplo concreto que vc. usaram...}. The list below shows the rule
+options for the top-5 rules \tname{} produces for this attack.
 
 \Mar{listem 5 primeira regras neste caso}
+
+To sum up, \tname{} uses the messages that manifest an attack in the
+first step (to create an overspecific seed rule), benign traffic in
+the second step (to create a set of plausible rules from the seed
+rule), and existing rules from popular sources in the third step (to
+rank the generated rules).
 
 
 \noindent
@@ -653,19 +660,24 @@ this option.
 
 \subsection{Active Reconnaissance}
 
+%% \Mar{@Lucas, acima falamos de porta. Abaixo nao falamos de
+%%   porta, apenas de maquina. Vc. pode ser mais especifico? ->} \Luc{De
+%%   fato estamos falando de duas coisas diferentes, mas ambas são
+%%   exemplos de 'active reconnaissance'. Primeiramente citamos o port
+%%   scanning, q tem o objetivo de encontrar portas abertas em uma
+%%   maquina especifica. Depois falamos do ping scan, q tem o objetivo de
+%%   encontrar ip's ativos numa rede.}
+
+
 Active reconnaissance is a method used by malicious individuals to
-collection information about a computing system to determine potential
+collect information about a computing system to determine potential
 vulnerabilities. Active reconnaissance is a preliminary step towards
-an actual attack. The most popular technique is to ``scan'' open ports
-in a host. A Ping Scan is a very common type of port scan based and it
-is based on the ICMP protocol. \Mar{@Lucas, acima falamos de
-  porta. Abaixo nao falamos de porta, apenas de maquina. Vc. pode ser
-  mais especifico? ->}
-  \Luc{De fato estamos falando de duas coisas diferentes, mas ambas são exemplos de 'active reconnaissance'. Primeiramente citamos o port scanning, q tem o objetivo de encontrar portas abertas em uma maquina especifica. Depois falamos do ping scan, q tem o objetivo de encontrar ip's ativos numa rede.} To scan a network, an attacker sends a several
-ICMP Echo requests addressed to a range of IP addresses in the network
-and checks which ones respond to the requests. This allow the attacker
-to know which machines are active in the network, then it can choose
-one of them to attack.
+an actual attack. For example, Ping Scan is a very common type of
+attack that scans the network for IPs of accessible hosts. An attacker
+sends several ICMP Echo requests to a range of IP addresses in the
+network and checks which ones respond to the requests. This allow the
+attacker to know which machines are active in the network. Then (s)he
+can choose one of them to attack.
 
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
@@ -673,16 +685,15 @@ one of them to attack.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure 4 shows a Suricata rule that captures a ping scan implemented
-with NMAP~\cite{netmap}, a network discovery and security auditing
-open-source tool. The relevant options are in bold---the option
-\CodeIn{dsize: 0} indicates that the packet has no bytes in the
-payload and the option \CodeIn{itype: 8} indicates that the packet to
-be captured are ICMP Echo requests.
+Figure 4 shows a Suricata rule that captures a reproduction of a Ping
+Scan attack available from NMAP~\cite{netmap}, a network discovery and
+security auditing open-source tool. The relevant options are in
+bold---the option \CodeIn{dsize: 0} indicates that the packet has no
+bytes in the payload and the option \CodeIn{itype: 8} indicates that
+the packet to be captured are ICMP Echo requests.
 
 Again, to synthesize rules for a Ping Scan, \tname{} analyzes the
-positive traffic and extracts the following rule options:
-
+positive malicious traffic and extracts the following rule options:
 
 \begin{figure}[h]
   \vspace{-2ex}
@@ -695,7 +706,7 @@ Again, note that rule \CodeIn{icode} was not present in the original
 rule.  \tname{} produces the following five rules at the top of the
 ranking after minimization and ranking.
 
-\Fix{...show rules...}
+\Fix{...listem 5 primeiras regras neste caso...}
 
 \subsection{\Fix{Name of attack ***with content***}}
 \label{sec:content-example}
@@ -723,10 +734,10 @@ ranking after minimization and ranking.
 
 \section{Technique}
 
-\tname{} is a technique to synthesize signature-based rules for
+\tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
-goal of \tname\ is to create rules that captures \emph{only} the
-malicious messages. 
+goal of \tname\ is to create rules that capture \emph{only} the
+malicious traffic.
 
 \begin{figure*}[t]
 \centering
@@ -741,7 +752,7 @@ benign and malicious network traffic and (2) rules from public
 rulesets. Figure~\ref{fig:overview} shows the workflow of \tname{} as
 a pipeline of three components, which appear numbered in the figure.
 The inputs of the technique appear at the bottom of the figure whereas
-the output appear at the right. \tname\ takes on input malicious and
+the output appears at the right. \tname\ takes on input malicious and
 benign traffic and a set of rules from public rulesets and produces on
 output a list of plausible rules to isolate the malicious traffic.
 
