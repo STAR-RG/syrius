@@ -800,6 +800,17 @@ of rules to rank the rules generated in the previous step.
 
 \subsection{Step 1: Reverse Engineering}
 
+The goal of the first step is to extract options from the positive
+traffic. For that, \tname{} parses the protocol message, looking for
+fields in the message associated with options (see
+Section~\ref{sec:rules-and-packets}).  Unfortunately, inferring
+options at the field granularity level is insufficient to capture
+\CodeIn{content} options (see
+Section~\ref{sec:example-suricata-rules}), which refer to parts of the
+payload of the message and cannot be extracted directly from the
+fields. Handling this case is critically important as \Fix{xx}\% of the
+rules contain \CodeIn{content} options as the one from
+Section~\ref{sec:content-example}.
 
 
 
@@ -837,31 +848,27 @@ of rules to rank the rules generated in the previous step.
 \end{figure}  
 
 
-
-The goal of the first step is to extract options from the positive
-traffic. For that, \tname{} parses the protocol message, looking for
-fields in the message associated with options (see
-Section~\ref{sec:rules-and-packets}).
-Unfortunately, inferring options at the field granularity
-level is insufficient to capture \CodeIn{content} options (see
-Section~\ref{sec:example-suricata-rules}), which refer to parts of the
-payload of the message and cannot be directly extracted directly from
-the fields. Handling this case is critically important as most rules
-contain \CodeIn{content}
-options. Figure~\ref{fig:distribution-contents} shows the histogram of
+Figure~\ref{fig:distribution-contents} shows the histogram of the
 number of these options per rule (up to 10) obtained from a public
 ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
 rules. Rules without \CodeIn{content} options is an exception and half
 of the rules contain at least two \CodeIn{content} options.  To find
 the values associated with these options, \tname{} splits the payload
 of the malicious message in tokens using natural language delimiters,
-such as $\backslash$t, $\backslash$n, $\backslash$r, and spaces. The
-rationale for this decision is that we observed, by inspecting
-existing rules, that \CodeIn{content} options typically refer to
-sequence of characters in the payload of messages separated by these
-delimiters. This tokenization step can generate dozens of options. For
-the example from Section~\ref{sec:content-example}, \tname{} produces
-a total of \Fix{xx} content options.
+such as $\backslash$t, $\backslash$n, $\backslash$r, and spaces. We
+observed, by inspecting existing rules, that \CodeIn{content} options
+typically refer to sequence of characters in the payload of messages
+separated by these delimiters. This tokenization step can generate
+dozens of options. For the example from
+Section~\ref{sec:content-example}, \tname{} produces a total of
+\Fix{xx} content options.
+
+\Mar{pessoal, isto explica como inferimos opcoes de content, mas nao
+  explica como inferimos as outras opcoes. Em particular, as opcoes
+  dos primeiros dois exemplos da Secao 3.}
+
+
+\Mar{-------------------------------- estou aqui}
 
 
 \subsection{Step 2: Rule Minimization}
