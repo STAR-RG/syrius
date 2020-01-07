@@ -550,17 +550,20 @@ messages. \tname{} finds the following set of options at this stage:
   \vspace{-3ex}  
 \end{figure}
 
-%% \Mar{<~ Lucas/Guilheme, logo acima a gente falou que threshold nao
-%%   poderia ser inferido a partir de uma unica mensagem e aqui a gente
-%%   fala isto. Vcs. podem explicar o que realmente acontece?}
-%% \Luc{O input considerado para ataques de flood eh um conjunto de pacotes e não apenas um pacote unico, nesse caso um conjunto com 20 pacotes. A opção de threshold é incluida na regra quando o input contem mais de um pacote, o parametro count recebe o valor da quantidade de pacotes do conjunto de entrada.}
-
-
 \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
-  respondam isto logo.}  \Gui{O window:64 seria removido sim.}
-  \Luc{O segundo campo da opção flags define flags que serão ignoradas. Nesse caso a regra procura por pacotes onde apenas a flag S está 'setada', independentemente do valor das flags 1 e 2. Portanto a regra gerada pode capturar coisas diferentes da regra original. A inferencia do "12" n pode ser feita apenas a partir do pacote de entrada, precisariamos tratar isso.}
+  respondam isto logo.}  \Gui{O window:64 seria removido
+  sim.}\Mar{ok. vou explicar isto.}
 
+  \Luc{O segundo campo da opção flags define flags que serão
+    ignoradas. Nesse caso a regra procura por pacotes onde apenas a
+    flag S está 'setada', independentemente do valor das flags 1 e
+    2. Portanto a regra gerada pode capturar coisas diferentes da
+    regra original. A inferencia do "12" n pode ser feita apenas a
+    partir do pacote de entrada, precisariamos tratar
+    isso.}\Mar{vc. pode explicar isto **mais detalhadamente** E (1)
+    explicar que isto eh uma limitacao e (2) indicar a possivel consequencia
+    disto?}
 
 \tname{} only reports a rule if the \nids\ (\ie{}, Suricata)
 instantiated with that rule is able to capture the traffic passed on
