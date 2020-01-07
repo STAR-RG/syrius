@@ -1,0 +1,1 @@
+GET /jmx-console/HtmlAdaptor?action=inspectMBean&name=Catalina%3Atype%3DServer HTTP/1.1\r\n User-Agent: Mozilla/5.00 (Nikto/2.1.5) (Evasions:None) (Test:003846)\r\n Connection: Keep-Alive\r\n Host: 192.168.1.108\r\n \r\n

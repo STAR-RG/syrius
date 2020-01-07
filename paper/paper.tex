@@ -584,7 +584,37 @@ various rules containing subsets of these three options.
 
 Finally, \tname{} ranks the inferred rules according to heuristics
 extracted from a database of existing \tname{} rules. One example
-heuristic is \Fix{...informa um exemplo concreto que
+heuristic is \Luc{Ataque "JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit"
+. O payload do pacote é o seguinte:
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-rule.suricata}
+  \label{fig:rule-example}
+\end{figure}
+
+A partir disso produzimos uma regra com os seguintes contents:
+
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-contents-splitted.suricata}
+  \label{fig:rule-example}
+\end{figure}
+
+Depois da etapa da minimização, as top 5 regras são:
+
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-top5-rules.suricata}
+  \label{fig:rule-example}
+\end{figure}
+
+A regra de ouro é:
+
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{adaptor-golden-rule.suricata}
+  \label{fig:rule-example}
+\end{figure}
+
+}
+
+\Fix{...informa um exemplo concreto que
   vc. usaram...}. Instead of traffic, this step looks for the
 structure of existing rules. The list below shows the rule options for
 the top-5 rules \tname{} produces for this attack.
