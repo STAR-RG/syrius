@@ -561,9 +561,9 @@ messages. \tname{} finds the following set of options at this stage:
     2. Portanto a regra gerada pode capturar coisas diferentes da
     regra original. A inferencia do "12" n pode ser feita apenas a
     partir do pacote de entrada, precisariamos tratar
-    isso.}\Mar{vc. pode explicar isto **mais detalhadamente** E (1)
-    explicar que isto eh uma limitacao e (2) indicar a possivel consequencia
-    disto?}
+    isso.}\Mar{vc. pode explicar isto **mais detalhadamente** \Luc{a opção flags pode ter dois campos separados por virgula (ex: flags:S,12). o primeiro campo indica quais flags devem estar ativas em um pacote para que o suricata gere um alerta. se uma ou mais flags forem irrelevantes para a detecção de um determinado ataque (ou seja, se n importa se a flag está ou não ativa), elas serão adicionadas ao segundo campo.} E (1)
+    explicar que isto eh uma limitacao \Luc{n entendi exatamente oq explicar aqui.} e (2) indicar a possivel consequencia
+    disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
 
 \tname{} only reports a rule if the \nids\ (\ie{}, Suricata)
 instantiated with that rule is able to capture the traffic passed on
