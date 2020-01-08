@@ -22,7 +22,9 @@
 %% in the same archive or directory.)
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
-\documentclass[sigconf,anonymous]{acmart}
+\documentclass[sigconf,anonymous,pre-print]{acmart}
+
+\pagenumbering{arabic} % Remove for camera-ready
 
 \usepackage{libertine}
 \usepackage{lipsum}% http://ctan.org/pkg/lipsum
@@ -629,7 +631,7 @@ the second step (to create a set of plausible rules from the seed
 rule), and existing rules from popular sources in the third step (to
 rank the generated rules).
 
-
+\vspace{1ex}
 \noindent
 \textbf{Differences.}~Note that there are differences between the
 options produced in the first step of \tname{} and the options from
@@ -689,6 +691,15 @@ can choose one of them to attack.
   \vspace{1ex}  
 \end{figure}
 
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
+  \caption{\tname\ workflow.}
+  \label{fig:overview}
+  \vspace{-1ex}
+\end{figure*}
+
+
 Figure 4 shows a Suricata rule that captures a reproduction of a Ping
 Scan attack available from NMAP~\cite{netmap}, a network discovery and
 security auditing open-source tool. The relevant options are in
@@ -711,6 +722,7 @@ rule.  \tname{} produces the following five rules at the top of the
 ranking after minimization and ranking.
 
 \Fix{...listem 5 primeiras regras neste caso...}
+
 
 \subsection{\Fix{Name of attack ***with content***}}
 \label{sec:content-example}
@@ -742,13 +754,6 @@ ranking after minimization and ranking.
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
 goal is to create rules that capture \emph{only} the
 malicious traffic.
-
-\begin{figure*}[t!]
-\centering
-\includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
-\caption{\tname\ workflow.}
-\label{fig:overview}
-\end{figure*}
 
 \vspace{1ex}
 \noindent\textbf{Overview.}~To create rules, \tname\ leverages (1)
@@ -873,99 +878,114 @@ Section~\ref{sec:content-example}.
 \subsection{Step 2: Rule Minimization}
 \label{sec:minimization}
 
-\Mar{-------------------------- estou aqui}
-
 The rule reported in the first step satisfies the criterion to only
-capture positive traffic. Unfortunately, the rule produced in the
-first step is overconstrained---it is unable to capture different
-manifestations of the same attack as the rule matches all options that
-\tname\ found for the input message.
+capture positive traffic. Unfortunately, that rule is overconstrained.
+The rule can include options that are irrelevant for the input
+message. Consequently, the \nids\ may be unable to capture a different
+manifestation of the same attack.
 
 %%  Some options added to the rule
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-\tname{} leverages public datasets\cite{tcpreplay} of negative traffic
+\tname{} leverages public datasets~\cite{tcpreplay} of benign traffic
 to guide the search for more general rules, hence addressing the
-overffiting issue. The goal of this step is to create rules that
-captures traffic similar to the input malicious traffic. To achieve
-that goal, \tname{} \emph{minimizes} the rules produced in the
-previous step, preserving the invariant of \emph{only} capturing the
-positive malicious traffic. A rule is minimal if discarding any option
-results in capturing negative (\ie{}, benign) traffic.  The
-minimization procedure we propose in this step builds on the
-observation that all options from the rule produced in the previous
-step are satisifed by the positive traffic. Consequently, any subset
-of these options also captures the positive traffic. The procedure
-iteratively discards options from the candidate rule until it detects
-that the rule is minimal, \ie{}, it finds that no other option can be
-removed. The procedure uses negative traffic to guide the search.
+overffiting issue. To that end, \tname{} \emph{minimizes} the rules
+produced in the previous step, preserving the invariant of \emph{only}
+capturing the positive malicious traffic. We say that a rule is
+minimal if discarding any option results in capturing negative (\ie{},
+benign) traffic.  The minimization procedure we propose in this step
+builds on the observation that all options from the rule produced in
+the previous step are satisifed by the positive traffic. Consequently,
+any subset of these options also captures the positive traffic. The
+procedure iteratively discards options from the candidate rule until
+it detects that the rule is minimal, \ie{}, it finds that no other
+option can be removed. The procedure uses negative traffic to guide
+the search.
 
 
 
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 \algnewcommand\algorithmicforeach{\textbf{for each}}
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
-\algnewcommand\And{\textbf{and} }
+\algnewcommand\And{\textbf{and} }%
 \begin{algorithm}[t!]
-  \noindent\hspace{-31ex}
-  \textbf{INPUT:} overconstrained rule $or$ \\
-  \noindent\hspace{-30ex} 
-  \textbf{OUTPUT:} Set of minimal rules $\mathcal R$\\
+  \noindent\hspace{-25ex}
+  \textbf{INPUT:} (overconstrained) seed rule $sr$ \\
+  \noindent\hspace{-27.5ex} 
+  \textbf{OUTPUT:} Set of minimized rules $\mathcal O$\\
 %\vspace{-3ex}
 \captionof{algorithm}{Minimization algorithm}\label{algo1}
 \begin{algorithmic}[1]
-  \State $\mathcal R \gets \{\mathit{or}\}$\Comment{initial population
-    of candidate solutions contains only the input rule.}\label{line-init}
+  \State $\mathcal R \gets \{\mathit{sr}\}$\Comment{initial population
+    of candidate solutions contains only the input
+    rule.}\label{line-init}
+  \State $\mathcal O \gets \emptyset$
   \Do\label{start-do-while}
-      \State $\mathcal R' \gets \emptyset$ \Comment{starting new
-        iteration. new generation should be empty.}\label{init-rprime}
-      \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate individual/rule separately.}\label{start-foreach}
+      \State $\mathcal R' \gets \emptyset$ \Comment{new iteration. reset.}\label{init-rprime}
+      \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate rule.}\label{start-foreach}
            \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}\label{start-for}
                \State $r \gets copy(ro)$      
                \State $j\gets \mathit{rand}(0,\mathit{len}(r))$
-               \State $r[j]\gets 0$\Comment{discard option $j$ of rule
-                 $r$, a copy of the original rule $\mathit{ro}$}
-               \If{$\mathit{isnew(r)} \And \mathit{isfit}(r)$} 
-                   \State $\mathcal R' \cup\gets \{r\}$\Comment{$r$
-                     can lead to a plausible candidate solution.}\label{line-progress}
+               \State $r[j]\gets 0$\Comment{discard option $j$ in $r$}
+               \If{$\mathit{isNew(r)} \And \mathit{isPlausible}(r)$} 
+                   \State $\mathcal R' \gets \mathcal R' \cup \{r\}$\label{line-progress}
                \EndIf
            \EndFor\label{end-for}
        \EndFor\label{end-foreach}
-       \State $\mathcal R \gets R'$\Comment{update new generation}
-  \doWhile{$\mathcal R'\not= \{\}$}\Comment{repeat until reaching a fixpoint}\label{end-do-while}
+       \State $\mathcal R \gets \mathcal R'$\Comment{update new generation}
+       \State $\mathcal O \gets \mathcal O \cup \mathcal
+       R$\Comment{remember all rules}
+  \doWhile{$\mathcal R\not= \{\}$}\Comment{repeat until reaching a fixpoint}\label{end-do-while}
 \end{algorithmic}
 \end{algorithm}
 
 Algorithm~\ref{algo1} shows the pseudocode of the \tname{}
 minimization algorithm. The algorithm takes as input the
 overconstrained rule produced by the reverse engineering step and
-produces a set $\mathcal R$ of rules that are minimal and only
-captures the positive traffic. Line~\ref{line-init} initializes the
-set $\mathcal{R}$ of candidate solutions with the input rule $or$. We
-encode a rule as a bitvector where each index in the vector represents
-one option; the value assigned at a given position indicates whether
-or not the option is present in the rule. Each iteration of the outer
-loop (lines~\ref{start-do-while}-\ref{end-do-while}) represents one
+produces a set $\mathcal R$ of minimized rules. Line~\ref{line-init}
+initializes the set $\mathcal{R}$ of candidate solutions with the seed
+rule $sr$. We encode a rule as a bitvector where each index in the
+vector represents one option; the value assigned at a given position
+indicates whether or not the option is present in the rule. Each
+iteration of the outer loop
+(lines~\ref{start-do-while}-\ref{end-do-while}) represents one
 generation of the population of individuals produced by the
 search. The algorithm terminates when no rule in the current
 generation of individuals could be further reduced without violating
 the property that a candidate solution should only capture positive
-traffic. This means that execution has not reached
-line~\ref{line-progress} as to augment the set $\mathcal{R'}$ and that
-set will be empty at the end of one iteration of the outer
+traffic. This means that execution of one iteration has not reached
+the statement declared at line~\ref{line-progress}, which adds an
+element to the set $\mathcal{R'}$. Consequently, that set will be
+empty at the end of one iteration of the outer
 loop. Line~\ref{init-rprime} initializes the new generation of
-candidate rules. The loop from
-lines~\ref{start-foreach}--\ref{end-foreach} iterates through each
+candidate rules. The inner loop
+(lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. Note that these rules have been found
 in the previous generation. The algorithm mutates each of these rules
 for $N$ times, discarding one option of the rule each time. The call
 to $\mathit{isNew}$ checks if $r$ has not been previously generated
-through another path whereas the call to $\mathit{isfit}$ checks if
-the rule only captures positive traffic. Function $\mathit{copy}$
+through another path whereas the call to $\mathit{isPlausible}$ checks
+if the rule only captures positive traffic. Function $\mathit{copy}$
 creates a copy of the bitvector of a rule, function $\mathit{len}$
 returns the length of the vector, and function $\mathit{rand}$
 randomly chooses one index of the vector.
+
+Note that no rules are produced in the last iteration of the
+algorithm. Minimal rules are produced in the second-to-last
+iteration. In the other iterations, intermediate rules are
+produced. Conceptually, the search induces a search tree with the seed
+rule $sr$ as the root, minimal rules as child nodes, and intermediate
+rules as internal nodes. The edges of the tree denote the ancestor
+relation between two rules. Note also that the algorithm reports every
+rule in the tree instead of only minimal rules. The reason is that the
+correct rule may be non-minimal. In summary, this algorithm reports
+many rules that are plausible by using benign traffic to minimize an
+overconstrained rule that is focused on the malicious traffic. In the
+following step, \tname{} ranks the rules this algorithm reports by
+their similarity with previous rules.
+
+
 
 \begin{theorem}
   The minimization algorithm computes rules that capture only
@@ -978,18 +998,21 @@ randomly chooses one index of the vector.
   traffic. By definition of function $\mathit{isfit}$, these rules
   also capture \emph{only} the positive traffic. If some negative
   traffic was captured, a rule would not be added to $\mathcal
-  R'$.\qed
+  R'$.
 \end{proof}
 
 \begin{proposition}
   The minimization algorithm may not produce minimal rules.
 \end{proposition}
 
+\begin{proof}
 The output of the minimization algorithm may contain rules that are
-not minimal given the non-determinism of the algorithm. It is possible
-that options that could be discarded are not selected in the loop from
-lines~\ref{start-for}--\ref{end-for}. However, we found empirically
-that a small value of $N$ suffices to produce minimal rules.
+not minimal given the non-determinism of the algorithm. In principle,
+it is possible that options that could be discarded are not selected
+in the loop from lines~\ref{start-for}--\ref{end-for}. However, we
+found empirically that a small value of $N$ suffices to discard those
+options from a rule.
+\end{proof}
 
 %% Public databases of negative traffic with
 %% \Fix{thousands} of messages exist  and can be used to
@@ -1002,20 +1025,24 @@ that a small value of $N$ suffices to produce minimal rules.
 \tname{} is accurate for generating rules that discrimate positive and
 negative traffic, the quality of these rules is limited by the quality
 of the training data it uses. For the positive traffic, \tname{} only
-requires one sample, but can benefit of several samples. For the
-negative traffic, \tname{} can use public datasets available online.
+requires one sample, but can benefit of several samples as the example
+from Section~\ref{sec:dos} illustrated. The same applies for the
+negative traffic. In this case, however, \tname{} can use public
+datasets available online.
 
 \vspace{2ex}
 \noindent\textbf{Implementation details.} We implemented function
-\emph{isFit} by 1)~updating Suricata to only use the informed rule,
-2)~replaying the negative traffic (see
-Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
-check if any benign message was captured by the rule. It is worth
-noting that the benign traffic is stored in ``pcap'' files~\cite{pcap}
-and Suricata can process those files very efficiently compared to
-analyzing network messages directly.
+\emph{isPlausible} by 1)~updating Suricata to only use the rule that
+is passed as parameter to this function, 2)~replaying the negative
+traffic (see Section~\ref{sec:dataset-benign}), and 3)~reading the
+Suricata logs to check if any benign message was captured by the
+rule. It is worth noting that the benign traffic is stored in ``pcap''
+files~\cite{pcap} and Suricata can process those files very
+efficiently compared to analyzing network messages directly.
 
 \subsection{Step 3: Ranking}
+
+\Mar{------------------------------------ estou aqui}
 
 \Fix{...elaborate...}
 
