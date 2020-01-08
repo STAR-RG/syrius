@@ -493,6 +493,7 @@ rules that \tname{} synthesizes to capture those attacks.
 
 
 \subsection{Denial-of-Service}
+\label{sec:dos}
 
 The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
 to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
@@ -617,44 +618,8 @@ subsets of the options from the seed rule.
 Finally, \tname{} ranks the inferred rules according to heuristics
 extracted from a database of existing rules. One example heuristic
 function we used to rank the generated rules was
-\Luc{
-%\begin{wrapfigure}[14]{r}{0.5\textwidth}
-\begin{figure}[H]
-  \centering
-%  \vspace{-7ex}
-  \scalebox{0.85}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
-%        \legend{relevant, irrelevant}
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-rules-protocol}Number of rules per number of contents.}
-%\end{wrapfigure}
-\end{figure}
-
-}
-
-\Mar{Lucas, mova isto para secao ``Ranking'' da tecnica. Aqui
-  vc. explica em alto-nivel como isto funciona. Ha alguma funcao
-  heuristica que afeta este exemplo?}
- \Fix{...informa um
-  exemplo concreto que vc. usaram...}. The list below shows the rule
-options for the top-5 rules \tname{} produces for this attack.
+\Fix{...elaborate...}. The list below shows the rule options for the
+top-5 rules \tname{} produces for this attack.
 
 \Mar{listem 5 primeira regras neste caso}
 
@@ -695,6 +660,7 @@ this option.
 
 
 \subsection{Active Reconnaissance}
+\label{sec:active-recon}
 
 %% \Mar{@Lucas, acima falamos de porta. Abaixo nao falamos de
 %%   porta, apenas de maquina. Vc. pode ser mais especifico? ->} \Luc{De
@@ -716,9 +682,11 @@ attacker to know which machines are active in the network. Then (s)he
 can choose one of them to attack.
 
 \begin{figure}[h!]
+  \vspace{1ex}
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
   \caption{Suricata rule for Ping Scan.}
   \label{fig:pingscan-example}
+  \vspace{1ex}  
 \end{figure}
 
 Figure 4 shows a Suricata rule that captures a reproduction of a Ping
@@ -772,10 +740,10 @@ ranking after minimization and ranking.
 
 \tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
-goal of \tname\ is to create rules that capture \emph{only} the
+goal is to create rules that capture \emph{only} the
 malicious traffic.
 
-\begin{figure*}[t]
+\begin{figure*}[t!]
 \centering
 \includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
 \caption{\tname\ workflow.}
@@ -785,12 +753,13 @@ malicious traffic.
 \vspace{1ex}
 \noindent\textbf{Overview.}~To create rules, \tname\ leverages (1)
 benign and malicious network traffic and (2) rules from public
-rulesets. Figure~\ref{fig:overview} shows the workflow of \tname{} as
-a pipeline of three components, which appear numbered in the figure.
+rulesets. \tname\ takes on input malicious and benign traffic and a
+set of rules from public rulesets and produces on output a list of
+plausible rules to isolate the malicious
+traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
+pipeline of three components, which appear numbered in the figure.
 The inputs of the technique appear at the bottom of the figure whereas
-the output appears at the right. \tname\ takes on input malicious and
-benign traffic and a set of rules from public rulesets and produces on
-output a list of plausible rules to isolate the malicious traffic.
+the output appears at the right.
 
 \tname\ works as follows. First, it produces a potentially
 overspecified rule that captures the malicious traffic, provided on
@@ -837,26 +806,27 @@ of rules to rank the rules generated in the previous step.
 \subsection{Step 1: Reverse Engineering}
 
 The goal of the first step is to extract options from the positive
-traffic. For that, \tname{} parses the protocol message, looking for
-fields in the message associated with options (see
-Section~\ref{sec:rules-and-packets}).  Unfortunately, inferring
-options at the field granularity level is insufficient to capture
-\CodeIn{content} options (see
-Section~\ref{sec:example-suricata-rules}), which refer to parts of the
-payload of the message and cannot be extracted directly from the
-fields. Handling this case is critically important as \Fix{xx}\% of the
-rules contain \CodeIn{content} options as the one from
-Section~\ref{sec:content-example}.
+traffic, which is characterized with pcap files~\cite{pcap}, a popular
+format to describe network packets.
 
+For that, \tname{} parses the message looking for options associated
+with the data. As described in Section~\ref{sec:rules-and-packets},
+there is a correspondence between packet fields and rule
+options. \tname{} leverages that mapping to infer options. The
+examples of sections~\ref{sec:dos} and~\ref{sec:active-recon} show
+cases where \tname{} infers options with this mapping. Unfortunately,
+inferring options at the field granularity level is insufficient to
+capture \CodeIn{content} options as the described on
+Section~\ref{sec:content-example}. These options refer to parts of the
+payload of the message and cannot be extracted directly from the
+fields. Handling this case is critically important as \Fix{xx}\% of
+the rules contain \CodeIn{content} options.
 
 
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
-
-%\begin{wrapfigure}[15]{r}{0.56\textwidth}
 \begin{figure}[t!]
   \centering
-%  \vspace{-4ex}
   \scalebox{1.2}{  
     \begin{tikzpicture}
       \begin{axis}[
@@ -867,49 +837,43 @@ Section~\ref{sec:content-example}.
           enlargelimits=0.15,
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          symbolic x coords={1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           xtick=data,
           nodes near coords,
           every node near coord/.append style={font=\tiny},
           nodes near coords align={vertical},
         ]
-        \addplot coordinates {(0,25) (1,10222) (2,4956) (3,5589)
+        \addplot coordinates {(1,10222) (2,4956) (3,5589)
           (4,1651) (5,1457) (6, 729) (7, 471) (8, 313) (9, 137) (10, 126)};
       \end{axis}
     \end{tikzpicture}
   }
   \caption{\label{fig:distribution-contents}Histogram of number of
-    \CodeIn{content} options per rule (up to 10).}
-%\end{wrapfigure}
+    \CodeIn{content} options per rule.}
 \end{figure}  
 
 
 Figure~\ref{fig:distribution-contents} shows the histogram of the
-number of these options per rule (up to 10) obtained from a public
+number of these options per rule obtained from a public
 ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
-rules. Rules without \CodeIn{content} options is an exception and half
-of the rules contain at least two \CodeIn{content} options.  To find
-the values associated with these options, \tname{} splits the payload
-of the malicious message in tokens using natural language delimiters,
-such as $\backslash$t, $\backslash$n, $\backslash$r, and spaces. We
-observed, by inspecting existing rules, that \CodeIn{content} options
-typically refer to sequence of characters in the payload of messages
-separated by these delimiters. This tokenization step can generate
-dozens of options. For the example from
-Section~\ref{sec:content-example}, \tname{} produces a total of
-\Fix{xx} content options.
-
-\Mar{pessoal, isto explica como inferimos opcoes de content, mas nao
-  explica como inferimos as outras opcoes. Em particular, as opcoes
-  dos primeiros dois exemplos da Secao 3.}
-\Luc{as outras opções, em geral, possuem um campo correspondente no pacote. isso ja esta sendo dito na linha 837/838 e é explicado na subseção 2.3, n?}
-
-
-\Mar{-------------------------------- estou aqui}
+rules. We limited the number of content options per rule to 10 for
+space. Rules without \CodeIn{content} options is an exception
+(\Fix{xx}\%) and half of the rules contain at least two
+\CodeIn{content} options.  To find the values associated with these
+options, \tname{} splits the payload of the malicious message in
+tokens using natural language delimiters, such as $\backslash$t,
+$\backslash$n, $\backslash$r, and spaces. We observed, by inspecting
+existing rules, that \CodeIn{content} options typically refer to
+sequence of characters in the payload of messages separated by these
+delimiters. This tokenization step can generate dozens of options.
+\tname{} produced a total of \Fix{xx} content options for the example
+Section~\ref{sec:content-example}. 
 
 
 \subsection{Step 2: Rule Minimization}
 \label{sec:minimization}
+
+\Mar{-------------------------- estou aqui}
 
 The rule reported in the first step satisfies the criterion to only
 capture positive traffic. Unfortunately, the rule produced in the
@@ -1054,6 +1018,31 @@ analyzing network messages directly.
 \subsection{Step 3: Ranking}
 
 \Fix{...elaborate...}
+
+\begin{figure}[H]
+  \centering
+  \scalebox{0.85}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          %          ylabel={\#rules},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},        
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-2ex}
+  \caption{\label{fig:distribution-rules-protocol}Number of rules per number of contents.}
+\end{figure}
 
 \section{Evaluation}
 
