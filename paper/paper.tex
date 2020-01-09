@@ -725,8 +725,18 @@ ranking after minimization and ranking.
 \Fix{...listem 5 primeiras regras neste caso...}
 
 
-\subsection{\Fix{Name of attack ***with content***}}
+\subsection{\Fix{JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit}}
 \label{sec:content-example}
+\Luc{JBoss é um servidor de aplicação Java muito popular, de codigo aberto. Esse ataque tem como alvo esses servidores e permite que seja feita execução remota de comandos. Os pacotes que estamos utilizando para testar esse ataque foram gerados pelo Nikto, mas o Metasploit tambem possui um modulo para ele. A regra de ouro para esse ataque é:
+
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={content}]{adaptor-golden-rule.suricata}
+  \label{fig:rule-example}
+\end{figure}
+
+A opção flow:established,to\_server; define que o match só será feito em pacotes que fazem parte de uma conexão já estabelecida entre um cliente e um servidor. Além disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente. Nos contents os modificadores nocase e http\_uri indicam que a detecção da string não será case sensitive e que essa string deverá se encontrar no campo de request uri.}
+
+\Luc{... sobre comportamento do syrius ...}
 
 \Fix{...please elaborate. We need on example that shows that the
   search can be non-trivial. In the examples above, we had to discard
