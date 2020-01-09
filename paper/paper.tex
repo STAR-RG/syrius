@@ -835,7 +835,7 @@ inferring options at the field granularity level is insufficient to
 capture \CodeIn{content} options as the described on
 Section~\ref{sec:content-example}. These options refer to parts of the
 payload of the message and cannot be extracted directly from the
-fields. Handling this case is critically important as \Fix{xx}\% of
+fields. Handling this case is critically important as 93\% of
 the rules contain \CodeIn{content} options.
 
 
@@ -853,14 +853,13 @@ the rules contain \CodeIn{content} options.
           enlargelimits=0.15,
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
-          symbolic x coords={1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           xtick=data,
           nodes near coords,
           every node near coord/.append style={font=\tiny},
           nodes near coords align={vertical},
         ]
-        \addplot coordinates {(1,10222) (2,4956) (3,5589)
-          (4,1651) (5,1457) (6, 729) (7, 471) (8, 313) (9, 137) (10, 126)};
+        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
       \end{axis}
     \end{tikzpicture}
   }
@@ -874,7 +873,7 @@ number of these options per rule obtained from a public
 ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
 rules. We limited the number of content options per rule to 10 for
 space. Rules without \CodeIn{content} options is an exception
-(\Fix{xx}\%) and half of the rules contain at least two
+(7\%) and half of the rules contain at least two
 \CodeIn{content} options.  To find the values associated with these
 options, \tname{} splits the payload of the malicious message in
 tokens using natural language delimiters, such as $\backslash$t,
@@ -1057,30 +1056,30 @@ efficiently compared to analyzing network messages directly.
 
 \Fix{...elaborate...}
 
-\begin{figure}[H]
-  \centering
-  \scalebox{0.85}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-rules-protocol}Number of rules per number of contents.}
-\end{figure}
+%%\begin{figure}[H]
+%%  \centering
+%%  \scalebox{1.2}{
+%%    \begin{tikzpicture}
+%%      \begin{axis}[
+%%          ybar stacked,
+%%          enlargelimits=0.15,
+%%          legend style={at={(0.5,-0.15)},
+%%            anchor=north,legend columns=-1},
+%%          %          ylabel={\#rules},
+%%          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+%%          xtick=data,
+%%          xticklabel style={rotate=45},          
+%%          nodes near coords,
+%%          every node near coord/.append style={font=\scriptsize},        
+%%          nodes near coords align={vertical},
+%%        ]
+%%        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+%%      \end{axis}
+%%    \end{tikzpicture}
+%%  }
+%%  \vspace{-2ex}
+%%  \caption{\label{fig:distribution-rules-protocol}Number of rules per number of contents.}
+%%\end{figure}
 
 \section{Evaluation}
 
