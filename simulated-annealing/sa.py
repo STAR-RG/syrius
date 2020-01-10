@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
-ruleFile_path = "../suricata/pesquisa/attacks/" + str(args.attack) + ".rules"
+ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
 fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
@@ -487,7 +487,7 @@ def isEmpty(fpath):
 
 def sendAttackVariation(attack):
     subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.05)
+    time.sleep(2.0)
 
 def checkFalseNegative(rules):
     global fitnessFile_path
@@ -507,12 +507,12 @@ def checkFalseNegative(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        if fitnessFile.count(':'+str(rules[i].sid)+':') >= variation_packets:
-            output[i] = 1
-        else:
-            print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
-            print("False negative rule:", rules[i])
-            print(fitnessFile)
+        if fitnessFile.count(':'+str(rules[i].sid)+':') >= 1:
+            output[i] = fitnessFile.count(':'+str(rules[i].sid)+':')
+        #else:
+            #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
+            #print("False negative rule:", rules[i])
+            #print(fitnessFile)
 
     return output
 
@@ -733,17 +733,17 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
-            all_bad_rules_list = checkFalseNegative(aux)
-            bad_rule_list = []
-            for i, fitness in enumerate(all_bad_rules_list):
-                if fitness == 0:
-                    aux3.append(aux[i])
-                    #print("{} : {}".format(aux[i], fitness))
-                    bad_rule_list.append(aux[i])
-            
-            with open("bad.rules", "a+") as writer:
-                for x in bad_rule_list:
-                    writer.write(str(x) + "\n")
+            #all_bad_rules_list = checkFalseNegative(aux)
+            #bad_rule_list = []
+            #for i, fitness in enumerate(all_bad_rules_list):
+            #    if fitness == 0:
+            #        aux3.append(aux[i])
+            #        #print("{} : {}".format(aux[i], fitness))
+            #        bad_rule_list.append(aux[i])
+            #
+            #with open("bad.rules", "a+") as writer:
+            #    for x in bad_rule_list:
+            #        writer.write(str(x) + "\n")
 
             fitness_list = evalContents(aux)
             #print("aqui auqi auiq")
@@ -790,10 +790,27 @@ def optimizeRule(rule):
     golden_rule_pos = 0
     all_rule_list = sorted(all_rule_list, key=newRuleFitness)
 
-    for rule in all_rule_list:
+    for x, rule in enumerate(all_rule_list):
         if rule.sid == 1099019:
             golden_rule_pos = all_rule_list.index(rule)
-        print(str(rule))
+        rule.sid=x+1
+        #print(str(rule))
+
+    abc=checkFalseNegative(all_rule_list)
+
+    with open("recall.txt", "w+") as writer:
+        for (x, y) in zip(all_rule_list, abc):
+            y=y*25
+            z="{} -> {}%".format(str(x), str(y))
+            writer.write(z + "\n")
+
+    with open("raw_recall.txt", "w+") as writer:
+        for x in abc:
+            writer.write("{}".format(x*25))
+
+    with open("output_sorted.txt", "w+") as writer:
+        for x in all_rule_list:
+            writer.write(str(x) + "\n")
 
     print(str(len(all_rule_list)-golden_rule_pos) + ',' + str(len(all_rule_list)))
 
