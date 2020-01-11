@@ -1141,6 +1141,31 @@ number of content options.
 \Mar{--------------------------- estou aqui}
 
 Componente 3: Raridade dos contents \Fix{adicionar histograma}
+\begin{figure}[H]
+  \centering
+  \scalebox{1.2}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387) (INSERT, 386) (200, 352) (/index.php?, 273)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:distribution-contents}-}
+\end{figure}  
 
 Contents mais comuns recebem maior pontuação.
 Nesse componente, para cada content da regra nós verificamos quão comum ele é. A pontuação é dada por:
