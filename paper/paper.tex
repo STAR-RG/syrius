@@ -842,35 +842,6 @@ fields. Handling this case is critically important as 93\% of
 the rules contain \CodeIn{content} options.
 
 
-\pgfplotsset{width=6cm,compat=1.8}
-\pgfplotsset{every tick label/.append style={font=\tiny}}
-\begin{figure}[t!]
-  \centering
-  \scalebox{1.2}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \caption{\label{fig:distribution-contents}Histogram of number of
-    \CodeIn{content} options per rule.}
-\end{figure}  
-
-
 Figure~\ref{fig:distribution-contents} shows the histogram of the
 number of these options per rule obtained from a public
 ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
@@ -1080,21 +1051,25 @@ other sizes.
 
 %\tname{} uses this information to rank rules.
 
+\pgfplotsset{width=6cm,compat=1.8}
+\pgfplotsset{every tick label/.append style={font=\tiny}}
+
 \begin{figure}[H]
   \centering
   \scalebox{1.2}{
     \begin{tikzpicture}
       \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
           ybar stacked,
-          enlargelimits=0.09,
+          enlargelimits=0.15,
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
           symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           xtick=data,
-          xticklabel style={rotate=45},          
           nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
+          every node near coord/.append style={font=\tiny},
           nodes near coords align={vertical},
         ]
         \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
@@ -1102,8 +1077,7 @@ other sizes.
     \end{tikzpicture}
   }
   \vspace{-2ex}
-  \caption{\label{fig:distribution-rule-size}Distribution of rule
-    size.}
+  \caption{\label{fig:distribution-rule-size}Distribution of rule sizes.}
 \end{figure}
 
 
@@ -1125,11 +1099,46 @@ whereas the contribution of a rule with 9 options would be 14.25
 (=763/5,353). Note that the measurement is normalized in the 0-1
 range.
 
-\Mar{--------------------------- estou aqui}
+\subsubsection{Number of content options.} We empirically observed that content options are very
+common. As consequence, we defined a heuristic function that takes the
+number of content options into account. We calculate the contribution
+of number of content options with the following formula:
 
-Componente 2: Quantidade de contents na regra (histograma da figura 6)
-Regras com uma quantidade mais comum de contents pontuam mais.
-Assim como no caso anterior, a pontuação dada por esse componente será: \[\frac{rules\_per\_number\_of\_contents[len(rule)]}{max(rules\_per_number\_of\_contents)}\]
+\begin{figure}[t!]
+  \centering
+  \scalebox{1.2}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          xtick=data,
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:distribution-contents}Distribution of number of
+    content options.}
+\end{figure}  
+
+\[\frac{\mathit{rules\_per\_number\_of\_contents[len(rule)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
+
+Note that the only difference compared to the formula to compute
+contribution of size is the distribution used, which is given by the
+term $\mathit{rules\_per\_number\_of\_contents}$ denoting a dictionary
+of number of content options to number of rules that contain that
+number of content options.
+
+\Mar{--------------------------- estou aqui}
 
 Componente 3: Raridade dos contents \Fix{adicionar histograma}
 
