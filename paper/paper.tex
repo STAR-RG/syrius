@@ -1138,9 +1138,21 @@ term $\mathit{rules\_per\_number\_of\_contents}$ denoting a dictionary
 of number of content options to number of rules that contain that
 number of content options.
 
-\Mar{--------------------------- estou aqui}
+\subsubsection{Content rarity.} 
+This heuristic weighs higher rules
+that use popular strings in content options. More precisely, for a
+given rule \tname{} takes the arithmetic mean of the popularity scores
+of each content in that rule. More precisely, we calculate the
+contribution of content rarity with the following formula:
 
-Componente 3: Raridade dos contents \Fix{adicionar histograma}
+\[\frac{\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}}{N}\]
+
+\noindent
+, where $N$ is the number of content options in a given rule. Figure~\Fix{...elaborate...}
+
+
+\Mar{----------------------------- parei aqui}
+
 \begin{figure}[H]
   \centering
   \scalebox{1.2}{  
@@ -1165,16 +1177,9 @@ Componente 3: Raridade dos contents \Fix{adicionar histograma}
     \end{tikzpicture}
   }
   \caption{\label{fig:distribution-contents}-}
-\end{figure}  
+\end{figure}
 
-Contents mais comuns recebem maior pontuação.
-Nesse componente, para cada content da regra nós verificamos quão comum ele é. A pontuação é dada por:
-
-\[\frac{\sum_{i=1}^{N}\frac{content\_frequency[content_i]}{max(content\_frequency)}}{N}\]
-
-Onde 'N' é a quantidade de contents na regra.
-
-Componente 4: Frequencia dos modificadores de content
+\subsubsection{Frequency of content modifiers.}
 
 Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
 Modificadores diferentes podem acessar campos iguais em um pacote. Por exemplo os modificadores http\_method e http\_header, o http\_method acessa apenas o metodo do pacote http, mas o http\_header acessa todo o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET" receberia a pontuação correspondente a esses dois modificadores.
