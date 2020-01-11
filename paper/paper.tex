@@ -727,6 +727,9 @@ ranking after minimization and ranking.
 
 \subsection{\Fix{JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit}}
 \label{sec:content-example}
+
+\Mar{Note que a gente organizou estas secoes por tipo de ataque. Este
+  titulo eh muito especifico.}
 \Luc{JBoss é um servidor de aplicação Java muito popular, de codigo aberto. Esse ataque tem como alvo esses servidores e permite que seja feita execução remota de comandos. Os pacotes que estamos utilizando para testar esse ataque foram gerados pelo Nikto, mas o Metasploit tambem possui um modulo para ele. A regra de ouro para esse ataque é:
 
 \begin{figure}[H]
@@ -1005,7 +1008,7 @@ their similarity with previous rules.
   Every rule created during the search captures the positive traffic
   as every rule contains a proper subset of the option from the
   original rule and all those options are satisfied by the positive
-  traffic. By definition of function $\mathit{isfit}$, these rules
+  traffic. By definition of function $\mathit{isPlausible}$, these rules
   also capture \emph{only} the positive traffic. If some negative
   traffic was captured, a rule would not be added to $\mathcal
   R'$.
@@ -1052,16 +1055,30 @@ efficiently compared to analyzing network messages directly.
 
 \subsection{Step 3: Ranking}
 
-\Mar{------------------------------------ estou aqui}
+\tname{} uses a composition of heurisitc functions to sort the rules
+it produces. Each function uses a different criterion to estimate how
+similar a rule created in the previous step is to existing Suricata
+rules~\cite{emerging-threats-open}. We describe in the following each
+of these heuristic functions. Each function $f_i$ ranges in the 0-1
+domain. \tname{} uses the weighted average of these functions to sort
+rules: $\sum{f_i}/|f_i|$.
 
-\Luc{Componente 1: Tamanho da regra.
+\subsubsection{Size of a rule}
+\tname{} uses the size of existing rules as a heuristic function. For
+example, we noted that most rules in the dataset have 2 to 5 options,
+so \tname{} values rules in this size range higher compared to other
+sizes. Figure~\ref{fig:distribution-rule-size} shows the histogram of
+rule sizes. The x-axis shows the number of options (\ie{}, size)
+included in a rule and the y-axis shows the number of rules that have
+that number of options. \tname{} uses this information to rank rules.
+
 \begin{figure}[H]
   \centering
   \scalebox{1.2}{
     \begin{tikzpicture}
       \begin{axis}[
           ybar stacked,
-          enlargelimits=0.15,
+          enlargelimits=0.09,
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
           %          ylabel={\#rules},
@@ -1077,8 +1094,12 @@ efficiently compared to analyzing network messages directly.
     \end{tikzpicture}
   }
   \vspace{-2ex}
-  \caption{\label{fig:distribution-rule-size}Number of rules per number of options.}
+  \caption{\label{fig:distribution-rule-size}Distribution of rule
+    size.\Mar{how is it possible a rule with 0 options?}}
 \end{figure}
+
+
+\Mar{----------------------------------------- estou aqui}
 
 Regras com um tamanho mais comum pontuam mais.
 Nesse caso, a pontuação dada por esse componente será: \[\frac{rules\_per\_size[len(rule)]}{max(rules\_per\_size)}\]
@@ -1128,10 +1149,6 @@ N é o numero de contents e M é a quantidade de modificadores de um content.
   \vspace{-2ex}
   \caption{\label{fig:distribution-content_modifiers} Content modifiers frequency.}
 \end{figure}
-
-}
-\Fix{...elaborate...}
-
 
 
 \section{Evaluation}
