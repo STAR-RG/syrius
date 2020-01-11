@@ -1057,24 +1057,26 @@ efficiently compared to analyzing network messages directly.
 
 \tname{} uses a composition of heurisitc functions to sort the rules
 it produces. Each function uses a different criterion to estimate how
-similar a rule, created in the previous step, is to existing Suricata
-rules~\cite{emerging-threats-open}. We describe in the following each
-of these heuristic functions. Each function $f_i$ ranges in the 0-1
+similar a rule, created in the previous step, is to rules from a
+public database~\cite{emerging-threats-open} including a total of
+\numrulessuri\ rules. We describe in the following each of these
+heuristic functions. Each function $f_i$ ranges in the 0-1
 domain. \tname{} uses the weighted average of these functions to sort
 rules: $\sum{f_i}/|f_i|$.
 
 \subsubsection{Size of a rule}
-\tname{} uses the size of existing rules as one element to measure
-similarity. Informally, rules with popular sizes score high; inpopular
-rules score low. 
+One element that \tname{} uses to measure similarity of synthesized to
+human-created rules is the size of the synthetic rule. Informally,
+rules with popular sizes score high whereas inpopular rules score low.
 
 Figure~\ref{fig:distribution-rule-size} shows the histogram of rule
-sizes for our rule dataset, including a total of
-\numrulessuri\ rules. The x-axis shows the number of options included
-in a rule and the y-axis shows the number of rules with the
-corresponding number of options. For example, we noted that most rules
-have 2 to 6 options. Based on that, \tname{} values rules in that size
-range higher compared to other sizes.
+sizes for our rule dataset. The x-axis shows the number of options
+included in a rule (up to 10) while the y-axis shows the number of
+rules with the corresponding number of options. Note that there are 11
+rules with no options. These rules only use the header to signal a
+traffic as malicious. Also note that most rules have 2 to 6
+options. \tname{} values rules in that size range higher compared to
+other sizes.
 
 %\tname{} uses this information to rank rules.
 
@@ -1101,7 +1103,7 @@ range higher compared to other sizes.
   }
   \vspace{-2ex}
   \caption{\label{fig:distribution-rule-size}Distribution of rule
-    size.\Mar{how is it possible a rule with 0 options?}}
+    size.}
 \end{figure}
 
 
@@ -1109,17 +1111,19 @@ range higher compared to other sizes.
 More precisely, we calculate the contribution of size of a given rule
 $r$ with the following formula:
 
-\[\frac{\mathit{rules\_per\_size}[\mathit{len(r)}]}{\mathit{num\_rules}}\]
+\[\frac{\mathit{rules\_per\_size}[\mathit{len(r)}]}{\mathit{max(rules\_per\_size})}\]
 
 \noindent
 , where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
-$\mathit{rules\_per\_size}$ encodes the size distribution--it is a
-dictionary mapping the number of rules associated with a given size,
-and $\mathit{num\_rules}$ returns the number of elements in the
-dictionary. Consequently, the contribution of size is proportion;al to
-its popularity. For example, the contribution of this heuristic for a
-rule with 3 options would be 0.145 (=3,662/25,239) whereas the
-contribution of a rule with 9 options would be 0.03 (=763/25,239).
+$\mathit{rules\_per\_size}$ encodes distribution of sizes as a
+dictionary mapping sizes to number of associated rules, and
+$\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
+for any dictionary entry. Consequently, the contribution of size is
+proportional to its popularity. For example, the contribution of this
+heuristic for a rule with 3 options would be 0.684 (=3,662/5,353)
+whereas the contribution of a rule with 9 options would be 14.25
+(=763/5,353). Note that the measurement is normalized in the 0-1
+range.
 
 \Mar{--------------------------- estou aqui}
 
