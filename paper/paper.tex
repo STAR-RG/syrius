@@ -1057,20 +1057,26 @@ efficiently compared to analyzing network messages directly.
 
 \tname{} uses a composition of heurisitc functions to sort the rules
 it produces. Each function uses a different criterion to estimate how
-similar a rule created in the previous step is to existing Suricata
+similar a rule, created in the previous step, is to existing Suricata
 rules~\cite{emerging-threats-open}. We describe in the following each
 of these heuristic functions. Each function $f_i$ ranges in the 0-1
 domain. \tname{} uses the weighted average of these functions to sort
 rules: $\sum{f_i}/|f_i|$.
 
 \subsubsection{Size of a rule}
-\tname{} uses the size of existing rules as a heuristic function. For
-example, we noted that most rules in the dataset have 2 to 5 options,
-so \tname{} values rules in this size range higher compared to other
-sizes. Figure~\ref{fig:distribution-rule-size} shows the histogram of
-rule sizes. The x-axis shows the number of options (\ie{}, size)
-included in a rule and the y-axis shows the number of rules that have
-that number of options. \tname{} uses this information to rank rules.
+\tname{} uses the size of existing rules as one element to measure
+similarity. Informally, rules with popular sizes score high; inpopular
+rules score low. 
+
+Figure~\ref{fig:distribution-rule-size} shows the histogram of rule
+sizes for our rule dataset, including a total of
+\numrulessuri\ rules. The x-axis shows the number of options included
+in a rule and the y-axis shows the number of rules with the
+corresponding number of options. For example, we noted that most rules
+have 2 to 6 options. Based on that, \tname{} values rules in that size
+range higher compared to other sizes.
+
+%\tname{} uses this information to rank rules.
 
 \begin{figure}[H]
   \centering
@@ -1099,10 +1105,23 @@ that number of options. \tname{} uses this information to rank rules.
 \end{figure}
 
 
-\Mar{----------------------------------------- estou aqui}
 
-Regras com um tamanho mais comum pontuam mais.
-Nesse caso, a pontuação dada por esse componente será: \[\frac{rules\_per\_size[len(rule)]}{max(rules\_per\_size)}\]
+More precisely, we calculate the contribution of size of a given rule
+$r$ with the following formula:
+
+\[\frac{\mathit{rules\_per\_size}[\mathit{len(r)}]}{\mathit{num\_rules}}\]
+
+\noindent
+, where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
+$\mathit{rules\_per\_size}$ encodes the size distribution--it is a
+dictionary mapping the number of rules associated with a given size,
+and $\mathit{num\_rules}$ returns the number of elements in the
+dictionary. Consequently, the contribution of size is proportion;al to
+its popularity. For example, the contribution of this heuristic for a
+rule with 3 options would be 0.145 (=3,662/25,239) whereas the
+contribution of a rule with 9 options would be 0.03 (=763/25,239).
+
+\Mar{--------------------------- estou aqui}
 
 Componente 2: Quantidade de contents na regra (histograma da figura 6)
 Regras com uma quantidade mais comum de contents pontuam mais.
