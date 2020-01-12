@@ -1306,6 +1306,30 @@ more efficient compared to sending and processing network messages. To
 illustrate, the SYN Flood attack was reproduced with the hping3
 tool~\cite{hping3} using the following command \CodeIn{hping3 -d 80 -w
   64 -S -p 80 --flood --rand-source <IP>}.
+  
+\Gui{
+O procedimento que já tínhamos representa a etapa de treinamento. Toda aquela parte que foi explicada na apresentação para os outros professores e descrito no paper. Descreverei novamente pra confirmar, e também foi adicionado uma pequena etapa.
+
+TREINAMENTO
+
+->Syrius recebe como input um pcap contendo o ataque (no caso de ataques com content, usamos ataques do Nikto), um pcap benígno (usamos o bigflows.pcap) e um pcap contendo as variações de ataque (isso pode ser otimizado unificando com o pcap de ataque, mas por agora está assim)
+->É gerado a regra máxima através do tokenizer e engenharia reversa.
+->Syrius remove UM content de uma regra da lista de regras atuais (inicialmente apenas a regra máxima) e checa se a regra criada já existe na lista. Se não, a regra é adicionada à lista de regras-não-testadas. Syrius faz isso duas vezes por regra, para todas as regras da lista.
+->A lista de regras-não-testadas é inicializada no suricata e então o rodamos com o pcap benígno de treinamento (75porcento do total). Verificando no arquivo de log do suricata, caso a regra alerte, ela é removida da lista. As regras restantes vão para a lista de regras atuais.
+->Quando não houver alterações, retornamos a lista com todas as regras que deram certo.
+->Opcionalmente, ainda rodamos no final uma variação de ataque (no momento apenas um pacote devido ao número limitado que temos do ataque). Ao contrário do método com pacotes benígnos, se a regra NÃO alertar, ela é removida.
+->Calculamos o fitness de cada regra e ordenamos de acordo com o fitness resultante. Esta lista ordenada é o fim do treinamento.
+
+TESTE
+
+->Inicializamos a lista de regras ordenadas no suricata e rodamos o pcap benígno de teste (25porcento restantes) para cálculo do precision. O cálculo ficou basicamente, por regra: [100 - (numero-de-alertas/total-de-pacotes)]
+
+->Inicializamos a lista de regras ordenadas no suricata e rodamos o pcap com variações de ataque (caso a etapa opcional ocorrer, não usamos aquele pacote especifico) para cálculo do recall. O cálculo ficou basicamente, por regra: [(100/total-de-pacotes) * n-alertas].
+
+->Por final calculamos o F1 Score por regra: [2*((precision*recall)/(precision+recall))]
+
+->O teste retorna um csv contendo a lista de regras ordenadas com seus respectivos precision, recall e f1 score.
+}
 
 %% \Gui{We are using the bigflows.pcap provided by tcpreplay on http://tcpreplay.appneta.com/wiki/captures.html "This is a capture of real network traffic on a busy private network’s access point to the Internet"
 %%  }
