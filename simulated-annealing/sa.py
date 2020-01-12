@@ -7,6 +7,7 @@ import random
 import re
 import binascii
 import argparse
+import csv
 from itertools import combinations
 
 open("bad.rules", 'w').close()
@@ -487,7 +488,7 @@ def isEmpty(fpath):
 
 def sendAttackVariation(attack):
     subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
-    time.sleep(2.0)
+    time.sleep(0.5)
 
 def checkFalseNegative(rules):
     global fitnessFile_path
@@ -507,8 +508,39 @@ def checkFalseNegative(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        if fitnessFile.count(':'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count(':'+str(rules[i].sid)+':')
+        if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
+            output[i] = fitnessFile.count('1:'+str(rules[i].sid)+':')
+        #else:
+            #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
+            #print("False negative rule:", rules[i])
+            #print(fitnessFile)
+
+    return output
+
+def sendTest(attack):
+    subprocess.Popen(["sh", "sendTest.sh", attack], stdout=subprocess.DEVNULL).wait()
+    time.sleep(0.5)
+
+def checkPrecision(rules):
+    global fitnessFile_path
+    global args
+    variation_packets = 2000
+
+    open(fitnessFile_path, 'w').close()
+    writeRuleOnFile(rules)
+    sendTest(args.attack)
+    
+    output = []
+
+    for i in range(len(rules)):
+        output.append(0)
+
+    with open(fitnessFile_path, "r") as fitnessFile:
+        fitnessFile = fitnessFile.read()
+    
+    for i in range(len(rules)):
+        if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
+            output[i] = fitnessFile.count('1:'+str(rules[i].sid)+':')
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
@@ -636,6 +668,7 @@ def newRuleFitness(rule):
     global max_fit2
     global max_fit3
     global max_fit4
+
     """fit1 = ruleSizeFitness(rule)
     if fit1 > max_fit1:
         max_fit1 = fit1
@@ -652,8 +685,8 @@ def newRuleFitness(rule):
     if fit4 > max_fit4:
         max_fit4 = fit4
 
-    if fit4 >= 0.16:
-        print("max_fit4:", fit4, rule)
+    #if fit4 >= 0.16:
+    #    print("max_fit4:", fit4, rule)
     
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
     return fit4
@@ -796,17 +829,35 @@ def optimizeRule(rule):
         rule.sid=x+1
         #print(str(rule))
 
-    abc=checkFalseNegative(all_rule_list)
+    print("pegando precision")
+    precision=checkPrecision(all_rule_list)
 
-    with open("recall.txt", "w+") as writer:
-        for (x, y) in zip(all_rule_list, abc):
+    print("pegando recall")
+    recall=checkFalseNegative(all_rule_list)
+
+    with open("result.csv", "w+", newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
+        for (x, y, z) in zip(all_rule_list, recall, precision):
             y=y*25
-            z="{} -> {}%".format(str(x), str(y))
-            writer.write(z + "\n")
+            z=100-(z/20)
+            f1=2*(((z*y)/100)/((y/100)+(z/100)))
+            total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
+            writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
     with open("raw_recall.txt", "w+") as writer:
-        for x in abc:
-            writer.write("{}".format(x*25))
+        for x in recall:
+            writer.write("{}\n".format(x*25))
+
+    with open("raw_precision.txt", "w+") as writer:
+        for x in precision:
+            writer.write("{}\n".format(100-(x/20)))
+
+    with open("raw_f1.txt", "w+") as writer:
+        for x, y in zip(recall, precision):
+            x=x*25
+            y=100-(z/20)
+            writer.write("{}\n".format(2*(((x*y)/100)/((x/100)+(y/100)))))
 
     with open("output_sorted.txt", "w+") as writer:
         for x in all_rule_list:
