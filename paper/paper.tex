@@ -1030,16 +1030,16 @@ efficiently compared to analyzing network messages directly.
 it produces. Each function uses a different criterion to estimate how
 similar a rule, created in the previous step, is to rules from a
 public database~\cite{emerging-threats-open} including a total of
-\numrulessuri\ rules. We describe in the following each of these
+\numrulessuri\ rules \Luc{acima na seção 4.1 falamos que o dataset contem 27.8K regras. No histograma da fig 7 de fato mostra apenas 25K, mas isso porque decidi colocar nele apenas 11 barras}. We describe in the following each of these
 heuristic functions. Each function $f_i$ ranges in the 0-1
-domain. \tname{} uses the weighted average of these functions to sort
+domain. \tname{} uses the weighted average \Luc{atualmente eh uma média simples e não ponderada ja q as funções tem o mesmo peso. conversamos na ultima reuniao sobre testar diferentes pesos para cada função, mas n sei quão prioritário eh isso comparado as outras atividades que definimos.} of these functions to sort
 rules: $\sum{f_i}/|f_i|$.
 
 \subsubsection{Size of a rule}
 One element that \tname{} uses to measure similarity of synthesized to
 human-created rules is the size of the synthetic rule. Informally,
 rules with popular sizes score high whereas inpopular rules score low.
-
+\Luc{talvez explicitar que "size of a rule" quer dizer a quantidade de opções que ha nela?}
 Figure~\ref{fig:distribution-rule-size} shows the histogram of rule
 sizes for our rule dataset. The x-axis shows the number of options
 included in a rule (up to 10) while the y-axis shows the number of
@@ -1095,12 +1095,12 @@ $\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
 for any dictionary entry. Consequently, the contribution of size is
 proportional to its popularity. For example, the contribution of this
 heuristic for a rule with 3 options would be 0.684 (=3,662/5,353)
-whereas the contribution of a rule with 9 options would be 14.25
-(=763/5,353). Note that the measurement is normalized in the 0-1
+whereas the contribution of a rule with 9 options would be 0.028
+(=154/5,353). Note that the measurement is normalized in the 0-1
 range.
 
 \subsubsection{Number of content options.} We empirically observed that content options are very
-common. As consequence, we defined a heuristic function that takes the
+common. \Luc{Se for preciso temos numeros para fundamentar isso melhor, sao cerca de 70K contents nas 28K regras do dataset} As consequence, we defined a heuristic function that takes the
 number of content options into account. We calculate the contribution
 of number of content options with the following formula:
 
@@ -1130,7 +1130,7 @@ of number of content options with the following formula:
     content options.}
 \end{figure}  
 
-\[\frac{\mathit{rules\_per\_number\_of\_contents[len(rule)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
+\[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
 
 Note that the only difference compared to the formula to compute
 contribution of size is the distribution used, which is given by the
@@ -1150,6 +1150,7 @@ contribution of content rarity with the following formula:
 \noindent
 , where $N$ is the number of content options in a given rule. Figure~\Fix{...elaborate...}
 
+\Luc{tudo ok ate aqui}
 
 \Mar{----------------------------- parei aqui}
 
