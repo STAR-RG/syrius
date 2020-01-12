@@ -1030,22 +1030,28 @@ efficiently compared to analyzing network messages directly.
 it produces. Each function uses a different criterion to estimate how
 similar a rule, created in the previous step, is to rules from a
 public database~\cite{emerging-threats-open} including a total of
-\numrulessuri\ rules \Luc{acima na seção 4.1 falamos que o dataset contem 27.8K regras. No histograma da fig 7 de fato mostra apenas 25K, mas isso porque decidi colocar nele apenas 11 barras}. We describe in the following each of these
-heuristic functions. Each function $f_i$ ranges in the 0-1
-domain. \tname{} uses the weighted average \Luc{atualmente eh uma média simples e não ponderada ja q as funções tem o mesmo peso. conversamos na ultima reuniao sobre testar diferentes pesos para cada função, mas n sei quão prioritário eh isso comparado as outras atividades que definimos.} of these functions to sort
-rules: $\sum{f_i}/|f_i|$.
+\numrulessuri\ rules. We describe in the following each of these
+heuristic functions. The codomain of each function ranges in the 0-1
+interval. The score of a rule is the average across the values
+produced by each function.
+
+%% \Luc{atualmente eh uma
+%%   média simples e não ponderada ja q as funções tem o mesmo
+%%   peso. conversamos na ultima reuniao sobre testar diferentes pesos
+%%   para cada função, mas n sei quão prioritário eh isso comparado as
+%%   outras atividades que definimos.} $\sum{f_i}/|f_i|$.
 
 \subsubsection{Size of a rule}
-One element that \tname{} uses to measure similarity of synthesized to
-human-created rules is the size of the synthetic rule. Informally,
-rules with popular sizes score high whereas inpopular rules score low.
-\Luc{talvez explicitar que "size of a rule" quer dizer a quantidade de opções que ha nela?}
-Figure~\ref{fig:distribution-rule-size} shows the histogram of rule
-sizes for our rule dataset. The x-axis shows the number of options
-included in a rule (up to 10) while the y-axis shows the number of
-rules with the corresponding number of options. Note that there are 11
-rules with no options. These rules only use the header to signal a
-traffic as malicious. Also note that most rules have 2 to 6
+One element that \tname{} uses to measure similarity between a
+synthesized and a human-created rule is the size of the synthetic
+rule, \ie{}, the number of options it contains. Informally, rules with
+popular sizes score high whereas inpopular rules score
+low. Figure~\ref{fig:distribution-rule-size} shows the histogram of
+rule sizes for our rule dataset. The x-axis shows the number of
+options included in a rule (up to 10) while the y-axis shows the
+number of rules with the corresponding number of options. Note that
+there are 11 rules with no options. These rules only use the header to
+signal a traffic as malicious. Also note that most rules have 2 to 6
 options. \tname{} values rules in that size range higher compared to
 other sizes.
 
@@ -1094,15 +1100,19 @@ dictionary mapping sizes to number of associated rules, and
 $\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
 for any dictionary entry. Consequently, the contribution of size is
 proportional to its popularity. For example, the contribution of this
-heuristic for a rule with 3 options would be 0.684 (=3,662/5,353)
-whereas the contribution of a rule with 9 options would be 0.028
+heuristic for a rule with three options would be 0.684 (=3,662/5,353)
+whereas the contribution of a rule with nine options would be 0.028
 (=154/5,353). Note that the measurement is normalized in the 0-1
 range.
 
 \subsubsection{Number of content options.} We empirically observed that content options are very
-common. \Luc{Se for preciso temos numeros para fundamentar isso melhor, sao cerca de 70K contents nas 28K regras do dataset} As consequence, we defined a heuristic function that takes the
-number of content options into account. We calculate the contribution
-of number of content options with the following formula:
+common. \Luc{Se for preciso temos numeros para fundamentar isso
+  melhor, sao cerca de 70K contents nas 28K regras do
+  dataset}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
+  (\%) das 28K regras tem contents.} As consequence, we defined a
+heuristic function that takes the number of content options into
+account. We calculate the contribution of number of content options
+with the following formula:
 
 \begin{figure}[t!]
   \centering
@@ -1132,27 +1142,35 @@ of number of content options with the following formula:
 
 \[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
 
-Note that the only difference compared to the formula to compute
-contribution of size is the distribution used, which is given by the
-term $\mathit{rules\_per\_number\_of\_contents}$ denoting a dictionary
-of number of content options to number of rules that contain that
-number of content options.
+\noindent
+Note that the only difference of this formula compared to the formula
+to compute contribution of size is the distribution used, which is
+given by the term $\mathit{rules\_per\_number\_of\_contents}$ denoting
+a dictionary of number of content options to number of rules that
+contain that number of content options.
 
 \subsubsection{Content rarity.} 
-This heuristic weighs higher rules
-that use popular strings in content options. More precisely, for a
-given rule \tname{} takes the arithmetic mean of the popularity scores
-of each content in that rule. More precisely, we calculate the
-contribution of content rarity with the following formula:
+This heuristic weighs higher rules that use popular strings in content
+options. For a given rule \tname{} takes the arithmetic mean of the
+popularity scores of each string used in contents in that rule. More
+precisely, we calculate the contribution of content rarity with the
+following formula:
 
 \[\frac{\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}}{N}\]
 
 \noindent
-, where $N$ is the number of content options in a given rule. Figure~\Fix{...elaborate...}
-
-\Luc{tudo ok ate aqui}
-
-\Mar{----------------------------- parei aqui}
+, where the term $\mathit{content_i}$ denotes the $i$-th xcontent in a
+given rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
+denotes the frequency of the string used in the $i$-th content, the
+term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
+observed across all strings appearing as content parameters, and $N$
+is the number of content options in a given
+rule. Figure~\ref{fig:distribution-strings} shows the distribution of
+the ten most popular strings in our rule dataset. To illustrate this
+function, let us consider a rule with two content options, using the
+strings ``GET'' and ``ID'', respectively. The contribution of that
+rule for the computation of similarity score would be 0.601
+(=(1+.203)/2).
 
 \begin{figure}[H]
   \centering
@@ -1177,10 +1195,13 @@ contribution of content rarity with the following formula:
       \end{axis}
     \end{tikzpicture}
   }
-  \caption{\label{fig:distribution-contents}-}
+  \caption{\label{fig:distribution-strings}Distribution of strings
+    used as parameters of content options.}
 \end{figure}
 
 \subsubsection{Frequency of content modifiers.}
+
+\Mar{----------------------------- parei aqui}
 
 Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
 Modificadores diferentes podem acessar campos iguais em um pacote. Por exemplo os modificadores http\_method e http\_header, o http\_method acessa apenas o metodo do pacote http, mas o http\_header acessa todo o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET" receberia a pontuação correspondente a esses dois modificadores.
