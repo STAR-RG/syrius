@@ -16,7 +16,8 @@ parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
-ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
+#ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
+ruleFile_path = "../suricata/pesquisa/attacks/" + str(args.attack) + ".rules"
 fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
@@ -39,7 +40,10 @@ contents_dict["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administ
 
 contents_dict["adaptor"] = {'GET':[], '/jmx-console':[], '/HtmlAdaptor':["http_uri", "nocase"], 'action=inspect':["http_uri", "nocase"], 'M':[], 'bean':["http_uri", "nocase"], 'name=':["http_uri"], 'Catalina%3Atype%3DServer':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003846)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
-contents = contents_dict[args.attack]
+if args.attack in contents_dict:
+    contents = contents_dict[args.attack]
+else:
+    print("ataque sem content")
 
 keyword_list=("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
 
@@ -52,10 +56,13 @@ rule_options = {}
 default_rule_sid = 1
 
 pcap = "Datasets/nikto-" + str(args.attack) + ".pcap"
+if args.attack == "pingscan":
+    pcap = "Datasets/ping_scan.pcap"
 pkts = pyshark.FileCapture(pcap)
 pkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
+print(rule_protocol)
 
 #print(rule_protocol)
 
@@ -347,30 +354,41 @@ def getStats():
     return rules_per_size, rules_per_contents, contents_dict, keywords_freq
 
 rules_per_size, rules_per_contents, contents_dict, keywords_freq = getStats()
-_, pkt_content_modifiers = getTokens()
+if rule_protocol == "http":
+    _, pkt_content_modifiers = getTokens()
+i=0
 
-aux_key_freq = {}
-for mod in list(pkt_content_modifiers.keys()):
-    if mod in keywords_freq:
-        aux_key_freq[mod] = keywords_freq[mod]
+sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
+
+for content in sd:
+    i += 1
+    print(content)
+    if i == 10:
+        break
+if rule_protocol == "http":    
+    aux_key_freq = {}
+    for mod in list(pkt_content_modifiers.keys()):
+        if mod in keywords_freq:
+            aux_key_freq[mod] = keywords_freq[mod]
 
 
 print("keyword_freq:", keywords_freq)
 print()
-print("pkt_content_modifiers", pkt_content_modifiers)
-print()
-print("aux_key_freq:", aux_key_freq)
-print()
-low_case_contents_dict = {}
+if rule_protocol == "http":
+    print("pkt_content_modifiers", pkt_content_modifiers)
+    print()
+    print("aux_key_freq:", aux_key_freq)
+    print()
+    low_case_contents_dict = {}
 
-for k, v in contents_dict.items():
-    if k.lower() in low_case_contents_dict:
-        low_case_contents_dict[k.lower()] += v
-    else:
-        low_case_contents_dict[k.lower()] = v
+    for k, v in contents_dict.items():
+        if k.lower() in low_case_contents_dict:
+            low_case_contents_dict[k.lower()] += v
+        else:
+            low_case_contents_dict[k.lower()] = v
 
-lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
-print()
+    lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
+    print()
 """print()
 print(getTokens())
 print()
@@ -609,7 +627,7 @@ class Rule:
         self.threshold = {}
 
         rule_options = {}
-        for keyword in keys_by_proto[protocol]:
+        """for keyword in keys_by_proto[protocol]:
             self.options = {}
             if type(keys_by_proto[protocol][keyword]) == int:
                 self.options[keyword] = 0
@@ -627,7 +645,7 @@ class Rule:
             print(fitness2)
             if fitness1 == fitness2:
                 rule_options[keyword] = self.options[keyword]
-
+        """
         self.options = rule_options
     
     def __str__(self):
@@ -669,10 +687,10 @@ def newRuleFitness(rule):
     global max_fit3
     global max_fit4
 
-    """fit1 = ruleSizeFitness(rule)
+    fit1 = ruleSizeFitness(rule)
     if fit1 > max_fit1:
         max_fit1 = fit1
-    """
+    
     """fit2 = ruleContentsFitness(rule)
     if fit2 > max_fit2:
         max_fit2 = fit2
@@ -680,16 +698,16 @@ def newRuleFitness(rule):
     """fit3 = rareContentsFitness(rule)
     if fit3 > max_fit3:
         max_fit3 = fit3
-    """
+    
     fit4 = ruleContentsModifiersFitness(rule)
     if fit4 > max_fit4:
         max_fit4 = fit4
-
+    """
     #if fit4 >= 0.16:
     #    print("max_fit4:", fit4, rule)
     
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
-    return fit4
+    return fit1
 
 
 def optimizeRule(rule):
@@ -697,8 +715,93 @@ def optimizeRule(rule):
     new_rule = copy.deepcopy(rule)
     #print("len options:", len(rule.options))
     if len(rule.options) > 1:
-        for keyword in rule.options:
-            if keyword != "content":
+        new_rule = copy.deepcopy(rule)
+        rule_list = [new_rule]
+        aux = []
+        aux2 = []
+        aux3 = []
+        timeout = 6000
+        start_time = time.time()   #inicia contador do timeout
+        while time.time() - start_time < timeout:
+            if not rule_list:
+                break
+
+            counter = 0
+            for rule in rule_list:
+                if len(rule.options) == 1:
+                    if len(rule_list) == 1:
+                        break
+                    else:
+                        continue
+                
+                tam = 2
+
+                if len(rule.options) == 2:
+                    tam = 1
+
+                elem = random.sample(list(rule.options.keys()), tam)
+                while 1:
+                    if "content" in elem:
+                        elem = random.sample(list(rule.options), tam)
+                    else:
+                        break
+
+                for i in range(tam):
+                    new_sid=0
+                    checker=False
+                    tmp = copy.deepcopy(rule)
+                    del tmp.options[elem[i]]
+                    
+                    for op in tmp.options:
+                        for c in op:
+                            new_sid += int(ord(c))
+
+                    tmp.message = "msg:\"Testing rule {}\";".format(counter)
+                    
+                    if new_sid>0:
+                        tmp.sid=new_sid
+                    else:
+                        tmp.sid=counter+1
+
+                    if not aux:
+                        aux.append(tmp)
+                        counter+=1
+                    else:
+                        for z in aux:
+                            if z.sid==new_sid:
+                                checker=True
+                                break
+                            else:
+                                checker=False
+                        if not checker:       
+                            aux.append(tmp)
+                            #print("REGRA UNICA")
+                            counter+=1
+
+                    print(tmp)
+                
+            print("len aux:", len(aux))
+
+            fitness_list = evalContents(aux)
+            #print("aqui auqi auiq")
+
+            #rule_list.clear()
+            for i, fitness in enumerate(fitness_list):
+                if fitness < 1.0:
+                    aux2.append(aux[i])
+                    #print("{} : {}".format(aux[i], fitness))
+                    all_rule_list.append(aux[i])
+
+            if not aux2:
+                #print(rule_list)
+                break
+            else:
+                rule_list.clear()
+                rule_list=aux2.copy()
+                aux2.clear()
+                aux.clear()
+
+            """if keyword != "content":
                 if len(new_rule.options) == 1:
                     break
                 del new_rule.options[keyword]
@@ -708,7 +811,8 @@ def optimizeRule(rule):
                 print("#4 - rule fitness: " + str(fitness))
                 if fitness >= 1.0:
                     new_rule.options[keyword] = rule.options[keyword]
-    
+            """
+
     if "content" in rule.options:
         new_rule = copy.deepcopy(rule)
         rule_list = [new_rule]
@@ -816,11 +920,12 @@ def optimizeRule(rule):
     golden_content["jsp"] = {'/jsp/snp/':["http_uri"], '.snp':["http_uri"]}
     golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
     golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
-    golden_rule.options["content"] = golden_content[args.attack]
+    """golden_rule.options["content"] = golden_content[args.attack]
     print(golden_rule)
     print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.append(golden_rule)
     golden_rule_pos = 0
+    """
     all_rule_list = sorted(all_rule_list, key=newRuleFitness)
 
     for x, rule in enumerate(all_rule_list):
@@ -867,14 +972,16 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-init_rule = Rule(default_rule_action, "http", default_rule_header, default_rule_message, default_rule_sid)
+init_rule = Rule(default_rule_action, "icmp", default_rule_header, default_rule_message, default_rule_sid)
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
     final_rule = evolveRuleFlood(init_rule)
 else:
+    pingscan_options = {'dsize':0, 'itype':8, 'icode': 0, 'icmp_id':23570, 'icmp_seq': 3439}
+    final_rule.options = pingscan_options
     #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
-    final_rule.options["content"] = contents
+    #final_rule.options["content"] = contents
     print(final_rule)
     #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
     #quit()
