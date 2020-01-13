@@ -1199,15 +1199,32 @@ rule for the computation of similarity score would be 0.601
     used as parameters of content options.}
 \end{figure}
 
-\subsubsection{Frequency of content modifiers.}
+\subsubsection{Frequency of content modifiers.} Content options are
+associated with specific packets fields\Mar{or modifiers?}.\Mar{why
+  GET is associated with http\_method and http\_header?}\Mar{are all
+  content associated with one or many fields or positions in a packet?
+  can you give examples other than GET to explain this? if yes,
+  shouldn't this be discussed before? Maybe Section 2.3?}\Mar{Also, it
+  is important to justify (to explain rationale)---how is it different
+  from counting rarity?}
 
-\Mar{----------------------------- parei aqui}
 
-Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
-Modificadores diferentes podem acessar campos iguais em um pacote. Por exemplo os modificadores http\_method e http\_header, o http\_method acessa apenas o metodo do pacote http, mas o http\_header acessa todo o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET" receberia a pontuação correspondente a esses dois modificadores.
+%% Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
+%% Modificadores diferentes podem acessar campos iguais em um pacote. Por
+%% exemplo os modificadores http\_method e http\_header, o http\_method
+%% acessa apenas o metodo do pacote http, mas o http\_header acessa todo
+%% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
+%% receberia a pontuação correspondente a esses dois modificadores.
+
+More precisely, we calculate the contribution of the frequency of
+content modifiers with the following formula:
+
 \[\frac{\sum_{i=1}^{N}\sum_{j=1}^{M}\frac{modifier\_frequency[modifier_{ij}]}{max(modifier\_frequency)}}{N}\]
 
-N é o numero de contents e M é a quantidade de modificadores de um content.
+\noindent
+, where $N$ is the number of contents in a given rule and $M$
+is the number of content modifiers\Mar{in a rule? what is a content
+  modifier in a rule?}.
 
 \begin{figure}[H]
   \centering
@@ -1231,7 +1248,9 @@ N é o numero de contents e M é a quantidade de modificadores de um content.
     \end{tikzpicture}
   }
   \vspace{-2ex}
-  \caption{\label{fig:distribution-content_modifiers} Content modifiers frequency.}
+  \caption{\label{fig:distribution-content_modifiers}Content modifiers
+    frequency.\Mar{This is awkward. This is the only histogram that
+      only shows 6 values in the x-axis. Aren't there more?}}
 \end{figure}
 
 
