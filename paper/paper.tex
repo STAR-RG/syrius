@@ -1005,7 +1005,7 @@ options from a rule.
 %\Fix{...}
 
 \vspace{2ex}
-\noindent\textbf{Limitation.} It is worth noting that although
+\noindent\textbf{Limitations.} It is worth noting that although
 \tname{} is accurate for generating rules that discrimate positive and
 negative traffic, the quality of these rules is limited by the quality
 of the training data it uses. For the positive traffic, \tname{} only
@@ -1259,13 +1259,44 @@ is the number of content modifiers\Mar{in a rule? what is a content
 This section evaluates the precision and efficiency of \tname{}.
 
 \subsection{Objects of Analysis}
+\label{sec:dataset-benign}
 
-Table~\ref{table:attacks} shows the attacks we analyzed and the
-options of the rule from the Emerging Threats Open
-Ruleset~\cite{emerging-threats-open} that captures the attack. Column
-``Name'' shows the name of the attack, column ``Protocol'' shows the
-protocol name, and column ``Ground Truth'' shows the options of the
-rule that captures the attack.
+Table~\ref{table:attacks} shows the attacks we considered in our
+evaluation. These attacks cover different protocols and features of
+\tname{}. Column ``Name'' shows the name of the attack, column
+``Protocol'' shows the protocol name, and column ``Ground Truth''
+shows the options of the rule that captures the attack.
+
+\vspace{1ex}
+\noindent
+\textbf{Malicious traffic.}~Nikito?\Fix{where do these
+  attacks/messages come from?}
+
+\vspace{1ex}
+\noindent
+\textbf{Benign traffic.}~\tname{} uses public databases storing benign
+traffic for all protocols covered by Suricata (see
+Figure~\ref{fig:distribution-rules-protocol}). We used two datasets of
+positive traffic. The Bigflows.pcap dataset is part of the
+TcpReplay~\cite{tcpreplay} open source project. This dataset includes
+real network traffic on a busy private network access point to the
+Internet. According to the TcpReplay web site ``This capture is much
+larger and has a smaller average packet size than the previous capture
+(smallFlows.pcap). It also has many more flows and different
+applications.''. In addition to the Bigflows.pcap dataset, we also
+used datasets of normal traffic made available by Stratosphere
+Lab~\cite{stratosphere-normal}.
+
+\vspace{1ex}
+\noindent
+\textbf{Ground Truth.}~The rules that detect those attacks were
+obtained from the Emerging Threats Open
+Ruleset~\cite{emerging-threats-open}.
+
+%% Note from Figure~\ref{fig:overview} that the positive traffic is an
+%% input to the technique. The negative non-malicious traffic, however,
+%% is not.
+
 
 \begin{table*}[h]
   \caption{\label{table:attacks}List of attacks.\Mar{Guilherme, por
@@ -1288,43 +1319,29 @@ rule that captures the attack.
   \end{tabular}
 \end{table*}
 
-\subsection{Dataset of Benign Traffic}
-\label{sec:dataset-benign}
 
-Note from Figure~\ref{fig:overview} that the positive traffic is an
-input to the technique. The negative non-malicious traffic, however,
-is not. \tname{} uses public databases storing different kinds of
-positive traffic for all protocols covered by Suricata. We used two
-datasets of positive traffic. The Bigflows.pcap dataset is part of the
-TcpReplay~\cite{tcpreplay} open source project. This dataset includes
-real network traffic on a busy private network access point to the
-Internet. According to the TcpReplay web site ``This capture is much
-larger and has a smaller average packet size than the previous capture
-(smallFlows.pcap). It also has many more flows and different
-applications.''. In addition to the Bigflows.pcap dataset, we also
-used datasets of normal traffic made available by Stratosphere
-Lab~\cite{stratosphere-normal}.
 
 \subsection{Methodology}
 
-\tname{} expects (a) message(s) reproducing an attack on input. As
-previously discussed, those messages could be directly provided by an
-anomaly-based \nids\ tool. To evaluate \tname{}, however, we created
-those messages ourselves. For all attacks listed on
-Table~\ref{table:attacks}, we found reproduction scripts available on
-the web. With the script to reproduce the attack, we proceeded as
-follows: 1)~we instantiated the script on a given target machine,
-2)~we executed the script, 3)~we monitored the traffic with the
-wireshark network monitor~\cite{wireshark-net-monitor}, and 4) we
-simulated the delivery of the corresponding network messages by
-directly executing Suricata on the ``pcap'' files that wireshark
-produced in the previous step. It is worth noting that Suricata is
-invoked multiple times in the process of minimizing the rule (see
-Section~\ref{sec:minimization}) and that processing pcap files is much
-more efficient compared to sending and processing network messages. To
-illustrate, the SYN Flood attack was reproduced with the hping3
-tool~\cite{hping3} using the following command \CodeIn{hping3 -d 80 -w
-  64 -S -p 80 --flood --rand-source <IP>}.
+\subsubsection{Attack reproduction.} \tname{} requires the attack to
+be replayed in order to check whether or not the rule it generates
+captures the attack.  See function $\mathit{isPlausible}$, used in the
+minimization algorithm from Section~\ref{sec:minimization}. For all
+attacks listed on Table~\ref{table:attacks}, we found scripts
+available on the web to replay the attacks. For example, the SYN Flood
+attack can be replayed with hping3~\cite{hping3}, using the following
+command: \CodeIn{hping3 -d 80 -w 64 -S -p 80 --flood --rand-source
+  <IP>}. With the script to reproduce the attack, we executed the
+following steps to obtain ``pcap'' files, which abstracts network
+messages~\cite{pcap}, to run \tname:~1)~instantiate the script (\eg{},
+define the IP, for the example above), 2)~execute the script,
+3)~monitor the traffic with the wireshark network
+monitor~\cite{wireshark-net-monitor}.
+
+Recall that Suricata is invoked multiple times in the process of
+minimizing the rule (see Section~\ref{sec:minimization}). Suricata
+supports a feature to process ``pcap'' files, enabling very efficient
+performance compared to processing actual network messages.
   
 \Gui{
 O procedimento que já tínhamos representa a etapa de treinamento. Toda aquela parte que foi explicada na apresentação para os outros professores e descrito no paper. Descreverei novamente pra confirmar, e também foi adicionado uma pequena etapa.
