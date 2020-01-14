@@ -1205,7 +1205,7 @@ options. Furthermnore, we observed that many of these rules indicate
 what parts of the message the content string should be checked
 against.\Mar{Lucas, (1) vc. tem dados para dar suporte a isto (de http
   e tcp)? ou seja, quantas options do tipo ``content'' possuem
-  modificadores.}  For example, the creator of the rule may want to
+  modificadores.} \Luc{conseguirei esses dados} For example, the creator of the rule may want to
 indicate that a specific string be present in the header of an HTTP
 request message. Content \emph{modifiers} serve this purpose. For
 example, the modifier \CodeIn{http\_header} in the option
@@ -1216,7 +1216,7 @@ should remain open for multiple HTTP requests/responses.)
 Figure~\Fix{adicione pequena figura...verifique se ainda faz sentido
   depois do que falei acima...}
 
-Suricata supports content modifiers for tcp and http. Given that
+Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
 content options often use modifiers\Mar{assumindo que eh
   verdade. confirmar estat. solicitada acima...}, \tname\ uses
 associated frequency to discriminate more or less likely rules. For
