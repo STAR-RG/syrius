@@ -1199,32 +1199,95 @@ rule for the computation of similarity score would be 0.601
     used as parameters of content options.}
 \end{figure}
 
-\subsubsection{Frequency of content modifiers.} 
-\Luc{\section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
+\subsubsection{Frequency of content modifiers.} As previously
+mentioned, \percRulesWithContent\ of Suricata rules involve content
+options. Furthermnore, we observed that many of these rules indicate
+what parts of the message the content string should be checked
+against.\Mar{Lucas, (1) vc. tem dados para dar suporte a isto (de http
+  e tcp)? ou seja, quantas options do tipo ``content'' possuem
+  modificadores.}  For example, the creator of the rule may want to
+indicate that a specific string be present in the header of an HTTP
+request message. Content \emph{modifiers} serve this purpose. For
+example, the modifier \CodeIn{http\_header} in the option
+\CodeIn{content: ``keep-alive''; http\_header} states the requirement that
+the string ``keep-alive'' be present in the header of the message. (A
+keep-alive connection attribute indicates that a single TCP connection
+should remain open for multiple HTTP requests/responses.)
+Figure~\Fix{adicione pequena figura...verifique se ainda faz sentido
+  depois do que falei acima...}
 
-Exemplo do payload "cru" de um pacote http:\\
-Aqui, todas as informações do pacote estão juntas.
-
-\begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example.payload}
-\end{figure}
-
-O mesmo payload interpretado pelo Wireshark:\\
-Aqui, o wireshark interpreta as informações dos pacotes e as divide para melhor visualização e entendimento.
+Suricata supports content modifiers for tcp and http. Given that
+content options often use modifiers\Mar{assumindo que eh
+  verdade. confirmar estat. solicitada acima...}, \tname\ uses
+associated frequency to discriminate more or less likely rules. For
+example, historical data indicates that content options that use the
+\CodeIn{http\_connection} modifiers are much less likely than content
+options that use the modifier
+\CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
+shows the distribution of content modifiers for http. We ommit the
+distribution for tcp for space. Similarly to the the previous
+heuristic functions, this function uses the frequency of content
+modifiers to calibrate the contribution of each rule.
 
 \begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example-wireshark.payload}
+  \centering
+  \scalebox{1.2}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          %          ylabel={\#rules},
+          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},        
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-2ex}
+  \caption{\label{fig:distribution-content_modifiers}Content modifiers
+    frequency.\Mar{what about ``none'' (no modifier)?}}
 \end{figure}
 
-O que o suricata faz eh identificar os campos e seus valores e com isso permite que as regras façam referencia direta a eles. Por exemplo, na figura do payload "cru" não conseguimos identificar facilmente oq eh o "Request URI Path:", já na segunda figura isso está explícito.
 
-Eu disse que o "GET" estava associado tambem ao http\_header, mas não está, me enganei. Mas sim, pode haver interseção entre os campos que dois ou mais modificadores referenciam. O seguinte trecho do payload é acessado pelo modificador http\_header:
 
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={content}]{http-header.payload}
-\end{figure}
+%% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
 
-Entretando, tambem existem os modificadores http\_host, http\_accept\_enc, http\_connection e http\_accept que permitem acessar diretamente cada uma das linhas acima.
+%% Exemplo do payload "cru" de um pacote http:\\
+%% Aqui, todas as informações do pacote estão juntas.
+
+%% \begin{figure}[h!]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example.payload}
+%% \end{figure}
+
+%% O mesmo payload interpretado pelo Wireshark:\\
+%% Aqui, o wireshark interpreta as informações dos pacotes e as divide para melhor visualização e entendimento.
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example-wireshark.payload}
+%% \end{figure}
+
+%% O que o suricata faz eh identificar os campos e seus valores e com isso permite que as regras façam referencia direta a eles. Por exemplo, na figura do payload "cru" não conseguimos identificar facilmente oq eh o "Request URI Path:", já na segunda figura isso está explícito.
+
+%% Eu disse que o "GET" estava associado tambem ao http\_header, mas não está, me enganei. Mas sim, pode haver interseção entre os campos que dois ou mais modificadores referenciam. O seguinte trecho do payload é acessado pelo modificador http\_header:
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-header.payload}
+%% \end{figure}
+
+%% Entretando, tambem existem os modificadores http\_host,
+%% http\_accept\_enc, http\_connection e http\_accept que permitem
+%% acessar diretamente cada uma das linhas acima.
+
+
+\Mar{----------------------------------------------------------- estou
+aqui}
 
 \subsection{Pontuação}
 A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. Posteriormente, esse content vai receber uma pontuação correspondente a popularidade desse modificador:\\
@@ -1232,7 +1295,8 @@ A avaliação que fazemos aqui pontua um dado content de acordo com quantas veze
 A multiplicação por 1 no denominador eh referente a quantidade de modificadores que estão associadas a esse content.
 No caso da opção content: "keep-alive", essa string pertence ao campo "Connection:". Como falado acima, o suricata pode acessar esse campo pelos modificadores http\_header ou http\_connection. Portanto, esse content será pontuado de acordo com a popularidade desses dois modificadores:
 \[\frac{4089+29}{10111*2}\]
-}
+
+
 
 Content options are
 associated with specific packets fields\Mar{or modifiers?}.\Mar{why
@@ -1259,34 +1323,10 @@ content modifiers with the following formula:
 \noindent
 , where $N$ is the number of contents in a given rule and $M$
 is the number of content modifiers\Mar{in a rule? what is a content
-  modifier in a rule?}. \Luc{M eh o numero de modificadores associados a cada content. Temos content[1], content[2], ..., content[N]. Cada um desses contents tem modificadores associados content[i][1], content[i][2], ..., content[i][M].}
-
-\begin{figure}[H]
-  \centering
-  \scalebox{1.2}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-content_modifiers}Content modifiers
-    frequency.\Mar{This is awkward. This is the only histogram that
-      only shows 6 values in the x-axis. Aren't there more?}}
-\end{figure}
+  modifier in a rule?}. \Luc{M eh o numero de modificadores associados
+  a cada content. Temos content[1], content[2], ..., content[N]. Cada
+  um desses contents tem modificadores associados content[i][1],
+  content[i][2], ..., content[i][M].}
 
 
 \section{Evaluation}
