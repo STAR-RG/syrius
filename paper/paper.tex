@@ -1240,34 +1240,35 @@ content options that use the \CodeIn{http\_connection} modifier are
 much less likely than content options that use the modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
 shows the histogram of content modifiers for http. Although content
-modifiers are applicable for rules of any protocol in Suricatax,
+modifiers are applicable for rules of any protocol in Suricata,
 currently, this heuristic function is only supported for tcp and http
 in \tname. The rationale is that (1) these are the protocols involving
-most attacks \Mar{Lucas, please confirm.} and (2) the payload of
+most attacks \Luc{Ainda n encontrei nenhuma informação concreta afirmando isso. N podemos citar o fato de que 80\% das regras do dataset são desses 2 protocolos?}\Mar{Lucas, please confirm.} and (2) the payload of
 messages of different protocols are not as segmented as the case of
 tcp and http, which makes the reference to specific parts of the
 payload less common for rule writers and more challenging for
-\tname\Mar{Lucas, please confirm}.
+\tname\Mar{Lucas, please confirm}\Luc{verificar}.
 
 Similarly to the the previous heuristic functions, this function uses
 the frequency of content modifiers to calibrate the contribution of
 each rule. More precisely, we calculate this heuristic function with
 the following formula:
 
-\[\frac{\sum_{i=1}^{N}\sum_{j=1}^{M}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{N}\]
+$\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}$
 
 \noindent
 , where $N$ is the number of contents in a given rule and $M$ is the
-number of content modifiers\Mar{isto eh confuso. vc. esta dizendo que
+number of content modifiers\Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
   o mesmo content pode ter mais de um modificador? ou a string poderia
   ser acessada por mais de um modificador. se for este o caso,
   sinceramente, achei isto bem confuso. afinal, a regra jah indica
-  qual o modificador foi escolhido para acessar a string.}. \Luc{M eh
+  qual o modificador foi escolhido para acessar a string.}.\Luc{Cada content em uma regra só pode possuir um modificador para indicar a posição onde ele deve ser procurado. Entretanto sim, uma "string poderia
+  ser acessada por mais de um modificador", foi o caso daquele exemplo com o http\_header.} \Luc{M eh
   o numero de modificadores associados a cada content. Temos
   content[1], content[2], ..., content[N]. Cada um desses contents tem
   modificadores associados content[i][1], content[i][2], ...,
   content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
-  content. a frequencia seria 0, correto?}
+  content. a frequencia seria 0, correto?} \Luc{Sim}
 
 
 \begin{figure}[H]
@@ -1328,7 +1329,8 @@ number of content modifiers\Mar{isto eh confuso. vc. esta dizendo que
 
 \Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
 que vai mante-la) e mostre como eh feito o calculo da regra desta
-funcao heuristica para regra inteira.}
+funcao heuristica para regra inteira.}\\
+\Luc{-------------}
 
 
 Consider a rule containing the option \CodeIn{content:
@@ -1348,7 +1350,7 @@ the modifier \CodeIn{http\_uri}.
 aqui}
 
 A multiplicação por 1 no denominador eh referente a quantidade de
-modificadores que estão associadas a esse content.\Mar{nao foi isto
+modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
   que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
   contents e o exemplo acima tem apenas 1 content.}  No caso da opção
 content: "keep-alive", essa string pertence ao campo
