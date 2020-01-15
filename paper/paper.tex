@@ -1184,7 +1184,7 @@ strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
 (=(1+.203)/2).
 
-\begin{figure}[H]
+\begin{figure}[t!]
   \centering
   \scalebox{1.2}{  
     \begin{tikzpicture}
@@ -1216,19 +1216,19 @@ mentioned, \percRulesWithContent\ of Suricata rules involve content
 options. Furthermore, we observed---by analyzing the dataset of
 existing rules (see Section~\ref{sec:dataset-benign})---that often
 these rules indicate what part of the message the content string
-should be checked against.\Mar{Lucas, (1) vc. tem dados para dar
-  suporte a isto (de http e tcp)? ou seja, quantas options do tipo
-  ``content'' possuem modificadores.} \Luc{conseguirei esses dados}
-For example, the creator of the rule may want to indicate that a
-specific string be present in the header of an HTTP request
-message. Content \emph{modifiers} serve this purpose. For example, the
-modifier \CodeIn{http\_header} in the option \CodeIn{content:
-  ``keep-alive''; http\_header} states the requirement that the string
-``keep-alive'' be present in the header of the message. (A keep-alive
-connection attribute indicates that a single TCP connection should
-remain open for multiple HTTP requests/responses.)
-Figure~\Fix{adicione pequena figura...verifique se ainda faz sentido
-  depois do que falei acima...}
+should be checked against.\Mar{Lucas, vc. tem dados para dar suporte a
+  isto? ou seja, quantas options do tipo ``content'' possuem
+  modificadores.} \Luc{conseguirei esses dados} For example, the
+creator of the rule may want to indicate that a specific string be
+present in the header of an HTTP request message. Content
+\emph{modifiers} serve this purpose. For example, the modifier
+\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
+  http\_header} states the requirement that the string ``keep-alive''
+be present in the header of the message. (A keep-alive connection
+attribute indicates that a single TCP connection should remain open
+for multiple HTTP requests/responses.)  Figure~\Fix{adicione pequena
+  figura...verifique se ainda faz sentido depois do que falei
+  acima...}
 
 %% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
 %% content options often use modifiers\Mar{assumindo que eh
@@ -1240,38 +1240,48 @@ content options that use the \CodeIn{http\_connection} modifier are
 much less likely than content options that use the modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
 shows the histogram of content modifiers for http. Although content
-modifiers are applicable for rules of any protocol in Suricata,
-currently, this heuristic function is only supported for tcp and http
-in \tname. The rationale is that (1) these are the protocols involving
-most attacks \Luc{Ainda n encontrei nenhuma informação concreta afirmando isso. N podemos citar o fato de que 80\% das regras do dataset são desses 2 protocolos?}\Mar{Lucas, please confirm.} and (2) the payload of
-messages of different protocols are not as segmented as the case of
-tcp and http, which makes the reference to specific parts of the
-payload less common for rule writers and more challenging for
-\tname\Mar{Lucas, please confirm}\Luc{verificar}.
+modifiers are applicable to rules of any protocol in Suricata,
+currently, \tname\ only supports tcp and http. These are the protocols
+involving ~80\% of the attacks.
+
+%% and
+%% (2) the payload of messages of different protocols are not as
+%% segmented as the case of tcp and http. Consequently, rule writers do
+%% not refer to specific parts of the payload as often as the task o and
+%% more challenging for
 
 Similarly to the the previous heuristic functions, this function uses
 the frequency of content modifiers to calibrate the contribution of
-each rule. More precisely, we calculate this heuristic function with
-the following formula:
+each rule. More precisely, we compute this function with the following
+formula:
 
-$\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}$
+\[\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
 
 \noindent
-, where $N$ is the number of contents in a given rule and $M$ is the
-number of content modifiers\Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
-  o mesmo content pode ter mais de um modificador? ou a string poderia
-  ser acessada por mais de um modificador. se for este o caso,
-  sinceramente, achei isto bem confuso. afinal, a regra jah indica
-  qual o modificador foi escolhido para acessar a string.}.\Luc{Cada content em uma regra só pode possuir um modificador para indicar a posição onde ele deve ser procurado. Entretanto sim, uma "string poderia
-  ser acessada por mais de um modificador", foi o caso daquele exemplo com o http\_header.} \Luc{M eh
-  o numero de modificadores associados a cada content. Temos
-  content[1], content[2], ..., content[N]. Cada um desses contents tem
-  modificadores associados content[i][1], content[i][2], ...,
-  content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
-  content. a frequencia seria 0, correto?} \Luc{Sim}
+, where $N$ is the number of contents in a given rule and $M_i$ is the
+number of content modifiers that could access the string associated
+with content $i$. \Mar{Qual o rationale para considerar as varias
+  alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}%% Isto
+                                                                             %% nao
+                                                                             %% intuitivo
+                                                                             %% para
+                                                                             %% mim
+                                                                             %% -Marcelo
+
+%% \Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
+%%   o mesmo content pode ter mais de um modificador? ou a string poderia
+%%   ser acessada por mais de um modificador. se for este o caso,
+%%   sinceramente, achei isto bem confuso. afinal, a regra jah indica
+%%   qual o modificador foi escolhido para acessar a string.}.\Luc{Cada content em uma regra só pode possuir um modificador para indicar a posição onde ele deve ser procurado. Entretanto sim, uma "string poderia
+%%   ser acessada por mais de um modificador", foi o caso daquele exemplo com o http\_header.} \Luc{M eh
+%%   o numero de modificadores associados a cada content. Temos
+%%   content[1], content[2], ..., content[N]. Cada um desses contents tem
+%%   modificadores associados content[i][1], content[i][2], ...,
+%%   content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
+%%   content. a frequencia seria 0, correto?} \Luc{Sim}
 
 
-\begin{figure}[H]
+\begin{figure}[t!]
   \centering
   \scalebox{1.2}{
     \begin{tikzpicture}
@@ -1297,6 +1307,24 @@ number of content modifiers\Luc{$M_i$ eh o numero de modificadores que podem ref
     frequency.\Mar{what about ``none'' (no modifier)?}}
 \end{figure}
 
+Consider a rule containing the option \CodeIn{content:
+  ``/HtmlAdaptor''; http\_uri}, as the one from
+Section~\ref{sec:jboss}. The contribution of this option to the score
+of the corresponding rule would be $0.5=\frac{10,111}{10,111*1}$. The
+value of $M_i$ for this case is 1 as the field of the HTTP message
+\CodeIn{Request URI} holding the string can only be accessed through
+the modifier \CodeIn{http\_uri}. For the option \CodeIn{content:
+  ``keep-alive''; <mod>}, either \CodeIn{http\_header} or
+\CodeIn{http\_connection} could substitute the placeholder
+\CodeIn{<mod>} to locate the string ``keep-alive'' stored in the field
+\CodeIn{Connection} in the header of an HTTP request
+message\Mar{Lucas, a imagem mostrando header com campos Request URI e
+  Connection e os conteudos citados acima pode ajudar.}. Consequently,
+for this case, the constribution of content modifiers would be
+$0.2=\frac{4089+29}{10111*2}$. Assuming that both options are
+mentioned in a rule, the aggregated contribution of this heuristic
+function would be \Fix{...}\Mar{Lucas, confirme que nao esta faltando
+  calcular a media (dividir tudo por N).}
 
 
 %% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
@@ -1327,38 +1355,22 @@ number of content modifiers\Luc{$M_i$ eh o numero de modificadores que podem ref
 %% http\_accept\_enc, http\_connection e http\_accept que permitem
 %% acessar diretamente cada uma das linhas acima.
 
-\Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
-que vai mante-la) e mostre como eh feito o calculo da regra desta
-funcao heuristica para regra inteira.}\\
-\Luc{-------------}
+%% \Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
+%% que vai mante-la) e mostre como eh feito o calculo da regra desta
+%% funcao heuristica para regra inteira.}\\
+%% \Luc{-------------}
 
 
-Consider a rule containing the option \CodeIn{content:
-  ``/HtmlAdaptor''; http\_uri}, as the one from
-Section~\ref{sec:jboss}. The contribution of this option to the score
-of the corresponding rule would be $\frac{10,111}{10,111*1}$. The
-value of $N$ for this case is 1 as the field of the HTTP message
-\CodeIn{Request URI} holding the string can be accessed only through
-the modifier \CodeIn{http\_uri}.
 
 %% A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. 
 %% Posteriormente, esse content vai receber uma pontuação
 %% correspondente a popularidade desse modificador:\\
 
 
-\Mar{----------------------------------------------------------- estou
-aqui}
-
-A multiplicação por 1 no denominador eh referente a quantidade de
-modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
-  que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
-  contents e o exemplo acima tem apenas 1 content.}  No caso da opção
-content: "keep-alive", essa string pertence ao campo
-"Connection:". Como falado acima, o suricata pode acessar esse campo
-pelos modificadores http\_header ou http\_connection. Portanto, esse
-content será pontuado de acordo com a popularidade desses dois
-modificadores:
-\[\frac{4089+29}{10111*2}\]
+%% A multiplicação por 1 no denominador eh referente a quantidade de
+%% modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
+%%   que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
+%%   contents e o exemplo acima tem apenas 1 content.}  
 
 
 
