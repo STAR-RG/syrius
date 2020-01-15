@@ -726,7 +726,7 @@ ranking after minimization and ranking.
 
 
 \subsection{\Fix{JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit}}
-\label{sec:content-example}
+\label{sec:jboss}
 
 \Mar{Note que a gente organizou estas secoes por tipo de ataque. Este
   titulo eh muito especifico.}
@@ -763,6 +763,7 @@ A opção flow:established,to\_server; define que o match só será feito em pac
 %% \end{table}
 
 \section{Technique}
+\label{sec:technique}
 
 \tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
@@ -856,7 +857,18 @@ existing rules, that \CodeIn{content} options typically refer to
 sequence of characters in the payload of messages separated by these
 delimiters. This tokenization step can generate dozens of options.
 \tname{} produced a total of \Fix{xx} content options for the example
-Section~\ref{sec:content-example}. 
+Section~\ref{sec:content-example}.
+
+
+\Mar{Revisar.........................}
+\Fix{
+A avaliação que fazemos aqui pontua um dado content de acordo com
+quantas vezes o campo em que ele se encontra eh referenciado nas
+regras. Por exemplo, vamos supor que o tokenizer produziu a opção
+content: "/HtmlAdaptor". Essa string pertence ao campo "Request
+URI:". Esse campo pode ser acessado pelo modificador http\_uri. O
+tokenizer associa o content a esse modificador.
+}
 
 
 \subsection{Step 2: Rule Minimization}
@@ -1201,33 +1213,62 @@ rule for the computation of similarity score would be 0.601
 
 \subsubsection{Frequency of content modifiers.} As previously
 mentioned, \percRulesWithContent\ of Suricata rules involve content
-options. Furthermnore, we observed that many of these rules indicate
-what parts of the message the content string should be checked
-against.\Mar{Lucas, (1) vc. tem dados para dar suporte a isto (de http
-  e tcp)? ou seja, quantas options do tipo ``content'' possuem
-  modificadores.} \Luc{conseguirei esses dados} For example, the creator of the rule may want to
-indicate that a specific string be present in the header of an HTTP
-request message. Content \emph{modifiers} serve this purpose. For
-example, the modifier \CodeIn{http\_header} in the option
-\CodeIn{content: ``keep-alive''; http\_header} states the requirement that
-the string ``keep-alive'' be present in the header of the message. (A
-keep-alive connection attribute indicates that a single TCP connection
-should remain open for multiple HTTP requests/responses.)
+options. Furthermore, we observed---by analyzing the dataset of
+existing rules (see Section~\ref{sec:dataset-benign})---that often
+these rules indicate what part of the message the content string
+should be checked against.\Mar{Lucas, (1) vc. tem dados para dar
+  suporte a isto (de http e tcp)? ou seja, quantas options do tipo
+  ``content'' possuem modificadores.} \Luc{conseguirei esses dados}
+For example, the creator of the rule may want to indicate that a
+specific string be present in the header of an HTTP request
+message. Content \emph{modifiers} serve this purpose. For example, the
+modifier \CodeIn{http\_header} in the option \CodeIn{content:
+  ``keep-alive''; http\_header} states the requirement that the string
+``keep-alive'' be present in the header of the message. (A keep-alive
+connection attribute indicates that a single TCP connection should
+remain open for multiple HTTP requests/responses.)
 Figure~\Fix{adicione pequena figura...verifique se ainda faz sentido
   depois do que falei acima...}
 
-Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
-content options often use modifiers\Mar{assumindo que eh
-  verdade. confirmar estat. solicitada acima...}, \tname\ uses
-associated frequency to discriminate more or less likely rules. For
-example, historical data indicates that content options that use the
-\CodeIn{http\_connection} modifiers are much less likely than content
-options that use the modifier
+%% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
+%% content options often use modifiers\Mar{assumindo que eh
+%%   verdade. confirmar estat. solicitada acima...},
+
+\tname\ uses the frequency of content modifiers to discriminate more
+or less likely rules. For example, historical data indicates that
+content options that use the \CodeIn{http\_connection} modifier are
+much less likely than content options that use the modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
-shows the distribution of content modifiers for http. We ommit the
-distribution for tcp for space. Similarly to the the previous
-heuristic functions, this function uses the frequency of content
-modifiers to calibrate the contribution of each rule.
+shows the histogram of content modifiers for http. Although content
+modifiers are applicable for rules of any protocol in Suricatax,
+currently, this heuristic function is only supported for tcp and http
+in \tname. The rationale is that (1) these are the protocols involving
+most attacks \Mar{Lucas, please confirm.} and (2) the payload of
+messages of different protocols are not as segmented as the case of
+tcp and http, which makes the reference to specific parts of the
+payload less common for rule writers and more challenging for
+\tname\Mar{Lucas, please confirm}.
+
+Similarly to the the previous heuristic functions, this function uses
+the frequency of content modifiers to calibrate the contribution of
+each rule. More precisely, we calculate this heuristic function with
+the following formula:
+
+\[\frac{\sum_{i=1}^{N}\sum_{j=1}^{M}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{N}\]
+
+\noindent
+, where $N$ is the number of contents in a given rule and $M$ is the
+number of content modifiers\Mar{isto eh confuso. vc. esta dizendo que
+  o mesmo content pode ter mais de um modificador? ou a string poderia
+  ser acessada por mais de um modificador. se for este o caso,
+  sinceramente, achei isto bem confuso. afinal, a regra jah indica
+  qual o modificador foi escolhido para acessar a string.}. \Luc{M eh
+  o numero de modificadores associados a cada content. Temos
+  content[1], content[2], ..., content[N]. Cada um desses contents tem
+  modificadores associados content[i][1], content[i][2], ...,
+  content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
+  content. a frequencia seria 0, correto?}
+
 
 \begin{figure}[H]
   \centering
@@ -1285,27 +1326,54 @@ modifiers to calibrate the contribution of each rule.
 %% http\_accept\_enc, http\_connection e http\_accept que permitem
 %% acessar diretamente cada uma das linhas acima.
 
+\Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
+que vai mante-la) e mostre como eh feito o calculo da regra desta
+funcao heuristica para regra inteira.}
+
+
+Consider a rule containing the option \CodeIn{content:
+  ``/HtmlAdaptor''; http\_uri}, as the one from
+Section~\ref{sec:jboss}. The contribution of this option to the score
+of the corresponding rule would be $\frac{10,111}{10,111*1}$. The
+value of $N$ for this case is 1 as the field of the HTTP message
+\CodeIn{Request URI} holding the string can be accessed only through
+the modifier \CodeIn{http\_uri}.
+
+%% A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. 
+%% Posteriormente, esse content vai receber uma pontuação
+%% correspondente a popularidade desse modificador:\\
+
 
 \Mar{----------------------------------------------------------- estou
 aqui}
 
-\subsection{Pontuação}
-A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. Posteriormente, esse content vai receber uma pontuação correspondente a popularidade desse modificador:\\
-\[\frac{10111}{10111*1}\]
-A multiplicação por 1 no denominador eh referente a quantidade de modificadores que estão associadas a esse content.
-No caso da opção content: "keep-alive", essa string pertence ao campo "Connection:". Como falado acima, o suricata pode acessar esse campo pelos modificadores http\_header ou http\_connection. Portanto, esse content será pontuado de acordo com a popularidade desses dois modificadores:
+A multiplicação por 1 no denominador eh referente a quantidade de
+modificadores que estão associadas a esse content.\Mar{nao foi isto
+  que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
+  contents e o exemplo acima tem apenas 1 content.}  No caso da opção
+content: "keep-alive", essa string pertence ao campo
+"Connection:". Como falado acima, o suricata pode acessar esse campo
+pelos modificadores http\_header ou http\_connection. Portanto, esse
+content será pontuado de acordo com a popularidade desses dois
+modificadores:
 \[\frac{4089+29}{10111*2}\]
 
 
 
-Content options are
-associated with specific packets fields\Mar{or modifiers?}.\Mar{why
-  GET is associated with http\_method and http\_header?}\Mar{are all
-  content associated with one or many fields or positions in a packet?
-  can you give examples other than GET to explain this? if yes,
-  shouldn't this be discussed before? Maybe Section 2.3?}\Mar{Also, it
-  is important to justify (to explain rationale)---how is it different
-  from counting rarity?}
+
+
+
+
+
+
+%% Content options are
+%% associated with specific packets fields\Mar{or modifiers?}.\Mar{why
+%%   GET is associated with http\_method and http\_header?}\Mar{are all
+%%   content associated with one or many fields or positions in a packet?
+%%   can you give examples other than GET to explain this? if yes,
+%%   shouldn't this be discussed before? Maybe Section 2.3?}\Mar{Also, it
+%%   is important to justify (to explain rationale)---how is it different
+%%   from counting rarity?}
 
 
 %% Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
@@ -1314,19 +1382,6 @@ associated with specific packets fields\Mar{or modifiers?}.\Mar{why
 %% acessa apenas o metodo do pacote http, mas o http\_header acessa todo
 %% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
 %% receberia a pontuação correspondente a esses dois modificadores.
-
-More precisely, we calculate the contribution of the frequency of
-content modifiers with the following formula:
-
-\[\frac{\sum_{i=1}^{N}\sum_{j=1}^{M}\frac{modifier\_frequency[modifier_{ij}]}{max(modifier\_frequency)}}{N}\]
-
-\noindent
-, where $N$ is the number of contents in a given rule and $M$
-is the number of content modifiers\Mar{in a rule? what is a content
-  modifier in a rule?}. \Luc{M eh o numero de modificadores associados
-  a cada content. Temos content[1], content[2], ..., content[N]. Cada
-  um desses contents tem modificadores associados content[i][1],
-  content[i][2], ..., content[i][M].}
 
 
 \section{Evaluation}
