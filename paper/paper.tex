@@ -1251,27 +1251,28 @@ involving ~80\% of the attacks.
 %% more challenging for
 
 Similarly to the the previous heuristic functions, this function uses
-the frequency of content modifiers to calibrate the contribution of
-each rule. More precisely, we compute this function with the following
+the frequency of content modifiers to calibrate the score of each
+rule. More precisely, we compute this function with the following
 formula:
 
-\[\frac{\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}}{N}\]
+\[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
 
 \noindent
-, where $N$ is the number of contents in a given rule and $M_i$ is the
-number of content modifiers that could access the string associated
-with content $i$. \Mar{Qual o rationale para considerar as varias
-  alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
-  \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no dataset.}
-  \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores que conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
+, where $N$ is the number of contents options, $g(i)$ is the
+contribution of content option $i$ to the score,
+$\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
+of a modifier $j$ to content option $i$,
+$\mathit{max(modifier\_frequency)}$ refers to the modifier with
+maximum popularity (for normalization), and $M_i$ is the number of
+content modifiers that could access the string associated with content
+$i$.
 
-                                                                             %% Isto
-                                                                             %% nao
-                                                                             %% intuitivo
-                                                                             %% para
-                                                                             %% mim
-                                                                             %% -Marcelo
 
+%% \Mar{Qual o rationale para considerar as varias
+%%   alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
+%%   \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no dataset.}
+%%   \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores que conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
+                                                                             
 %% \Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
 %%   o mesmo content pode ter mais de um modificador? ou a string poderia
 %%   ser acessada por mais de um modificador. se for este o caso,
@@ -1308,29 +1309,37 @@ with content $i$. \Mar{Qual o rationale para considerar as varias
   }
   \vspace{-2ex}
   \caption{\label{fig:distribution-content_modifiers}Content modifiers
-    frequency.\Mar{what about ``none'' (no modifier)?}}
-  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n vem ao caso aqui. Nessa heuristica toda string do payload vai ter associada a ela os modificadores q podem acessar a sua posição. Portanto, não vai existir o caso de não haver modificador. Atenção: isso não quer dizer q as regras q geramos incluem os modificadores, elas n incluem.}
+    frequency.}
 \end{figure}
 
-Consider a rule containing the option \CodeIn{content:
-  ``/HtmlAdaptor''; http\_uri}, as the one from
-Section~\ref{sec:jboss}. The contribution of this option to the score
-of the corresponding rule would be $0.5=\frac{10,111}{10,111*1}$. The
-value of $M_i$ for this case is 1 as the field of the HTTP message
-\CodeIn{Request URI} holding the string can only be accessed through
-the modifier \CodeIn{http\_uri}. For the option \CodeIn{content:
-  ``keep-alive''; <mod>}, either \CodeIn{http\_header} or
-\CodeIn{http\_connection} could substitute the placeholder
-\CodeIn{<mod>} to locate the string ``keep-alive'' stored in the field
-\CodeIn{Connection} in the header of an HTTP request
-message\Mar{Lucas, a imagem mostrando header com campos Request URI e
-  Connection e os conteudos citados acima pode ajudar.}\Luc{adicionar}. Consequently,
-for this case, the constribution of content modifiers would be
-$0.2=\frac{4089+29}{10111*2}$. Assuming that both options are
-mentioned in a rule, the aggregated contribution of this heuristic
-function would be \Fix{...}\Mar{Lucas, confirme que nao esta faltando
-  calcular a media (dividir tudo por N).} \Luc{Sim, tem q dividir. A implementação estava errada, está de acordo com a formula agora}
 
+%\Mar{what about ``none'' (no modifier)?}}
+%  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n
+    %% vem ao caso aqui. Nessa heuristica toda string do payload vai ter
+    %% associada a ela os modificadores q podem acessar a sua
+    %% posição. Portanto, não vai existir o caso de não haver
+    %% modificador. Atenção: isso não quer dizer q as regras q geramos
+    %% incluem os modificadores, elas n incluem.
+    
+Consider a rule containing the option \CodeIn{content:
+  ``/HtmlAdaptor''}. The contribution of this option to the score of
+the corresponding rule would be $0.5$
+(=$\frac{10,111}{10,111*1}$). The value of $M_i$ for this case is 1 as
+the field of the HTTP message \CodeIn{Request URI}---holding the
+string ``/HtmlAdaptor''---can be accessed through the modifier
+\CodeIn{http\_uri}. Conceptually, the relatively high heuristic value
+given to this option indicates that this is a reasonable option
+because the string used in the content option (``/HtmlAdaptor'') is
+stored in a specific field of the HTTP message (\CodeIn{Request URI})
+and can be accessible through content modifiers
+(\CodeIn{http\_uri}). For the option \CodeIn{content: ``keep-alive''},
+either \CodeIn{http\_header} or \CodeIn{http\_coxnnection} could be
+used as modifier to locate the string ``keep-alive'' stored in the
+field \CodeIn{Connection} (see Figure~\Fix{xxx}). Consequently, for
+this case, the contribution of modifiers to this content option would
+be $0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
+used in a rule, the aggregated contribution of this heuristic function
+would be 0.35 (=(0.2+0.5)/2).
 
 %% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
 
@@ -1376,14 +1385,6 @@ function would be \Fix{...}\Mar{Lucas, confirme que nao esta faltando
 %% modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
 %%   que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
 %%   contents e o exemplo acima tem apenas 1 content.}  
-
-
-
-
-
-
-
-
 
 %% Content options are
 %% associated with specific packets fields\Mar{or modifiers?}.\Mar{why
