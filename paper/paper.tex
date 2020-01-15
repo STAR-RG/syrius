@@ -1242,7 +1242,7 @@ much less likely than content options that use the modifier
 shows the histogram of content modifiers for http. Although content
 modifiers are applicable to rules of any protocol in Suricata,
 currently, \tname\ only supports tcp and http. These are the protocols
-involving ~80\% of the attacks.
+involving ~80\% of the attacks. \Luc{80\% das regras do nosso dataset.}
 
 %% and
 %% (2) the payload of messages of different protocols are not as
@@ -1324,16 +1324,16 @@ $i$.
 Consider a rule containing the option \CodeIn{content:
   ``/HtmlAdaptor''}. The contribution of this option to the score of
 the corresponding rule would be $0.5$
-(=$\frac{10,111}{10,111*1}$). The value of $M_i$ for this case is 1 as
+(=$\frac{10,111+11}{10,111*2}$). The value of $M_i$ for this case is 2 as
 the field of the HTTP message \CodeIn{Request URI}---holding the
-string ``/HtmlAdaptor''---can be accessed through the modifier
-\CodeIn{http\_uri}. Conceptually, the relatively high heuristic value
+string ``/HtmlAdaptor''---can be accessed through the modifiers
+\CodeIn{http\_uri} and \CodeIn{http\_request\_line} \Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}. Conceptually, the relatively high heuristic value
 given to this option indicates that this is a reasonable option
 because the string used in the content option (``/HtmlAdaptor'') is
 stored in a specific field of the HTTP message (\CodeIn{Request URI})
 and can be accessible through content modifiers
-(\CodeIn{http\_uri}). For the option \CodeIn{content: ``keep-alive''},
-either \CodeIn{http\_header} or \CodeIn{http\_coxnnection} could be
+(\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the option \CodeIn{content: ``keep-alive''},
+either \CodeIn{http\_header} or \CodeIn{http\_connection} could be
 used as modifier to locate the string ``keep-alive'' stored in the
 field \CodeIn{Connection} (see Figure~\Fix{xxx}). Consequently, for
 this case, the contribution of modifiers to this content option would
