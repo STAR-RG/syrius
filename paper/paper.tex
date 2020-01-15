@@ -1255,13 +1255,17 @@ the frequency of content modifiers to calibrate the contribution of
 each rule. More precisely, we compute this function with the following
 formula:
 
-\[\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
+\[\frac{\sum_{i=1}^{N}\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}}{N}\]
 
 \noindent
 , where $N$ is the number of contents in a given rule and $M_i$ is the
 number of content modifiers that could access the string associated
 with content $i$. \Mar{Qual o rationale para considerar as varias
-  alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}%% Isto
+  alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
+  \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no dataset.}
+  \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
+
+                                                                             %% Isto
                                                                              %% nao
                                                                              %% intuitivo
                                                                              %% para
@@ -1291,20 +1295,21 @@ with content $i$. \Mar{Qual o rationale para considerar as varias
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
           %          ylabel={\#rules},
-          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection},
+          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection, http\_request\_line},
           xtick=data,
           xticklabel style={rotate=45},          
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},        
           nodes near coords align={vertical},
         ]
-        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29)};
+        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29) (http\_request\_line,11)};
       \end{axis}
     \end{tikzpicture}
   }
   \vspace{-2ex}
   \caption{\label{fig:distribution-content_modifiers}Content modifiers
     frequency.\Mar{what about ``none'' (no modifier)?}}
+  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n vem ao caso aqui. Nessa heuristica toda string do payload vai ter associada a ela os modificadores q podem acessar a sua posição. Portanto, não vai existir o caso de não haver modificador. Atenção: isso não quer dizer q as regras q geramos incluem os modificadores, elas n incluem.}
 \end{figure}
 
 Consider a rule containing the option \CodeIn{content:
@@ -1319,12 +1324,12 @@ the modifier \CodeIn{http\_uri}. For the option \CodeIn{content:
 \CodeIn{<mod>} to locate the string ``keep-alive'' stored in the field
 \CodeIn{Connection} in the header of an HTTP request
 message\Mar{Lucas, a imagem mostrando header com campos Request URI e
-  Connection e os conteudos citados acima pode ajudar.}. Consequently,
+  Connection e os conteudos citados acima pode ajudar.}\Luc{adicionar}. Consequently,
 for this case, the constribution of content modifiers would be
 $0.2=\frac{4089+29}{10111*2}$. Assuming that both options are
 mentioned in a rule, the aggregated contribution of this heuristic
 function would be \Fix{...}\Mar{Lucas, confirme que nao esta faltando
-  calcular a media (dividir tudo por N).}
+  calcular a media (dividir tudo por N).} \Luc{Sim, tem q dividir. A implementação estava errada, está de acordo com a formula agora}
 
 
 %% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
