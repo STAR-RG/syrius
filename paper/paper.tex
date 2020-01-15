@@ -1226,23 +1226,23 @@ present in the header of an HTTP request message. Content
   http\_header} states the requirement that the string ``keep-alive''
 be present in the header of the message. (A keep-alive connection
 attribute indicates that a single TCP connection should remain open
-for multiple HTTP requests/responses.)  Figure~\Fix{adicione pequena
-  figura...verifique se ainda faz sentido depois do que falei
-  acima...}
+for multiple HTTP requests/responses.)
+Figure \Fix{xxx}
 
 %% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
 %% content options often use modifiers\Mar{assumindo que eh
 %%   verdade. confirmar estat. solicitada acima...},
 
-\tname\ uses the frequency of content modifiers to discriminate more
-or less likely rules. For example, historical data indicates that
-content options that use the \CodeIn{http\_connection} modifier are
-much less likely than content options that use the modifier
+\tname\ uses the frequency of content modifiers to discriminate rules
+more or less likely to reflect actual rules. For example, historical
+data indicates that content options that use the
+\CodeIn{http\_connection} modifier are much less likely than content
+options that use the modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
 shows the histogram of content modifiers for http. Although content
-modifiers are applicable to rules of any protocol in Suricata,
-currently, \tname\ only supports tcp and http. These are the protocols
-involving ~80\% of the attacks. \Luc{80\% das regras do nosso dataset.}
+modifiers are applicable to rules of any protocol supported by
+Suricata, currently, \tname\ only supports tcp and http. These are the
+protocols involving ~80\% of the rules from our dataset.
 
 %% and
 %% (2) the payload of messages of different protocols are not as
@@ -1319,25 +1319,27 @@ $i$.
     %% associada a ela os modificadores q podem acessar a sua
     %% posição. Portanto, não vai existir o caso de não haver
     %% modificador. Atenção: isso não quer dizer q as regras q geramos
-    %% incluem os modificadores, elas n incluem.
+%% incluem os modificadores, elas n incluem.
+%\Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}
     
 Consider a rule containing the option \CodeIn{content:
   ``/HtmlAdaptor''}. The contribution of this option to the score of
-the corresponding rule would be $0.5$
-(=$\frac{10,111+11}{10,111*2}$). The value of $M_i$ for this case is 2 as
-the field of the HTTP message \CodeIn{Request URI}---holding the
+the rule that uses it would be $0.5$
+(=$\frac{10,111+11}{10,111*2}$). The value of $M_i$ for this case is 2
+as the field of the HTTP message \CodeIn{Request URI}---holding the
 string ``/HtmlAdaptor''---can be accessed through the modifiers
-\CodeIn{http\_uri} and \CodeIn{http\_request\_line} \Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}. Conceptually, the relatively high heuristic value
-given to this option indicates that this is a reasonable option
-because the string used in the content option (``/HtmlAdaptor'') is
-stored in a specific field of the HTTP message (\CodeIn{Request URI})
-and can be accessible through content modifiers
-(\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the option \CodeIn{content: ``keep-alive''},
-either \CodeIn{http\_header} or \CodeIn{http\_connection} could be
-used as modifier to locate the string ``keep-alive'' stored in the
-field \CodeIn{Connection} (see Figure~\Fix{xxx}). Consequently, for
-this case, the contribution of modifiers to this content option would
-be $0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
+\CodeIn{http\_uri} and \CodeIn{http\_request\_line}. The relatively
+high heuristic value given to this option suggests it is a plausible
+option to be used in rules---the string used in the content option
+(``/HtmlAdaptor'') is stored in a specific field of the HTTP message
+(\CodeIn{Request URI}) and can be accessed by two content modifiers,
+namely (\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the
+option \CodeIn{content: ``keep-alive''}, either the modifier
+\CodeIn{http\_header} or the modifier \CodeIn{http\_connection} could
+be used to locate the string ``keep-alive'' stored in the field
+\CodeIn{Connection} (see Figure~\Fix{xxx}). Consequently, for this
+case, the contribution of modifiers to this content option would be
+$0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
 used in a rule, the aggregated contribution of this heuristic function
 would be 0.35 (=(0.2+0.5)/2).
 
