@@ -713,7 +713,7 @@ positive malicious traffic and extracts the following rule options:
 
 \begin{figure}[h]
   \vspace{-2ex}
-  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype}]{pingscan.suricata.synth}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{pingscan.suricata.synth}
   \vspace{-3ex}  
 \end{figure}
 
@@ -722,11 +722,21 @@ Again, note that rule \CodeIn{icode} was not present in the original
 rule.  \tname{} produces the following five rules at the top of the
 ranking after minimization and ranking.
 
+\begin{figure}[h]
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{top-pingscan.rules}
+  \vspace{-3ex}  
+\end{figure}
+
+\Luc{Apenas 3 regras tiveram f1 de 100\%. O total de regras nesse caso foi de 13.}
 \Fix{...listem 5 primeiras regras neste caso...}
 
 
-\subsection{\Fix{JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit}}
-\label{sec:content-example}
+\subsection{Remote Code Execution}
+\label{sec:rce}
+
+\Luc{"RCE refers to the process by which an agent can exploit a network vulnerability to run arbitrary code on a targeted machine or system. In an RCE attack, hackers intentionally exploit a remote code execution vulnerability to run malware. By prompting the targeted device to perform code execution, a hacker can run their own programming in its place. This programming can then enable them to gain full access, steal data, carry out a full distributed denial of service (DDoS) attack, destroy files and infrastructure, or engage in illegal activity. And as the term remote execution suggests, an RCE cyberattack can take place from any geophysical location."\\ Texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution \\
+---------------- estou aqui}
 
 \Mar{Note que a gente organizou estas secoes por tipo de ataque. Este
   titulo eh muito especifico.}
@@ -763,6 +773,7 @@ A opção flow:established,to\_server; define que o match só será feito em pac
 %% \end{table}
 
 \section{Technique}
+\label{sec:technique}
 
 \tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
@@ -856,7 +867,18 @@ existing rules, that \CodeIn{content} options typically refer to
 sequence of characters in the payload of messages separated by these
 delimiters. This tokenization step can generate dozens of options.
 \tname{} produced a total of \Fix{xx} content options for the example
-Section~\ref{sec:content-example}. 
+Section~\ref{sec:content-example}.
+
+
+\Mar{Revisar.........................}
+\Fix{
+A avaliação que fazemos aqui pontua um dado content de acordo com
+quantas vezes o campo em que ele se encontra eh referenciado nas
+regras. Por exemplo, vamos supor que o tokenizer produziu a opção
+content: "/HtmlAdaptor". Essa string pertence ao campo "Request
+URI:". Esse campo pode ser acessado pelo modificador http\_uri. O
+tokenizer associa o content a esse modificador.
+}
 
 
 \subsection{Step 2: Rule Minimization}
@@ -1005,7 +1027,7 @@ options from a rule.
 %\Fix{...}
 
 \vspace{2ex}
-\noindent\textbf{Limitation.} It is worth noting that although
+\noindent\textbf{Limitations.} It is worth noting that although
 \tname{} is accurate for generating rules that discrimate positive and
 negative traffic, the quality of these rules is limited by the quality
 of the training data it uses. For the positive traffic, \tname{} only
@@ -1109,7 +1131,7 @@ range.
 common. \Luc{Se for preciso temos numeros para fundamentar isso
   melhor, sao cerca de 70K contents nas 28K regras do
   dataset}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
-  (\%) das 28K regras tem contents.} As consequence, we defined a
+  (\%) das 28K regras tem contents.} \Luc{sao 69417 contents nas 26094 regras q utilizam contents} As consequence, we defined a
 heuristic function that takes the number of content options into
 account. We calculate the contribution of number of content options
 with the following formula:
@@ -1172,7 +1194,7 @@ strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
 (=(1+.203)/2).
 
-\begin{figure}[H]
+\begin{figure}[t!]
   \centering
   \scalebox{1.2}{  
     \begin{tikzpicture}
@@ -1199,17 +1221,89 @@ rule for the computation of similarity score would be 0.601
     used as parameters of content options.}
 \end{figure}
 
-\subsubsection{Frequency of content modifiers.}
+\subsubsection{Frequency of content modifiers.} As previously
+mentioned, \percRulesWithContent\ of Suricata rules involve content
+options. Furthermore, we observed---by analyzing the dataset of
+existing rules (see Section~\ref{sec:dataset-benign})---that often
+these rules indicate what part of the message the content string
+should be checked against.\Mar{Lucas, vc. tem dados para dar suporte a
+  isto? ou seja, quantas options do tipo ``content'' possuem
+  modificadores.} \Luc{das 26k regras que utilizam content, 13k delas utilizam modificadores http q sao os q nós consideramos.} For example, the
+creator of the rule may want to indicate that a specific string be
+present in the header of an HTTP request message. Content
+\emph{modifiers} serve this purpose. For example, the modifier
+\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
+  http\_header} states the requirement that the string ``keep-alive''
+be present in the header of the message. (A keep-alive connection
+attribute indicates that a single TCP connection should remain open
+for multiple HTTP requests/responses.)
+Figure~\ref{fig:http-header-example}
 
-\Mar{----------------------------- parei aqui}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figs/http_header-example.png}
+\caption{\CodeIn{http\_header} example.}
+\label{fig:http-header-example}
+\end{figure}
 
-Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
-Modificadores diferentes podem acessar campos iguais em um pacote. Por exemplo os modificadores http\_method e http\_header, o http\_method acessa apenas o metodo do pacote http, mas o http\_header acessa todo o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET" receberia a pontuação correspondente a esses dois modificadores.
-\[\frac{\sum_{i=1}^{N}\sum_{j=1}^{M}\frac{modifier\_frequency[modifier_{ij}]}{max(modifier\_frequency)}}{N}\]
+%% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
+%% content options often use modifiers\Mar{assumindo que eh
+%%   verdade. confirmar estat. solicitada acima...},
 
-N é o numero de contents e M é a quantidade de modificadores de um content.
+\tname\ uses the frequency of content modifiers to discriminate rules
+more or less likely to reflect actual rules. For example, historical
+data indicates that content options that use the
+\CodeIn{http\_connection} modifier are much less likely than content
+options that use the modifier
+\CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
+shows the histogram of content modifiers for http. Although content
+modifiers are applicable to rules of any protocol supported by
+Suricata, currently, \tname\ only supports tcp and http. These are the
+protocols involving ~80\% of the rules from our dataset.
 
-\begin{figure}[H]
+%% and
+%% (2) the payload of messages of different protocols are not as
+%% segmented as the case of tcp and http. Consequently, rule writers do
+%% not refer to specific parts of the payload as often as the task o and
+%% more challenging for
+
+Similarly to the the previous heuristic functions, this function uses
+the frequency of content modifiers to calibrate the score of each
+rule. More precisely, we compute this function with the following
+formula:
+
+\[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
+
+\noindent
+, where $N$ is the number of contents options, $g(i)$ is the
+contribution of content option $i$ to the score,
+$\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
+of a modifier $j$ to content option $i$,
+$\mathit{max(modifier\_frequency)}$ refers to the modifier with
+maximum popularity (for normalization), and $M_i$ is the number of
+content modifiers that could access the string associated with content
+$i$.
+
+
+%% \Mar{Qual o rationale para considerar as varias
+%%   alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
+%%   \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no dataset.}
+%%   \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores que conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
+                                                                             
+%% \Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
+%%   o mesmo content pode ter mais de um modificador? ou a string poderia
+%%   ser acessada por mais de um modificador. se for este o caso,
+%%   sinceramente, achei isto bem confuso. afinal, a regra jah indica
+%%   qual o modificador foi escolhido para acessar a string.}.\Luc{Cada content em uma regra só pode possuir um modificador para indicar a posição onde ele deve ser procurado. Entretanto sim, uma "string poderia
+%%   ser acessada por mais de um modificador", foi o caso daquele exemplo com o http\_header.} \Luc{M eh
+%%   o numero de modificadores associados a cada content. Temos
+%%   content[1], content[2], ..., content[N]. Cada um desses contents tem
+%%   modificadores associados content[i][1], content[i][2], ...,
+%%   content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
+%%   content. a frequencia seria 0, correto?} \Luc{Sim}
+
+
+\begin{figure}[t!]
   \centering
   \scalebox{1.2}{
     \begin{tikzpicture}
@@ -1219,20 +1313,114 @@ N é o numero de contents e M é a quantidade de modificadores de um content.
           legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
           %          ylabel={\#rules},
-          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection},
+          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection, http\_request\_line},
           xtick=data,
           xticklabel style={rotate=45},          
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},        
           nodes near coords align={vertical},
         ]
-        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29)};
+        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29) (http\_request\_line,11)};
       \end{axis}
     \end{tikzpicture}
   }
   \vspace{-2ex}
-  \caption{\label{fig:distribution-content_modifiers} Content modifiers frequency.}
+  \caption{\label{fig:distribution-content_modifiers}Content modifiers
+    frequency.}
 \end{figure}
+
+
+%\Mar{what about ``none'' (no modifier)?}}
+%  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n
+    %% vem ao caso aqui. Nessa heuristica toda string do payload vai ter
+    %% associada a ela os modificadores q podem acessar a sua
+    %% posição. Portanto, não vai existir o caso de não haver
+    %% modificador. Atenção: isso não quer dizer q as regras q geramos
+%% incluem os modificadores, elas n incluem.
+%\Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}
+    
+Consider a rule containing the option \CodeIn{content:
+  ``/HtmlAdaptor''}. The contribution of this option to the score of
+the rule that uses it would be $0.5$
+(=$\frac{10,111+11}{10,111*2}$). The value of $M_i$ for this case is 2
+as the field of the HTTP message \CodeIn{Request URI}---holding the
+string ``/HtmlAdaptor''---can be accessed through the modifiers
+\CodeIn{http\_uri} and \CodeIn{http\_request\_line}. The relatively
+high heuristic value given to this option suggests it is a plausible
+option to be used in rules---the string used in the content option
+(``/HtmlAdaptor'') is stored in a specific field of the HTTP message
+(\CodeIn{Request URI}) and can be accessed by two content modifiers,
+namely (\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the
+option \CodeIn{content: ``keep-alive''}, either the modifier
+\CodeIn{http\_header} or the modifier \CodeIn{http\_connection} could
+be used to locate the string ``keep-alive'' stored in the field
+\CodeIn{Connection} (see Figurgure~\ref{fig:http-header-example}). Consequently, for this
+case, the contribution of modifiers to this content option would be
+$0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
+used in a rule, the aggregated contribution of this heuristic function
+would be 0.35 (=(0.2+0.5)/2).
+
+%% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
+
+%% Exemplo do payload "cru" de um pacote http:\\
+%% Aqui, todas as informações do pacote estão juntas.
+
+%% \begin{figure}[h!]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example.payload}
+%% \end{figure}
+
+%% O mesmo payload interpretado pelo Wireshark:\\
+%% Aqui, o wireshark interpreta as informações dos pacotes e as divide para melhor visualização e entendimento.
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example-wireshark.payload}
+%% \end{figure}
+
+%% O que o suricata faz eh identificar os campos e seus valores e com isso permite que as regras façam referencia direta a eles. Por exemplo, na figura do payload "cru" não conseguimos identificar facilmente oq eh o "Request URI Path:", já na segunda figura isso está explícito.
+
+%% Eu disse que o "GET" estava associado tambem ao http\_header, mas não está, me enganei. Mas sim, pode haver interseção entre os campos que dois ou mais modificadores referenciam. O seguinte trecho do payload é acessado pelo modificador http\_header:
+
+%% \begin{figure}[H]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-header.payload}
+%% \end{figure}
+
+%% Entretando, tambem existem os modificadores http\_host,
+%% http\_accept\_enc, http\_connection e http\_accept que permitem
+%% acessar diretamente cada uma das linhas acima.
+
+%% \Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
+%% que vai mante-la) e mostre como eh feito o calculo da regra desta
+%% funcao heuristica para regra inteira.}\\
+%% \Luc{-------------}
+
+
+
+%% A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. 
+%% Posteriormente, esse content vai receber uma pontuação
+%% correspondente a popularidade desse modificador:\\
+
+
+%% A multiplicação por 1 no denominador eh referente a quantidade de
+%% modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
+%%   que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
+%%   contents e o exemplo acima tem apenas 1 content.}  
+
+%% Content options are
+%% associated with specific packets fields\Mar{or modifiers?}.\Mar{why
+%%   GET is associated with http\_method and http\_header?}\Mar{are all
+%%   content associated with one or many fields or positions in a packet?
+%%   can you give examples other than GET to explain this? if yes,
+%%   shouldn't this be discussed before? Maybe Section 2.3?}\Mar{Also, it
+%%   is important to justify (to explain rationale)---how is it different
+%%   from counting rarity?}
+
+
+%% Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
+%% Modificadores diferentes podem acessar campos iguais em um pacote. Por
+%% exemplo os modificadores http\_method e http\_header, o http\_method
+%% acessa apenas o metodo do pacote http, mas o http\_header acessa todo
+%% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
+%% receberia a pontuação correspondente a esses dois modificadores.
 
 
 \section{Evaluation}
@@ -1240,13 +1428,45 @@ N é o numero de contents e M é a quantidade de modificadores de um content.
 This section evaluates the precision and efficiency of \tname{}.
 
 \subsection{Objects of Analysis}
+\label{sec:dataset-benign}
 
-Table~\ref{table:attacks} shows the attacks we analyzed and the
-options of the rule from the Emerging Threats Open
-Ruleset~\cite{emerging-threats-open} that captures the attack. Column
-``Name'' shows the name of the attack, column ``Protocol'' shows the
-protocol name, and column ``Ground Truth'' shows the options of the
-rule that captures the attack.
+Table~\ref{table:attacks} shows the attacks we considered in our
+evaluation. These attacks cover different protocols and features of
+\tname{}. Column ``Name'' shows the name of the attack, column
+``Protocol'' shows the protocol name, and column ``Ground Truth''
+shows the options of the rule that captures the attack.
+
+\vspace{1ex}
+\noindent
+\textbf{Malicious traffic.}~Nikto?\Fix{where do these
+  attacks/messages come from?}
+  \Luc{Nós executamos um servidor http (Apache2) numa maquina e executamos o Nikto em outra maquina atacando o servidor http. Capturamos o trafego q chegava ao servidor e eh ele q estamos utilizando.}
+
+\vspace{1ex}
+\noindent
+\textbf{Benign traffic.}~\tname{} uses public databases storing benign
+traffic for all protocols covered by Suricata (see
+Figure~\ref{fig:distribution-rules-protocol}). We used two datasets of
+positive traffic. The Bigflows.pcap dataset is part of the
+TcpReplay~\cite{tcpreplay} open source project. This dataset includes
+real network traffic on a busy private network access point to the
+Internet. According to the TcpReplay web site ``This capture is much
+larger and has a smaller average packet size than the previous capture
+(smallFlows.pcap). It also has many more flows and different
+applications.''. In addition to the Bigflows.pcap dataset, we also
+used datasets of normal traffic made available by Stratosphere
+Lab~\cite{stratosphere-normal}.
+
+\vspace{1ex}
+\noindent
+\textbf{Ground Truth.}~The rules that detect those attacks were
+obtained from the Emerging Threats Open
+Ruleset~\cite{emerging-threats-open}.
+
+%% Note from Figure~\ref{fig:overview} that the positive traffic is an
+%% input to the technique. The negative non-malicious traffic, however,
+%% is not.
+
 
 \begin{table*}[h]
   \caption{\label{table:attacks}List of attacks.\Mar{Guilherme, por
@@ -1269,43 +1489,29 @@ rule that captures the attack.
   \end{tabular}
 \end{table*}
 
-\subsection{Dataset of Benign Traffic}
-\label{sec:dataset-benign}
 
-Note from Figure~\ref{fig:overview} that the positive traffic is an
-input to the technique. The negative non-malicious traffic, however,
-is not. \tname{} uses public databases storing different kinds of
-positive traffic for all protocols covered by Suricata. We used two
-datasets of positive traffic. The Bigflows.pcap dataset is part of the
-TcpReplay~\cite{tcpreplay} open source project. This dataset includes
-real network traffic on a busy private network access point to the
-Internet. According to the TcpReplay web site ``This capture is much
-larger and has a smaller average packet size than the previous capture
-(smallFlows.pcap). It also has many more flows and different
-applications.''. In addition to the Bigflows.pcap dataset, we also
-used datasets of normal traffic made available by Stratosphere
-Lab~\cite{stratosphere-normal}.
 
 \subsection{Methodology}
 
-\tname{} expects (a) message(s) reproducing an attack on input. As
-previously discussed, those messages could be directly provided by an
-anomaly-based \nids\ tool. To evaluate \tname{}, however, we created
-those messages ourselves. For all attacks listed on
-Table~\ref{table:attacks}, we found reproduction scripts available on
-the web. With the script to reproduce the attack, we proceeded as
-follows: 1)~we instantiated the script on a given target machine,
-2)~we executed the script, 3)~we monitored the traffic with the
-wireshark network monitor~\cite{wireshark-net-monitor}, and 4) we
-simulated the delivery of the corresponding network messages by
-directly executing Suricata on the ``pcap'' files that wireshark
-produced in the previous step. It is worth noting that Suricata is
-invoked multiple times in the process of minimizing the rule (see
-Section~\ref{sec:minimization}) and that processing pcap files is much
-more efficient compared to sending and processing network messages. To
-illustrate, the SYN Flood attack was reproduced with the hping3
-tool~\cite{hping3} using the following command \CodeIn{hping3 -d 80 -w
-  64 -S -p 80 --flood --rand-source <IP>}.
+\subsubsection{Attack reproduction.} \tname{} requires the attack to
+be replayed in order to check whether or not the rule it generates
+captures the attack.  See function $\mathit{isPlausible}$, used in the
+minimization algorithm from Section~\ref{sec:minimization}. For all
+attacks listed on Table~\ref{table:attacks}, we found scripts
+available on the web to replay the attacks. For example, the SYN Flood
+attack can be replayed with hping3~\cite{hping3}, using the following
+command: \CodeIn{hping3 -d 80 -w 64 -S -p 80 --flood --rand-source
+  <IP>}. With the script to reproduce the attack, we executed the
+following steps to obtain ``pcap'' files, which abstracts network
+messages~\cite{pcap}, to run \tname:~1)~instantiate the script (\eg{},
+define the IP, for the example above), 2)~execute the script,
+3)~monitor the traffic with the wireshark network
+monitor~\cite{wireshark-net-monitor}.
+
+Recall that Suricata is invoked multiple times in the process of
+minimizing the rule (see Section~\ref{sec:minimization}). Suricata
+supports a feature to process ``pcap'' files, enabling very efficient
+performance compared to processing actual network messages.
   
 \Gui{
 O procedimento que já tínhamos representa a etapa de treinamento. Toda aquela parte que foi explicada na apresentação para os outros professores e descrito no paper. Descreverei novamente pra confirmar, e também foi adicionado uma pequena etapa.
