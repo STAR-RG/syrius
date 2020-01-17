@@ -17,7 +17,7 @@ parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
 #ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
-ruleFile_path = "../suricata/pesquisa/attacks/" + str(args.attack) + ".rules"
+ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
 fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
@@ -62,6 +62,7 @@ pkts = pyshark.FileCapture(pcap)
 pkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
+#rule_protocol = "http"
 print(rule_protocol)
 
 #print(rule_protocol)
@@ -460,22 +461,36 @@ def ruleContentsModifiersFitness(rule):
     #print("rule_contents:", list(rule_contents.keys()))
     #print()
     count = 0
-    
+    print(rule_contents)
+    print(len(rule_contents))
+    fit_list = []
+    fit_aux = 0
     for content in rule_contents:
+        count = 0
+        fitness = 0
         for keyword in pkt_content_modifiers:
             if "nocase" in rule_contents[content]:
                 if content.lower() in lower_case_pkt_content_modifiers[keyword]:
-                    count += 1
-                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))    
-            else:
-                if content in pkt_content_modifiers[keyword]:
+                    print(keyword)
+                    print("content: ", content)
                     count += 1
                     fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
-    
+                    print(keywords_freq[keyword]/max(list(aux_key_freq.values())))    
+            else:
+                if content in pkt_content_modifiers[keyword]:
+                    print("content: ", content)
+                    count += 1
+                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
+        
+        if count > 0:
+            fitness = fitness/count
+        print("fitness:", fitness)
+        fit_aux += fitness
+    print(fit_aux)
     if count == 0:
         return 0
     
-    return fitness/count
+    return fit_aux/len(rule_contents)
 
 def writeRuleOnFile(rules):
     global ruleFile_path
@@ -715,6 +730,7 @@ def optimizeRule(rule):
     new_rule = copy.deepcopy(rule)
     #print("len options:", len(rule.options))
     if len(rule.options) > 1:
+        print("aqe")
         new_rule = copy.deepcopy(rule)
         rule_list = [new_rule]
         aux = []
@@ -778,11 +794,14 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
 
-                    print(tmp)
-                
-            print("len aux:", len(aux))
+                    #print(tmp)
+            
+            for a in aux:
+                print(a)
+            print("len aux1:", len(aux))
 
             fitness_list = evalContents(aux)
+            print(fitness_list)
             #print("aqui auqi auiq")
 
             #rule_list.clear()
@@ -791,6 +810,10 @@ def optimizeRule(rule):
                     aux2.append(aux[i])
                     #print("{} : {}".format(aux[i], fitness))
                     all_rule_list.append(aux[i])
+            
+            for a in aux2:
+                print(a)
+                print("len aux2:", len(aux))
 
             if not aux2:
                 #print(rule_list)
@@ -812,7 +835,7 @@ def optimizeRule(rule):
                 if fitness >= 1.0:
                     new_rule.options[keyword] = rule.options[keyword]
             """
-
+    
     if "content" in rule.options:
         new_rule = copy.deepcopy(rule)
         rule_list = [new_rule]
@@ -920,12 +943,20 @@ def optimizeRule(rule):
     golden_content["jsp"] = {'/jsp/snp/':["http_uri"], '.snp':["http_uri"]}
     golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
     golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
-    """golden_rule.options["content"] = golden_content[args.attack]
-    print(golden_rule)
-    print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
+    
+    if rule_protocol == "http":
+        golden_rule.options["content"] = golden_content[args.attack]
+    elif rule_protocol == "icmp":
+        golden_rule.options = {'dsize':0, 'itype':8}
+    
+    print("golden_rule:", golden_rule)
+    #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.append(golden_rule)
     golden_rule_pos = 0
-    """
+
+    for rule in all_rule_list:
+        print(rule)
+
     all_rule_list = sorted(all_rule_list, key=newRuleFitness)
 
     for x, rule in enumerate(all_rule_list):
@@ -950,6 +981,17 @@ def optimizeRule(rule):
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
             writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
+    with open("result_final.csv", "w+", newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
+        for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
+            y=y*25
+            z=100-(z/20)
+            f1=2*(((z*y)/100)/((y/100)+(z/100)))
+            if f1>90.0:
+                total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
+                writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
+
     with open("raw_recall.txt", "w+") as writer:
         for x in recall:
             writer.write("{}\n".format(x*25))
@@ -972,16 +1014,28 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-init_rule = Rule(default_rule_action, "icmp", default_rule_header, default_rule_message, default_rule_sid)
+init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
+"""golden_content = {}
+golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
+init_rule.options["content"] = golden_content["adaptor"]
+print(ruleContentsModifiersFitness(init_rule))
+exit()
+"""
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
     final_rule = evolveRuleFlood(init_rule)
 else:
-    pingscan_options = {'dsize':0, 'itype':8, 'icode': 0, 'icmp_id':23570, 'icmp_seq': 3439}
-    final_rule.options = pingscan_options
+    #pingscan_options = {'dsize':0, 'itype':8, 'icode': 0, 'icmp_id':23570, 'icmp_seq': 3439}
+    #final_rule.options = pingscan_options
     #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
     #final_rule.options["content"] = contents
+    if rule_protocol == "http":
+        final_rule.options["content"] = contents
+    elif rule_protocol == "icmp":
+        pingscan_options = {'dsize':0, 'itype':8, 'icode':0, 'icmp_id':23570, 'icmp_seq':3439}
+        final_rule.options = pingscan_options
+        
     print(final_rule)
     #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
     #quit()

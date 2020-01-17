@@ -713,7 +713,7 @@ positive malicious traffic and extracts the following rule options:
 
 \begin{figure}[h]
   \vspace{-2ex}
-  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype}]{pingscan.suricata.synth}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{pingscan.suricata.synth}
   \vspace{-3ex}  
 \end{figure}
 
@@ -722,12 +722,22 @@ Again, note that rule \CodeIn{icode} was not present in the original
 rule.  \tname{} produces the following five rules at the top of the
 ranking after minimization and ranking.
 
+\begin{figure}[h]
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{top-pingscan.rules}
+  \vspace{-3ex}  
+\end{figure}
+
+\Luc{Apenas 3 regras tiveram f1 de 100\%. O total de regras nesse caso foi de 13.}
 \Fix{...listem 5 primeiras regras neste caso...}
 
 
-\subsection{\Fix{JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit}}
+\subsection{Remote Code Execution}
+\label{sec:rce}
 \label{sec:jboss}
 \label{sec:content-example}
+
+\Luc{"RCE refers to the process by which an agent can exploit a network vulnerability to run arbitrary code on a targeted machine or system. In an RCE attack, hackers intentionally exploit a remote code execution vulnerability to run malware. By prompting the targeted device to perform code execution, a hacker can run their own programming in its place. This programming can then enable them to gain full access, steal data, carry out a full distributed denial of service (DDoS) attack, destroy files and infrastructure, or engage in illegal activity. And as the term remote execution suggests, an RCE cyberattack can take place from any geophysical location."\\ Texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution \\
 
 \Mar{Note que a gente organizou estas secoes por tipo de ataque. Este
   titulo eh muito especifico.}
@@ -1125,7 +1135,7 @@ range.
 common. \Luc{Se for preciso temos numeros para fundamentar isso
   melhor, sao cerca de 70K contents nas 28K regras do
   dataset}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
-  (\%) das 28K regras tem contents.} As consequence, we defined a
+  (\%) das 28K regras tem contents.} \Luc{sao 69417 contents nas 26094 regras q utilizam contents} As consequence, we defined a
 heuristic function that takes the number of content options into
 account. We calculate the contribution of number of content options
 with the following formula:
@@ -1222,7 +1232,7 @@ existing rules (see Section~\ref{sec:dataset-benign})---that often
 these rules indicate what part of the message the content string
 should be checked against.\Mar{Lucas, vc. tem dados para dar suporte a
   isto? ou seja, quantas options do tipo ``content'' possuem
-  modificadores.} \Luc{conseguirei esses dados} For example, the
+  modificadores.} \Luc{das 26k regras que utilizam content, 13k delas utilizam modificadores http q sao os q nós consideramos.} For example, the
 creator of the rule may want to indicate that a specific string be
 present in the header of an HTTP request message. Content
 \emph{modifiers} serve this purpose. For example, the modifier
@@ -1231,7 +1241,14 @@ present in the header of an HTTP request message. Content
 be present in the header of the message. (A keep-alive connection
 attribute indicates that a single TCP connection should remain open
 for multiple HTTP requests/responses.)
-Figure \Fix{xxx}
+Figure~\ref{fig:http-header-example}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figs/http_header-example.png}
+\caption{\CodeIn{http\_header} example.}
+\label{fig:http-header-example}
+\end{figure}
 
 %% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
 %% content options often use modifiers\Mar{assumindo que eh
@@ -1341,7 +1358,7 @@ namely (\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the
 option \CodeIn{content: ``keep-alive''}, either the modifier
 \CodeIn{http\_header} or the modifier \CodeIn{http\_connection} could
 be used to locate the string ``keep-alive'' stored in the field
-\CodeIn{Connection} (see Figure~\Fix{xxx}). Consequently, for this
+\CodeIn{Connection} (see Figurgure~\ref{fig:http-header-example}). Consequently, for this
 case, the contribution of modifiers to this content option would be
 $0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
 used in a rule, the aggregated contribution of this heuristic function
@@ -1425,8 +1442,9 @@ shows the options of the rule that captures the attack.
 
 \vspace{1ex}
 \noindent
-\textbf{Malicious traffic.}~Nikito?\Fix{where do these
+\textbf{Malicious traffic.}~Nikto?\Fix{where do these
   attacks/messages come from?}
+  \Luc{Nós executamos um servidor http (Apache2) numa maquina e executamos o Nikto em outra maquina atacando o servidor http. Capturamos o trafego q chegava ao servidor e eh ele q estamos utilizando.}
 
 \vspace{1ex}
 \noindent
