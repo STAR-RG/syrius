@@ -1226,39 +1226,52 @@ rule for the computation of similarity score would be 0.601
 \end{figure}
 
 \subsubsection{Frequency of content modifiers.} As previously
-mentioned, \percRulesWithContent\ of Suricata rules involve content
-options. Furthermore, we observed---by analyzing the dataset of
-existing rules (see Section~\ref{sec:dataset-benign})---that often
-these rules indicate what part of the message the content string
-should be checked against.\Mar{Lucas, vc. tem dados para dar suporte a
-  isto? ou seja, quantas options do tipo ``content'' possuem
-  modificadores.} \Luc{das 26k regras que utilizam content, 13k delas utilizam modificadores http q sao os q nós consideramos.} For example, the
-creator of the rule may want to indicate that a specific string be
-present in the header of an HTTP request message. Content
-\emph{modifiers} serve this purpose. For example, the modifier
+mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
+rules involve content options. Furthermore, of the 26K rules that use
+content options, 13K use HTTP modifiers\Mar{@Lucas, pode dar o numero
+  desconsiderando HTTP? Esta parte eh generica.}. Content modifiers
+serve to indicate what part of a network packet the string mentioned
+in the content option should appear. For example, the modifier
 \CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
   http\_header} states the requirement that the string ``keep-alive''
 be present in the header of the message. (A keep-alive connection
 attribute indicates that a single TCP connection should remain open
 for multiple HTTP requests/responses.)
-Figure~\ref{fig:http-header-example}
+Figure~\ref{fig:http-header-example} illustrates possible content
+options used to match against certain strings that appear in an HTTP
+message. A check (resp., cross) mark indicates a match (resp.,
+unmatch).
 
-\begin{figure}[h!]
+\begin{figure}[t!]
 \centering
 \includegraphics[scale=0.5]{figs/http_header-example.png}
 \caption{\CodeIn{http\_header} example.}
 \label{fig:http-header-example}
 \end{figure}
 
+%% we observed---by analyzing
+%% the dataset of existing rules (see
+%% Section~\ref{sec:dataset-benign})---that these rules often indicate
+%% what part of the message the content string should be checked
+%% against. For example,
+%% For example, the
+%% creator of the rule may want to indicate that a specific string be
+%% present in the header of an HTTP request message. Content
+%% \emph{modifiers} serve this purpose.
 %% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
 %% content options often use modifiers\Mar{assumindo que eh
 %%   verdade. confirmar estat. solicitada acima...},
 
-\tname\ uses the frequency of content modifiers to discriminate rules
-more or less likely to reflect actual rules. For example, historical
-data indicates that content options that use the
-\CodeIn{http\_connection} modifier are much less likely than content
-options that use the modifier
+\tname{} leverages the fact that these modifiers are commonly used to
+define rules as to better rank the rules it synthesizes. More
+precisely, it builds on the observation that strings acessible in
+positions associated with content modifiers (\eg{}, GET, Host,
+Connection) are more likely to produce useful rules. \tname\ uses the
+frequency of content modifiers to discriminate rules that are more or
+less likely to reflect actual rules. For example, historical data
+indicates that content options that use the \CodeIn{http\_connection}
+modifier are much less likely than content options that use the
+modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
 shows the histogram of content modifiers for http. Although content
 modifiers are applicable to rules of any protocol supported by
