@@ -55,7 +55,10 @@ default_rule_message = "msg:\"Testing rule\";"
 rule_options = {}
 default_rule_sid = 1
 
-pcap = "Datasets/nikto-" + str(args.attack) + ".pcap"
+if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron"]:
+    pcap = "Datasets/nikto-" + str(args.attack) + ".pcap"
+else:
+    pcap = "Datasets/" + str(args.attack) + ".pcap"
 if args.attack == "pingscan":
     pcap = "Datasets/ping_scan.pcap"
 pkts = pyshark.FileCapture(pcap)
@@ -1024,12 +1027,19 @@ exit()
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
-    final_rule = evolveRuleFlood(init_rule)
+    synflood_options = {'seq':0, 'window':64, 'flags':'S'}
+    final_rule.options = synflood_options
+    final_rule.threshold = {'type':'both', 'track':'by_dst', 'count':len(pkts._packets), 'seconds': 2}
+    print(final_rule)
+
+    final_rule = optimizeRule(final_rule)
+    #final_rule = evolveRuleFlood(init_rule)
 else:
     #pingscan_options = {'dsize':0, 'itype':8, 'icode': 0, 'icmp_id':23570, 'icmp_seq': 3439}
     #final_rule.options = pingscan_options
     #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
     #final_rule.options["content"] = contents
+    
     if rule_protocol == "http":
         final_rule.options["content"] = contents
     elif rule_protocol == "icmp":
