@@ -513,7 +513,7 @@ legitimate requests cannot be satisfied due to resource exhaustion.
 
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
-  \caption{Suricata rule for SYN Flood Attacks.}
+  \caption{Suricata rule for SYN Flood attack.}
   \label{fig:synflood-example}
 \end{figure}
 
@@ -687,7 +687,7 @@ can choose one of them to attack.
 \begin{figure}[h!]
   \vspace{1ex}
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
-  \caption{Suricata rule for Ping Scan.}
+  \caption{Suricata rule for Ping Scan attack.}
   \label{fig:pingscan-example}
   \vspace{1ex}  
 \end{figure}
@@ -732,29 +732,71 @@ ranking after minimization and ranking.
 \Fix{...listem 5 primeiras regras neste caso...}
 
 
-\subsection{Remote Code Execution}
+\subsection{Remote Code Execution (RCE)}
 \label{sec:rce}
 \label{sec:jboss}
 \label{sec:content-example}
 
-\Luc{"RCE refers to the process by which an agent can exploit a network vulnerability to run arbitrary code on a targeted machine or system. In an RCE attack, hackers intentionally exploit a remote code execution vulnerability to run malware. By prompting the targeted device to perform code execution, a hacker can run their own programming in its place. This programming can then enable them to gain full access, steal data, carry out a full distributed denial of service (DDoS) attack, destroy files and infrastructure, or engage in illegal activity. And as the term remote execution suggests, an RCE cyberattack can take place from any geophysical location."\\ Texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution} \\
+%% Adaptacao do texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution
 
-\Mar{Note que a gente organizou estas secoes por tipo de ataque. Este
-  titulo eh muito especifico.}
-\Luc{JBoss é um servidor de aplicação Java muito popular, de codigo aberto. Esse ataque tem como alvo esses servidores e permite que seja feita execução remota de comandos. Os pacotes que estamos utilizando para testar esse ataque foram gerados pelo Nikto, mas o Metasploit tambem possui um modulo para ele. A regra de ouro para esse ataque é:
+RCE refers to the family of attacks where hackers exploit a network
+vulnerability to run arbitrary code---that could damage the system or
+steal sensitive information---on a remote machine. JBoss~\cite{jboss}
+is popular open source Java application server. This attacks enables
+remote execution of code on the JBoss application server.
+\Mar{@Lucas, por favor, observe o padrao usado nos exemplos
+  anteriores. eh preciso explicar em alto nivel o ataque antes de
+  explicar a regra!}
+
+%% In an RCE attack, hackers
+%% intentionally exploit a vulnerability in the system to run malware
+%% By prompting the targeted device to perform code execution, a hacker
+%% can run arbritrary code to
+%% their own programming in its
+%% place. This programming can then enable them to gain full access,
+%% steal data, carry out a full distributed denial of service (DDoS)
+%% attack, destroy files and infrastructure, or engage in illegal
+%% activity. And as the term remote execution suggests, an RCE
+%% cyberattack can take place from any geophysical location."\\
+
 
 \begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={content}]{adaptor-golden-rule.suricata}
-  \label{fig:rule-example}
+  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
+  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code Execution.}
 \end{figure}
 
-A opção flow:established,to\_server; define que o match só será feito em pacotes que fazem parte de uma conexão já estabelecida entre um cliente e um servidor. Além disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente. Nos contents os modificadores nocase e http\_uri indicam que a detecção da string não será case sensitive e que essa string deverá se encontrar no campo de request uri.}
+%A opção  define que o match só será feito em pacotes que fazem parte
+%de uma conexão já estabelecida entre um cliente e um servidor. Além
+%disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente.
 
-\Luc{... sobre comportamento do syrius ...}
+Figure~\ref{fig:rule-jboss} shows a Suricata rule that captures a
+JBoss RCE attack.  The option \CodeIn{flow: established, to\_server;}
+indicates that a rule match will only occur on packets that (1) flow
+on an already-established connection and that (2) flow to the server
+as opposed to the client. For the content options the modifiers
+\CodeIn{nocase} and \CodeIn{http\_uri} indicate, respectively, that
+the matching not be case sensitive and that the string should be
+located at the packet field ``Request URI''. \Mar{Lucas, ``nocase''
+  tambem eh considerado modificador? Isto nao eh confuso? Na secao
+  4.3.4 consideramos modificadores como sinonimo para qualificador de
+  campo, nao?}
 
-\Fix{...please elaborate. We need on example that shows that the
-  search can be non-trivial. In the examples above, we had to discard
-  only one rule option!}
+\tname{} reproduces the malicious JBoss attack using the traffic from
+a Nikto script~\cite{nikto}. However, similar JBoss attack is also
+available from the Metasploit database~\cite{metasploit}. As in the
+other examples, \tname{} uses, as additional inputs, benign traffic
+from \Fix{...} and a set of existing Suricata rules from
+\Fix{...}. \tname{} initially produces one seed rule containing
+\Fix{xx} options, by analyzing the malicious traffic alone. Then, it
+uses that seed rule to derive \Fix{yy} rules, each rule containing
+subsets of the option in the initial rule. Finally, it ranks that
+list. The list below shows the top-5 rules that \tname{}
+produces.\Mar{<- check/revise}
+
+\Fix{list rules}
+
+Note that the golden rule is in position \Fix{...} on this
+case. \Mar{explain syntactical difference, if exist}
 
 
 %% \begin{table}[h]
