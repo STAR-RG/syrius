@@ -1429,50 +1429,7 @@ would be 0.35 (=(0.2+0.5)/2).
 
 \section{Evaluation}
 
-This section evaluates the precision and efficiency of \tname{}.
-
-\subsection{Objects of Analysis}
-\label{sec:dataset-benign}
-
-Table~\ref{table:attacks} shows the attacks we considered in our
-evaluation. These attacks cover different protocols and features of
-\tname{}. Column ``Name'' shows the name of the attack, column
-``Protocol'' shows the protocol name, and column ``Ground Truth''
-shows the options of the rule that captures the attack.
-
-\vspace{1ex}
-\noindent
-\textbf{Malicious traffic.}~Nikto?\Fix{where do these
-  attacks/messages come from?}
-  \Luc{Nós executamos um servidor http (Apache2) numa maquina e executamos o Nikto em outra maquina atacando o servidor http. Capturamos o trafego q chegava ao servidor e eh ele q estamos utilizando.}
-
-\vspace{1ex}
-\noindent
-\textbf{Benign traffic.}~\tname{} uses public databases storing benign
-traffic for all protocols covered by Suricata (see
-Figure~\ref{fig:distribution-rules-protocol}). We used two datasets of
-positive traffic. The Bigflows.pcap dataset is part of the
-TcpReplay~\cite{tcpreplay} open source project. This dataset includes
-real network traffic on a busy private network access point to the
-Internet. According to the TcpReplay web site ``This capture is much
-larger and has a smaller average packet size than the previous capture
-(smallFlows.pcap). It also has many more flows and different
-applications.''. In addition to the Bigflows.pcap dataset, we also
-used datasets of normal traffic made available by Stratosphere
-Lab~\cite{stratosphere-normal}.
-
-\vspace{1ex}
-\noindent
-\textbf{Ground Truth.}~The rules that detect those attacks were
-obtained from the Emerging Threats Open
-Ruleset~\cite{emerging-threats-open}.
-
-%% Note from Figure~\ref{fig:overview} that the positive traffic is an
-%% input to the technique. The negative non-malicious traffic, however,
-%% is not.
-
-
-\begin{table*}[h]
+\begin{table*}[h!]
   \caption{\label{table:attacks}List of attacks.\Mar{Guilherme, por
       favor, adicione mais ataques aqui...}}
   \centering
@@ -1494,10 +1451,53 @@ Ruleset~\cite{emerging-threats-open}.
 \end{table*}
 
 
+This section reports on the evaluation of \tname{}.
+
+\subsection{Objects of Analysis}
+\label{sec:dataset-benign}
+
+Table~\ref{table:attacks} shows the attacks we considered in our
+evaluation. These attacks cover different protocols and features of
+\tname{}. Column ``Name'' shows the name of the attack, column
+``Protocol'' shows the protocol name, and column ``Ground Truth''
+shows the options of the rule that captures the attack.
+
+\subsubsection{Malicious traffic.}To reproduce the malicious traffic, we
+configured an HTTP server (Apache2) in one machine and ran
+Nikto2~\cite{nikto} in a different machine. We used this setup to
+replay each of the attacks from Table~\ref{table:attacks}.  On each
+execution, we captured the incoming traffic to the web server with
+Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
+files as an input to \tname.\Mar{@Lucas, eu traduzi o que vc. falou
+  para ingles. Mas, aparentemente, isto esta **inconsistente** com o
+  que eh dito na Secao~\ref{attack-reproduction}. Por favor, esclareca!}
+
+\subsubsection{Benign traffic.}\tname{} uses public databases storing benign
+traffic for all protocols covered by Suricata (see
+Figure~\ref{fig:distribution-rules-protocol}). We used two datasets of
+benign traffic. The Bigflows.pcap dataset is part of the
+TcpReplay~\cite{tcpreplay} open source project. This dataset includes
+real network traffic of a busy private network access point to the
+Internet. According to the TcpReplay web site ``This capture is much
+larger and has a smaller average packet size than the previous capture
+(smallFlows.pcap). It also has many more flows and different
+applications.''. In addition to the Bigflows.pcap dataset, we also
+used datasets of normal traffic made available by Stratosphere
+Lab~\cite{stratosphere-normal}.
+
+\subsubsection{Ground Truth.}To evaluate precision of \tname\ we
+need rules that are considered correct to use as reference. The rules
+that detect the attacks from Table~\ref{table:attacks} were obtained
+from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
+
+%% Note from Figure~\ref{fig:overview} that the positive traffic is an
+%% input to the technique. The negative non-malicious traffic, however,
+%% is not.
+
 
 \subsection{Methodology}
 
-\subsubsection{Attack reproduction.} \tname{} requires the attack to
+\subsubsection{Attack reproduction.}\label{attack-reproduction} \tname{} requires the attack to
 be replayed in order to check whether or not the rule it generates
 captures the attack.  See function $\mathit{isPlausible}$, used in the
 minimization algorithm from Section~\ref{sec:minimization}. For all
@@ -1559,11 +1559,8 @@ performance compared to processing actual network messages.
 
 %% \Fix{any other detail we should consider?}
 
-\subsection{Precision}
+\subsection{Results}
 
-\Fix{}
-
-\subsection{Efficiency}
 
 \subsection{Threats to Validity}
 
