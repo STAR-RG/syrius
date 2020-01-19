@@ -779,7 +779,7 @@ the matching not be case sensitive and that the string should be
 located at the packet field ``Request URI''. \Mar{Lucas, ``nocase''
   tambem eh considerado modificador? Isto nao eh confuso? Na secao
   4.3.4 consideramos modificadores como sinonimo para qualificador de
-  campo, nao?}
+  campo, nao?}\Luc{Sim, ``nocase'' define que a busca pela string nao deve ser case sensitive. Em 4.3.4 estamos considerando apenas os modificadores que definem posições/campos de pacotes http.}
 
 \tname{} reproduces the malicious JBoss attack using the traffic from
 a Nikto script~\cite{nikto}. However, similar JBoss attack is also
@@ -1271,7 +1271,7 @@ rule for the computation of similarity score would be 0.601
 mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
 rules involve content options. Furthermore, of the 26K rules that use
 content options, 13K use HTTP modifiers\Mar{@Lucas, pode dar o numero
-  desconsiderando HTTP? Esta parte eh generica.}. Content modifiers
+  desconsiderando HTTP? Esta parte eh generica.}. \Luc{Posso, mas nessa função nós consideramos apenas os modificadores http.} Content modifiers
 serve to indicate what part of a network packet the string mentioned
 in the content option should appear. For example, the modifier
 \CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
@@ -1496,11 +1496,15 @@ would be 0.35 (=(0.2+0.5)/2).
     \midrule     
     Ping Scan \MyComment{& single} & ICMP \MyComment{& Discovers
       active hosts in a network} & \scriptsize{dsize:0; itype:8;} \\
-    Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
-    Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
-    Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
+    %%Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
+    %%Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
+    %%Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
     SYN Flood \MyComment{& multiple} & TCP \MyComment{& Denial of Service} & \scriptsize{flags: S,12; threshold: type both, track by\_dst, count 5000, seconds 5;}\\
-    UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
+    %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
+    JBoss JMX Console Beanshell Exploit \MyComment{& single} & HTTP \MyComment{& Remote Code Execution} & \scriptsize{content:"/HtmlAdaptor"; nocase; http\_uri; content:"action=inspect"; nocase; http\_uri; content:"bean"; nocase; http\_uri; content:"name="; http\_uri;} \\
+    WeBid Local File Inclusion \MyComment{& single} & TCP \MyComment{& Local File Inclusion} & \scriptsize{content:"GET "; depth:4; content:"/cron.php?"; http\_uri; nocase; content:"include\_path="; http\_uri; nocase; content:"../";} \\
+    ColdFusion Privilege Escalation \MyComment{& single} & HTTP \MyComment{& Privilege Escalation} & \scriptsize{content:"GET"; http\_method; nocase; content:"/CFIDE/administrator"; http\_uri; nocase;} \\
+    \Luc{Adicionar nome} \MyComment{& single} & HTTP \MyComment{& \Luc{Adicionar}} & \scriptsize{content:".htaccess"; nocase; http\_uri;} \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1526,6 +1530,7 @@ Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
 files as an input to \tname.\Mar{@Lucas, eu traduzi o que vc. falou
   para ingles. Mas, aparentemente, isto esta **inconsistente** com o
   que eh dito na Secao~\ref{attack-reproduction}. Por favor, esclareca!}
+  \Luc{Essa descrição é referente aos ataques HTTP/TCP da tabela. O hping3 gera apenas o trafego do SYN Flood. Ambas as explicações estão corretas. Creio q a descrição da seção 5.2.1 tenha q ser movida para cá pois está explicando como capturamos o trafego malicioso. Nós executamos o Nikto e o hping3 uma unica vez para capturar com o wireshark o trafego q eles geram. O trafego produzido pelo Nikto ja inclui todos os ataques que utilizamos, nós separamos os pacotes de cada um deles manualmente utilizando o wireshark.}
 
 \subsubsection{Benign traffic.}\tname{} uses public databases storing benign
 traffic for all protocols covered by Suricata (see
