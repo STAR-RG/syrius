@@ -576,7 +576,7 @@ malicious traffic. Unfortunately, this rule is potentially
 overspecified. Informally, the rule includes ``too specific''
 characteristics of the malicious traffic and could potentially result
 in false negatives. For example, in this particular case, note that
-the option \CodeIn{windows: 64} is not included in the golden rule
+the option \CodeIn{windows: 512} is not included in the golden rule
 from Figure~\ref{fig:synflood-example}.
 
 Second, \tname{} uses negative (\ie{}, benign) traffic to mitigate the
@@ -624,7 +624,12 @@ function we used to rank the generated rules was
 \Fix{...elaborate...}. The list below shows the rule options for the
 top-5 rules \tname{} produces for this attack.
 
-\Mar{listem 5 primeira regras neste caso}
+\begin{figure}[h]
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold,window,icmp\_id,icmp\_seq}]{synflood-top5-rules.suricata}
+  \vspace{-3ex}  
+\end{figure}
+
 
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step (to create an overspecific seed rule), benign traffic in
