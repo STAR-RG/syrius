@@ -1484,30 +1484,53 @@ would be 0.35 (=(0.2+0.5)/2).
 
 \section{Evaluation}
 
-\begin{table*}[h!]
-  \caption{\label{table:attacks}List of attacks.\Mar{Guilherme, por
-      favor, adicione mais ataques aqui...}}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    \multicolumn{1}{c}{Name} &
-    \multicolumn{1}{c}{Protocol} &
-    \multicolumn{1}{c}{Groud Truth} \\
-    \midrule     
-    Ping Scan \MyComment{& single} & ICMP \MyComment{& Discovers
-      active hosts in a network} & \scriptsize{dsize:0; itype:8;} \\
     %%Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
     %%Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
     %%Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
-    SYN Flood \MyComment{& multiple} & TCP \MyComment{& Denial of Service} & \scriptsize{flags: S,12; threshold: type both, track by\_dst, count 5000, seconds 5;}\\
+    
     %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
-    JBoss JMX Console Beanshell Exploit \MyComment{& single} & HTTP \MyComment{& Remote Code Execution} & \scriptsize{content:"/HtmlAdaptor"; nocase; http\_uri; content:"action=inspect"; nocase; http\_uri; content:"bean"; nocase; http\_uri; content:"name="; http\_uri;} \\
-    WeBid Local File Inclusion \MyComment{& single} & TCP \MyComment{& Local File Inclusion} & \scriptsize{content:"GET "; depth:4; content:"/cron.php?"; http\_uri; nocase; content:"include\_path="; http\_uri; nocase; content:"../";} \\
-    ColdFusion Privilege Escalation \MyComment{& single} & HTTP \MyComment{& Privilege Escalation} & \scriptsize{content:"GET"; http\_method; nocase; content:"/CFIDE/administrator"; http\_uri; nocase;} \\
-    \Luc{Adicionar nome} \MyComment{& single} & HTTP \MyComment{& \Luc{Adicionar}} & \scriptsize{content:".htaccess"; nocase; http\_uri;} \\
+
+\begin{table*}[h!]
+  \small
+  \caption{\label{table:attacks}List of attacks.}
+  \centering
+  \begin{tabular}{lllp{11cm}}
+    \toprule
+    \multicolumn{1}{c}{Name} &
+    \multicolumn{1}{c}{Category} &
+    \multicolumn{1}{c}{Protocol} &
+    \multicolumn{1}{c}{Groud Truth} \\
+    \midrule     
+    Ping Scan & Active Recon. & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
+    SYN Flood & DoS & TCP & \textbf{flags}: S,12; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
+
+    JBoss JMX\MyComment{ Console Beanshell Exploit} & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
+    WeBid \MyComment{Local File Inclusion} & - & TCP \MyComment{& Local File Inclusion} & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
+    ColdFusion \MyComment{Privilege Escalation} & - & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
+    - & - & HTTP \MyComment{& \Luc{Adicionar}} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     \bottomrule
   \end{tabular}
 \end{table*}
+
+
+\begin{table}[h!]
+  \small
+  \caption{\label{table:results}Results.}
+  \centering
+  \begin{tabular}{lllp{9cm}}
+    \toprule
+    \multicolumn{1}{c}{Name} &
+    \multicolumn{1}{c}{\#~Rules created} &
+    \multicolumn{1}{c}{Rank} \\
+    \midrule
+    Ping Scan & - & - \\
+    SYN Flood & - & - \\
+    JBoss JMX & - & - \\
+    WeBid & - & - \\    
+    ColdFusion & - & - \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 This section reports on the evaluation of \tname{}.
@@ -1530,7 +1553,17 @@ Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
 files as an input to \tname.\Mar{@Lucas, eu traduzi o que vc. falou
   para ingles. Mas, aparentemente, isto esta **inconsistente** com o
   que eh dito na Secao~\ref{attack-reproduction}. Por favor, esclareca!}
-  \Luc{Essa descrição é referente aos ataques HTTP/TCP da tabela. O hping3 gera apenas o trafego do SYN Flood. Ambas as explicações estão corretas. Creio q a descrição da seção 5.2.1 tenha q ser movida para cá pois está explicando como capturamos o trafego malicioso. Nós executamos o Nikto e o hping3 uma unica vez para capturar com o wireshark o trafego q eles geram. O trafego produzido pelo Nikto ja inclui todos os ataques que utilizamos, nós separamos os pacotes de cada um deles manualmente utilizando o wireshark.}
+  \Luc{Essa descrição é referente aos ataques HTTP/TCP da tabela. O
+    hping3 gera apenas o trafego do SYN Flood. Ambas as explicações
+    estão corretas. Creio q a descrição da seção 5.2.1 tenha q ser
+    movida para cá pois está explicando como capturamos o trafego
+    malicioso. Nós executamos o Nikto e o hping3 uma unica vez para
+    capturar com o wireshark o trafego q eles geram. O trafego
+    produzido pelo Nikto ja inclui todos os ataques que utilizamos,
+    nós separamos os pacotes de cada um deles manualmente utilizando o
+    wireshark.}\Mar{Fiquei na duvida se o hping soh serve para o SYN
+    Flood e se/porque o Nikto nao eh usado neste caso...Enfim, nao
+    precisa responder por aqui. Mova o texto deixando-o *consistente*.}
 
 \subsubsection{Benign traffic.}\tname{} uses public databases storing benign
 traffic for all protocols covered by Suricata (see
@@ -1620,6 +1653,8 @@ performance compared to processing actual network messages.
 %% \Fix{any other detail we should consider?}
 
 \subsection{Results}
+
+\Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
 
 
 \subsection{Threats to Validity}
