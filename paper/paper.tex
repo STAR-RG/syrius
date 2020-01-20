@@ -1419,6 +1419,8 @@ $0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
 used in a rule, the aggregated contribution of this heuristic function
 would be 0.35 (=(0.2+0.5)/2).
 
+\Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
+
 %% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
 
 %% Exemplo do payload "cru" de um pacote http:\\
@@ -1537,6 +1539,30 @@ would be 0.35 (=(0.2+0.5)/2).
     iisadmin access & 502 & 117 \\
     /system32/ in URI & 1,060 & 191 \\
     Script tag in URI & 1,332 & 304 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+  \small
+  \caption{\label{table:weight}Weight Combinations.}
+  \centering
+  \begin{tabular}{lrrp{15cm}}
+    \toprule
+    \multicolumn{1}{c}{Name} &
+    \multicolumn{1}{c}{Weights} &
+    \multicolumn{1}{c}{Rank} \\
+    \midrule
+    Ping Scan & - & - \\
+    SYN Flood & - & - \\
+    JBoss JMX & 1,0,1,1 & 107 \\
+    WeBid & - & - \\    
+    ColdFusion & 0,1,1,1 & 7 \\
+    .htaccess access & 0,1,1,1 & 11 \\
+    .idq access & 0,1,1,1 & 7 \\
+    iisadmin access & 0,1,1,1 & 2 \\
+    /system32/ in URI & 0,1,1,1 & 11 \\
+    Script tag in URI & 0,1,1,1 & 9 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1662,6 +1688,7 @@ performance compared to processing actual network messages.
 %% \Fix{any other detail we should consider?}
 
 \subsection{Results}
+
 
 \Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
 
