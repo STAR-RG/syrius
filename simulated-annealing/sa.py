@@ -40,6 +40,14 @@ contents_dict["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administ
 
 contents_dict["adaptor"] = {'GET':[], '/jmx-console':[], '/HtmlAdaptor':["http_uri", "nocase"], 'action=inspect':["http_uri", "nocase"], 'M':[], 'bean':["http_uri", "nocase"], 'name=':["http_uri"], 'Catalina%3Atype%3DServer':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003846)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
+contents_dict["script"] = {'GET':[], '/themes/mambosimple.php?':[], 'detection=':[], 'detected&sitename=':[], '</title>':[], '<script>':[], 'alert':[], '(document.cookie)':[], '</script>':["http_uri", "nocase"], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
+
+contents_dict["issadmin"] = {'GET':[], '/scripts':[], '/iisadmin':["nocase", "http_uri"], '/bdir.htr':[],  'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
+
+contents_dict["idq"] = {'GET':[], '/scripts':[], '/samples':[], '/search':[], '/author':[], '.idq':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
+
+contents_dict["system"] = {'GET':[], '/c':[], '/winnt':[], '/system32/':["http_uri", "nocase"], 'cmd.exe?':[], '/c+dir+':[], '/OG':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
+
 if args.attack in contents_dict:
     contents = contents_dict[args.attack]
 else:
@@ -55,14 +63,17 @@ default_rule_message = "msg:\"Testing rule\";"
 rule_options = {}
 default_rule_sid = 1
 
-if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron"]:
+if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq", "system"]:
     pcap = "Datasets/nikto-" + str(args.attack) + ".pcap"
 else:
     pcap = "Datasets/" + str(args.attack) + ".pcap"
 if args.attack == "pingscan":
     pcap = "Datasets/ping_scan.pcap"
+allpcap = "Datasets/all-" + str(args.attack) + ".pcap"
 pkts = pyshark.FileCapture(pcap)
 pkts.load_packets()
+allpkts = pyshark.FileCapture(allpcap)
+allpkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
 #rule_protocol = "http"
@@ -474,22 +485,22 @@ def ruleContentsModifiersFitness(rule):
         for keyword in pkt_content_modifiers:
             if "nocase" in rule_contents[content]:
                 if content.lower() in lower_case_pkt_content_modifiers[keyword]:
-                    print(keyword)
-                    print("content: ", content)
+                    #print(keyword)
+                    #print("content: ", content)
                     count += 1
                     fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
-                    print(keywords_freq[keyword]/max(list(aux_key_freq.values())))    
+                    #print(keywords_freq[keyword]/max(list(aux_key_freq.values())))    
             else:
                 if content in pkt_content_modifiers[keyword]:
-                    print("content: ", content)
+                    #print("content: ", content)
                     count += 1
                     fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
         
         if count > 0:
             fitness = fitness/count
-        print("fitness:", fitness)
+        #print("fitness:", fitness)
         fit_aux += fitness
-    print(fit_aux)
+    #print(fit_aux)
     if count == 0:
         return 0
     
@@ -709,23 +720,23 @@ def newRuleFitness(rule):
     if fit1 > max_fit1:
         max_fit1 = fit1
     
-    """fit2 = ruleContentsFitness(rule)
+    fit2 = ruleContentsFitness(rule)
     if fit2 > max_fit2:
         max_fit2 = fit2
-    """
-    """fit3 = rareContentsFitness(rule)
+    
+    fit3 = rareContentsFitness(rule)
     if fit3 > max_fit3:
         max_fit3 = fit3
     
     fit4 = ruleContentsModifiersFitness(rule)
     if fit4 > max_fit4:
         max_fit4 = fit4
-    """
+    
     #if fit4 >= 0.16:
     #    print("max_fit4:", fit4, rule)
     
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
-    return fit1
+    return (fit1+fit2+fit3+fit4)/4
 
 
 def optimizeRule(rule):
@@ -946,7 +957,11 @@ def optimizeRule(rule):
     golden_content["jsp"] = {'/jsp/snp/':["http_uri"], '.snp':["http_uri"]}
     golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
     golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
-    
+    golden_content["script"] = {'</script>':["http_uri", "nocase"]}
+    golden_content["issadmin"] = {'/iisadmin':["nocase"]}
+    golden_content["idq"] = {'.idq':["nocase"]}
+    golden_content["system"] = {'/system32/':["http_uri", "nocase"]}
+
     if rule_protocol == "http":
         golden_rule.options["content"] = golden_content[args.attack]
     elif rule_protocol == "icmp":
@@ -957,15 +972,18 @@ def optimizeRule(rule):
     all_rule_list.append(golden_rule)
     golden_rule_pos = 0
 
-    for rule in all_rule_list:
-        print(rule)
+    #for rule in all_rule_list:
+        #print(rule)
 
     all_rule_list = sorted(all_rule_list, key=newRuleFitness)
+
+    regrafit=[]
 
     for x, rule in enumerate(all_rule_list):
         if rule.sid == 1099019:
             golden_rule_pos = all_rule_list.index(rule)
-        rule.sid=x+1
+        else:
+            rule.sid=x+1
         #print(str(rule))
 
     print("pegando precision")
@@ -974,44 +992,53 @@ def optimizeRule(rule):
     print("pegando recall")
     recall=checkFalseNegative(all_rule_list)
 
+    print("tamanho da variacao: {}".format(len(allpkts)))
+
+
     with open("result.csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(all_rule_list, recall, precision):
-            y=y*25
+            y=y*(100/len(allpkts))
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
             writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
     with open("result_final.csv", "w+", newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
-        for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
-            y=y*25
-            z=100-(z/20)
-            f1=2*(((z*y)/100)/((y/100)+(z/100)))
-            if f1>90.0:
-                total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
-                writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
+        with open("fitness_list.csv", "w+", newline='') as fitness_file:
+            writer = csv.writer(file)
+            writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
+            fitness_writer = csv.writer(fitness_file)
+            fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
-    with open("raw_recall.txt", "w+") as writer:
-        for x in recall:
-            writer.write("{}\n".format(x*25))
+            for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
+                y=y*(100/len(allpkts))
+                z=100-(z/20)
+                f1=2*(((z*y)/100)/((y/100)+(z/100)))
+                if f1>90.0: 
+                    total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
+                    writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
+                    fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
+                    regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+            
+    #with open("raw_recall.txt", "w+") as writer:
+    #    for x in recall:
+    #        writer.write("{}\n".format(x*25))
 
-    with open("raw_precision.txt", "w+") as writer:
-        for x in precision:
-            writer.write("{}\n".format(100-(x/20)))
+    #with open("raw_precision.txt", "w+") as writer:
+    #    for x in precision:
+    #        writer.write("{}\n".format(100-(x/20)))
 
-    with open("raw_f1.txt", "w+") as writer:
-        for x, y in zip(recall, precision):
-            x=x*25
-            y=100-(z/20)
-            writer.write("{}\n".format(2*(((x*y)/100)/((x/100)+(y/100)))))
+    #with open("raw_f1.txt", "w+") as writer:
+    #    for x, y in zip(recall, precision):
+    #        x=x*25
+    #        y=100-(z/20)
+    #        writer.write("{}\n".format(2*(((x*y)/100)/((x/100)+(y/100)))))
 
-    with open("output_sorted.txt", "w+") as writer:
-        for x in all_rule_list:
-            writer.write(str(x) + "\n")
+    #with open("output_sorted.txt", "w+") as writer:
+    #    for x in all_rule_list:
+    #        writer.write(str(x) + "\n")
 
     print(str(len(all_rule_list)-golden_rule_pos) + ',' + str(len(all_rule_list)))
 

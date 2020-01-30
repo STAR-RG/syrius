@@ -55,7 +55,7 @@ vars:
 # placed here if its not specified with a full path name. This can be
 # overridden with the -l command line parameter.
 #default-log-dir: /usr/local/var/log/suricata/
-default-log-dir: /home/jnolj/Downloads/nids-rule-learner/simulated-annealing/suricata-logs/
+default-log-dir: ../suricata-logs/
 
 # global stats configuration
 stats:
@@ -1876,7 +1876,7 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: /home/jnolj/Downloads/nids-rule-learner/simulated-annealing/attacks/
+default-rule-path: ../attacks/
 #default-rule-path: rules/emerging-threats/
 
 

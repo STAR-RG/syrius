@@ -14,7 +14,7 @@ vars:
   address-groups:
     #HOME_NET: "[192.168.1.0/24, 172.22.43.0/24]"
     #HOME_NET: "[172.22.68.0/28]"
-    HOME_NET: "[192.168.1.0/24]"
+    HOME_NET: "[192.168.1.102/24]"
     #HOME_NET: "[10.0.0.0/8]"
     #HOME_NET: "[172.16.0.0/12]"
     #HOME_NET: "any"
@@ -56,7 +56,7 @@ vars:
 # overridden with the -l command line parameter.
 #default-log-dir: /usr/local/var/log/suricata/
 #default-log-dir: /usr/local/var/log/suricata/
-default-log-dir: /home/lucas/Documents/Repositórios/GitHub/nids-rule-learner/simulated-annealing/suricata-logs/
+default-log-dir: ../suricata-logs/
 
 # global stats configuration
 stats:
@@ -1185,7 +1185,7 @@ host-os-policy:
   old-linux: []
   # linux: [172.22.43.0/24]
   # linux: [192.168.1.0/24]
-  linux: [192.168.1.0/24]
+  linux: [192.168.1.102/24]
   old-solaris: []
   solaris: []
   hpux10: []
@@ -1877,13 +1877,13 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: ../suricata/pesquisa/attacks
+default-rule-path: ../attacks
 #default-rule-path: rules/emerging-threats/
 
 
 rule-files:
 #- nikto.rules
-- bad.rules
+- htaccess.rules
 #- nocontent.rules
 # - test.rules
 # - botcc.rules
