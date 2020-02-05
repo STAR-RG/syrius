@@ -8,6 +8,8 @@ import re
 import binascii
 import argparse
 import csv
+import math
+from functools import partial
 from itertools import combinations
 
 open("bad.rules", 'w').close()
@@ -21,13 +23,6 @@ ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
 fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
-
-keys_by_proto = {}
-keys_by_proto["icmp"] = {"dsize":1480, "itype":255, "icode":255}#,"icmp_seq":65525, "icmp_id":65535}
-keys_by_proto["tcp"] = {"window": 65525, "flags":['F', 'S', 'R', 'P', 'A', 'U', 'C', 'E', '0']}#"ack":4294967295, "seq":4294967295}
-keys_by_proto["udp"] = {"fragbits": ['D', 'R', 'M']}
-keys_by_proto["http"] = {}
-threshold = {"type":["limit", "threshold", "both"], "track":["by_src", "by_dst"], "count": 65535, "seconds": 1}
 
 contents_dict = {}
 contents_dict["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
@@ -69,6 +64,7 @@ else:
     pcap = "Datasets/" + str(args.attack) + ".pcap"
 if args.attack == "pingscan":
     pcap = "Datasets/ping_scan.pcap"
+
 allpcap = "Datasets/all-" + str(args.attack) + ".pcap"
 pkts = pyshark.FileCapture(pcap)
 pkts.load_packets()
@@ -232,8 +228,7 @@ def getTokens():
     return tokens, pkt_content_modifiers
 
 def getStats():
-    rule_file = open("Datasets/all_rules.txt", "r")
-
+    
     output_file_path = "data.csv"
     output_file = open(output_file_path, 'w+')
 
@@ -248,84 +243,85 @@ def getStats():
     rare_contents_freq={}
     rules_per_size = {}
     rules_per_contents = {}
-    for line in rule_file:
-        if line == "\n":
-            continue
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
 
-        if str("alert " + rule_protocol) in line:
-            rule_size = 0
-            line = line.strip()
-            rare_contents_count = 0
+            if str("alert " + rule_protocol) in line:
+                rule_size = 0
+                line = line.strip()
+                rare_contents_count = 0
 
-            for keyword in keyword_list:
-                aux_key = ' ' + keyword + ':'
-                if keyword in keywords_freq:
-                    keywords_freq[keyword] += line.count(aux_key)
-                else:
-                    keywords_freq[keyword] = line.count(aux_key)
+                for keyword in keyword_list:
+                    aux_key = ' ' + keyword + ':'
+                    if keyword in keywords_freq:
+                        keywords_freq[keyword] += line.count(aux_key)
+                    else:
+                        keywords_freq[keyword] = line.count(aux_key)
 
-                rule_size += line.count(aux_key)
-            
-            for modifier in content_modifiers:
-                aux_modifier = modifier + ';'
-
-                if modifier in keywords_freq:
-                    keywords_freq[modifier] += line.count(aux_modifier)
-                else:
-                    keywords_freq[modifier] = line.count(aux_modifier)
-
-            contents = re.findall(r'content:\"(.+?)\"\;',line)
-
-            for content in contents:
-                if content in contents_dict:
-                    contents_dict[content] += 1
-                else:
-                    contents_dict[content] = 1
-            
-            if " content:" in line:
-                for content in contents:
-                    if contents_dict[content] < 10:
-                        rare_contents_count+=1
+                    rule_size += line.count(aux_key)
                 
-                if rare_contents_count in rare_contents_freq:
-                    rare_contents_freq[rare_contents_count] += 1
-                else:
-                    rare_contents_freq[rare_contents_count] = 1
+                for modifier in content_modifiers:
+                    aux_modifier = modifier + ';'
 
-                if rare_contents_count>max_rare_contents:
-                    max_rare_contents=rare_contents_count
+                    if modifier in keywords_freq:
+                        keywords_freq[modifier] += line.count(aux_modifier)
+                    else:
+                        keywords_freq[modifier] = line.count(aux_modifier)
 
-            for i in range(1, 11):
+                contents = re.findall(r'content:\"(.+?)\"\;',line)
+
                 for content in contents:
-                    if contents_dict[content] == i:
-                        if rule_size not in rare_contents_per_rule_size:
-                            rare_contents_per_rule_size[rule_size] = {1:0}
-                        
-                        if i in rare_contents_per_rule_size[rule_size]:
-                            rare_contents_per_rule_size[rule_size][i] += 1
-                        else:
-                            rare_contents_per_rule_size[rule_size][i] = 1
+                    if content in contents_dict:
+                        contents_dict[content] += 1
+                    else:
+                        contents_dict[content] = 1
+                
+                if " content:" in line:
+                    for content in contents:
+                        if contents_dict[content] < 10:
+                            rare_contents_count+=1
+                    
+                    if rare_contents_count in rare_contents_freq:
+                        rare_contents_freq[rare_contents_count] += 1
+                    else:
+                        rare_contents_freq[rare_contents_count] = 1
 
-            content_count = line.count(" content:")
-            #content_count += line.count(" content: ")
-            proto = line.split("alert ")[1].split(' ')[0]
-            sid = line.split("sid:")[1].split(";")[0]
-            output_file.write(str(sid) + "," + str(proto) + "," + str(rule_size) + "," + str(content_count)+'\n')
-            if content_count>max_content:
-                max_content = content_count
-            if rule_size>max_options:
-                max_options = rule_size
-            
-            if content_count in rules_per_contents:
-                rules_per_contents[content_count] += 1
-            else:
-                rules_per_contents[content_count] = 1
+                    if rare_contents_count>max_rare_contents:
+                        max_rare_contents=rare_contents_count
 
-            if rule_size in rules_per_size:
-                rules_per_size[rule_size] += 1
-            else:
-                rules_per_size[rule_size] = 1
-            rule_count += 1
+                for i in range(1, 11):
+                    for content in contents:
+                        if contents_dict[content] == i:
+                            if rule_size not in rare_contents_per_rule_size:
+                                rare_contents_per_rule_size[rule_size] = {1:0}
+                            
+                            if i in rare_contents_per_rule_size[rule_size]:
+                                rare_contents_per_rule_size[rule_size][i] += 1
+                            else:
+                                rare_contents_per_rule_size[rule_size][i] = 1
+
+                content_count = line.count(" content:")
+                #content_count += line.count(" content: ")
+                proto = line.split("alert ")[1].split(' ')[0]
+                sid = line.split("sid:")[1].split(";")[0]
+                output_file.write(str(sid) + "," + str(proto) + "," + str(rule_size) + "," + str(content_count)+'\n')
+                if content_count>max_content:
+                    max_content = content_count
+                if rule_size>max_options:
+                    max_options = rule_size
+                
+                if content_count in rules_per_contents:
+                    rules_per_contents[content_count] += 1
+                else:
+                    rules_per_contents[content_count] = 1
+
+                if rule_size in rules_per_size:
+                    rules_per_size[rule_size] += 1
+                else:
+                    rules_per_size[rule_size] = 1
+                rule_count += 1
 
     """tmp_list = []
     for i in sorted(list(rules_per_size)):
@@ -409,6 +405,8 @@ print(getTokens())
 print()
 """
 
+max_fitness = [0,0,0,0]
+
 def ruleSizeFitness(rule):
     global rules_per_size
     rule_size = 0
@@ -475,8 +473,8 @@ def ruleContentsModifiersFitness(rule):
     #print("rule_contents:", list(rule_contents.keys()))
     #print()
     count = 0
-    print(rule_contents)
-    print(len(rule_contents))
+    #print(rule_contents)
+    #print(len(rule_contents))
     fit_list = []
     fit_aux = 0
     for content in rule_contents:
@@ -540,7 +538,7 @@ def sendAttackVariation(attack):
 def checkFalseNegative(rules):
     global fitnessFile_path
     global args
-    variation_packets = 4
+    variation_packets = 3
 
     open(fitnessFile_path, 'w').close()
     writeRuleOnFile(rules)
@@ -652,30 +650,9 @@ class Rule:
         self.header = header
         self.message = message
         self.sid = sid
-        self.fitness = 0
         self.threshold = {}
-
-        rule_options = {}
-        """for keyword in keys_by_proto[protocol]:
-            self.options = {}
-            if type(keys_by_proto[protocol][keyword]) == int:
-                self.options[keyword] = 0
-            else:                
-                rule_option = keys_by_proto[protocol][keyword][0]
-                message
-                self.options[keyword] = rule_option 
-
-            print(self.options)
-
-            print(str(self))
-            fitness1, _ = evalRule(self)
-            fitness2, _ = evalRule(self)
-            print(fitness1)
-            print(fitness2)
-            if fitness1 == fitness2:
-                rule_options[keyword] = self.options[keyword]
-        """
-        self.options = rule_options
+        self.fitness = []
+        self.options = {}
     
     def __str__(self):
         str_options = ""
@@ -705,12 +682,35 @@ class Rule:
 
         return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
 
+    def calculateFitness(self):
+        global max_fitness
+        self.fitness = []
+        self.fitness.append(ruleSizeFitness(self))
+        #self.fitness.append(ruleContentsFitness(self))
+        #self.fitness.append(rareContentsFitness(self))
+        #self.fitness.append(ruleContentsModifiersFitness(self))
+
+        for i in range(0, len(self.fitness)):
+            if self.fitness[i] > max_fitness[i]:
+                max_fitness[i] = self.fitness[i]
+    
+    def getFitness(self, weights):
+        ret = 0 
+        for i in range(0, len(self.fitness)):
+            ret += weights[i] * self.fitness[i]
+        
+        ret = ret/len(self.fitness)
+        
+        return ret
+    def getAllAttributesRaw(self):
+        return (str(self.protocol) + '#' + str(self.action) + '#' + str(self.header) + '#' + str(self.message) + '#' + str(self.sid) + '#' + str(self.fitness) + '#' + str(self.threshold) + '#' + str(self.options))
+
 max_fit1 = 0
 max_fit2 = 0
 max_fit3 = 0
 max_fit4 = 0
 
-def newRuleFitness(rule):
+def newRuleFitness(rule, weights):
     global max_fit1
     global max_fit2
     global max_fit3
@@ -736,8 +736,71 @@ def newRuleFitness(rule):
     #    print("max_fit4:", fit4, rule)
     
     #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
-    return (fit1+fit2+fit3+fit4)/4
 
+    return (weights[0]*fit1+weights[1]*fit2+weights[2]*fit3+weights[3]*fit4)/4
+
+def callGetFitness(rule, weights):
+    return rule.getFitness(weights)
+
+def sortRules():
+    with open("all_rules_raw.out", "r") as all_rules:
+        all_rules = all_rules.readlines()
+
+    all_rules_list = []
+    tmp_str_rule = ""
+    tmp_rule = Rule("","","","","")
+    golden_rule_pos = 0
+
+    for i in range(0, len(all_rules)):
+        tmp_rule = Rule("","","","","")
+        tmp_str_rule = all_rules[i].split('#')
+        tmp_rule.protocol = tmp_str_rule[0]
+        tmp_rule.action = tmp_str_rule[1]
+        tmp_rule.header = tmp_str_rule[2]
+        tmp_rule.message = tmp_str_rule[3]
+        tmp_rule.sid = int(tmp_str_rule[4])
+        tmp_rule.fitness = eval(tmp_str_rule[5])
+        tmp_rule.threshold = eval(tmp_str_rule[6])
+        tmp_rule.options = eval(tmp_str_rule[7])
+
+        all_rules_list.append(tmp_rule)
+    
+    current_pos = 0
+    best_pos = math.inf
+    last_pos = 0
+    best_rule_list = []
+    best_weights = []
+    all_rules_len = len(all_rules_list)
+
+    print("all rules len:", all_rules_len)
+    
+    for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
+        for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
+            for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+                for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
+                    w = [w0,w1,w2,w3]
+                    #print("weights:", str(w))
+                    all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+
+                    for x, rule in enumerate(all_rules_list):
+                        if rule.sid == 1099019:
+                            golden_rule_pos = all_rules_list.index(rule)
+                        else:
+                            rule.sid=x+1
+                        #print(str(rule))
+
+                    current_pos = all_rules_len-golden_rule_pos
+                    
+                    #print(current_pos)
+
+                    if current_pos < best_pos:
+                        best_pos = current_pos
+                        best_rule_list = all_rules_list
+                        best_weights = w
+                    
+                    last_pos = current_pos
+
+    return best_rule_list, best_weights, best_pos
 
 def optimizeRule(rule):
     all_rule_list = []
@@ -770,6 +833,7 @@ def optimizeRule(rule):
                     tam = 1
 
                 elem = random.sample(list(rule.options.keys()), tam)
+                print('RANDOM ELEM:', str(elem))
                 while 1:
                     if "content" in elem:
                         elem = random.sample(list(rule.options), tam)
@@ -827,7 +891,7 @@ def optimizeRule(rule):
             
             for a in aux2:
                 print(a)
-                print("len aux2:", len(aux))
+            print("len aux2:", len(aux2))
 
             if not aux2:
                 #print(rule_list)
@@ -972,23 +1036,23 @@ def optimizeRule(rule):
     all_rule_list.append(golden_rule)
     golden_rule_pos = 0
 
-    #for rule in all_rule_list:
-        #print(rule)
+    for i in range(0, len(all_rule_list)):
+        all_rule_list[i].calculateFitness()
 
-    all_rule_list = sorted(all_rule_list, key=newRuleFitness)
+    with open("all_rules.out", "w+") as writer, open("all_rules_raw.out", "w+") as raw_writer:
+        for i in range(0, len(all_rule_list)):
+            writer.write(str(all_rule_list[i])+'\n')
+            raw_writer.write(str(all_rule_list[i].getAllAttributesRaw())+'\n')
+    
+    all_rule_list, best_weights, best_pos = sortRules()
+
+    print("Best Weights:", str(best_weights))
+    print("Best Pos: " + str(best_pos) + ',' + str(len(all_rule_list)))
 
     regrafit=[]
 
-    for x, rule in enumerate(all_rule_list):
-        if rule.sid == 1099019:
-            golden_rule_pos = all_rule_list.index(rule)
-        else:
-            rule.sid=x+1
-        #print(str(rule))
-
     print("pegando precision")
     precision=checkPrecision(all_rule_list)
-
     print("pegando recall")
     recall=checkFalseNegative(all_rule_list)
 
@@ -1040,7 +1104,6 @@ def optimizeRule(rule):
     #    for x in all_rule_list:
     #        writer.write(str(x) + "\n")
 
-    print(str(len(all_rule_list)-golden_rule_pos) + ',' + str(len(all_rule_list)))
 
     return rule_list[0]
 
@@ -1051,12 +1114,13 @@ init_rule.options["content"] = golden_content["adaptor"]
 print(ruleContentsModifiersFitness(init_rule))
 exit()
 """
+
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
-    synflood_options = {'seq':0, 'window':64, 'flags':'S'}
+    synflood_options = {'window':512, 'flags':'S'}
     final_rule.options = synflood_options
-    final_rule.threshold = {'type':'both', 'track':'by_dst', 'count':len(pkts._packets), 'seconds': 2}
+    final_rule.threshold = {'type':'both', 'track':'by_dst', 'count':len(pkts._packets), 'seconds': 5}
     print(final_rule)
 
     final_rule = optimizeRule(final_rule)
@@ -1067,6 +1131,14 @@ else:
     #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
     #final_rule.options["content"] = contents
     
+    """w = [1,1,1,1]
+    final_rule.calculateFitness()
+    print(final_rule.getFitness(w))
+    print(newRuleFitness(final_rule,w))
+    print(callGetFitness(final_rule, [0.5,0.5,0.5,0.5]))
+    exit()
+    """
+
     if rule_protocol == "http":
         final_rule.options["content"] = contents
     elif rule_protocol == "icmp":
@@ -1084,9 +1156,6 @@ if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
 time_end = time.time()
 
 print("max fits:")
-print(max_fit1)
-print(max_fit2)
-print(max_fit3)
-print(max_fit4)
+print(max_fitness)
 
 print("Exec time:", time_end - time_begin)
