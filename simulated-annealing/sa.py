@@ -59,38 +59,28 @@ rule_options = {}
 default_rule_sid = 1
 
 if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq", "system"]:
-    pcap = "Datasets/nikto-" + str(args.attack) + ".pcap"
+    pcapAttack = "Datasets/nikto-" + str(args.attack) + ".pcap"
 else:
-    pcap = "Datasets/" + str(args.attack) + ".pcap"
-if args.attack == "pingscan":
-    pcap = "Datasets/ping_scan.pcap"
+    pcapAttack = "Datasets/" + str(args.attack) + ".pcap"
 
-allpcap = "Datasets/all-" + str(args.attack) + ".pcap"
-pkts = pyshark.FileCapture(pcap)
+if args.attack == "pingscan":
+    pcapAttack = "Datasets/ping_scan.pcap"
+
+pcapVariations = "Datasets/all-" + str(args.attack) + ".pcap"
+pkts = pyshark.FileCapture(pcapAttack)
 pkts.load_packets()
-allpkts = pyshark.FileCapture(allpcap)
+allpkts = pyshark.FileCapture(pcapVariations)
 allpkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
-#rule_protocol = "http"
 print(rule_protocol)
 
-#print(rule_protocol)
-
-def getTokens():
-    global pcap
-    cap_raw = pyshark.FileCapture(pcap, include_raw=True, use_json=True)
-    cap = pyshark.FileCapture(pcap)
-
-    token = []
+def getContentModifiers():
+    global pcapAttack
+    cap = pyshark.FileCapture(pcapAttack)
     cap.load_packets()
-    #print(dir(cap[0].tcp))
-    #print(dir(cap[0].http))
-    #print()
-    #print(cap[0].http.request_line)
-
     pkt_content_modifiers = {}
-
+    
     if cap[0].http.request :
         pkt_content_modifiers["http_method"] = cap[0].http.request_method
         pkt_content_modifiers["http_uri"] = cap[0].http.request_uri
@@ -106,16 +96,20 @@ def getTokens():
             pkt_content_modifiers[c] = pkt_content_modifiers[c].replace("\\xd\\xa", '')
         if "\\r\\n" in pkt_content_modifiers[c]:
             pkt_content_modifiers[c] = pkt_content_modifiers[c].replace("\\r\\n", '')
+    
+    return pkt_content_modifiers
 
-    #print(content_modifiers)
-
-    #print()
+def getTokens():
+    global pcapAttack
+    cap_raw = pyshark.FileCapture(pcapAttack, include_raw=True, use_json=True)
+    cap = pyshark.FileCapture(pcapAttack)
+    cap.load_packets()
+    aux_list = []
 
     for pkt in cap_raw:
         hex_data = str(binascii.b2a_hex(pkt.get_raw_packet()))[134:][:-1]
         str_data = str(binascii.unhexlify(hex_data))[2:][:-1]
 
-        #print(str_data)
         tokens = str_data.split(' ')
         
         aux_list = []
@@ -127,17 +121,6 @@ def getTokens():
             for a in aux:
                 aux_list.append(a)
 
-        """tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('-')
-            if len(aux) > 1:
-                for a in range(0, len(aux)-1):
-                    aux[a] = aux[a] + str('-')
-                
-            for a in aux:
-                aux_list.append(a)
-        """
         tokens = copy.deepcopy(aux_list)
         aux_list = []
         for t in range(0, len(tokens)):
@@ -175,17 +158,7 @@ def getTokens():
 
             for a in aux:
                 aux_list.append(a)
-        
-        """tokens = copy.deepcopy(aux_list)    
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('.')
-            if len(aux) > 1:
-                for a in range(1, len(aux)):
-                    aux[a] = str('.') + aux[a]
-            for a in aux:
-                aux_list.append(a)
-        """
+
         tokens = copy.deepcopy(aux_list)
         aux_list = []
         for t in range(0, len(tokens)):
@@ -225,42 +198,36 @@ def getTokens():
 
     #print(tokens)
 
-    return tokens, pkt_content_modifiers
+    return tokens
 
-def getStats():
-    
-    output_file_path = "data.csv"
-    output_file = open(output_file_path, 'w+')
+def getRuleSize(rule):
+    global keyword_list
+    rule_size = 0
 
-    max_content=0
-    max_options=0
-    rule_count = 0
+    for keyword in keyword_list:
+        aux_key = ' ' + keyword + ':'
+        rule_size += rule.count(aux_key)
+
+    return rule_size
+
+def getKeywordsFrequency():
+    global keyword_list
+    global content_modifiers
     keywords_freq = {}
-    output_file.write("sid,protocol,options,contents\n")
-    contents_dict={}
-    rare_contents_per_rule_size = {1:{1:0}}
-    max_rare_contents=0
-    rare_contents_freq={}
-    rules_per_size = {}
-    rules_per_contents = {}
+
     with open("Datasets/all_rules.txt", "r") as rule_file:
         for line in rule_file:
             if line == "\n":
                 continue
 
             if str("alert " + rule_protocol) in line:
-                rule_size = 0
                 line = line.strip()
-                rare_contents_count = 0
-
                 for keyword in keyword_list:
                     aux_key = ' ' + keyword + ':'
                     if keyword in keywords_freq:
                         keywords_freq[keyword] += line.count(aux_key)
                     else:
                         keywords_freq[keyword] = line.count(aux_key)
-
-                    rule_size += line.count(aux_key)
                 
                 for modifier in content_modifiers:
                     aux_modifier = modifier + ';'
@@ -269,7 +236,37 @@ def getStats():
                         keywords_freq[modifier] += line.count(aux_modifier)
                     else:
                         keywords_freq[modifier] = line.count(aux_modifier)
+    
+    return keywords_freq
 
+def getRulesPerSize():
+    rules_per_size = {}
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+            
+            
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
+                rule_size = getRuleSize(line)
+
+                if rule_size in rules_per_size:
+                    rules_per_size[rule_size] += 1
+                else:
+                    rules_per_size[rule_size] = 1
+
+    return rules_per_size
+   
+def getContentsDict():
+    contents_dict = {}
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()              
                 contents = re.findall(r'content:\"(.+?)\"\;',line)
 
                 for content in contents:
@@ -277,19 +274,70 @@ def getStats():
                         contents_dict[content] += 1
                     else:
                         contents_dict[content] = 1
+    
+    return contents_dict
+
+def getRulesPerContents():
+    rules_per_contents = {}
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
+                content_count = line.count(" content:")
+                
+                if content_count in rules_per_contents:
+                    rules_per_contents[content_count] += 1
+                else:
+                    rules_per_contents[content_count] = 1
+    
+    return rules_per_contents
+
+def getRareContentsFreq():
+    rare_contents_freq = {}
+    contents_dict = getContentsDict()
+    max_rare_contents = 0
+
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                rare_contents_count = 0
+                line = line.strip()
+                contents = re.findall(r'content:\"(.+?)\"\;',line)
                 
                 if " content:" in line:
                     for content in contents:
                         if contents_dict[content] < 10:
-                            rare_contents_count+=1
+                            rare_contents_count += 1
                     
                     if rare_contents_count in rare_contents_freq:
                         rare_contents_freq[rare_contents_count] += 1
                     else:
                         rare_contents_freq[rare_contents_count] = 1
 
-                    if rare_contents_count>max_rare_contents:
-                        max_rare_contents=rare_contents_count
+                    if rare_contents_count > max_rare_contents:
+                        max_rare_contents = rare_contents_count
+
+    return rare_contents_freq
+
+def getRareContentsPerRuleSize():
+    rare_contents_per_rule_size = {1:{1:0}}
+    contents_dict = getContentsDict()
+    
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
+                rule_size = getRuleSize(line)
+                contents = re.findall(r'content:\"(.+?)\"\;',line)
 
                 for i in range(1, 11):
                     for content in contents:
@@ -302,71 +350,69 @@ def getStats():
                             else:
                                 rare_contents_per_rule_size[rule_size][i] = 1
 
+    return rare_contents_per_rule_size
+
+def getMaxRuleSize():
+    max_rule_size = 0
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
+                rule_size = getRuleSize(line)
+
+                if rule_size>max_rule_size:
+                    max_rule_size = rule_size
+
+    return max_rule_size
+
+def getMaxContents():
+    max_contents = 0
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
                 content_count = line.count(" content:")
-                #content_count += line.count(" content: ")
+                
+                if content_count>max_contents:
+                    max_contents = content_count
+    
+    return max_contents
+
+def getStats():
+    output_file_path = "data.csv"
+    output_file = open(output_file_path, 'w+')
+
+    with open(output_file_path, 'w+') as output_file:
+        output_file.write("sid,protocol,options,contents\n")
+
+    with open("Datasets/all_rules.txt", "r") as rule_file:
+        for line in rule_file:
+            if line == "\n":
+                continue
+
+            if str("alert " + rule_protocol) in line:
+                line = line.strip()
+                rule_size = getRuleSize(line)
+                content_count = line.count(" content:")
                 proto = line.split("alert ")[1].split(' ')[0]
                 sid = line.split("sid:")[1].split(";")[0]
-                output_file.write(str(sid) + "," + str(proto) + "," + str(rule_size) + "," + str(content_count)+'\n')
-                if content_count>max_content:
-                    max_content = content_count
-                if rule_size>max_options:
-                    max_options = rule_size
                 
-                if content_count in rules_per_contents:
-                    rules_per_contents[content_count] += 1
-                else:
-                    rules_per_contents[content_count] = 1
+                with open(output_file_path, 'a') as output_file:
+                    output_file.write(str(sid) + "," + str(proto) + "," + str(rule_size) + "," + str(content_count)+'\n')
 
-                if rule_size in rules_per_size:
-                    rules_per_size[rule_size] += 1
-                else:
-                    rules_per_size[rule_size] = 1
-                rule_count += 1
+    return 1
 
-    """tmp_list = []
-    for i in sorted(list(rules_per_size)):
-        tmp_list.append(rules_per_size[i])
-
-    rules_per_size = tmp_list
-
-    tmp_list = []
-    for i in sorted(list(rules_per_contents)):
-        tmp_list.append(rules_per_contents[i])
-
-    rules_per_contents = tmp_list
-    """
-    x=0
-    rare_contents = {}
-    for key, value in contents_dict.items():
-        if value > 278:
-            x+=1
-            rare_contents[key] = value
-    #print(rare_contents)
-    #if "GET " in contents_dict:
-    #    print(contents_dict["GET "])
-    #print(contents_dict)
-    #print(rule_count)
-    #print(rules_per_contents)
-    #print(rules_per_size)
-
-    """x=0
-    while 1:
-        x=1
-    """
-    frequent_contents=0
-
-    for key, value in contents_dict.items():
-        if value >= 10:
-            #print(key)
-            frequent_contents+=1
-
-    output_file.close()
-
-    return rules_per_size, rules_per_contents, contents_dict, keywords_freq
-
-rules_per_size, rules_per_contents, contents_dict, keywords_freq = getStats()
-if rule_protocol == "http":
-    _, pkt_content_modifiers = getTokens()
+rules_per_size = getRulesPerSize()
+rules_per_contents = getRulesPerContents()
+contents_dict = getContentsDict()
+keywords_freq = getKeywordsFrequency()
+    
 i=0
 
 sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
@@ -376,7 +422,9 @@ for content in sd:
     print(content)
     if i == 10:
         break
-if rule_protocol == "http":    
+
+if rule_protocol == "http":  
+    pkt_content_modifiers = getContentModifiers()  
     aux_key_freq = {}
     for mod in list(pkt_content_modifiers.keys()):
         if mod in keywords_freq:
@@ -400,10 +448,7 @@ if rule_protocol == "http":
 
     lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
     print()
-"""print()
-print(getTokens())
-print()
-"""
+
 
 max_fitness = [0,0,0,0]
 
@@ -470,11 +515,7 @@ def ruleContentsModifiersFitness(rule):
     else:
         return fitness
     
-    #print("rule_contents:", list(rule_contents.keys()))
-    #print()
     count = 0
-    #print(rule_contents)
-    #print(len(rule_contents))
     fit_list = []
     fit_aux = 0
     for content in rule_contents:
@@ -511,8 +552,6 @@ def writeRuleOnFile(rules):
     ruleFile.seek(0)
     ruleFile.truncate()
     for rule in rules:
-        #print("CCCCCCCCCCCCCCCCCCCC")
-        #print(str(rule))
         ruleFile.write(str(rule) + "\n" + "\n")
     ruleFile.close()
     time.sleep(0.050)
@@ -731,11 +770,6 @@ def newRuleFitness(rule, weights):
     fit4 = ruleContentsModifiersFitness(rule)
     if fit4 > max_fit4:
         max_fit4 = fit4
-    
-    #if fit4 >= 0.16:
-    #    print("max_fit4:", fit4, rule)
-    
-    #print("fit1:", fit1, "fit2:", fit2, "fit3:", fit3)
 
     return (weights[0]*fit1+weights[1]*fit2+weights[2]*fit3+weights[3]*fit4)/4
 
