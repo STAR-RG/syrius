@@ -52,6 +52,8 @@ keyword_list=("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopt
 
 content_modifiers = ("http_uri", "http_raw_uri", "http_method", "http_request_line", "http_client_body", "http_header", "http_raw_header", "http_cookie", "http_user_agent", "http_host", "http_raw_host", "http_accept", "http_accept_lang", "http_accept_enc", "http_referer", "http_connection", "http_content_type", "http_content_len", "http_start", "http_protocol", "http_header_names", "http_stat_msg", "http_stat_code", "http_response_line", "http_server_body", "file_data")
 
+html_modifiers = ["http_method", "http_uri", "http_user_agent", "http_protocol", "http_host", "http_connection", "http_header", "http_request_line"]
+
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
 default_rule_message = "msg:\"Testing rule\";"
@@ -75,7 +77,7 @@ print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
 print(rule_protocol)
 
-def getContentModifiers():
+def getContentsPerModifiers():
     global pcapAttack
     cap = pyshark.FileCapture(pcapAttack)
     cap.load_packets()
@@ -421,22 +423,41 @@ for content in sd:
     i += 1
     print(content)
     if i == 10:
-        break
+        break    
 
-if rule_protocol == "http":  
-    pkt_content_modifiers = getContentModifiers()  
-    aux_key_freq = {}
-    for mod in list(pkt_content_modifiers.keys()):
+
+#print("keyword_freq:", keywords_freq)
+#print()
+html_modifiers_freq = {}
+def getHtmlModifiersFreq(keywords_freq):
+    global html_modifiers
+    global html_modifiers_freq
+
+    for mod in html_modifiers:
         if mod in keywords_freq:
-            aux_key_freq[mod] = keywords_freq[mod]
+            html_modifiers_freq[mod] = keywords_freq[mod]
+    
+    return html_modifiers_freq
 
+def getLowerCaseContentsDict():
+    global contents_dict
+    low_case_contents_dict = {}
 
-print("keyword_freq:", keywords_freq)
-print()
+    for k, v in contents_dict.items():
+        if k.lower() in low_case_contents_dict:
+            low_case_contents_dict[k.lower()] += v
+        else:
+            low_case_contents_dict[k.lower()] = v
+    
+    return low_case_contents_dict
+
 if rule_protocol == "http":
+    pkt_content_modifiers = getContentsPerModifiers()
+    html_modifiers_freq = getHtmlModifiersFreq(keywords_freq)
+
     print("pkt_content_modifiers", pkt_content_modifiers)
     print()
-    print("aux_key_freq:", aux_key_freq)
+    print("html_modifiers_freq:", html_modifiers_freq)
     print()
     low_case_contents_dict = {}
 
@@ -445,10 +466,17 @@ if rule_protocol == "http":
             low_case_contents_dict[k.lower()] += v
         else:
             low_case_contents_dict[k.lower()] = v
+    if low_case_contents_dict != getLowerCaseContentsDict():
+        print("ERRO LOWER CASE CONTENTS DICT")
+    else:
+        print("IGUAL")
+    
+    exit()
 
     lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
     print()
 
+exit()
 
 max_fitness = [0,0,0,0]
 
@@ -459,7 +487,9 @@ def ruleSizeFitness(rule):
     for keyword in keyword_list:
         keyword = ' ' + keyword + str(":")
         rule_size += str(rule).count(keyword)
+
     fitness = 0
+
     if rule_size in rules_per_size:
         fitness = rules_per_size[rule_size]/max(rules_per_size.values())
     else:
@@ -506,7 +536,7 @@ def rareContentsFitness(rule):
 def ruleContentsModifiersFitness(rule):
     global keywords_freq
     global pkt_content_modifiers
-    global aux_key_freq
+    global html_modifiers_freq
     global lower_case_pkt_content_modifiers
     fitness = 0
 
@@ -527,13 +557,13 @@ def ruleContentsModifiersFitness(rule):
                     #print(keyword)
                     #print("content: ", content)
                     count += 1
-                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
-                    #print(keywords_freq[keyword]/max(list(aux_key_freq.values())))    
+                    fitness += keywords_freq[keyword]/max(list(html_modifiers_freq.values()))
+                    #print(keywords_freq[keyword]/max(list(html_modifiers_freq.values())))    
             else:
                 if content in pkt_content_modifiers[keyword]:
                     #print("content: ", content)
                     count += 1
-                    fitness += keywords_freq[keyword]/max(list(aux_key_freq.values()))
+                    fitness += keywords_freq[keyword]/max(list(html_modifiers_freq.values()))
         
         if count > 0:
             fitness = fitness/count
