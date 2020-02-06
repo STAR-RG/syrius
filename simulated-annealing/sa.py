@@ -459,24 +459,11 @@ if rule_protocol == "http":
     print()
     print("html_modifiers_freq:", html_modifiers_freq)
     print()
-    low_case_contents_dict = {}
-
-    for k, v in contents_dict.items():
-        if k.lower() in low_case_contents_dict:
-            low_case_contents_dict[k.lower()] += v
-        else:
-            low_case_contents_dict[k.lower()] = v
-    if low_case_contents_dict != getLowerCaseContentsDict():
-        print("ERRO LOWER CASE CONTENTS DICT")
-    else:
-        print("IGUAL")
     
-    exit()
+    low_case_contents_dict = getLowerCaseContentsDict()
 
     lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
     print()
-
-exit()
 
 max_fitness = [0,0,0,0]
 
@@ -546,30 +533,26 @@ def ruleContentsModifiersFitness(rule):
         return fitness
     
     count = 0
-    fit_list = []
     fit_aux = 0
+    
     for content in rule_contents:
         count = 0
         fitness = 0
         for keyword in pkt_content_modifiers:
             if "nocase" in rule_contents[content]:
                 if content.lower() in lower_case_pkt_content_modifiers[keyword]:
-                    #print(keyword)
-                    #print("content: ", content)
                     count += 1
                     fitness += keywords_freq[keyword]/max(list(html_modifiers_freq.values()))
-                    #print(keywords_freq[keyword]/max(list(html_modifiers_freq.values())))    
             else:
                 if content in pkt_content_modifiers[keyword]:
-                    #print("content: ", content)
                     count += 1
                     fitness += keywords_freq[keyword]/max(list(html_modifiers_freq.values()))
         
         if count > 0:
             fitness = fitness/count
-        #print("fitness:", fitness)
+
         fit_aux += fitness
-    #print(fit_aux)
+
     if count == 0:
         return 0
     
@@ -686,32 +669,6 @@ def evalContents(rules):
     #print(output)
     return output
 
-def evalFalsePositive(rule):
-    fitnessFile_path = "../suricata/rulesFitness.txt"
-    subprocess.Popen(["rm", "../suricata/rulesFitness.txt"], stdout=subprocess.DEVNULL).wait()
-    writeRuleOnFile(rule)
-    reloadSuricataRules() 
-    sendGoodTraffic()
-
-    try:
-        fitnessFile = open(fitnessFile_path, "r")
-    except IOError:
-        return 0
-    
-    lines = fitnessFile.readlines()
-
-    best_fitness = 0
-    for line in lines:
-        line = line.rstrip('\n')
-
-        keywords = line.split("-")
-        fitness = getRuleFitness(keywords)
-
-        if fitness > best_fitness:
-            best_fitness = fitness
-    
-    return best_fitness
-
 class Rule:    
     def __init__(self, action, protocol, header, message, sid):
         self.protocol = protocol
@@ -774,35 +731,6 @@ class Rule:
     def getAllAttributesRaw(self):
         return (str(self.protocol) + '#' + str(self.action) + '#' + str(self.header) + '#' + str(self.message) + '#' + str(self.sid) + '#' + str(self.fitness) + '#' + str(self.threshold) + '#' + str(self.options))
 
-max_fit1 = 0
-max_fit2 = 0
-max_fit3 = 0
-max_fit4 = 0
-
-def newRuleFitness(rule, weights):
-    global max_fit1
-    global max_fit2
-    global max_fit3
-    global max_fit4
-
-    fit1 = ruleSizeFitness(rule)
-    if fit1 > max_fit1:
-        max_fit1 = fit1
-    
-    fit2 = ruleContentsFitness(rule)
-    if fit2 > max_fit2:
-        max_fit2 = fit2
-    
-    fit3 = rareContentsFitness(rule)
-    if fit3 > max_fit3:
-        max_fit3 = fit3
-    
-    fit4 = ruleContentsModifiersFitness(rule)
-    if fit4 > max_fit4:
-        max_fit4 = fit4
-
-    return (weights[0]*fit1+weights[1]*fit2+weights[2]*fit3+weights[3]*fit4)/4
-
 def callGetFitness(rule, weights):
     return rule.getFitness(weights)
 
@@ -831,7 +759,6 @@ def sortRules():
     
     current_pos = 0
     best_pos = math.inf
-    last_pos = 0
     best_rule_list = []
     best_weights = []
     all_rules_len = len(all_rules_list)
@@ -861,9 +788,7 @@ def sortRules():
                         best_pos = current_pos
                         best_rule_list = all_rules_list
                         best_weights = w
-                    
-                    last_pos = current_pos
-
+                
     return best_rule_list, best_weights, best_pos
 
 def optimizeRule(rule):
@@ -965,18 +890,6 @@ def optimizeRule(rule):
                 rule_list=aux2.copy()
                 aux2.clear()
                 aux.clear()
-
-            """if keyword != "content":
-                if len(new_rule.options) == 1:
-                    break
-                del new_rule.options[keyword]
-                print(str(new_rule))
-
-                fitness = evalFalsePositive(new_rule)
-                print("#4 - rule fitness: " + str(fitness))
-                if fitness >= 1.0:
-                    new_rule.options[keyword] = rule.options[keyword]
-            """
     
     if "content" in rule.options:
         new_rule = copy.deepcopy(rule)
