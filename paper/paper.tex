@@ -21,9 +21,10 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 %%
-%% The first command in your LaTeX source must be the \documentclass command.
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
 \documentclass[sigconf,review, anonymous]{acmart}
-\acmConference[ISSTA 2020]{ACM SIGSOFT International Symposium on Software Testing and Analysis}{18–22 July, 2020}{Los Angeles, US}
+\acmConference[ESEC/FSE 2020]{The 28th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering}{8 - 13 November, 2020}{Sacramento, California, United States}
 
 \pagenumbering{arabic} % Remove for camera-ready
 
@@ -205,17 +206,23 @@
 Network Intrusion Detection Systems (\nids{}) are a popular mechanism
 used by system administrators to defend against network attacks. These
 systems monitor the network traffic and flag suspicious network
-behavior. Signature-based \nids\ do that by checking the network
-traffic against a pre-defined set of rules, which can become obsolete
+behavior. Signature-based \nids\ do that by checking the\MyComment{ network}
+traffic against a pre-defined set of rules, which become obsolete
 as attackers learn new strategies to circumvent existing defenses.
+
 This paper proposes \tname{}, a technique that automatically
 synthesizes \nids\ rules from positive and negative examples, \ie{},
 malicious and benign traffic. \tname{} formulates synthesis as an
-optimization problem whose candidate solutions are rules that maximize
-the capture of positive traffic and minimize the capture of negative
-traffic. \tname{} bootstraps the search with candidate solutions that
-use data from the payload of the malicious message and produces
-optimal rule candidates on output. We evaluated \tname{} on a diverse
+optimization problem whose candidate solutions are rules. Optimal
+solutions maximize the capture of positive traffic and minimize the
+capture of negative traffic. \tname{} bootstraps the search with a
+candidate solution inferred from the payload of the malicious message.
+It uses that initial overfitting solution to search for alternative
+rules that only capture the malicious traffic. Then, it ranks those
+rules according to heuristics---drawn from a data set of existing
+rules---denoting the likelihood of those rules of being useful.
+
+We evaluated \tname{} on a diverse
 set of attacks. Results indicate that \Fix{...}
 \end{abstract}
 
