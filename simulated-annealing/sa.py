@@ -9,7 +9,7 @@ import binascii
 import argparse
 import csv
 import math
-from functools import partial
+from functools import partial, reduce
 from itertools import combinations
 
 open("bad.rules", 'w').close()
@@ -426,8 +426,9 @@ for content in sd:
         break    
 
 
-#print("keyword_freq:", keywords_freq)
-#print()
+print("keyword_freq:", keywords_freq)
+#exit()
+
 html_modifiers_freq = {}
 def getHtmlModifiersFreq(keywords_freq):
     global html_modifiers
@@ -465,7 +466,7 @@ if rule_protocol == "http":
     lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
     print()
 
-max_fitness = [0,0,0,0]
+max_fitness = [0,0,0,0,0]
 
 def ruleSizeFitness(rule):
     global rules_per_size
@@ -558,6 +559,21 @@ def ruleContentsModifiersFitness(rule):
     
     return fit_aux/len(rule_contents)
 
+def ruleOptionsFitness(rule):
+    global keywords_freq
+    count = 0
+    fitness = 0
+
+    for option in rule.options:
+        count += 1
+        fitness += keywords_freq[option]/max(list(keywords_freq.values()))
+    
+    if count > 0:
+        fitness = fitness/count
+
+    return fitness
+
+
 def writeRuleOnFile(rules):
     global ruleFile_path
     open(ruleFile_path, 'w').close()
@@ -565,13 +581,13 @@ def writeRuleOnFile(rules):
     ruleFile.seek(0)
     ruleFile.truncate()
     for rule in rules:
-        ruleFile.write(str(rule) + "\n" + "\n")
+        ruleFile.write(str(rule) + "\n")
     ruleFile.close()
-    time.sleep(0.050)
+    #time.sleep(0.050)
 
 def sendGoodTraffic(attack):
     subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.05)
+    #time.sleep(0.05)
 
 def isEmpty(fpath):
     result=False
@@ -585,12 +601,12 @@ def isEmpty(fpath):
 
 def sendAttackVariation(attack):
     subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.5)
+    #time.sleep(0.5)
 
 def checkFalseNegative(rules):
     global fitnessFile_path
     global args
-    variation_packets = 3
+    variation_packets = 4
 
     open(fitnessFile_path, 'w').close()
     writeRuleOnFile(rules)
@@ -606,7 +622,9 @@ def checkFalseNegative(rules):
     
     for i in range(len(rules)):
         if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('1:'+str(rules[i].sid)+':')
+            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+            if str(rules[i].sid) == "1099019":
+                print("GOLDEN RECALL:", output[i])
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
@@ -616,12 +634,12 @@ def checkFalseNegative(rules):
 
 def sendTest(attack):
     subprocess.Popen(["sh", "sendTest.sh", attack], stdout=subprocess.DEVNULL).wait()
-    time.sleep(0.5)
+    #time.sleep(0.5)
 
 def checkPrecision(rules):
     global fitnessFile_path
     global args
-    variation_packets = 2000
+    variation_packets = 4
 
     open(fitnessFile_path, 'w').close()
     writeRuleOnFile(rules)
@@ -637,7 +655,7 @@ def checkPrecision(rules):
     
     for i in range(len(rules)):
         if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('1:'+str(rules[i].sid)+':')
+            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
@@ -712,9 +730,10 @@ class Rule:
         global max_fitness
         self.fitness = []
         self.fitness.append(ruleSizeFitness(self))
-        #self.fitness.append(ruleContentsFitness(self))
-        #self.fitness.append(rareContentsFitness(self))
-        #self.fitness.append(ruleContentsModifiersFitness(self))
+        self.fitness.append(ruleContentsFitness(self))
+        self.fitness.append(rareContentsFitness(self))
+        self.fitness.append(ruleContentsModifiersFitness(self))
+        self.fitness.append(ruleOptionsFitness(self))
 
         for i in range(0, len(self.fitness)):
             if self.fitness[i] > max_fitness[i]:
@@ -735,7 +754,7 @@ def callGetFitness(rule, weights):
     return rule.getFitness(weights)
 
 def sortRules():
-    with open("all_rules_raw.out", "r") as all_rules:
+    with open("all_rules_raw_2.out", "r") as all_rules:
         all_rules = all_rules.readlines()
 
     all_rules_list = []
@@ -769,26 +788,149 @@ def sortRules():
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
             for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
                 for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
+                    for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
+                        w = [w0,w1,w2,w3,w4]
+                        #print("weights:", str(w))
+                        all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+
+                        for x, rule in enumerate(all_rules_list):
+                            if rule.sid == 1099019:
+                                golden_rule_pos = all_rules_list.index(rule)
+                            else:
+                                rule.sid=x+1
+
+                        current_pos = all_rules_len-golden_rule_pos
+                        
+                        #print(current_pos)
+
+                        if current_pos < best_pos:
+                            best_pos = current_pos
+                            best_rule_list = copy.deepcopy(all_rules_list)
+                            best_weights = w
+    
+    """i = 0
+    for rule in best_rule_list:
+        i += 1
+        if "1099019" in str(rule):
+            golden_index = i
+            print("golden index: ", end=' ')
+        print(i, " ", str(rule))
+    """
+
+    return best_rule_list, best_weights, best_pos
+
+def sortMultipleAttacks():
+    all_rules = []
+    for i in range(0,10):
+        file_name = "all_rules_raw_"+str(i)+".out"
+        try:
+            with open(file_name, "r") as reader:
+                #all_rules.append([])
+                all_rules.append(reader.readlines())
+                print(file_name, "successfully loaded.")
+        except:
+            print(file_name, "loading failed.")
+            if i == 0:
+                print("No file was loaded, something is wrong.")
+                exit()
+            break
+ 
+
+    all_rules_list = []
+    tmp_str_rule = ""
+    tmp_rule = Rule("","","","","")
+    golden_rule_pos = []
+    current_pos = []
+    best_pos = []
+    best_rule_list = []
+    best_weights = []
+
+    for i in range(0, len(all_rules)):
+        all_rules_list.append([])
+        golden_rule_pos.append(0)
+        current_pos.append(0)
+        best_pos.append(math.inf)
+        best_rule_list.append([])
+        best_weights.append([])
+
+        for elem in all_rules[i]:
+            tmp_rule = Rule("","","","","")
+            tmp_str_rule = elem.split('#')
+            tmp_rule.protocol = tmp_str_rule[0]
+            tmp_rule.action = tmp_str_rule[1]
+            tmp_rule.header = tmp_str_rule[2]
+            tmp_rule.message = tmp_str_rule[3]
+            tmp_rule.sid = int(tmp_str_rule[4])
+            tmp_rule.fitness = eval(tmp_str_rule[5])
+            tmp_rule.threshold = eval(tmp_str_rule[6])
+            tmp_rule.options = eval(tmp_str_rule[7])
+
+            all_rules_list[i].append(tmp_rule)
+    
+    print("all rules list len:", len(all_rules_list))
+
+    #exit()
+
+    all_rules_len = []
+    all_pos_sum = 0
+    best_all_pos_sum = math.inf
+    best_all_weights = []
+    
+    for elem in all_rules_list:
+        all_rules_len.append(len(elem))
+
+    print("all rules len:", all_rules_len)
+
+    
+
+    for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
+        for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
+            for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+                for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
+                    all_pos_sum = 0
                     w = [w0,w1,w2,w3]
-                    #print("weights:", str(w))
-                    all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+                    print("weights:", str(w))
+                    i=0
+                    for elem in all_rules:
+                        all_rules_list[i] = sorted(all_rules_list[i], key=partial(callGetFitness, weights=w))
 
-                    for x, rule in enumerate(all_rules_list):
-                        if rule.sid == 1099019:
-                            golden_rule_pos = all_rules_list.index(rule)
-                        else:
-                            rule.sid=x+1
-                        #print(str(rule))
+                        for x, rule in enumerate(all_rules_list[i]):
+                            if rule.sid == 1099019:
+                                golden_rule_pos[i] = all_rules_list[i].index(rule)
+                            else:
+                                rule.sid=x+1
 
-                    current_pos = all_rules_len-golden_rule_pos
+                        current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
+                        all_pos_sum += current_pos[i]
+                        print("current pos", i, ":", current_pos[i])
+                        print("best pos:", best_pos[i])
+                        
+                        if current_pos[i] <= best_pos[i]:
+                            best_pos[i] = current_pos[i]
+                            #best_rule_list[i] = copy.deepcopy(all_rules_list[i])
+                            best_weights[i] = w
+                        
+                        i += 1
                     
-                    #print(current_pos)
-
-                    if current_pos < best_pos:
-                        best_pos = current_pos
-                        best_rule_list = all_rules_list
-                        best_weights = w
-                
+                    #print("all pos sum:", all_pos_sum)
+                    if all_pos_sum <= best_all_pos_sum:
+                        best_all_pos_sum = all_pos_sum
+                        best_all_weights = w
+                    
+    print("best pos:", best_pos)
+    print("best weights indiv:", best_weights)
+    print("best all:", best_all_pos_sum)
+    print("best all weights:", best_all_weights)
+    
+    """i = 0
+    for rule in best_rule_list:
+        i += 1
+        if "1099019" in str(rule):
+            golden_index = i
+            print("golden index: ", end=' ')
+        print(i, " ", str(rule))
+    """
+    exit()
     return best_rule_list, best_weights, best_pos
 
 def optimizeRule(rule):
@@ -1016,11 +1158,11 @@ def optimizeRule(rule):
     for i in range(0, len(all_rule_list)):
         all_rule_list[i].calculateFitness()
 
-    with open("all_rules.out", "w+") as writer, open("all_rules_raw.out", "w+") as raw_writer:
+    with open("all_rules.out", "w+") as writer, open("all_rules_raw_2.out", "w+") as raw_writer:
         for i in range(0, len(all_rule_list)):
             writer.write(str(all_rule_list[i])+'\n')
             raw_writer.write(str(all_rule_list[i].getAllAttributesRaw())+'\n')
-    
+
     all_rule_list, best_weights, best_pos = sortRules()
 
     print("Best Weights:", str(best_weights))
@@ -1032,9 +1174,20 @@ def optimizeRule(rule):
     precision=checkPrecision(all_rule_list)
     print("pegando recall")
     recall=checkFalseNegative(all_rule_list)
+    i=0
+    golden_index = 0
+
+    """for rule in all_rule_list:
+        i += 1
+        if "1099019" in str(rule):
+            golden_index = i
+            print("golden index: ", end=' ')
+        print(i, " ", str(rule))
+    """
+
+    print('recall golden rule:', recall[golden_index])
 
     print("tamanho da variacao: {}".format(len(allpkts)))
-
 
     with open("result.csv", "w+", newline='') as file:
         writer = csv.writer(file)
@@ -1048,12 +1201,62 @@ def optimizeRule(rule):
 
     with open("result_final.csv", "w+", newline='') as file:
         with open("fitness_list.csv", "w+", newline='') as fitness_file:
+            with open("all_rules_raw_2.out", "w+") as raw_writer:
+                writer = csv.writer(file)
+                writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
+                fitness_writer = csv.writer(fitness_file)
+                fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
+
+                for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
+                    y=y*(100/len(allpkts))
+                    z=100-(z/20)
+                    f1=2*(((z*y)/100)/((y/100)+(z/100)))
+                    if f1>90.0:
+                        raw_writer.write(str(x.getAllAttributesRaw())+'\n')
+                        total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
+                        writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
+                        fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
+                        regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+    
+
+    w = [1,1,1,1,1]
+    print("weights:", str(w))
+    normal_rules_list = sorted(all_rule_list, key=partial(callGetFitness, weights=w))
+
+    for x, rule in enumerate(normal_rules_list):
+        if rule.sid == 1099019:
+            golden_rule_pos = normal_rules_list.index(rule)
+        else:
+            rule.sid=x+1
+        #print(str(rule))
+
+    current_pos = len(normal_rules_list) - golden_rule_pos
+
+    print("normal pos:", current_pos)
+
+    print("pegando precision")
+    normal_precision=checkPrecision(normal_rules_list)
+    print("pegando recall")
+    normal_recall=checkFalseNegative(normal_rules_list)
+
+    with open("result2.csv", "w+", newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
+        for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
+            y=y*(100/len(allpkts))
+            z=100-(z/20)
+            f1=2*(((z*y)/100)/((y/100)+(z/100)))
+            total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
+            writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
+
+    with open("result_final2.csv", "w+", newline='') as file:
+        with open("fitness_list.csv", "w+", newline='') as fitness_file:
             writer = csv.writer(file)
             writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
             fitness_writer = csv.writer(fitness_file)
             fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
-            for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
+            for (x, y, z) in zip(list(reversed(normal_rules_list)), list(reversed(normal_recall)), list(reversed(normal_precision))):
                 y=y*(100/len(allpkts))
                 z=100-(z/20)
                 f1=2*(((z*y)/100)/((y/100)+(z/100)))
@@ -1084,7 +1287,10 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
+#sortMultipleAttacks()
+
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
+
 """golden_content = {}
 golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
 init_rule.options["content"] = golden_content["adaptor"]
