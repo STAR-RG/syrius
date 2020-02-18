@@ -76,7 +76,7 @@ outputs:
   # a line based alerts log similar to Snort's fast.log
   - fast:
       enabled: yes
-      filename: cron.log
+      filename: synflood.log
       append: no
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
 
@@ -606,7 +606,7 @@ logging:
       enabled: yes
       # type: json
   - file:
-      enabled: yes
+      enabled: no
       level: info
       filename: /usr/local/var/log/suricata/suricata.log
       # type: json
@@ -1876,13 +1876,13 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: ../attacks
+default-rule-path: ./attacks/
 #default-rule-path: rules/emerging-threats/
 
 
 rule-files:
 #- nikto.rules
-- cron.rules
+- synflood.rules
 #- nocontent.rules
 # - test.rules
 # - botcc.rules
