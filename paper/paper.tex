@@ -359,11 +359,23 @@ Snort~\cite{snort}).
 
 Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
-the Open Information Security Foundation (OISF)~\cite{oisf}. A
+the Open Information Security Foundation (OISF)~\cite{oisf}. 
+
+\vspace{-1ex}
+\begin{figure}[h!]
+  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
+  \vspace{-2ex}
+  \caption{Suricata rule for SYN Flood attack.}
+  \label{fig:synflood-example}
+\end{figure}
+\vspace{-2ex}
+
+A
 Suricata rule is divided in three parts---action, header, and rule
 options~\cite{suri-rule-format}. The action part appears as the first
 word in the rule description. An action denotes the task that needs to
-be executed if the rule pattern is satisfied. In this example, a
+be executed if the rule pattern is satisfied.
+In this example, a
 message will be sent to system administrators if the rule pattern is
 satisfied. The header comes after the action in the rule
 description. It restricts the information flow covered by the
@@ -379,8 +391,11 @@ pattern (\eg, ``flags'', ``threshold'', and ``content''). \tname{}
 produces options of the second kind, which are \emph{relevant} to
 capturing the attack.
 
-\begin{table}[t!]
-  \caption{\label{table:rules}Example options of Suricata.}  
+\vspace{-1ex}
+\begin{table}[h!]
+  \footnotesize
+  \caption{\label{table:rules}Example options of Suricata.}
+  \vspace{-2ex}
   \centering
   \begin{tabular}{clp{5.5cm}}
     \toprule
@@ -399,8 +414,7 @@ capturing the attack.
     \bottomrule
   \end{tabular}
 \end{table}
-
-
+%\vspace{-1ex}
 
 Table~\ref{table:rules} shows a sample of the options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
@@ -413,57 +427,63 @@ option takes a sequence of bytes as argument (\eg{},
 in the payload of the message. Detailed description of the Suricata
 rules can be found elsewhere~\cite{suri-rule-format}. It is worth
 noting that Suricata supports a total of \totoptions\ distinct options
-covering \numproto\ distinct protocols. A total of 9 of these options
-are for documentation.\MyComment{For instance, the purpose of rule
-  option \CodeIn{msg} is to print on the output an informative message
-  indicating what kind of intrusion has been observed.}
-Figure~\ref{fig:distribution-rules-protocol} shows the distributions
-of these options per protocol. The sum of the number of protocol
-options is higher than \totoptions\ as some options are shared across
-different protocols. \tname{} does not make distinction among protocols.
+covering \numproto\ distinct protocols.
 
 
-%\begin{wrapfigure}[14]{r}{0.5\textwidth}
-\begin{figure}[t!]
-  \centering
-%  \vspace{-7ex}
-  \scalebox{0.85}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={dns, ftp, http, icmp, ip, smb, smtp, ssh,
-          tcp, tls, udp},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(dns,10) (ftp,11) (http,20) (icmp,18)(ip,16) (smb,13) (smtp,11) (ssh, 10) (tcp, 32) (tls,18) (udp, 18)};
-%        \legend{relevant, irrelevant}
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-rules-protocol}Number of relevant
-    options per protocol supported by Suricata.}
-%\end{wrapfigure}
-\end{figure}
+%% A total of 9 of these options
+%% are for documentation.\MyComment{For instance, the purpose of rule
+%%   option \CodeIn{msg} is to print on the output an informative message
+%%   indicating what kind of intrusion has been observed.}
+%% Figure~\ref{fig:distribution-rules-protocol} shows the distributions
+%% of these options per protocol. The sum of the number of protocol
+%% options is higher than \totoptions\ as some options are shared across
+%% different protocols. \tname{} does not make distinction among protocols.
+
+
+%% %\begin{wrapfigure}[14]{r}{0.5\textwidth}
+%% \begin{figure}[t!]
+%%   \centering
+%% %  \vspace{-7ex}
+%%   \scalebox{0.85}{
+%%     \begin{tikzpicture}
+%%       \begin{axis}[
+%%           ybar stacked,
+%%           enlargelimits=0.15,
+%%           legend style={at={(0.5,-0.15)},
+%%             anchor=north,legend columns=-1},
+%%           %          ylabel={\#rules},
+%%           symbolic x coords={dns, ftp, http, icmp, ip, smb, smtp, ssh,
+%%           tcp, tls, udp},
+%%           xtick=data,
+%%           xticklabel style={rotate=45},          
+%%           nodes near coords,
+%%           every node near coord/.append style={font=\scriptsize},        
+%%           nodes near coords align={vertical},
+%%         ]
+%%         \addplot coordinates {(dns,10) (ftp,11) (http,20) (icmp,18)(ip,16) (smb,13) (smtp,11) (ssh, 10) (tcp, 32) (tls,18) (udp, 18)};
+%% %        \legend{relevant, irrelevant}
+%%       \end{axis}
+%%     \end{tikzpicture}
+%%   }
+%%   \vspace{-2ex}
+%%   \caption{\label{fig:distribution-rules-protocol}Number of relevant
+%%     options per protocol supported by Suricata.\Mar{not sure if this
+%%       is really helpful.}}
+%% %\end{wrapfigure}
+%% \end{figure}
   
 
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-\begin{figure}[h!]
+\begin{figure}[t!]
 \centering
 \includegraphics[scale=0.28]{figs/ICMP-packet-structure.png}
+\vspace{-2ex}
 \caption{Layout of an ICMP packet.}
 \label{fig:icmp-packet-layout}
 \end{figure}
+%\vspace{-2ex}
 
 Rule options are often associated with specific fields of network
 packets. Let's consider the ICMP protocol as an
@@ -472,22 +492,25 @@ ICMP packet. The packet fields ``Flags'' and ``Time to Live'',
 declared in the IP header, are mapped to the options \CodeIn{flagbits}
 and \CodeIn{ttl}, respectively. Likewise, the fields ``Type'' and
 ``Code'', declared in the ICMP header, are mapped to the options
-\CodeIn{itype} and \CodeIn{icode}. (Table~\ref{table:rules} lists some
-example rule options.) The values of the options ``ttl'', ``itype'',
-and ``icode'' are the same as the value of the corresponding fields in
-the ICMP packet. For the field ``Flags'' the value of the
-corresponding option is encoded in the bitvector. For example, if the
-``Flags'' field stores the value 1010, the corresponding rule option
-will be \CodeIn{flagbits:RM}, as each position of the vector encodes a
-different character in the \CodeIn{flagbits} rule option. The value of
-several options can be determined through transformation functions, as
-those described above. One expection to this is the option
-\CodeIn{threshold}, which is typically used in denial-of-service
-attacks. That option operates over sequence of messages as opposed to
-a single message. Consequently, it is not possible to determined its
-values from a single message. More precisely, to trigger an action on
-a rule containing that option a \nids\ tool needs to monitor several
-messages.
+\CodeIn{itype} and \CodeIn{icode}. The values of the options ``ttl'',
+``itype'', and ``icode'' are the same as the value of the
+corresponding fields in the ICMP packet. For the field ``Flags'' the
+value of the corresponding option is encoded in a bitvector. For
+example, if the ``Flags'' field stores the value 1010, the
+corresponding rule option will be \CodeIn{flagbits:RM}, as each
+position of the vector encodes a different character in the
+\CodeIn{flagbits} rule option. The value of several options can be
+determined through transformation functions, as those described
+above. One exception to this is the option \CodeIn{threshold}, which
+is typically used in denial-of-service attacks. That option operates
+over sequence of messages as opposed to a single
+message. Consequently, it is not possible to determined its values
+from a single message.
+
+
+%% More precisely, to trigger an action on a rule
+%% containing that option a \nids\ tool needs to monitor several
+%% messages.
 
 %% \Luc{
 %%   Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
@@ -517,13 +540,6 @@ server responds with a SYN-ACK packet, the client keeps sending other
 SYN packets to avoid the connection to time out. Without proper
 protection, the server accepts these malicious requests and eventually
 legitimate requests cannot be satisfied due to resource exhaustion.
-
-\begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
-  \caption{Suricata rule for SYN Flood attack.}
-  \label{fig:synflood-example}
-\end{figure}
-
 
 Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
 this attack. This rule was obtained from the Emerging Threats Open
