@@ -1530,50 +1530,51 @@ would be 0.35 (=(0.2+0.5)/2).
   \small
   \caption{\label{table:results}Results.}
   \centering
-  \begin{tabular}{lrrp{9cm}}
+  \begin{tabular}{lrrrp{9cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{\#~Rules created} &
-    \multicolumn{1}{c}{Rank} \\
+    \multicolumn{1}{c}{Rank} &
+    \multicolumn{1}{c}{Rank fitness global} \\
     \midrule
-    Ping Scan & - & - \\
-    SYN Flood & - & - \\
-    JBoss JMX & 283 & 219 \\
-    WeBid & - & - \\    
-    ColdFusion & 566 & 11 \\
-    .htaccess access & 572 & 223 \\
-    .idq access & 700 & 235 \\
-    iisadmin access & 502 & 133 \\
-    /system32/ in URI & 1,060 & 368 \\
-    Script tag in URI & 1,332 & 287 \\
+    Ping Scan & - & - & - \\
+    SYN Flood & - & - & - \\
+    JBoss JMX & 382 & 208 & 23 \\
+    WeBid & - & - & - \\    
+    ColdFusion & 34 & 5 & 5\\
+    .htaccess access & 2107 & 365 & 2\\
+    .idq access & 1112 & 429 & 2 \\
+    iisadmin access & 862 & 372 & 1 \\
+    /system32/ in URI & - & - & - \\
+    Script tag in URI & - & - & - \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{table}[h!]
-  \small
-  \caption{\label{table:weight}Weight Combinations.}
-  \centering
-  \begin{tabular}{lrrp{15cm}}
-    \toprule
-    \multicolumn{1}{c}{Name} &
-    \multicolumn{1}{c}{Weights} &
-    \multicolumn{1}{c}{Rank} \\
-    \midrule
-    Ping Scan & - & - \\
-    SYN Flood & - & - \\
-    JBoss JMX & 1,0,1,1 & 107 \\
-    WeBid & - & - \\    
-    ColdFusion & 0,1,1,1 & 7 \\
-    .htaccess access & 0,1,1,1 & 11 \\
-    .idq access & 0,1,1,1 & 7 \\
-    iisadmin access & 0,1,1,1 & 2 \\
-    /system32/ in URI & 0,1,1,1 & 11 \\
-    Script tag in URI & 0,1,1,1 & 9 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
+%%\begin{table}[h!]
+%%  \small
+%%  \caption{\label{table:weight}Weight Combinations.}
+%%  \centering
+%%  \begin{tabular}{lrrp{15cm}}
+%%    \toprule
+%%    \multicolumn{1}{c}{Name} &
+%%    \multicolumn{1}{c}{Weights} &
+%%    \multicolumn{1}{c}{Rank} \\
+%%    \midrule
+%%    Ping Scan & - & - \\
+%%    SYN Flood & - & - \\
+%%    JBoss JMX & 1,0,1,1 & 107 \\
+%%    WeBid & - & - \\    
+%%    ColdFusion & 0,1,1,1 & 7 \\
+%%    .htaccess access & 0,1,1,1 & 11 \\
+%%    .idq access & 0,1,1,1 & 7 \\
+%%    iisadmin access & 0,1,1,1 & 2 \\
+%%    /system32/ in URI & 0,1,1,1 & 11 \\
+%%    Script tag in URI & 0,1,1,1 & 9 \\
+%%    \bottomrule
+%%  \end{tabular}
+%%\end{table}
+%%
 
 This section reports on the evaluation of \tname{}.
 
