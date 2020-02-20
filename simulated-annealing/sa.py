@@ -754,7 +754,7 @@ def callGetFitness(rule, weights):
     return rule.getFitness(weights)
 
 def sortRules():
-    with open("all_rules_raw_2.out", "r") as all_rules:
+    with open("all_rules_raw_0.out", "r") as all_rules:
         all_rules = all_rules.readlines()
 
     all_rules_list = []
@@ -803,7 +803,7 @@ def sortRules():
                         
                         #print(current_pos)
 
-                        if current_pos < best_pos:
+                        if current_pos <= best_pos:
                             best_pos = current_pos
                             best_rule_list = copy.deepcopy(all_rules_list)
                             best_weights = w
@@ -887,50 +887,50 @@ def sortMultipleAttacks():
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
             for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
                 for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
-                    all_pos_sum = 0
-                    w = [w0,w1,w2,w3]
-                    print("weights:", str(w))
-                    i=0
-                    for elem in all_rules:
-                        all_rules_list[i] = sorted(all_rules_list[i], key=partial(callGetFitness, weights=w))
+                    for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
+                        all_pos_sum = 0
+                        w = [w0,w1,w2,w3,w4]
+                        print("weights:", str(w))
+                        i=0
+                        for elem in all_rules:
+                            all_rules_list[i] = sorted(all_rules_list[i], key=partial(callGetFitness, weights=w))
 
-                        for x, rule in enumerate(all_rules_list[i]):
-                            if rule.sid == 1099019:
-                                golden_rule_pos[i] = all_rules_list[i].index(rule)
-                            else:
-                                rule.sid=x+1
+                            for x, rule in enumerate(all_rules_list[i]):
+                                if rule.sid == 1099019:
+                                    golden_rule_pos[i] = all_rules_list[i].index(rule)
+                                else:
+                                    rule.sid=x+1
 
-                        current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
-                        all_pos_sum += current_pos[i]
-                        print("current pos", i, ":", current_pos[i])
-                        print("best pos:", best_pos[i])
+                            current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
+                            all_pos_sum += current_pos[i]
+                            print("current pos", i, ":", current_pos[i])
+                            print("best pos:", best_pos[i])
+                            
+                            if current_pos[i] <= best_pos[i]:
+                                best_pos[i] = current_pos[i]
+                                #best_rule_list[i] = copy.deepcopy(all_rules_list[i])
+                                best_weights[i] = w
+                            
+                            i += 1
                         
-                        if current_pos[i] <= best_pos[i]:
-                            best_pos[i] = current_pos[i]
-                            #best_rule_list[i] = copy.deepcopy(all_rules_list[i])
-                            best_weights[i] = w
-                        
-                        i += 1
-                    
-                    #print("all pos sum:", all_pos_sum)
-                    if all_pos_sum <= best_all_pos_sum:
-                        best_all_pos_sum = all_pos_sum
-                        best_all_weights = w
+                        #print("all pos sum:", all_pos_sum)
+                        if all_pos_sum <= best_all_pos_sum:
+                            best_all_pos_sum = all_pos_sum
+                            best_all_weights = w
                     
     print("best pos:", best_pos)
     print("best weights indiv:", best_weights)
     print("best all:", best_all_pos_sum)
     print("best all weights:", best_all_weights)
     
-    """i = 0
+    i = 0
     for rule in best_rule_list:
         i += 1
         if "1099019" in str(rule):
             golden_index = i
-            print("golden index: ", end=' ')
-        print(i, " ", str(rule))
-    """
-    exit()
+            print("golden index: ", golden_index, end=' ')
+        #print(i, " ", str(rule))
+
     return best_rule_list, best_weights, best_pos
 
 def optimizeRule(rule):
@@ -1158,7 +1158,7 @@ def optimizeRule(rule):
     for i in range(0, len(all_rule_list)):
         all_rule_list[i].calculateFitness()
 
-    with open("all_rules.out", "w+") as writer, open("all_rules_raw_2.out", "w+") as raw_writer:
+    with open("all_rules.out", "w+") as writer, open("all_rules_raw_0.out", "w+") as raw_writer:
         for i in range(0, len(all_rule_list)):
             writer.write(str(all_rule_list[i])+'\n')
             raw_writer.write(str(all_rule_list[i].getAllAttributesRaw())+'\n')
@@ -1178,16 +1178,16 @@ def optimizeRule(rule):
     golden_index = 0
 
     """for rule in all_rule_list:
-        i += 1
         if "1099019" in str(rule):
             golden_index = i
             print("golden index: ", end=' ')
         print(i, " ", str(rule))
-    """
+        i += 1
 
     print('recall golden rule:', recall[golden_index])
 
     print("tamanho da variacao: {}".format(len(allpkts)))
+    """
 
     with open("result.csv", "w+", newline='') as file:
         writer = csv.writer(file)
@@ -1201,7 +1201,7 @@ def optimizeRule(rule):
 
     with open("result_final.csv", "w+", newline='') as file:
         with open("fitness_list.csv", "w+", newline='') as fitness_file:
-            with open("all_rules_raw_2.out", "w+") as raw_writer:
+            with open("all_rules_raw_0.out", "w+") as raw_writer:
                 writer = csv.writer(file)
                 writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
                 fitness_writer = csv.writer(fitness_file)
@@ -1211,6 +1211,8 @@ def optimizeRule(rule):
                     y=y*(100/len(allpkts))
                     z=100-(z/20)
                     f1=2*(((z*y)/100)/((y/100)+(z/100)))
+                    if x.sid == "1099019":
+                        print("GOLDEN RULE IS HERE")
                     if f1>90.0:
                         raw_writer.write(str(x.getAllAttributesRaw())+'\n')
                         total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
@@ -1287,7 +1289,8 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-#sortMultipleAttacks()
+sortMultipleAttacks()
+exit()
 
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
 
