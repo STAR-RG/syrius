@@ -540,34 +540,39 @@ server responds with a SYN-ACK packet, the client keeps sending other
 SYN packets to avoid the connection to time out. Without proper
 protection, the server accepts these malicious requests and eventually
 legitimate requests cannot be satisfied due to resource exhaustion.
-
 Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
 this attack. This rule was obtained from the Emerging Threats Open
 Ruleset~\cite{emerging-threats-open}. The relevant options in the
 rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
 SYN packet in a TCP packet and the option \CodeIn{threshold: type
   both, track by\_dst, count 5000, seconds 5} indicates that a high
-volume of such packets should be requested in a short period of time.
+volume of such packets should be requested in a short period of
+time. The other options are for documentation purposes.
 
-In the following, we illustrate how \tname{} proceeds for obtaining
-the rule for the SYN Flood attack. The challenge in synthesizing rules
-is to discover the set of options in a rule that makes the \nids\ to
-capture the malicious traffic, but allow the benign traffic to go
-through.  The other parts of the rule (\ie{}, the action and the
-header) are either inferred or left constant. For example, in this
-case, \tname{} sets the action header to \CodeIn{alert} and sets the
-header to \CodeIn{<proto> any any -> any any}, indicating that it
-infers the target protocol and uses the most general flow description
-possible, \ie{}, it instructs the \nids\ to analyze the traffic
-flowing from/to any address and port.  We understand that this is
-domain-specific information and assume that the system administrator
-would know how to customize it.
+In the following, we discuss the rule produced by \tname{} to capture
+this attack. The action and the header of the rules that \tname{}
+creates are either inferred or left constant. For example, in this
+case, \tname{} sets the action to \CodeIn{alert} and sets the header
+to \CodeIn{<proto> any any -> any any}, indicating that it infers the
+target protocol and uses the most general flow description possible,
+\ie{}, it instructs the \nids\ to analyze the traffic flowing from/to
+any address and port.  We understand that the choice of these
+parameters are domain-specific and assume that the sys admin would
+know how (and want) to customize them.
 
-\tname{} proceeds as follows to synthesize rules for this
-attack. First, it analyzes the positive (\ie, malicious) traffic and
-extracts options expressed in that traffic. In this case, the
-malicious traffic is characterized as a sequence of 5000
-messages. \tname{} finds the following set of options at this stage:
+The main challenge in synthesizing rules is to discover the set of
+options in a rule that blocks the malicious traffic, but allows the
+benign traffic to pass. \tname{} proceeds as follows to synthesize
+rules for this attack.
+
+First, \tname{} analyzes the malicious traffic and extracts options
+expressed in that traffic. Recall from
+Section~\ref{sec:rules-and-packets} that rule options can be inferred
+from packet contents. In this case, however, that information alone is
+insufficient as the malicious traffic is characterized as a sequence
+of 5K\Mar{really 5K?}\Mar{...and where did they come from?}
+messages. \tname{} finds the following set of options at this stage by
+analyzing the flow and contents of the messages:
 
 \begin{figure}[h]
   \vspace{-2ex}
@@ -592,9 +597,7 @@ messages. \tname{} finds the following set of options at this stage:
   %%   disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
 
 \noindent
-\tname{} only reports a rule if the \nids\ instantiated with that rule
-is able to capture the traffic passed on input. Consequently, by
-construction, a rule that uses this set of options captures the
+By construction, a rule that uses this set of options captures the
 malicious traffic. Unfortunately, this rule is potentially
 overspecified. Informally, the rule includes ``too specific''
 characteristics of the malicious traffic and could potentially result
@@ -602,13 +605,13 @@ in false negatives. For example, in this particular case, note that
 the option \CodeIn{window: 512} is not included in the golden rule
 from Figure~\ref{fig:synflood-example}.
 
-Second, \tname{} uses negative (\ie{}, benign) traffic to mitigate the
-overfitting issue. In this step, \tname{} searches for alternative
-rules that preserves the invarianxt that a rule should capture the
-positive traffic but not capture the negative traffic. It uses the
-rule obtained in the previous step, containing three options, to
-bootstrap the search for rules. The search generates rules containing
-subsets of the options from the seed rule.
+Second, \tname{} uses benign traffic to mitigate the overfitting
+issue. In this step, \tname{} searches for alternative rules that
+preserves the invarianxt that a rule should capture the positive
+malicious traffic but not capture the negative benign traffic. It uses
+the rule obtained in the previous step, containing three options, to
+bootstrap the search for alternative rules. The search generates rules
+containing subsets of the options from the seed rule.
 
  
 %% \Luc{Ataque "JBoss JMX Console Beanshell Deployer WAR Upload and Deployment Exploit"
@@ -642,16 +645,19 @@ subsets of the options from the seed rule.
 %% }
 
 Finally, \tname{} ranks the inferred rules according to heuristics
-extracted from a database of existing rules. One example heuristic
-function we used to rank the generated rules was \Luc{a quantidade de opcoes na regra}
-\Fix{...elaborate...}. The list below shows the rule options for the
-top-5 rules \tname{} produces for this attack.
+learned from a database of existing rules. For example, one heuristic
+function \tname{} uses for ranking leverages the amount of options a
+rule of a given protocol typically has---the score of a rule on this
+function is proportional to the popularity of the number of options it
+declares. The list below shows the rule options for the top-5 rules
+\tname{} produces for this attack.\Mar{algum problema em fazer isto?
+  exemplos concretos ajudam muito!}
 
 To sum up, \tname{} uses the messages that manifest an attack in the
-first step (to create an overspecific seed rule), benign traffic in
-the second step (to create a set of plausible rules from the seed
-rule), and existing rules from popular sources in the third step (to
-rank the generated rules).
+first step to create an overspecific seed rule, benign traffic in the
+second step to create a set of plausible rules from the seed rule, and
+existing rules from popular sources in the third step to rank
+alternative plausible rules.
 
 \vspace{1ex}
 \noindent
@@ -663,16 +669,16 @@ extra option \CodeIn{window}, and there are differences in the option
 \CodeIn{threshold}. Considering the option \CodeIn{flags}, the first
 parameter of that option indicates what flags in the packet must be
 set while the second parameter indicates non-mandatory flags (\ie{},
-``don't cares''). The option \CodeIn{flags: S} indicates that the flag
-``S'' must be set and all flags not mentioned (``1'' and ``2'', in our
-case) must be unset for the \nids\ to capture the
-traffic. Consequently, that choice of option alone could result in
+``don't cares''). More specifically, the option \CodeIn{flags: S}
+indicates that the flag ``S'' must be set and all flags not mentioned
+(including ``1'' and ``2'') must be unset for the \nids\ to capture
+the traffic. Consequently, that choice of option alone could result in
 false negatives and false positives. An attack that satisfies all
-other conditions in a rule and have flags ``1'' or ``2'' set would be
-captured by the original rule but not the inferred rule---a case of
+other conditions in a rule and has flags ``1'' or ``2'' set would be
+captured by the original rule but not captured by the inferred rule---a case of
 false negative. Likewise, an attack that satisfies all conditions and
 have flags ``1'' and ``2'' unset would be captured by the inferred
-rule but not the original rule---a case of false positive. The set of
+rule but not captured by the original rule---a case of false positive. The set of
 positive examples is to blame in this case. To mitigate this issue,
 the input messages should have covered cases with options ``1'' or
 ``2'' set. Considering option \CodeIn{window: 512}, \tname{} is able
