@@ -566,7 +566,7 @@ would know how to customize it.
 \tname{} proceeds as follows to synthesize rules for this
 attack. First, it analyzes the positive (\ie, malicious) traffic and
 extracts options expressed in that traffic. In this case, the
-malicious traffic is characterized as a sequence of 20
+malicious traffic is characterized as a sequence of 5000
 messages. \tname{} finds the following set of options at this stage:
 
 \begin{figure}[h]
@@ -599,7 +599,7 @@ malicious traffic. Unfortunately, this rule is potentially
 overspecified. Informally, the rule includes ``too specific''
 characteristics of the malicious traffic and could potentially result
 in false negatives. For example, in this particular case, note that
-the option \CodeIn{windows: 512} is not included in the golden rule
+the option \CodeIn{window: 512} is not included in the golden rule
 from Figure~\ref{fig:synflood-example}.
 
 Second, \tname{} uses negative (\ie{}, benign) traffic to mitigate the
@@ -643,11 +643,9 @@ subsets of the options from the seed rule.
 
 Finally, \tname{} ranks the inferred rules according to heuristics
 extracted from a database of existing rules. One example heuristic
-function we used to rank the generated rules was
+function we used to rank the generated rules was \Luc{a quantidade de opcoes na regra}
 \Fix{...elaborate...}. The list below shows the rule options for the
 top-5 rules \tname{} produces for this attack.
-
-\Mar{listem 5 primeira regras neste caso}
 
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step (to create an overspecific seed rule), benign traffic in
@@ -677,7 +675,7 @@ have flags ``1'' and ``2'' unset would be captured by the inferred
 rule but not the original rule---a case of false positive. The set of
 positive examples is to blame in this case. To mitigate this issue,
 the input messages should have covered cases with options ``1'' or
-``2'' set. Considering option \CodeIn{windows: 64}, \tname{} is able
+``2'' set. Considering option \CodeIn{window: 512}, \tname{} is able
 to generate rules without that option, as discussed above. Considering
 option \CodeIn{threshold}, the values used in the golden rule are
 domain-specific. \tname{} uses default values for these options. We
@@ -751,7 +749,6 @@ ranking after minimization and ranking.
   \vspace{-3ex}  
 \end{figure}
 
-\Luc{Apenas 3 regras tiveram f1 de 100\%. O total de regras nesse caso foi de 13.}
 \Fix{...listem 5 primeiras regras neste caso...}
 
 
