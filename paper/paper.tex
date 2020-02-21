@@ -28,6 +28,7 @@
 
 \pagenumbering{arabic} % Remove for camera-ready
 
+\usepackage{subcaption}
 \usepackage{libertine}
 \usepackage{lipsum}% http://ctan.org/pkg/lipsum
 \usepackage{algorithm}% http://ctan.org/pkg/algorithm
@@ -42,7 +43,7 @@
 \usepackage{tikz}
 \usetikzlibrary{matrix,fit,shapes,calc,positioning,shadows,arrows,shapes,backgrounds,decorations.markings,fadings}
 \usepackage{listings}
-\usepackage[caption=false, font=footnotesize]{subfig}
+%\usepackage[caption=false, font=footnotesize]{subfig}
 \renewcommand{\ttdefault}{pcr}
 \lstset{
   basicstyle=\scriptsize\ttfamily,
@@ -1151,34 +1152,7 @@ other sizes.
 
 %\tname{} uses this information to rank rules.
 
-\pgfplotsset{width=6cm,compat=1.8}
-\pgfplotsset{every tick label/.append style={font=\tiny}}
 
-\begin{figure}[H]
-  \centering
-  \scalebox{1.2}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-rule-size}Distribution of rule sizes.}
-\end{figure}
 
 
 
@@ -1208,7 +1182,14 @@ heuristic function that takes the number of content options into
 account. We calculate the contribution of number of content options
 with the following formula:
 
-\begin{figure}[t!]
+\pgfplotsset{width=6cm,compat=1.8}
+\pgfplotsset{every tick label/.append style={font=\tiny}}
+
+
+
+\begin{figure*}[t!]
+\centering
+\begin{subfigure}{.5\textwidth}
   \centering
   \scalebox{1.2}{  
     \begin{tikzpicture}
@@ -1230,9 +1211,94 @@ with the following formula:
       \end{axis}
     \end{tikzpicture}
   }
-  \caption{\label{fig:distribution-contents}Distribution of number of
-    content options.}
-\end{figure}  
+  \vspace{-1ex}
+  \caption{\label{fig:distribution-contents}Number of content options.}
+\end{subfigure}% <---- don't forget this %
+%\vspace{1ex}
+%\\
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \scalebox{1.2}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          xtick=data,
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-1ex}
+  \caption{\label{fig:distribution-rule-size}Rule sizes.}
+\end{subfigure}%
+%\vspace{1ex}
+\\
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \scalebox{1.2}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387) (INSERT, 386) (200, 352) (/index.php?, 273)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-3ex}  
+  \caption{\label{fig:distribution-strings}Strings used as parameters of content options.}
+\end{subfigure}%
+%\vspace{1ex}
+%\\
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \scalebox{1.2}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          %          ylabel={\#rules},
+          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection, http\_request\_line},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},        
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29) (http\_request\_line,11)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-1ex}
+  \caption{\label{fig:distribution-content_modifiers}Content modifiers
+    frequency.}
+\end{subfigure}%
+\vspace{-1ex}
+  \caption{Distribution of features.}
+\end{figure*}
 
 \[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
 
@@ -1266,32 +1332,7 @@ strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
 (=(1+.203)/2).
 
-\begin{figure}[t!]
-  \centering
-  \scalebox{1.2}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387) (INSERT, 386) (200, 352) (/index.php?, 273)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \caption{\label{fig:distribution-strings}Distribution of strings
-    used as parameters of content options.}
-\end{figure}
+
 
 \subsubsection{Frequency of content modifiers.} As previously
 mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
@@ -1388,33 +1429,6 @@ $i$.
 %%   content. a frequencia seria 0, correto?} \Luc{Sim}
 
 
-\begin{figure}[t!]
-  \centering
-  \scalebox{1.2}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection, http\_request\_line},
-          xtick=data,
-          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29) (http\_request\_line,11)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2ex}
-  \caption{\label{fig:distribution-content_modifiers}Content modifiers
-    frequency.}
-\end{figure}
-
-
 %\Mar{what about ``none'' (no modifier)?}}
 %  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n
     %% vem ao caso aqui. Nessa heuristica toda string do payload vai ter
@@ -1509,16 +1523,7 @@ would be 0.35 (=(0.2+0.5)/2).
 %% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
 %% receberia a pontuação correspondente a esses dois modificadores.
 
-
-\section{Evaluation}
-
-    %%Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
-    %%Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
-    %%Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
-    
-    %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
-
-\begin{table*}[h!]
+\begin{table*}[t!]
   \small
   \caption{\label{table:attacks}List of attacks.}
   \centering
@@ -1543,6 +1548,43 @@ would be 0.35 (=(0.2+0.5)/2).
     \bottomrule
   \end{tabular}
 \end{table*}
+
+
+\section{Evaluation}
+
+This section reports on the evaluation of \tname{}.
+
+
+\newcommand{\textRQone}{How well \tname\ ranks the golden rule?}
+\vspace{0.2cm}
+\begin{itemize}[leftmargin=*]
+\item{\textbf{RQ1.}} \textRQone
+\end{itemize}
+
+\textbf{Rationale.}~The golden rule is a rule that is known to capture
+a given attack. \tname\ generates several rules that satisfy the
+invariant to only capture the malicious traffic, but the amount of
+data we use to assess that invariant, albeit large, is limited. In
+fact, assessing quality of each rule (\ie{}, fitness to the attack)
+requires domain knowledge. The position of the golden rule at the
+ranking produced by \tname\ is a proxy measure to the effort of a
+system administrator in finding the rule that fits the purpose.
+
+
+\newcommand{\textRQtwo}{What is the importance of heuristic functions in ranking?}
+\vspace{0.2cm}
+\begin{itemize}[leftmargin=*]
+\item{\textbf{RQ2.}} \textRQtwo\
+\end{itemize}
+
+
+
+    %%Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
+    %%Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
+    %%Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
+    
+    %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
+
 
 
 \begin{table}[h!]
@@ -1595,10 +1637,9 @@ would be 0.35 (=(0.2+0.5)/2).
 %%\end{table}
 %%
 
-This section reports on the evaluation of \tname{}.
-
 \subsection{Objects of Analysis}
 \label{sec:dataset-benign}
+\label{attack-reproduction}
 
 Table~\ref{table:attacks} shows the attacks we considered in our
 evaluation. These attacks cover different protocols and features of
@@ -1625,7 +1666,24 @@ files as an input to \tname.\Mar{@Lucas, eu traduzi o que vc. falou
     nós separamos os pacotes de cada um deles manualmente utilizando o
     wireshark.}\Mar{Fiquei na duvida se o hping soh serve para o SYN
     Flood e se/porque o Nikto nao eh usado neste caso...Enfim, nao
-    precisa responder por aqui. Mova o texto deixando-o *consistente*.}
+    precisa responder por aqui. Mova o texto deixando-o
+    *consistente*.}
+
+  \tname{} requires the attack to
+be replayed in order to check whether or not the rule it generates
+captures the attack.  See function $\mathit{isPlausible}$, used in the
+minimization algorithm from Section~\ref{sec:minimization}. For all
+attacks listed on Table~\ref{table:attacks}, we found scripts
+available on the web to replay the attacks. For example, the SYN Flood
+attack can be replayed with hping3~\cite{hping3}, using the following
+command: \CodeIn{hping3 -d 80 -w 64 -S -p 80 --flood --rand-source
+  <IP>}. With the script to reproduce the attack, we executed the
+following steps to obtain ``pcap'' files, which abstracts network
+messages~\cite{pcap}, to run \tname:~1)~instantiate the script (\eg{},
+define the IP, for the example above), 2)~execute the script,
+3)~monitor the traffic with the wireshark network
+monitor~\cite{wireshark-net-monitor}.
+
 
 \subsubsection{Benign traffic.}\tname{} uses public databases storing benign
 traffic for all protocols covered by Suricata (see
@@ -1652,20 +1710,6 @@ from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
 
 \subsection{Methodology}
 
-\subsubsection{Attack reproduction.}\label{attack-reproduction} \tname{} requires the attack to
-be replayed in order to check whether or not the rule it generates
-captures the attack.  See function $\mathit{isPlausible}$, used in the
-minimization algorithm from Section~\ref{sec:minimization}. For all
-attacks listed on Table~\ref{table:attacks}, we found scripts
-available on the web to replay the attacks. For example, the SYN Flood
-attack can be replayed with hping3~\cite{hping3}, using the following
-command: \CodeIn{hping3 -d 80 -w 64 -S -p 80 --flood --rand-source
-  <IP>}. With the script to reproduce the attack, we executed the
-following steps to obtain ``pcap'' files, which abstracts network
-messages~\cite{pcap}, to run \tname:~1)~instantiate the script (\eg{},
-define the IP, for the example above), 2)~execute the script,
-3)~monitor the traffic with the wireshark network
-monitor~\cite{wireshark-net-monitor}.
 
 Recall that Suricata is invoked multiple times in the process of
 minimizing the rule (see Section~\ref{sec:minimization}). Suricata
@@ -1714,7 +1758,9 @@ performance compared to processing actual network messages.
 
 %% \Fix{any other detail we should consider?}
 
-\subsection{Results}
+\subsection{Answering RQ1: \textRQone}
+
+\subsection{Answering RQ2: \textRQtwo}
 
 
 \Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
