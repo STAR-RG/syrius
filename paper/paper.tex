@@ -571,7 +571,7 @@ expressed in that traffic. Recall from
 Section~\ref{sec:rules-and-packets} that rule options can be inferred
 from packet contents. In this case, however, that information alone is
 insufficient as the malicious traffic is characterized as a sequence
-of 5K\Mar{really 5K?}\Mar{...and where did they come from?}
+of 5K\Mar{really 5K?}\Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
 messages. \tname{} finds the following set of options at this stage by
 analyzing the flow and contents of the messages:
 
@@ -652,7 +652,12 @@ rule of a given protocol typically has---the score of a rule on this
 function is proportional to the popularity of the number of options it
 declares. The list below shows the rule options for the top-5 rules
 \tname{} produces for this attack.\Mar{algum problema em fazer isto?
-  exemplos concretos ajudam muito!}
+  exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
+
+  \CodeIn{...window:512; threshold: type both, track by\_dst, count 5000, seconds 3;...}
+
+  \CodeIn{...flags: S; window:512; threshold: type both, track by\_dst, count 5000, seconds 3;...}
+   }
 
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step to create an overspecific seed rule, benign traffic in the
@@ -742,6 +747,7 @@ indicates, as expected, that the set of rule options is
 overspecified. \tname{} produces the following five rules at the top
 of the ranking after minimization and ranking.\Mar{eu ainda estou
   aguardando isto. A tabela 3 tambem nao indica o resultado!}
+  \Luc{Irei adicionar}
 
 \begin{figure}[h]
   \vspace{-2ex}
