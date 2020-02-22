@@ -702,42 +702,32 @@ this option.
 %%   encontrar ip's ativos numa rede.}
 
 
-Active reconnaissance is a method used by malicious individuals to
+Active Reconnaissance is a method used by malicious individuals to
 collect information about a computing system to determine potential
-vulnerabilities. Active reconnaissance is a preliminary step towards
-an actual attack. For example, Ping Scan is a very common type of
-attack that scans the network for IPs of accessible hosts. An attacker
-sends several ICMP Echo requests to a range of IP addresses in the
-network and checks which ones respond to the requests. This allow the
-attacker to know which machines are active in the network. Then (s)he
-can choose one of them to attack.
+vulnerabilities. This methods is used as a preliminary step towards an
+actual attack. For example, Ping Scan scans the network for IPs of
+accessible hosts. An attacker sends several ICMP Echo requests to a
+range of IP addresses in the network and checks which ones respond to
+these requests. This method enables an attacker to know which machines
+are active in the network.
 
+\vspace{-2ex}
 \begin{figure}[h!]
-  \vspace{1ex}
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
+  \vspace{-2ex}    
   \caption{Suricata rule for Ping Scan attack.}
   \label{fig:pingscan-example}
-  \vspace{1ex}  
 \end{figure}
+\vspace{-4ex}
 
-\begin{figure*}[ht!]
-  \centering
-  \includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
-  \caption{\tname\ workflow.}
-  \label{fig:overview}
-  \vspace{-1ex}
-\end{figure*}
-
-
-Figure 4 shows a Suricata rule that captures a reproduction of a Ping
-Scan attack available from NMAP~\cite{netmap}, a network discovery and
-security auditing open-source tool. The relevant options are in
-bold---the option \CodeIn{dsize: 0} indicates that the packet has no
-bytes in the payload and the option \CodeIn{itype: 8} indicates that
-the packet to be captured are ICMP Echo requests.
-
-Again, to synthesize rules for a Ping Scan, \tname{} analyzes the
-positive malicious traffic and extracts the following rule options:
+Figure 4 shows a Suricata rule that captures a Ping Scan attempt, as
+documented in NMAP~\cite{netmap}, a network discovery and security
+auditing open-source tool. The relevant options are in bold---the
+option \CodeIn{dsize: 0} indicates that the packet has no bytes in the
+payload and the option \CodeIn{itype: 8} indicates that the packet to
+be captured are ICMP Echo requests. Again, to synthesize rules for a
+Ping Scan, \tname{} analyzes the positive malicious traffic and
+extracts the following rule options:
 
 \begin{figure}[h]
   \vspace{-2ex}
@@ -745,10 +735,13 @@ positive malicious traffic and extracts the following rule options:
   \vspace{-3ex}  
 \end{figure}
 
-
-Again, note that rule \CodeIn{icode} was not present in the original
-rule.  \tname{} produces the following five rules at the top of the
-ranking after minimization and ranking.
+\noindent
+Note that, although options \CodeIn{dsize:0} and \CodeIn{itype:8} are
+present in the set of inferred options, the others are not.  This
+indicates, as expected, that the set of rule options is
+overspecified. \tname{} produces the following five rules at the top
+of the ranking after minimization and ranking.\Mar{eu ainda estou
+  aguardando isto. A tabela 3 tambem nao indica o resultado!}
 
 \begin{figure}[h]
   \vspace{-2ex}
@@ -844,6 +837,15 @@ case. \Mar{explain syntactical difference, if exist}
 
 \section{Technique}
 \label{sec:technique}
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
+  \caption{\tname\ workflow.}
+  \label{fig:overview}
+  \vspace{-1ex}
+\end{figure*}
+
 
 \tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
