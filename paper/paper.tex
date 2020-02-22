@@ -390,7 +390,8 @@ pairs. Rule options serve to document the analyzed traffic (\eg{},
 ``msg'', ``classtype'', and ``sid'') and to characterize the attack
 pattern (\eg, ``flags'', ``threshold'', and ``content''). \tname{}
 produces options of the second kind, which are \emph{relevant} to
-capturing the attack.
+capture the attack. For example, the option \CodeIn{content:<arg>} checks if
+the argument is present in the payload of the message.
 
 \vspace{-1ex}
 \begin{table}[h!]
@@ -410,7 +411,7 @@ capturing the attack.
     6 & window & checks the size of the TCP window\\
     7 & flags & matches on TCP flags\\
     8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
-    9 & threshold & controls the rule’s alert frequency\\
+    9 & threshold & minimum threshold for a rule before it generates alerts\\
     10 & content & checks if argument is present on the payload\\
     \bottomrule
   \end{tabular}
@@ -564,16 +565,15 @@ know how (and want) to customize them.
 The main challenge in synthesizing rules is to discover the set of
 options in a rule that blocks the malicious traffic, but allows the
 benign traffic to pass. \tname{} proceeds as follows to synthesize
-rules for this attack.
-
-First, \tname{} analyzes the malicious traffic and extracts options
+rules for this attack. First, \tname{} analyzes the malicious traffic and extracts options
 expressed in that traffic. Recall from
 Section~\ref{sec:rules-and-packets} that rule options can be inferred
 from packet contents. In this case, however, that information alone is
 insufficient as the malicious traffic is characterized as a sequence
-of 5K\Mar{really 5K?}\Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
-messages. \tname{} finds the following set of options at this stage by
+of messages. \tname{} finds the following set of options at this stage by
 analyzing the flow and contents of the messages:
+
+%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
 
 \begin{figure}[h]
   \vspace{-2ex}
@@ -659,13 +659,17 @@ declares. The list below shows the rule options for the top-5 rules
     \vspace{-3ex}  
   \end{figure}
 
-   }
+   }\Mar{Lucas, eu nao entendo porque vc. desconsiderou threshold da
+  discussao (afinal, a gente destaca thrshold como relevante no inicio
+  desta secao). tambem nao entendo porque window---que a gente disse
+  acima que *nao* era relevante---aparece nas duas regras
+  geradas. enfim, isto esta inconsistente com nosso discurso.}
 
 To sum up, \tname{} uses the messages that manifest an attack in the
-first step to create an overspecific seed rule, benign traffic in the
-second step to create a set of plausible rules from the seed rule, and
-existing rules from popular sources in the third step to rank
-alternative plausible rules.
+first step to create an overspecific seed rule, it uses the benign
+traffic in the second step to create a set of plausible rules from the
+seed rule, and it uses existing rules from popular sources in the
+third step to rank alternative plausible rules.
 
 \vspace{1ex}
 \noindent
