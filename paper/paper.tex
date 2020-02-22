@@ -653,10 +653,12 @@ function is proportional to the popularity of the number of options it
 declares. The list below shows the rule options for the top-5 rules
 \tname{} produces for this attack.\Mar{algum problema em fazer isto?
   exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
+  \begin{figure}[h]
+    \vspace{-2ex}
+    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags}]{top-synflood.rules}
+    \vspace{-3ex}  
+  \end{figure}
 
-  \CodeIn{...window:512; threshold: type both, track by\_dst, count 5000, seconds 3;...}
-
-  \CodeIn{...flags: S; window:512; threshold: type both, track by\_dst, count 5000, seconds 3;...}
    }
 
 To sum up, \tname{} uses the messages that manifest an attack in the
@@ -747,7 +749,6 @@ indicates, as expected, that the set of rule options is
 overspecified. \tname{} produces the following five rules at the top
 of the ranking after minimization and ranking.\Mar{eu ainda estou
   aguardando isto. A tabela 3 tambem nao indica o resultado!}
-  \Luc{Irei adicionar}
 
 \begin{figure}[h]
   \vspace{-2ex}
