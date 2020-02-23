@@ -597,30 +597,33 @@ the previous step as seed to bootstrap the search for alternative
 plausible rules, \ie{}, rules that satisfy the aforementioned
 invariant. The search is designed to generate rules containing subsets
 of the options from the seed rule. Considering this example, \tname{}
-produces a total of \Fix{XXXXX} plausible rules at the end of the
-search.\Mar{Technically, there are $32 (=2^5)$ subsets for a set with 5
-  elements. So, it is important to indicate why Table 3 shows sooo
-  many plausible rules and that this is is a very simple rule (for illustration).}
+produces a total of \pingscanplausible{} plausible rules at the end of
+the search.  In the worst case, \tname{} produces $2^n$ plausible
+rules, where $n$ is the number of options contained in the inferred
+rule ($n=5$, in this case). Rules are discared in the search process
+as they are found to be implausible.
+
+%% \Mar{Technically, there are $32 (=2^5)$ subsets for a set
+%%   with 5 elements. So, it is important to indicate why Table 3 shows
+%%   sooo many plausible rules and that this is is a very simple rule
+%%   (for illustration).}
 
 Finally, \tname{} ranks plausible rules according to heuristics
 learned from a database of existing rules. The intuition is that new
 rules should share characteristics with pre-existing rules. For
-example, one heuristic function used by \tname{} leverages the amount
-of options a rule typically has. The score of a rule, given by this
-function, is proportional to the popularity of the number of options
+example, one heuristic function used by \tname{} leverages the
+\emph{size of a rule} for that. The score of a rule given by such a
+function is proportional to the popularity of the number of options
 declared in rules of a given
-protocol. Figure~\ref{fig:distribution-contents} shows the
-distribution of the number of content options for the database of
-rules we used\Mar{reference} \Luc{essa distribuicao n eh utilizada 
-para pontuar as regras desse exemplo, n seria mais interessante citar outra?
-poderia ser a de tamanhos das regras.}. Note that rules with 1 to 3 options 
-are more common \Luc{1 to 3 \textbf{content} options}. At the end of the 
-process, \tname{} ranks the golden rule at the top of the ranking 
-including \Fix{XXXXXX} other plausible rules.
-
-\Mar{add short par indicating that other problems can be much more
-  complex than this...}
-
+protocol. Figure~\ref{fig:distribution-rule-size} shows the
+distribution of the number of content options associated with rules
+from a public data set~\cite{emerging-threats-open}. Note that rules
+with 2 to 6 options are more common. At the end of this step, \tname{}
+ranks the golden rule at the top of the ranking, including
+\pingscanplausible{} rules. It is worth noting that
+\tname\ consistently ranks the golden rule very high in most of the
+cases even when the seed rule, produced at the first step, contains a
+large number of options (see Table~\ref{table:results}).
 
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step to create a potentially overspecified seed rule. Then, it
@@ -679,7 +682,7 @@ that goal, \tname{} uses benign traffic to reduce the likelihood the
 minimization step uses a population-based gradient descent-like search
 to find all plausible rules derived from the seed rule, obtained in
 the previous step. Third, \tname{} uses several heuristic functions
-derived from a dataset of rules to rank the rules generated in the
+derived from a data set of rules to rank the rules generated in the
 previous step.
 
 
@@ -762,7 +765,7 @@ manifestation of the same attack.
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-\tname{} leverages public datasets~\cite{tcpreplay} of benign traffic
+\tname{} leverages public data sets~\cite{tcpreplay} of benign traffic
 to guide the search for more general rules, hence addressing the
 overffiting issue. To that end, \tname{} \emph{minimizes} the rules
 produced in the previous step, preserving the invariant of \emph{only}
@@ -902,7 +905,7 @@ of the training data it uses. For the positive traffic, \tname{} only
 requires one sample, but can benefit of several samples as the example
 from Section~\ref{sec:dos} illustrated. The same applies for the
 negative traffic. In this case, however, \tname{} can use public
-datasets available online.
+data sets available online.
 
 \vspace{2ex}
 \noindent\textbf{Implementation details.} We implemented function
@@ -937,7 +940,7 @@ synthesized and a human-created rule is the size of the synthetic
 rule, \ie{}, the number of options it contains. Informally, rules with
 popular sizes score high whereas inpopular rules score
 low. Figure~\ref{fig:distribution-rule-size} shows the histogram of
-rule sizes for our rule dataset. The x-axis shows the number of
+rule sizes for our rule data set. The x-axis shows the number of
 options included in a rule (up to 10) while the y-axis shows the
 number of rules with the corresponding number of options. Note that
 there are 11 rules with no options. These rules only use the header to
@@ -971,7 +974,7 @@ range.
 \subsubsection{Number of content options.} We empirically observed that content options are very
 common. \Luc{Se for preciso temos numeros para fundamentar isso
   melhor, sao cerca de 70K contents nas 28K regras do
-  dataset}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
+  data set}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
   (\%) das 28K regras tem contents.} \Luc{sao 69417 contents nas 26094 regras q utilizam contents} As consequence, we defined a
 heuristic function that takes the number of content options into
 account. We calculate the contribution of number of content options
@@ -1121,7 +1124,7 @@ term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
 observed across all strings appearing as content parameters, and $N$
 is the number of content options in a given
 rule. Figure~\ref{fig:distribution-strings} shows the distribution of
-the ten most popular strings in our rule dataset. To illustrate this
+the ten most popular strings in our rule data set. To illustrate this
 function, let us consider a rule with two content options, using the
 strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
@@ -1154,8 +1157,8 @@ unmatch).
 \end{figure}
 
 %% we observed---by analyzing
-%% the dataset of existing rules (see
-%% Section~\ref{sec:dataset-benign})---that these rules often indicate
+%% the data set of existing rules (see
+%% Section~\ref{sec:data set-benign})---that these rules often indicate
 %% what part of the message the content string should be checked
 %% against. For example,
 %% For example, the
@@ -1180,7 +1183,7 @@ modifier
 shows the histogram of content modifiers for http. Although content
 modifiers are applicable to rules of any protocol supported by
 Suricata, currently, \tname\ only supports tcp and http. These are the
-protocols involving ~80\% of the rules from our dataset.
+protocols involving ~80\% of the rules from our data set.
 
 %% and
 %% (2) the payload of messages of different protocols are not as
@@ -1208,7 +1211,7 @@ $i$.
 
 %% \Mar{Qual o rationale para considerar as varias
 %%   alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
-%%   \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no dataset.}
+%%   \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no data set.}
 %%   \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores que conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
                                                                              
 %% \Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
@@ -1482,15 +1485,15 @@ monitor~\cite{wireshark-net-monitor}.
 
 \subsubsection{Benign traffic.}\tname{} uses public databases storing benign
 traffic for all protocols covered by Suricata (see
-Figure~\ref{fig:distribution-rules-protocol}). We used two datasets of
-benign traffic. The Bigflows.pcap dataset is part of the
-TcpReplay~\cite{tcpreplay} open source project. This dataset includes
+Figure~\ref{fig:distribution-rules-protocol}). We used two data sets of
+benign traffic. The Bigflows.pcap data set is part of the
+TcpReplay~\cite{tcpreplay} open source project. This data set includes
 real network traffic of a busy private network access point to the
 Internet. According to the TcpReplay web site ``This capture is much
 larger and has a smaller average packet size than the previous capture
 (smallFlows.pcap). It also has many more flows and different
-applications.''. In addition to the Bigflows.pcap dataset, we also
-used datasets of normal traffic made available by Stratosphere
+applications.''. In addition to the Bigflows.pcap data set, we also
+used data sets of normal traffic made available by Stratosphere
 Lab~\cite{stratosphere-normal}.
 
 \subsubsection{Ground Truth.}To evaluate precision of \tname\ we
@@ -1669,7 +1672,9 @@ of messages.
 ...........
 
 
-%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
+%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser
+%% compostos por milhares de pacotes, um dos data sets q encontrei
+%% possui mais de 500k pacotes de flood. Os data set  s foram encontrados na internet.}
 
 \begin{figure}[h]
   \vspace{-2ex}
