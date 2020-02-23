@@ -520,35 +520,19 @@ from a single message.
 %% O campo Flags é intepretado como um vetor de bits, onde cada posição representa uma flag. Na regra, o valor do campo Flags é traduzido em caracteres que representam cada flag presente no pacote. Por exemplo: se o campo Flags possuir o valor 1010, na regra aparecerá fragbits:RM, pois os caracteres R e M indicam a presença do quarto e segundo bits.}
 
 
-\section{Illustrative Examples}
+\section{Illustrative Example}
 \label{sec:suri-metas-coverage}
-
-This section briefly presents examples of attacks and illustrates the
-rules that \tname{} synthesizes to capture those attacks.
-
-
-
-
-
-\subsection{Active Reconnaissance}
 \label{sec:active-recon}
 
-%% \Mar{@Lucas, acima falamos de porta. Abaixo nao falamos de
-%%   porta, apenas de maquina. Vc. pode ser mais especifico? ->} \Luc{De
-%%   fato estamos falando de duas coisas diferentes, mas ambas são
-%%   exemplos de 'active reconnaissance'. Primeiramente citamos o port
-%%   scanning, q tem o objetivo de encontrar portas abertas em uma
-%%   maquina especifica. Depois falamos do ping scan, q tem o objetivo de
-%%   encontrar ip's ativos numa rede.}
-
-Active Reconnaissance is a method used by malicious individuals to
-collect information about a computing system to determine potential
-vulnerabilities. This methods is used as a preliminary step towards an
-actual attack. For example, Ping Scan scans the network for IPs of
-accessible hosts. An attacker sends several ICMP Echo requests to a
-range of IP addresses in the network and checks which ones respond to
-these requests. This method enables an attacker to know which machines
-are active in the network.
+This section briefly shows how \tname{} synthesizes rules for one
+example attack. Active Reconnaissance is a method used by malicious
+individuals to collect information about a computing system to
+determine potential vulnerabilities. This method is used as a
+preliminary step towards an actual attack. For example, Ping Scan
+scans the network for IPs of accessible hosts. An attacker sends
+several ICMP Echo requests to a range of IP addresses in the network
+and checks which ones respond to these requests. This method enables
+an attacker to know which machines are active in the network.
 
 \vspace{-1ex}
 \begin{figure}[h!]
@@ -559,47 +543,51 @@ are active in the network.
 \end{figure}
 \vspace{-3ex}
 
-Figure 4 shows a Suricata rule that captures a Ping Scan attempt, as
-documented in NMAP~\cite{netmap}, a network discovery and security
-auditing open-source tool. The relevant options are in bold---the
+Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
+a Ping Scan attempt, as documented in NMAP~\cite{netmap}, a network
+discovery and security auditing open-source tool. The relevant options
+(see Section~\ref{sec:example-suricata-rules}) are in bold---the
 option \CodeIn{dsize: 0} indicates that the packet has no bytes in the
 payload and the option \CodeIn{itype: 8} indicates that the packet to
 be captured are ICMP Echo requests.
 
 
-In the following, we discuss the rule produced by \tname{} to capture
+In the following, we briefly show how \tname{} synthesizes rules for
 this attack. The action and the header of the rules that \tname{}
 creates are either inferred or left constant. For example, in this
 case, \tname{} sets the action to \CodeIn{alert} and sets the header
 to \CodeIn{<proto> any any -> any any}, indicating that it infers the
 target protocol and uses the most general flow description possible,
 \ie{}, it instructs the \nids\ to analyze the traffic flowing from/to
-any address and port.  The choice of these parameters are
-domain-specific and subject to change by the system administrator.
-The main challenge in synthesizing rules is to discover the set of
-options in a rule that blocks the malicious traffic, but allows the
-benign traffic to pass.
+any address and port.  The rationale for this decision is that the
+choice of these parameters are domain-specific and subject to change
+by the system administrator.  The main challenge in synthesizing rules
+is to discover the set of options in a rule that blocks the malicious
+traffic, but allows the benign traffic to pass.
 
-\tname{} proceeds as follows to synthesize rules. First, it analyzes the malicious
-traffic and extracts options expressed in that traffic. Recall from
-Section~\ref{sec:rules-and-packets} that rule options can be inferred
-from packet contents. \tname{} finds the following set of options at
-this stage:
+\tname{} proceeds as follows to synthesize rules. First, it analyzes
+the malicious traffic and extracts options expressed in that
+traffic. Recall from Section~\ref{sec:rules-and-packets} that some
+options can be inferred from packet contents. \tname{} finds the
+following options at this stage:
+{\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
+      \textbf{icode:}0; \textbf{icmp\_id:}23570;
+      \textbf{icmp\_seq:}3439;}}}.  By construction, a rule that uses
+this set of options captures the malicious traffic. Unfortunately, the
+rule above is overspecified. Informally, the rule includes ``too
+specific'' characteristics of the malicious traffic and could
+potentially result in false negatives. In this case, although the
+options \CodeIn{dsize:0} and \CodeIn{itype:8} are present in the set
+of inferred options (as the golden rule from
+Figure~\ref{fig:pingscan-example}), the others are not.
 
-\begin{figure}[h]
-  \vspace{-2ex}
-  \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{pingscan.suricata.synth}
-  \vspace{-2ex}  
-\end{figure}
+%% \vspace{-2.5ex}
+%% \begin{figure}[h]
+%%   \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{pingscan.suricata.synth}
+%% \end{figure}
+%% \vspace{-2.5ex}
+%% \noindent
 
-\noindent
-By construction, a rule that uses this set of options captures the
-malicious traffic. Unfortunately, the rule above is
-overspecified. Informally, the rule includes ``too specific''
-characteristics of the malicious traffic and could potentially result
-in false negatives. In this case, although options \CodeIn{dsize:0}
-and \CodeIn{itype:8}~(see Figure~\ref{fig:pingscan-example}) are
-present in the set of inferred options, the others are not.
 
 Second, \tname{} uses the benign traffic to mitigate the overfitting
 issue. In this step, \tname{} searches for alternative rules that
@@ -610,7 +598,9 @@ plausible rules, \ie{}, rules that satisfy the aforementioned
 invariant. The search is designed to generate rules containing subsets
 of the options from the seed rule. Considering this example, \tname{}
 produces a total of \Fix{XXXXX} plausible rules at the end of the
-search.
+search.\Mar{Technically, there are $32 (=2^5)$ subsets for a set with 5
+  elements. So, it is important to indicate why Table 3 shows sooo
+  many plausible rules and that this is is a very simple rule (for illustration).}
 
 Finally, \tname{} ranks plausible rules according to heuristics
 learned from a database of existing rules. The intuition is that new
@@ -618,218 +608,23 @@ rules should share characteristics with pre-existing rules. For
 example, one heuristic function used by \tname{} leverages the amount
 of options a rule typically has. The score of a rule, given by this
 function, is proportional to the popularity of the number of options
-declared in rules of a given protocol. At the end of the process,
-\tname{} ranks the golden rule at the top of the ranking including
-\Fix{XXXXXX} other plausible rules.
+declared in rules of a given
+protocol. Figure~\ref{fig:distribution-contents} shows the
+distribution of the number of content options for the database of
+rules we used\Mar{reference}. Note that rules with 1 to 3 options are
+more common.  At the end of the process, \tname{} ranks the golden
+rule at the top of the ranking including \Fix{XXXXXX} other plausible
+rules.
 
-
-%% the following rules 
-%% at the top of the ranking produced by \tname{}:
-%% 1)~{\small\CodeIn{itype:8; dsize:0;}}, 2)~{\small\CodeIn{itype:8;
-%%     icmp\_id:23570;}}, 3)~{\small\CodeIn{icode:8; icmp\_id:23570;}},
-%% 4)~{\small\CodeIn{itype:8; icode:0; dsize:0;}},
-%% 5)~{\small\CodeIn{icmp\_id:23570}}. Note that the golden rule appears
-%% at the top position.
-
-%% \begin{figure}[h]
-%%   \vspace{-2ex}
-%%   \lstinputlisting[language=C,numbers=none,frame=none,keywords={dsize,icode,itype,icmp\_id,icmp\_seq}]{top-pingscan.rules}
-%%   \vspace{-3ex}  
-%% \end{figure}
+\Mar{add short par indicating that other problems can be much more
+  complex than this...}
 
 
 To sum up, \tname{} uses the messages that manifest an attack in the
-first step to create a potentially overspecified seed rule, it uses
-the benign traffic in the second step to create a set of plausible
-rules from the seed rule, and it uses public databases with existing
-rules in the third step to rank plausible rules.
-
-\subsection{Remote Code Execution (RCE)}
-\label{sec:rce}
-\label{sec:jboss}
-\label{sec:content-example}
-
-%% Adaptacao do texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution
-
-RCE refers to the family of attacks where hackers exploit a network
-vulnerability to run arbitrary code---that could damage the system or
-steal sensitive information---on a remote machine. JBoss~\cite{jboss}
-is popular open source Java application server. This attacks enables
-remote execution of code on the JBoss application server.
-\Mar{@Lucas, por favor, observe o padrao usado nos exemplos
-  anteriores. eh preciso explicar em alto nivel o ataque antes de
-  explicar a regra!}
-
-%% In an RCE attack, hackers
-%% intentionally exploit a vulnerability in the system to run malware
-%% By prompting the targeted device to perform code execution, a hacker
-%% can run arbritrary code to
-%% their own programming in its
-%% place. This programming can then enable them to gain full access,
-%% steal data, carry out a full distributed denial of service (DDoS)
-%% attack, destroy files and infrastructure, or engage in illegal
-%% activity. And as the term remote execution suggests, an RCE
-%% cyberattack can take place from any geophysical location."\\
-
-
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
-  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code Execution.}
-\end{figure}
-
-%A opção  define que o match só será feito em pacotes que fazem parte
-%de uma conexão já estabelecida entre um cliente e um servidor. Além
-%disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente.
-
-Figure~\ref{fig:rule-jboss} shows a Suricata rule that captures a
-JBoss RCE attack.  The option \CodeIn{flow: established, to\_server;}
-indicates that a rule match will only occur on packets that (1) flow
-on an already-established connection and that (2) flow to the server
-as opposed to the client. For the content options the modifiers
-\CodeIn{nocase} and \CodeIn{http\_uri} indicate, respectively, that
-the matching not be case sensitive and that the string should be
-located at the packet field ``Request URI''. \Mar{Lucas, ``nocase''
-  tambem eh considerado modificador? Isto nao eh confuso? Na secao
-  4.3.4 consideramos modificadores como sinonimo para qualificador de
-  campo, nao?}\Luc{Sim, ``nocase'' define que a busca pela string nao deve ser case sensitive. Em 4.3.4 estamos considerando apenas os modificadores que definem posições/campos de pacotes http.}
-
-\tname{} reproduces the malicious JBoss attack using the traffic from
-a Nikto script~\cite{nikto}. However, similar JBoss attack is also
-available from the Metasploit database~\cite{metasploit}. As in the
-other examples, \tname{} uses, as additional inputs, benign traffic
-from \Fix{...} and a set of existing Suricata rules from
-\Fix{...}. \tname{} initially produces one seed rule containing
-\Fix{xx} options, by analyzing the malicious traffic alone. Then, it
-uses that seed rule to derive \Fix{yy} rules, each rule containing
-subsets of the option in the initial rule. Finally, it ranks that
-list. The list below shows the top-5 rules that \tname{}
-produces.\Mar{<- check/revise}
-
-\Fix{list rules}
-
-Note that the golden rule is in position \Fix{...} on this
-case. \Mar{explain syntactical difference, if exist}
-
-\subsection{Denial-of-Service}
-\label{sec:dos}
-
-The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
-to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
-works as follows in normal circumstances. First, a client sends a SYN
-packet to the server, requesting a connection. Second, the server
-responds with a SYN-ACK packet to the client. Third, the client
-responds with an ACK message and the connection is established. Aware
-of the protocol, an attacker sends multiple SYN packets to different
-ports of a server, often using fake IP addresses. Then, after the
-server responds with a SYN-ACK packet, the client keeps sending other
-SYN packets to avoid the connection to time out. Without proper
-protection, the server accepts these malicious requests and eventually
-legitimate requests cannot be satisfied due to resource exhaustion.
-Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
-this attack. This rule was obtained from the Emerging Threats Open
-Ruleset~\cite{emerging-threats-open}. The relevant options in the
-rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
-SYN packet in a TCP packet and the option \CodeIn{threshold: type
-  both, track by\_dst, count 5000, seconds 5} indicates that a high
-volume of such packets should be requested in a short period of
-time. The other options are for documentation purposes.
-
-
-...........
-In this case, however, that information alone is
-insufficient as the malicious traffic is characterized as a sequence
-of messages. 
-...........
-
-
-%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
-
-\begin{figure}[h]
-  \vspace{-2ex}
-  \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold,window}]{synflood.suricata.synth}
-%  \caption{Suricata rule for SYN Flood Attacks.}
-  %  \label{fig:synflood-example-synt}
-  \vspace{-2ex}  
-\end{figure}
-
-%% \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
-%%   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
-%%   respondam isto logo.}  \Gui{O window:64 seria removido
-%%   sim.}\Mar{ok. vou explicar isto.}
-  %% \Luc{O segundo campo da opção flags define flags que serão
-  %%   ignoradas. Nesse caso a regra procura por pacotes onde apenas a
-  %%   flag S está 'setada', independentemente do valor das flags 1 e
-  %%   2. Portanto a regra gerada pode capturar coisas diferentes da
-  %%   regra original. A inferencia do "12" n pode ser feita apenas a
-  %%   partir do pacote de entrada, precisariamos tratar
-  %%   isso.}\Mar{vc. pode explicar isto **mais detalhadamente** \Luc{a opção flags pode ter dois campos separados por virgula (ex: flags:S,12). o primeiro campo indica quais flags devem estar ativas em um pacote para que o suricata gere um alerta. se uma ou mais flags forem irrelevantes para a detecção de um determinado ataque (ou seja, se n importa se a flag está ou não ativa), elas serão adicionadas ao segundo campo.} E (1)
-  %%   explicar que isto eh uma limitacao \Luc{n entendi exatamente oq explicar aqui.} e (2) indicar a possivel consequencia
-  %%   disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
-
-\noindent
-
-.....
-
- The list below shows the rule options for the top-5 rules
-\tname{} produces for this attack.\Mar{algum problema em fazer isto?
-  exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
-  \begin{figure}[h]
-    \vspace{-2ex}
-    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags}]{top-synflood.rules}
-    \vspace{-3ex}  
-  \end{figure}
-
-   }\Mar{Lucas, eu nao entendo porque vc. desconsiderou threshold da
-  discussao (afinal, a gente destaca thrshold como relevante no inicio
-  desta secao). tambem nao entendo porque window---que a gente disse
-  acima que *nao* era relevante---aparece nas duas regras
-  geradas. enfim, isto esta inconsistente com nosso discurso.}
-
-\vspace{1ex}
-\noindent
-\textbf{Differences.}~Note that there are differences between the
-options produced in the first step of \tname{} and the options from
-the golden rule, as per Figure~\ref{fig:synflood-example}. The option
-\CodeIn{flags} does not mention parameters \CodeIn{1 2}, there is an
-extra option \CodeIn{window}, and there are differences in the option
-\CodeIn{threshold}. Considering the option \CodeIn{flags}, the first
-parameter of that option indicates what flags in the packet must be
-set while the second parameter indicates non-mandatory flags (\ie{},
-``don't cares''). More specifically, the option \CodeIn{flags: S}
-indicates that the flag ``S'' must be set and all flags not mentioned
-(including ``1'' and ``2'') must be unset for the \nids\ to capture
-the traffic. Consequently, that choice of option alone could result in
-false negatives and false positives. An attack that satisfies all
-other conditions in a rule and has flags ``1'' or ``2'' set would be
-captured by the original rule but not captured by the inferred rule---a case of
-false negative. Likewise, an attack that satisfies all conditions and
-have flags ``1'' and ``2'' unset would be captured by the inferred
-rule but not captured by the original rule---a case of false positive. The set of
-positive examples is to blame in this case. To mitigate this issue,
-the input messages should have covered cases with options ``1'' or
-``2'' set. Considering option \CodeIn{window: 512}, \tname{} is able
-to generate rules without that option, as discussed above. Considering
-option \CodeIn{threshold}, the values used in the golden rule are
-domain-specific. \tname{} uses default values for these options. We
-conjecture that the system administrator would be able to configure
-this option.
-
-
-%% \begin{table}[h]
-%%   \caption{\label{table:rules}Rule evolution}  
-%%   \centering
-%%   \begin{tabular}{lllll}
-%%     \toprule
-%%     \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
-%%     \midrule     
-%%     0 & (ack:0; seq:0; window:0; flags:F;)\\
-%%     5 & (window:0; flags:F;)\\
-%%     68 & (window:64; flags:F;)\\
-%%     73 & (window:64; flags:S,12;)\\
-%%     94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
-%%     \bottomrule
-%%   \end{tabular}
-%% \end{table}
+first step to create a potentially overspecified seed rule. Then, it
+uses benign traffic in the second step to create a set of plausible
+rules from the seed rule. Finally, in the third step, \tname{} uses
+existing rules to learn heuristics to rank plausible rules.
 
 \section{Technique}
 \label{sec:technique}
@@ -1766,7 +1561,202 @@ performance compared to processing actual network messages.
 
 \subsection{Threats to Validity}
 
-External Validity. \Fix{elaborate ...how popular are Suricata/Metasploit?}
+External Validity. \Fix{elaborate ...how popular are
+  Suricata/Metasploit?}
+
+
+\section{Discussion}
+
+\subsection{Sample of other attacks}
+
+\subsubsection{Remote Code Execution (RCE)}
+\label{sec:rce}
+\label{sec:jboss}
+\label{sec:content-example}
+
+%% Adaptacao do texto copiado de:  https://www.solarwindsmsp.com/blog/remote-code-execution
+
+RCE refers to the family of attacks where hackers exploit a network
+vulnerability to run arbitrary code---that could damage the system or
+steal sensitive information---on a remote machine. JBoss~\cite{jboss}
+is popular open source Java application server. This attacks enables
+remote execution of code on the JBoss application server.
+\Mar{@Lucas, por favor, observe o padrao usado nos exemplos
+  anteriores. eh preciso explicar em alto nivel o ataque antes de
+  explicar a regra!}
+
+%% In an RCE attack, hackers
+%% intentionally exploit a vulnerability in the system to run malware
+%% By prompting the targeted device to perform code execution, a hacker
+%% can run arbritrary code to
+%% their own programming in its
+%% place. This programming can then enable them to gain full access,
+%% steal data, carry out a full distributed denial of service (DDoS)
+%% attack, destroy files and infrastructure, or engage in illegal
+%% activity. And as the term remote execution suggests, an RCE
+%% cyberattack can take place from any geophysical location."\\
+
+
+\begin{figure}[H]
+  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
+  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code Execution.}
+\end{figure}
+
+%A opção  define que o match só será feito em pacotes que fazem parte
+%de uma conexão já estabelecida entre um cliente e um servidor. Além
+%disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente.
+
+Figure~\ref{fig:rule-jboss} shows a Suricata rule that captures a
+JBoss RCE attack.  The option \CodeIn{flow: established, to\_server;}
+indicates that a rule match will only occur on packets that (1) flow
+on an already-established connection and that (2) flow to the server
+as opposed to the client. For the content options the modifiers
+\CodeIn{nocase} and \CodeIn{http\_uri} indicate, respectively, that
+the matching not be case sensitive and that the string should be
+located at the packet field ``Request URI''. \Mar{Lucas, ``nocase''
+  tambem eh considerado modificador? Isto nao eh confuso? Na secao
+  4.3.4 consideramos modificadores como sinonimo para qualificador de
+  campo, nao?}\Luc{Sim, ``nocase'' define que a busca pela string nao deve ser case sensitive. Em 4.3.4 estamos considerando apenas os modificadores que definem posições/campos de pacotes http.}
+
+\tname{} reproduces the malicious JBoss attack using the traffic from
+a Nikto script~\cite{nikto}. However, similar JBoss attack is also
+available from the Metasploit database~\cite{metasploit}. As in the
+other examples, \tname{} uses, as additional inputs, benign traffic
+from \Fix{...} and a set of existing Suricata rules from
+\Fix{...}. \tname{} initially produces one seed rule containing
+\Fix{xx} options, by analyzing the malicious traffic alone. Then, it
+uses that seed rule to derive \Fix{yy} rules, each rule containing
+subsets of the option in the initial rule. Finally, it ranks that
+list. The list below shows the top-5 rules that \tname{}
+produces.\Mar{<- check/revise}
+
+\Fix{list rules}
+
+Note that the golden rule is in position \Fix{...} on this
+case. \Mar{explain syntactical difference, if exist}
+
+\subsubsection{Denial-of-Service}
+\label{sec:dos}
+
+The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
+to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
+works as follows in normal circumstances. First, a client sends a SYN
+packet to the server, requesting a connection. Second, the server
+responds with a SYN-ACK packet to the client. Third, the client
+responds with an ACK message and the connection is established. Aware
+of the protocol, an attacker sends multiple SYN packets to different
+ports of a server, often using fake IP addresses. Then, after the
+server responds with a SYN-ACK packet, the client keeps sending other
+SYN packets to avoid the connection to time out. Without proper
+protection, the server accepts these malicious requests and eventually
+legitimate requests cannot be satisfied due to resource exhaustion.
+Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
+this attack. This rule was obtained from the Emerging Threats Open
+Ruleset~\cite{emerging-threats-open}. The relevant options in the
+rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
+SYN packet in a TCP packet and the option \CodeIn{threshold: type
+  both, track by\_dst, count 5000, seconds 5} indicates that a high
+volume of such packets should be requested in a short period of
+time. The other options are for documentation purposes.
+
+
+...........
+In this case, however, that information alone is
+insufficient as the malicious traffic is characterized as a sequence
+of messages. 
+...........
+
+
+%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser compostos por milhares de pacotes, um dos datasets q encontrei possui mais de 500k pacotes de flood. Os datasets foram encontrados na internet.}
+
+\begin{figure}[h]
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold,window}]{synflood.suricata.synth}
+%  \caption{Suricata rule for SYN Flood Attacks.}
+  %  \label{fig:synflood-example-synt}
+  \vspace{-2ex}  
+\end{figure}
+
+%% \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
+%%   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
+%%   respondam isto logo.}  \Gui{O window:64 seria removido
+%%   sim.}\Mar{ok. vou explicar isto.}
+  %% \Luc{O segundo campo da opção flags define flags que serão
+  %%   ignoradas. Nesse caso a regra procura por pacotes onde apenas a
+  %%   flag S está 'setada', independentemente do valor das flags 1 e
+  %%   2. Portanto a regra gerada pode capturar coisas diferentes da
+  %%   regra original. A inferencia do "12" n pode ser feita apenas a
+  %%   partir do pacote de entrada, precisariamos tratar
+  %%   isso.}\Mar{vc. pode explicar isto **mais detalhadamente** \Luc{a opção flags pode ter dois campos separados por virgula (ex: flags:S,12). o primeiro campo indica quais flags devem estar ativas em um pacote para que o suricata gere um alerta. se uma ou mais flags forem irrelevantes para a detecção de um determinado ataque (ou seja, se n importa se a flag está ou não ativa), elas serão adicionadas ao segundo campo.} E (1)
+  %%   explicar que isto eh uma limitacao \Luc{n entendi exatamente oq explicar aqui.} e (2) indicar a possivel consequencia
+  %%   disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
+
+\noindent
+
+.....
+
+ The list below shows the rule options for the top-5 rules
+\tname{} produces for this attack.\Mar{algum problema em fazer isto?
+  exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
+  \begin{figure}[h]
+    \vspace{-2ex}
+    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags}]{top-synflood.rules}
+    \vspace{-3ex}  
+  \end{figure}
+
+   }\Mar{Lucas, eu nao entendo porque vc. desconsiderou threshold da
+  discussao (afinal, a gente destaca thrshold como relevante no inicio
+  desta secao). tambem nao entendo porque window---que a gente disse
+  acima que *nao* era relevante---aparece nas duas regras
+  geradas. enfim, isto esta inconsistente com nosso discurso.}
+
+\vspace{1ex}
+\noindent
+\textbf{Differences.}~Note that there are differences between the
+options produced in the first step of \tname{} and the options from
+the golden rule, as per Figure~\ref{fig:synflood-example}. The option
+\CodeIn{flags} does not mention parameters \CodeIn{1 2}, there is an
+extra option \CodeIn{window}, and there are differences in the option
+\CodeIn{threshold}. Considering the option \CodeIn{flags}, the first
+parameter of that option indicates what flags in the packet must be
+set while the second parameter indicates non-mandatory flags (\ie{},
+``don't cares''). More specifically, the option \CodeIn{flags: S}
+indicates that the flag ``S'' must be set and all flags not mentioned
+(including ``1'' and ``2'') must be unset for the \nids\ to capture
+the traffic. Consequently, that choice of option alone could result in
+false negatives and false positives. An attack that satisfies all
+other conditions in a rule and has flags ``1'' or ``2'' set would be
+captured by the original rule but not captured by the inferred rule---a case of
+false negative. Likewise, an attack that satisfies all conditions and
+have flags ``1'' and ``2'' unset would be captured by the inferred
+rule but not captured by the original rule---a case of false positive. The set of
+positive examples is to blame in this case. To mitigate this issue,
+the input messages should have covered cases with options ``1'' or
+``2'' set. Considering option \CodeIn{window: 512}, \tname{} is able
+to generate rules without that option, as discussed above. Considering
+option \CodeIn{threshold}, the values used in the golden rule are
+domain-specific. \tname{} uses default values for these options. We
+conjecture that the system administrator would be able to configure
+this option.
+
+
+%% \begin{table}[h]
+%%   \caption{\label{table:rules}Rule evolution}  
+%%   \centering
+%%   \begin{tabular}{lllll}
+%%     \toprule
+%%     \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
+%%     \midrule     
+%%     0 & (ack:0; seq:0; window:0; flags:F;)\\
+%%     5 & (window:0; flags:F;)\\
+%%     68 & (window:64; flags:F;)\\
+%%     73 & (window:64; flags:S,12;)\\
+%%     94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
+%%     \bottomrule
+%%   \end{tabular}
+%% \end{table}
+
+
 
 \section{Related Work}
 
