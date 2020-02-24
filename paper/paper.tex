@@ -664,27 +664,33 @@ only needs to provide the malicious traffic on input.
 \tname\ works as follows. First, it produces a potentially
 overspecified rule that captures the malicious traffic, which is
 provided on input in the form of pcap files~\cite{pcap}. In this step,
-\tname\ detects rule options directly from the input messages (see
-Section~\ref{sec:rules-and-packets}). As only malicious traffic is
-considered in this step, the rule produced is likely overspecified,
-\ie{}, it may be more restrictive than the golden rule (see
-Section~\ref{sec:suri-metas-coverage}). Consequently, the use of that
-rule could lead to false negatives. Second, \tname{} generates rules
-that weakens the constraints expressed in the inferred seed rule
-whilest still capturing the malicious traffic. Given that every option
-declared in a rule needs to be satisfied for a rule to capture an
-attack, any subset of the set of options---inferred in the first
-step---captures the malicious traffic by definition. \tname{}
-leverages that observation to search for rules containing a proper
-subset of rules defined in the original seed option. Although that
-approach captures the malicious traffic, it can result in false
-positives. Intuitively, there are no restrictions on to what extent a
-rule can be relaxed. \tname{} uses benign traffic for that
-purpose. The minimization step uses a population-based gradient
-descent-like search to find all plausible rules derived from the seed
-rule, obtained in the previous step. Finally, \tname{} uses several
-heuristic functions derived from a data set of existing rules to rank
-the plausible rules generated in the previous step.
+\tname\ detects options directly from the input messages (see
+Section~\ref{sec:rules-and-packets}). More precisely, it produces a
+rule containing all possible options satisfied by the traffic. Let us
+refer to that rule as the \emph{seed rule} and its corresponding set
+of options as \emph{seed options}. Note that, as only malicious
+traffic is considered in this step, the seed rule is likely
+overspecified, \ie{}, it may be more restrictive than the golden rule
+(see Section~\ref{sec:suri-metas-coverage}). Consequently, the use of
+that rule to capture attacks associated with the input traffic could
+lead to false negatives.  Second, \tname\ generates rules that weaken
+the constraints associated with the seed options whilst still
+capturing the malicious traffic. Given that every option declared in a
+rule needs to be satisfied for a rule to capture an attack, any subset
+of the set of seed options must capture the malicious traffic by
+definition. \tname{} leverages that observation to search for rules
+containing a proper subset of options from the seed options. However,
+note that that approach alone could result in false positives as it
+imposes no limit on to what extent a rule can be relaxed. \tname{}
+uses benign traffic for that purpose. More precisely, it uses a
+gradient descent-like search to find all plausible rules derived from
+the seed rule, obtained in the previous step. Finally, \tname{} uses
+several heuristic functions derived from a data set of existing rules
+to rank the plausible rules generated in the previous step by their
+similarity to existing rules. The rationale is that many plausible
+rules can be generated in this step and they have different semantics,
+which can differ from user's intent. Similarity is used to approximate
+user's intent.
 
 
 %%  As the generation
