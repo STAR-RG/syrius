@@ -631,17 +631,16 @@ uses benign traffic in the second step to create a set of plausible
 rules from the seed rule. Finally, in the third step, \tname{} uses
 existing rules to learn heuristics to rank plausible rules.
 
-\section{Technique}
-\label{sec:technique}
-
-\begin{figure*}[ht!]
+\begin{figure*}[ht]
   \centering
-  \includegraphics[trim=0 350 100 0,clip,width=0.65\textwidth]{figs/nids-workflow}
+  \includegraphics[trim=0 395 50 0,clip,width=0.65\textwidth]{figs/nids-workflow}
   \caption{\tname\ workflow.}
   \label{fig:overview}
-  \vspace{-1ex}
+  \vspace{-2ex}
 \end{figure*}
 
+\section{Technique}
+\label{sec:technique}
 
 \tname{} is a technique to synthesize rules for signature-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
@@ -653,37 +652,44 @@ malicious traffic.
 benign and malicious network traffic and (2) rules from public
 rulesets. \tname\ takes on input malicious and benign traffic and a
 set of rules from public rulesets and produces on output a list of
-plausible rules to isolate the malicious from the benign
-traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
-pipeline of three components, which appear numbered in the figure.
-The inputs of the technique appear at the bottom of the figure whereas
-the output appears at the right.
+\emph{plausible rules}---\ie{}, rules that isolate the malicious
+traffic from the benign traffic---in order of their likelihood to
+reflect user's intent. Figure~\ref{fig:overview} shows the workflow of
+\tname{} as a pipeline of three components, which appear numbered in
+the figure.  Public data sets of benign
+traffic~\cite{tcpreplay,stratosphere-normal} and \nids\ rules
+exist~\cite{emerging-threats-open}. Consequently, a user of \tname{}
+only needs to provide the malicious traffic on input.
 
 \tname\ works as follows. First, it produces a potentially
-overspecified rule that captures the malicious traffic, provided on
-input in the form of pcap files~\cite{pcap}. In this step,
+overspecified rule that captures the malicious traffic, which is
+provided on input in the form of pcap files~\cite{pcap}. In this step,
 \tname\ detects rule options directly from the input messages (see
 Section~\ref{sec:rules-and-packets}). As only malicious traffic is
 considered in this step, the rule produced is likely overspecified,
-\ie{}, it includes more options than the golden rule (see
+\ie{}, it may be more restrictive than the golden rule (see
 Section~\ref{sec:suri-metas-coverage}). Consequently, the use of that
-rule could lead to false negatives as not all manifestations of the
-same attack are identical. Second, \tname{} generates plausible rules
-that are similar to the seed rule produced in the previous step. It is
-worth noting that any subset of the original set of options captures
-the malicious traffic. \tname{} leverages that observation to search
-for rules containing a proper subset of rules defined in the original
-seed option. As the generation procedure discards options from the
-initial rule, the rules \tname{} creates satisfies the property of
-capturing malicious traffic. However, the goal of \tname\ is to
-produce rules that capture \emph{only} malicious traffic. To achieve
-that goal, \tname{} uses benign traffic to reduce the likelihood the
-\nids\ will report false positives on the synthesized rule. The
-minimization step uses a population-based gradient descent-like search
-to find all plausible rules derived from the seed rule, obtained in
-the previous step. Third, \tname{} uses several heuristic functions
-derived from a data set of rules to rank the rules generated in the
-previous step.
+rule could lead to false negatives. Second, \tname{} generates rules
+that weakens the constraints expressed in the inferred seed rule
+whilest still capturing the malicious traffic. Given that every option
+declared in a rule needs to be satisfied for a rule to capture an
+attack, any subset of the set of options---inferred in the first
+step---captures the malicious traffic by definition. \tname{}
+leverages that observation to search for rules containing a proper
+subset of rules defined in the original seed option. Although that
+approach captures the malicious traffic, it can result in false
+positives. Intuitively, there are no restrictions on to what extent a
+rule can be relaxed. \tname{} uses benign traffic for that
+purpose. The minimization step uses a population-based gradient
+descent-like search to find all plausible rules derived from the seed
+rule, obtained in the previous step. Finally, \tname{} uses several
+heuristic functions derived from a data set of existing rules to rank
+the plausible rules generated in the previous step.
+
+
+%%  As the generation
+%% procedure discards options from the initial rule, the rules \tname{}
+%% creates satisfy the property of capturing malicious traffic.
 
 
 
@@ -705,6 +711,8 @@ previous step.
 
 
 \subsection{Step 1: Reverse Engineering}
+
+\Mar{----------------------------------- PAREI AQUI}
 
 The goal of the first step is to extract options from the positive
 traffic, which is characterized with pcap files~\cite{pcap}, a popular
