@@ -718,56 +718,73 @@ user's intent.
 
 \subsection{Step 1: Reverse Engineering}
 
-\Mar{----------------------------------- PAREI AQUI}
+The first step of \tname\ is Reverse Engineering. The goal of this
+step is to extract options from the malicious traffic. A rule that
+contains these options, by construction, captures the malicious
+traffic. \tname\ uses two strategies to extract options: 1)~field and
+2)~payload. We elaborate these strategies in the following.
 
-The goal of the first step is to extract options from the positive
-traffic, which is characterized with pcap files~\cite{pcap}, a popular
-format to describe network packets.
+For the field strategy, \tname{} parses the input messages looking for
+options associated with the data in the fields of a network
+message. Section~\ref{sec:rules-and-packets} shows the correspondence
+between packet fields and some of the rule options from
+\suri. Section~\ref{sec:active-recon} shows a concrete example where
+the values for options are directly extracted from packet fields. We
+constructed the mapping of network fields to options manually, from
+the \suri\ documentation.
 
-For that, \tname{} parses the message looking for options associated
-with the data. As described in Section~\ref{sec:rules-and-packets},
-there is a correspondence between packet fields and rule
-options. \tname{} leverages that mapping to infer options. The
-examples of sections~\ref{sec:dos} and~\ref{sec:active-recon} show
-cases where \tname{} infers options with this mapping. Unfortunately,
-inferring options at the field granularity level is insufficient to
-capture content options as those described on
-Section~\ref{sec:content-example}. These options refer to parts of the
-payload of the message and cannot be extracted directly from the
-fields. Handling this case is critically important as 93\% of the
-rules contain \CodeIn{content} options.
+Unfortunately, the relevant data for the option may be at the message
+payload not the fields. Figure~\ref{fig:rule-jboss} shows an example
+of a rule that captures traffic containing the string
+\CodeIn{"/HtmlAdaptor"} in the payload.  The content strategy focuses
+on extracting (content) options from the payload. It is very important
+to note that content options are prevalent. For example,
+\percRulesWithContent{} of the \numrulessuri{} rules from the public
+data set~\cite{emerging-threats-open} we analyzed contain at least one
+option of this kind. Figure~\ref{fig:distribution-contents} shows the
+histogram of the number of these options per rule for the data set
+mentioned above. We limited the number of content options per rule to
+10 for space. Rules without \CodeIn{content} options are an exception
+and half of the rules contain at least two \CodeIn{content} options.
+To find the values associated with these options, \tname{} splits the
+payload of the malicious message in tokens using natural language
+delimiters, such as $\backslash$t, $\backslash$n, $\backslash$r, and
+spaces. We observed, by inspecting existing rules, that
+\CodeIn{content} options typically refer to sequence of characters in
+the payload of messages separated by these delimiters. This
+tokenization step can generate dozens of options.  For example,
+considering the example from Section~\ref{sec:content-example},
+\tname{} produces a total of \Fix{XXX} content options.
+
+\Mar{Nao esta muito claro como isto funciona. Rodamos sempre as duas
+  estrategias (para obter field options e content options)?
+  (Precisamos dizer se eh possivel ter regras com os dois tipos de
+  opcoes). Como isto funciona 1) quando uma ataque tem varias
+  mensagens (e.g., ping scan) e 2) quando temos varios ataques?}
+
+\textbf{Implementation.}\Fix{elaborate...}
+, characterized with pcap files~\cite{pcap}, a popular format
+to describe network packets.
 
 
-Figure~\ref{fig:distribution-contents} shows the histogram of the
-number of these options per rule obtained from a public
-ruleset~\cite{emerging-threats-open} containing 27.8K Suricata
-rules. We limited the number of content options per rule to 10 for
-space. Rules without \CodeIn{content} options is an exception
-(7\%) and half of the rules contain at least two
-\CodeIn{content} options.  To find the values associated with these
-options, \tname{} splits the payload of the malicious message in
-tokens using natural language delimiters, such as $\backslash$t,
-$\backslash$n, $\backslash$r, and spaces. We observed, by inspecting
-existing rules, that \CodeIn{content} options typically refer to
-sequence of characters in the payload of messages separated by these
-delimiters. This tokenization step can generate dozens of options.
-\tname{} produced a total of \Fix{xx} content options for the example
-Section~\ref{sec:content-example}.
 
 
-\Mar{Revisar.........................}
-\Fix{
-A avaliação que fazemos aqui pontua um dado content de acordo com
-quantas vezes o campo em que ele se encontra eh referenciado nas
-regras. Por exemplo, vamos supor que o tokenizer produziu a opção
-content: "/HtmlAdaptor". Essa string pertence ao campo "Request
-URI:". Esse campo pode ser acessado pelo modificador http\_uri. O
-tokenizer associa o content a esse modificador.
-}
+
+
+%% \Fix{
+%% A avaliação que fazemos aqui pontua um dado content de acordo com
+%% quantas vezes o campo em que ele se encontra eh referenciado nas
+%% regras. Por exemplo, vamos supor que o tokenizer produziu a opção
+%% content: "/HtmlAdaptor". Essa string pertence ao campo "Request
+%% URI:". Esse campo pode ser acessado pelo modificador http\_uri. O
+%% tokenizer associa o content a esse modificador.
+%% }
 
 
 \subsection{Step 2: Rule Minimization}
 \label{sec:minimization}
+
+\Mar{------------------------------------------- Eu estou aqui}
 
 The rule reported in the first step satisfies the criterion to only
 capture positive traffic. Unfortunately, that rule is overconstrained.
@@ -1397,28 +1414,34 @@ system administrator in finding the rule that fits the purpose.
     
     %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
 
-
-
 \begin{table}[h!]
   \small
   \caption{\label{table:results}Results.}
+  \vspace{-2ex}
   \centering
-  \begin{tabular}{lcrp{9cm}}
+  \begin{tabular}{lrrr}
     \toprule
-    \multicolumn{1}{c}{Name} &
-    \multicolumn{1}{c}{\#~Options Seed Rule} &
+    \multicolumn{1}{c}{\multirow{2}{*}{Name}} &
+    \#~Options &
+    \#~Plausible Rules &    
     \multicolumn{1}{c}{Rank} \\
+
+     &
+    \multicolumn{1}{c}{(step 1)} &
+    \multicolumn{1}{c}{(step 2)} &    
+    \multicolumn{1}{c}{(step 3)} \\
+
     \midrule
-    Ping Scan & 5 & - \\
-    SYN Flood & 2 & - \\
-    JBoss JMX & 23 & 23 \\
-    WeBid & 23 & -\\    
-    ColdFusion & 19 & 5\\
-    .htaccess access & 17 & 2\\
-    .idq access & 19 & 2 \\
-    iisadmin access & 17 & 1 \\
-    /system32/ in URI & 20 & 2 \\
-    Script tag in URI & 22 & - \\
+    Ping Scan & 5 & - & - \\
+    SYN Flood & 2 & - & - \\
+    JBoss JMX & 23 & - & 23 \\
+    WeBid & 23 & - & -\\    
+    ColdFusion & 19 & - & 5\\
+    .htaccess access & 17 & - & 2\\
+    .idq access & 19 & - & 2 \\
+    iisadmin access & 17 & - & 1 \\
+    /system32/ in URI & 20 & - & 2 \\
+    Script tag in URI & 22 & - & - \\
     \bottomrule
   \end{tabular}
 \end{table}
