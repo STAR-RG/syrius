@@ -939,25 +939,27 @@ options from a rule.
 %\subsection{Limitations}
 %\Fix{...}
 
-\vspace{2ex}
-\noindent\textbf{Limitations.} It is worth noting that although
+\textbf{Implementation details.} We implemented function
+\emph{isPlausible} by 1)~updating Suricata to only monitor the rule
+that is passed as parameter, 2)~replaying the negative traffic (see
+Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
+check if any benign message was captured by the rule. It is worth
+noting that the benign traffic is stored in ``pcap'' files~\cite{pcap}
+and Suricata can process those files very efficiently compared to
+analyzing network messages directly. Instead of sending traffic to a
+machine with a deployed server (\eg{}, web server) that
+\suri\ monitors, our setup calls Suricata directly through an
+API. Suricata is invoked multiple times in the process of minimizing
+the rule.
+\textbf{Limitations.} It is worth noting that although
 \tname{} is accurate for generating rules that discrimate positive and
 negative traffic, the quality of these rules is limited by the quality
 of the training data it uses. For the positive traffic, \tname{} only
-requires one sample, but can benefit of several samples as the example
-from Section~\ref{sec:dos} illustrated. The same applies for the
-negative traffic. In this case, however, \tname{} can use public
-data sets available online.
+requires one sample, but can benefit of several samples. The same
+applies for the negative traffic. In this case, however, \tname{} can
+use public data sets available online.
+  
 
-\vspace{2ex}
-\noindent\textbf{Implementation details.} We implemented function
-\emph{isPlausible} by 1)~updating Suricata to only use the rule that
-is passed as parameter to this function, 2)~replaying the negative
-traffic (see Section~\ref{sec:dataset-benign}), and 3)~reading the
-Suricata logs to check if any benign message was captured by the
-rule. It is worth noting that the benign traffic is stored in ``pcap''
-files~\cite{pcap} and Suricata can process those files very
-efficiently compared to analyzing network messages directly.
 
 \subsection{Step 3: Ranking}
 
@@ -1403,14 +1405,16 @@ This section reports on the evaluation of \tname{}.
 \item{\textbf{RQ1.}} \textRQone
 \end{itemize}
 
-\textbf{Rationale.}~The golden rule is a rule that is known to capture
-a given attack. \tname\ generates several rules that satisfy the
-invariant to only capture the malicious traffic, but the amount of
-data we use to assess that invariant, albeit large, is limited. In
-fact, assessing quality of each rule (\ie{}, fitness to the attack)
-requires domain knowledge. The position of the golden rule at the
-ranking produced by \tname\ is a proxy measure to the effort of a
-system administrator in finding the rule that fits the purpose.
+\noindent
+\textbf{Rationale.}~The golden rule is a trusted human-written rule
+obtained from credible sources. \tname\ generates several rules that
+satisfy the invariant to only capture the malicious traffic, but the
+amount of data we use to evaluate that property, albeit large, is
+limited. Assessing the quality of each rule \tname\ produces (\ie{},
+fitness to the attack) requires domain knowledge and much effort. The
+position of the golden rule at the ranking produced by \tname\ is a
+proxy measure to the effort a system administrator would have in
+finding the rule that fits the purpose.
 
 
 \newcommand{\textRQtwo}{What is the importance of heuristic functions in ranking?}
@@ -1419,13 +1423,33 @@ system administrator in finding the rule that fits the purpose.
 \item{\textbf{RQ2.}} \textRQtwo\
 \end{itemize}
 
+\noindent
+\textbf{Rationale.}~\tname\ proposes a variety of heuristic functions
+to rank the plausible rules produced during minimization. It is
+therefore important to understand how much each function contributes
+to the overall performance of the technique.
 
 
-    %%Black Nurse \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:3; icode:3; detection\_filter:track by\_dst, count 250, seconds 1;}\\
-    %%Ping Flood  \MyComment{& multiple} & ICMP \MyComment{& Denial of Service} & \scriptsize{itype:8; icode:0; detection\_filter:track by\_src, count 30, seconds 1;}\\  
-    %%Port Scan \MyComment{& single} & TCP \MyComment{& Discovers open ports in a host} & \scriptsize{flags: A; ack: 0;dsize: 0;} \\
-    
-    %%UDP Flood \MyComment{& multiple} & UDP \MyComment{& Denial of Service} & \scriptsize{fragbits:M; threshold: type both, track by\_dst, count 5000, seconds 5;} \\
+\newcommand{\textRQthree}{What is the importance of the positive and
+  negative traffic in ranking?}
+\vspace{0.2cm}
+\begin{itemize}[leftmargin=*]
+\item{\textbf{RQ3.}} \textRQthree\
+\end{itemize}
+
+\noindent
+\textbf{Rationale.}~\tname\ uses both positive and negative examples
+to generate rules. This question investigates how sensible the
+technique is to the traffic that it uses.
+\noindent
+\vspace{1ex}
+
+The following sections describe the objects we used to evaluate the
+technique (Section~\ref{sec:dataset-benign}), answer the questions
+(sections~\ref{sec:answer-rqone},~\ref{sec:answer-rqothree}), and
+discuss threats to the validity of the
+experiments~(Section~\ref{sec:threats}).
+
 
 \begin{table}[h!]
   \small
@@ -1555,14 +1579,9 @@ from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
 %% is not.
 
 
-\subsection{Methodology}
+%subsection{Methodology}
 
 
-Recall that Suricata is invoked multiple times in the process of
-minimizing the rule (see Section~\ref{sec:minimization}). Suricata
-supports a feature to process ``pcap'' files, enabling very efficient
-performance compared to processing actual network messages.
-  
 %% \Gui{
 %% O procedimento que já tínhamos representa a etapa de treinamento. Toda aquela parte que foi explicada na apresentação para os outros professores e descrito no paper. Descreverei novamente pra confirmar, e também foi adicionado uma pequena etapa.
 
@@ -1606,14 +1625,19 @@ performance compared to processing actual network messages.
 %% \Fix{any other detail we should consider?}
 
 \subsection{Answering RQ1: \textRQone}
+\label{sec:answer-rqone}
 
 \subsection{Answering RQ2: \textRQtwo}
+\label{sec:answer-rqotwo}
 
+\subsection{Answering RQ3: \textRQthree}
+\label{sec:answer-rqothree}
 
 \Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
 
 
 \subsection{Threats to Validity}
+\label{sec:threats}
 
 External Validity. \Fix{elaborate ...how popular are
   Suricata/Metasploit?}
