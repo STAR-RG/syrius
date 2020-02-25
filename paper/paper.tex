@@ -1136,7 +1136,9 @@ with the following formula:
 \end{subfigure}%
 \vspace{-1ex}
   \caption{Distribution of features.}
+  \Luc{@Marcelo, estamos utilizando mais uma distribuicao agora. Precisamos adicionar o grafico dela tb?}
 \end{figure*}
+
 
 \[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
 
@@ -1441,15 +1443,15 @@ system administrator in finding the rule that fits the purpose.
     \multicolumn{1}{c}{(step 3)} \\
 
     \midrule
-    Ping Scan & 5 & - & - \\
-    SYN Flood & 2 & - & - \\
-    JBoss JMX & 23 & - & 23 \\
+    Ping Scan & 5 & 2 & - \\
+    SYN Flood & 2 & 2 & - \\
+    JBoss JMX & 23 & 381 & 23 \\
     WeBid & 23 & - & -\\    
-    ColdFusion & 19 & - & 5\\
-    .htaccess access & 17 & - & 2\\
-    .idq access & 19 & - & 2 \\
-    iisadmin access & 17 & - & 1 \\
-    /system32/ in URI & 20 & - & 2 \\
+    ColdFusion & 19 & 39 & 5\\
+    .htaccess access & 17 & 2458 & 2\\
+    .idq access & 19 & 1111 & 2 \\
+    iisadmin access & 17 & 861 & 1 \\
+    /system32/ in URI & 20 & 3665 & 2 \\
     Script tag in URI & 22 & - & - \\
     \bottomrule
   \end{tabular}
