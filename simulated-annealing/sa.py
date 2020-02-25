@@ -13,7 +13,7 @@ from functools import partial, reduce
 from itertools import combinations
 
 open("bad.rules", 'w').close()
-
+attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "pingscan", "synflood"]
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
@@ -66,7 +66,7 @@ else:
     pcapAttack = "Datasets/" + str(args.attack) + ".pcap"
 
 if args.attack == "pingscan":
-    pcapAttack = "Datasets/ping_scan.pcap"
+    pcapAttack = "Datasets/pingscan.pcap"
 
 pcapVariations = "Datasets/all-" + str(args.attack) + ".pcap"
 pkts = pyshark.FileCapture(pcapAttack)
@@ -730,10 +730,13 @@ class Rule:
         global max_fitness
         self.fitness = []
         self.fitness.append(ruleSizeFitness(self))
-        self.fitness.append(ruleContentsFitness(self))
-        self.fitness.append(rareContentsFitness(self))
-        self.fitness.append(ruleContentsModifiersFitness(self))
         self.fitness.append(ruleOptionsFitness(self))
+        
+        if self.protocol == "http":
+            self.fitness.append(ruleContentsFitness(self))
+            self.fitness.append(rareContentsFitness(self))
+            self.fitness.append(ruleContentsModifiersFitness(self))
+        
 
         for i in range(0, len(self.fitness)):
             if self.fitness[i] > max_fitness[i]:
@@ -754,7 +757,7 @@ def callGetFitness(rule, weights):
     return rule.getFitness(weights)
 
 def sortRules():
-    with open("all_rules_raw_0.out", "r") as all_rules:
+    with open("all_rules_raw_"+str(args.attack)+".out", "r") as all_rules:
         all_rules = all_rules.readlines()
 
     all_rules_list = []
@@ -786,27 +789,30 @@ def sortRules():
     
     for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
-            for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+            """for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
                 for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
                     for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
                         w = [w0,w1,w2,w3,w4]
-                        #print("weights:", str(w))
-                        all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+                        """
+            w = [w0,w1]
 
-                        for x, rule in enumerate(all_rules_list):
-                            if rule.sid == 1099019:
-                                golden_rule_pos = all_rules_list.index(rule)
-                            else:
-                                rule.sid=x+1
+            print("weights:", str(w))
+            all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
 
-                        current_pos = all_rules_len-golden_rule_pos
-                        
-                        #print(current_pos)
+            for x, rule in enumerate(all_rules_list):
+                if rule.sid == 1099019:
+                    golden_rule_pos = all_rules_list.index(rule)
+                else:
+                    rule.sid=x+1
 
-                        if current_pos <= best_pos:
-                            best_pos = current_pos
-                            best_rule_list = copy.deepcopy(all_rules_list)
-                            best_weights = w
+            current_pos = all_rules_len-golden_rule_pos
+            
+            print(current_pos)
+
+            if current_pos <= best_pos:
+                best_pos = current_pos
+                best_rule_list = copy.deepcopy(all_rules_list)
+                best_weights = w
     
     """i = 0
     for rule in best_rule_list:
@@ -821,8 +827,8 @@ def sortRules():
 
 def sortMultipleAttacks():
     all_rules = []
-    for i in range(0,10):
-        file_name = "all_rules_raw_"+str(i)+".out"
+    for atk in attacks_list:
+        file_nme = "all_rules_raw_"+str(atk)+".out"
         try:
             with open(file_name, "r") as reader:
                 #all_rules.append([])
@@ -951,6 +957,8 @@ def optimizeRule(rule):
                 break
 
             counter = 0
+            print("RULE LIST:", len(rule_list))
+
             for rule in rule_list:
                 if len(rule.options) == 1:
                     if len(rule_list) == 1:
@@ -1153,12 +1161,13 @@ def optimizeRule(rule):
     print("golden_rule:", golden_rule)
     #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.append(golden_rule)
+    all_rule_list.append(final_rule)
     golden_rule_pos = 0
 
     for i in range(0, len(all_rule_list)):
         all_rule_list[i].calculateFitness()
 
-    with open("all_rules.out", "w+") as writer, open("all_rules_raw_0.out", "w+") as raw_writer:
+    with open("all_rules.out", "w+") as writer, open("all_rules_raw_"+str(args.attack)+".out", "w+") as raw_writer:
         for i in range(0, len(all_rule_list)):
             writer.write(str(all_rule_list[i])+'\n')
             raw_writer.write(str(all_rule_list[i].getAllAttributesRaw())+'\n')
@@ -1189,26 +1198,26 @@ def optimizeRule(rule):
     print("tamanho da variacao: {}".format(len(allpkts)))
     """
 
-    with open("result.csv", "w+", newline='') as file:
+    with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(all_rule_list, recall, precision):
-            y=y*(100/len(allpkts))
+            y=y*(100/3)
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
             writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
-    with open("result_final.csv", "w+", newline='') as file:
-        with open("fitness_list.csv", "w+", newline='') as fitness_file:
-            with open("all_rules_raw_0.out", "w+") as raw_writer:
+    with open("result_final_"+str(args.attack)+".csv", "w+", newline='') as file:
+        with open("fitness_list_"+str(args.attack)+".csv", "w+", newline='') as fitness_file:
+            with open("all_rules_raw_"+str(args.attack)+".out", "w+") as raw_writer:
                 writer = csv.writer(file)
                 writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
                 fitness_writer = csv.writer(fitness_file)
                 fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
                 for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
-                    y=y*(100/len(allpkts))
+                    y=y*(100/3)
                     z=100-(z/20)
                     f1=2*(((z*y)/100)/((y/100)+(z/100)))
                     if x.sid == "1099019":
@@ -1217,8 +1226,10 @@ def optimizeRule(rule):
                         raw_writer.write(str(x.getAllAttributesRaw())+'\n')
                         total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
                         writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
-                        fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
-                        regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+                        #fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
+                        #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+                        fitness_writer.writerow([str(x), ruleSizeFitness(x), ruleOptionsFitness(x)])
+                        regrafit.append((x, ruleSizeFitness(x), ruleOptionsFitness(x)))
     
 
     w = [1,1,1,1,1]
@@ -1241,32 +1252,34 @@ def optimizeRule(rule):
     print("pegando recall")
     normal_recall=checkFalseNegative(normal_rules_list)
 
-    with open("result2.csv", "w+", newline='') as file:
+    with open("result_"+str(args.attack)+"2.csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
-            y=y*(100/len(allpkts))
+            y=y*(100/3)
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
             writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
-    with open("result_final2.csv", "w+", newline='') as file:
-        with open("fitness_list.csv", "w+", newline='') as fitness_file:
+    with open("result_final_"+str(args.attack)+"2.csv", "w+", newline='') as file:
+        with open("fitness_list_"+str(args.attack)+".csv", "w+", newline='') as fitness_file:
             writer = csv.writer(file)
             writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
             fitness_writer = csv.writer(fitness_file)
             fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
             for (x, y, z) in zip(list(reversed(normal_rules_list)), list(reversed(normal_recall)), list(reversed(normal_precision))):
-                y=y*(100/len(allpkts))
+                y=y*(100/3)
                 z=100-(z/20)
                 f1=2*(((z*y)/100)/((y/100)+(z/100)))
                 if f1>90.0: 
                     total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
                     writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
-                    fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
-                    regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+                    #fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
+                    #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+                    fitness_writer.writerow([str(x), ruleSizeFitness(x), ruleOptionsFitness(x)])
+                    regrafit.append((x, ruleSizeFitness(x), ruleOptionsFitness(x)))
             
     #with open("raw_recall.txt", "w+") as writer:
     #    for x in recall:
@@ -1289,8 +1302,8 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-sortMultipleAttacks()
-exit()
+#sortMultipleAttacks()
+#exit()
 
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
 
