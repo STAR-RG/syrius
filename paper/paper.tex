@@ -634,7 +634,7 @@ existing rules to learn heuristics to rank plausible rules.
 \begin{figure*}[ht]
   \centering
   \includegraphics[trim=0 395 50 0,clip,width=0.65\textwidth]{figs/nids-workflow}
-  \caption{\tname\ workflow.}
+  \caption{The \tname\ workflow.}
   \label{fig:overview}
   \vspace{-2ex}
 \end{figure*}
@@ -718,11 +718,12 @@ user's intent.
 
 \subsection{Step 1: Reverse Engineering}
 
-The first step of \tname\ is Reverse Engineering. The goal of this
-step is to extract options from the malicious traffic. A rule that
-contains these options, by construction, captures the malicious
-traffic. \tname\ uses two strategies to extract options: 1)~field and
-2)~payload. We elaborate these strategies in the following.
+The first step in the \tname's workflow is Reverse Engineering. The
+goal of this step is to extract options from the malicious traffic. A
+rule that contains these options, by construction, captures the
+malicious traffic. \tname\ uses two strategies to extract options:
+1)~field (for any protocol) and 2)~payload (for http only). We
+elaborate these strategies in the following.
 
 For the field strategy, \tname{} parses the input messages looking for
 options associated with the data in the fields of a network
@@ -730,46 +731,54 @@ message. Section~\ref{sec:rules-and-packets} shows the correspondence
 between packet fields and some of the rule options from
 \suri. Section~\ref{sec:active-recon} shows a concrete example where
 the values for options are directly extracted from packet fields. We
-constructed the mapping of network fields to options manually, from
-the \suri\ documentation.
+obtained the mapping of network fields to options manually, from the
+\suri\ documentation.
 
 Unfortunately, the relevant data for the option may be at the message
-payload not the fields. Figure~\ref{fig:rule-jboss} shows an example
-of a rule that captures traffic containing the string
+payload not the fields. We found empirically that this occurs
+frequently in http attacks. Figure~\ref{fig:rule-jboss} shows an
+example of a rule that captures traffic containing the string
 \CodeIn{"/HtmlAdaptor"} in the payload.  The content strategy focuses
-on extracting (content) options from the payload. It is very important
-to note that content options are prevalent. For example,
-\percRulesWithContent{} of the \numrulessuri{} rules from the public
-data set~\cite{emerging-threats-open} we analyzed contain at least one
-option of this kind. Figure~\ref{fig:distribution-contents} shows the
-histogram of the number of these options per rule for the data set
-mentioned above. We limited the number of content options per rule to
-10 for space. Rules without \CodeIn{content} options are an exception
-and half of the rules contain at least two \CodeIn{content} options.
-To find the values associated with these options, \tname{} splits the
+on extracting such kinds of options from the payload. It is very
+important to note that content options are prevalent in \suri\ rules
+and the majority of these rule prescribe defenses against http
+attacks. For example, \percRulesWithContent{} of the \numrulessuri{}
+rules from the public data set~\cite{emerging-threats-open} we
+analyzed contain at least one content
+option. Figure~\ref{fig:distribution-contents} shows the histogram of
+the number of these options per rule for the data set mentioned
+above. We limited the number of content options per rule to 10 for
+space. Furthermore, \Fix{xxx\%} of the rules are for
+http.\MyComment{Rules without \CodeIn{content} options are an
+  exception and half of the rules contain at least two
+  \CodeIn{content} options.}  Consequently, hangling content options
+for http is very important.
+
+We observed, by inspecting existing rules, that \CodeIn{content}
+options typically refer to sequence of characters in the payload. To
+find the values associated with these options, \tname{} splits the
 payload of the malicious message in tokens using natural language
 delimiters, such as $\backslash$t, $\backslash$n, $\backslash$r, and
-spaces. We observed, by inspecting existing rules, that
-\CodeIn{content} options typically refer to sequence of characters in
-the payload of messages separated by these delimiters. This
-tokenization step can generate dozens of options.  For example,
-considering the example from Section~\ref{sec:content-example},
-\tname{} produces a total of \Fix{XXX} content options.
+spaces. Considering the example from
+Section~\ref{sec:content-example}, \tname{} produced a total of 23
+content options.
 
-\Mar{Nao esta muito claro como isto funciona. Rodamos sempre as duas
-  estrategias (para obter field options e content options)?
-  (Precisamos dizer se eh possivel ter regras com os dois tipos de
-  opcoes). Como isto funciona 1) quando uma ataque tem varias
-  mensagens (e.g., ping scan) e 2) quando temos varios ataques?}
+It is worth noting that we found empirically that deciding which
+reverse engineering strategy to use based on the protocol was
+effective. We used the payload strategy for http and the field
+strategy for the other protocols. At the end of this step,
+\tname\ produces a seed rule that captures the malicious traffic by
+definition.
 
-\textbf{Implementation.}\Fix{elaborate...}
-, characterized with pcap files~\cite{pcap}, a popular format
-to describe network packets.
+%% \Mar{Nao esta muito claro como isto funciona. Rodamos sempre as duas
+%%   estrategias (para obter field options e content options)?
+%%   (Precisamos dizer se eh possivel ter regras com os dois tipos de
+%%   opcoes). Como isto funciona 1) quando uma ataque tem varias
+%%   mensagens (e.g., ping scan) e 2) quando temos varios ataques?}
 
-
-
-
-
+%% \textbf{Implementation.}~
+%% , characterized with pcap files~\cite{pcap}, a popular format
+%% to describe network packets.
 
 %% \Fix{
 %% A avaliação que fazemos aqui pontua um dado content de acordo com
