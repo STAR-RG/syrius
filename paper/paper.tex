@@ -944,24 +944,24 @@ options from a rule.
 that is passed as parameter, 2)~replaying the negative traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
 check if any benign message was captured by the rule. It is worth
-noting that the benign traffic is stored in ``pcap'' files~\cite{pcap}
-and Suricata can process those files very efficiently compared to
-analyzing network messages directly. Instead of sending traffic to a
-machine with a deployed server (\eg{}, web server) that
-\suri\ monitors, our setup calls Suricata directly through an
-API. Suricata is invoked multiple times in the process of minimizing
-the rule.
-\textbf{Limitations.} It is worth noting that although
-\tname{} is accurate for generating rules that discrimate positive and
-negative traffic, the quality of these rules is limited by the quality
-of the training data it uses. For the positive traffic, \tname{} only
-requires one sample, but can benefit of several samples. The same
-applies for the negative traffic. In this case, however, \tname{} can
-use public data sets available online.
+noting that the benign traffic is stored in \emph{pcap}
+files~\cite{pcap} and Suricata can process those files very
+efficiently compared to analyzing network messages directly. Instead
+of sending traffic to a machine with a deployed server (\eg{}, web
+server) that \suri\ monitors, our setup calls Suricata directly
+through an API. Suricata is invoked multiple times in the process of
+minimizing the rule.  \textbf{Limitations.} It is worth noting that
+although \tname{} is accurate for generating rules that discrimate
+positive and negative traffic, the quality of these rules is limited
+by the quality of the training data it uses. For the positive traffic,
+\tname{} only requires one sample, but can benefit of several
+samples. The same applies for the negative traffic. In this case,
+however, \tname{} can use public data sets available online.
   
 
 
 \subsection{Step 3: Ranking}
+\label{sec:ranking}
 
 \tname{} uses a composition of heurisitc functions to sort the rules
 it produces. Each function uses a different criterion to estimate how
@@ -1401,52 +1401,56 @@ This section reports on the evaluation of \tname{}.
 
 \newcommand{\textRQone}{How well \tname\ ranks the golden rule?}
 \vspace{0.2cm}
-\begin{itemize}[leftmargin=*]
+\begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ1.}} \textRQone
 \end{itemize}
 
 \noindent
-\textbf{Rationale.}~The golden rule is a trusted human-written rule
-obtained from credible sources. \tname\ generates several rules that
-satisfy the invariant to only capture the malicious traffic, but the
-amount of data we use to evaluate that property, albeit large, is
-limited. Assessing the quality of each rule \tname\ produces (\ie{},
-fitness to the attack) requires domain knowledge and much effort. The
-position of the golden rule at the ranking produced by \tname\ is a
-proxy measure to the effort a system administrator would have in
-finding the rule that fits the purpose.
+\textbf{Rationale.}~The golden rule is a trusted human-written
+\nids\ rule that we obtained from credible sources. \tname\ generates
+several rules that satisfy the invariant to only capture the malicious
+traffic, but the amount of data we used to evaluate that property,
+albeit large, is limited. Assessing the quality of each rule
+\tname\ produces (\ie{}, fitness to the attack) requires domain
+knowledge and much effort. The position of the golden rule at the
+ranking produced by \tname\ is a proxy measure to the effort of a
+system administrator in finding the rule that fits the purpose.
 
 
-\newcommand{\textRQtwo}{What is the importance of heuristic functions in ranking?}
+\newcommand{\textRQtwo}{What is the importance of heuristic functions
+  on \tname's performance?}
 \vspace{0.2cm}
-\begin{itemize}[leftmargin=*]
+\begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ2.}} \textRQtwo\
 \end{itemize}
 
 \noindent
-\textbf{Rationale.}~\tname\ proposes a variety of heuristic functions
-to rank the plausible rules produced during minimization. It is
-therefore important to understand how much each function contributes
-to the overall performance of the technique.
+\textbf{Rationale.}~We proposed a variety of heuristic functions to
+rank the plausible rules that \tname\ created during minimization (as
+per step 2 in the workflow). Recall that these functions are based on
+the data from a public ruleset~\cite{emerging-threats-open} (see
+Section~\ref{sec:ranking}). It is therefore important to understand
+the extent to which each function contributes to the overall
+performance of the technique.
 
-
-\newcommand{\textRQthree}{What is the importance of the positive and
-  negative traffic in ranking?}
+\newcommand{\textRQthree}{What is the importance of the benign and
+  malicious traffic on \tname's performance?}
 \vspace{0.2cm}
-\begin{itemize}[leftmargin=*]
+\begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ3.}} \textRQthree\
 \end{itemize}
 
 \noindent
 \textbf{Rationale.}~\tname\ uses both positive and negative examples
 to generate rules. This question investigates how sensible the
-technique is to the traffic that it uses.
+technique is to the selection of these inputs.
 \noindent
 \vspace{1ex}
 
 The following sections describe the objects we used to evaluate the
-technique (Section~\ref{sec:dataset-benign}), answer the questions
-(sections~\ref{sec:answer-rqone},~\ref{sec:answer-rqothree}), and
+technique (Section~\ref{sec:dataset-benign}), answer the posed
+research questions (sections~\ref{sec:answer-rqone},
+and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), and
 discuss threats to the validity of the
 experiments~(Section~\ref{sec:threats}).
 
@@ -1518,43 +1522,57 @@ evaluation. These attacks cover different protocols and features of
 ``Protocol'' shows the protocol name, and column ``Ground Truth''
 shows the options of the rule that captures the attack.
 
-\subsubsection{Malicious traffic.}To reproduce the malicious traffic, we
-configured an HTTP server (Apache2) in one machine and ran
-Nikto2~\cite{nikto} in a different machine. We used this setup to
-replay each of the attacks from Table~\ref{table:attacks}.  On each
-execution, we captured the incoming traffic to the web server with
-Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
-files as an input to \tname.\Mar{@Lucas, eu traduzi o que vc. falou
-  para ingles. Mas, aparentemente, isto esta **inconsistente** com o
-  que eh dito na Secao~\ref{attack-reproduction}. Por favor, esclareca!}
-  \Luc{Essa descrição é referente aos ataques HTTP/TCP da tabela. O
-    hping3 gera apenas o trafego do SYN Flood. Ambas as explicações
-    estão corretas. Creio q a descrição da seção 5.2.1 tenha q ser
-    movida para cá pois está explicando como capturamos o trafego
-    malicioso. Nós executamos o Nikto e o hping3 uma unica vez para
-    capturar com o wireshark o trafego q eles geram. O trafego
-    produzido pelo Nikto ja inclui todos os ataques que utilizamos,
-    nós separamos os pacotes de cada um deles manualmente utilizando o
-    wireshark.}\Mar{Fiquei na duvida se o hping soh serve para o SYN
-    Flood e se/porque o Nikto nao eh usado neste caso...Enfim, nao
-    precisa responder por aqui. Mova o texto deixando-o
-    *consistente*.}
+\subsubsection{Malicious traffic.}To reproduce the malicious traffic
+for http and tcp attacks, we configured an http server (Apache2) in
+one machine and Nikto2~\cite{nikto} in a different machine. Nikto is
+an open source tool with a catalog of scripts to reproduce
+vulnerabilities. It is important to note that this setup is \emph{not}
+necessary if \emph{pcap} files---pcap is the input format used by
+\tname{}---for the attack already exist. As explained in
+Section~\ref{sec:minimization}, pcap files abstract network
+messages~\cite{pcap} and can be used to avoid network traffic during
+rule synthesis. We proceeded as follows to obtain pcap files for the
+the attacks we analyzed: we 1)~instantiated the script (\eg{}, defined
+the IP of the web server), 2)~executed the Nikto2 script, 3)~and
+monitored the traffic with the Wireshark network
+monitor~\cite{wireshark-net-monitor}. The Wireshark tool records the
+traffic and reports pcap files on output for replaying. The only
+difference in the setup of non-http non-tcp attack is in the first
+step of this procedure. For example, we used the hping3~\cite{hping3}
+command to reproduce the ICMP SYN Flood attack: \CodeIn{hping3 -d 80
+  -w 64 -S -p 80 --flood --rand-source <IP>}. This command alone
+reproduces a flooding attack on a given machine
+(Section~\ref{sec:dos}).\Mar{what about the variants? where do they
+  come from? this is confusing as the narrative above suggests the
+  attack is hardcoded in the tool.}
 
-  \tname{} requires the attack to
-be replayed in order to check whether or not the rule it generates
-captures the attack.  See function $\mathit{isPlausible}$, used in the
-minimization algorithm from Section~\ref{sec:minimization}. For all
-attacks listed on Table~\ref{table:attacks}, we found scripts
-available on the web to replay the attacks. For example, the SYN Flood
-attack can be replayed with hping3~\cite{hping3}, using the following
-command: \CodeIn{hping3 -d 80 -w 64 -S -p 80 --flood --rand-source
-  <IP>}. With the script to reproduce the attack, we executed the
-following steps to obtain ``pcap'' files, which abstracts network
-messages~\cite{pcap}, to run \tname:~1)~instantiate the script (\eg{},
-define the IP, for the example above), 2)~execute the script,
-3)~monitor the traffic with the wireshark network
-monitor~\cite{wireshark-net-monitor}.
+%% On each execution, we captured
+%% the incoming traffic to the web server with
+%% Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
+%% files as an input to
 
+%% \tname.\Mar{@Lucas, eu traduzi o que vc. falou
+%%   para ingles. Mas, aparentemente, isto esta **inconsistente** com o
+%%   que eh dito na Secao~\ref{attack-reproduction}. Por favor,
+%%   esclareca!}  \Luc{Essa descrição é referente aos ataques HTTP/TCP da
+%%   tabela. O hping3 gera apenas o trafego do SYN Flood. Ambas as
+%%   explicações estão corretas. Creio q a descrição da seção 5.2.1 tenha
+%%   q ser movida para cá pois está explicando como capturamos o trafego
+%%   malicioso. Nós executamos o Nikto e o hping3 uma unica vez para
+%%   capturar com o wireshark o trafego q eles geram. O trafego produzido
+%%   pelo Nikto ja inclui todos os ataques que utilizamos, nós separamos
+%%   os pacotes de cada um deles manualmente utilizando o
+%%   wireshark.}\Mar{Fiquei na duvida se o hping soh serve para o SYN
+%%   Flood e se/porque o Nikto nao eh usado neste caso...Enfim, nao
+%%   precisa responder por aqui. Mova o texto deixando-o *consistente*.}
+%%   \tname{} requires the attack to
+%% be replayed in order to check whether or not the rule it generates
+%% captures the attack.  See function $\mathit{isPlausible}$, used in the
+%% minimization algorithm from Section~\ref{sec:minimization}. For all
+%% attacks listed on Table~\ref{table:attacks}, we found scripts
+%available on the web to replay the attacks. For example, 
+
+\Mar{--------------------------- estou aqui!}
 
 \subsubsection{Benign traffic.}\tname{} uses public databases storing benign
 traffic for all protocols covered by Suricata (see
@@ -1628,10 +1646,10 @@ from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
 \label{sec:answer-rqone}
 
 \subsection{Answering RQ2: \textRQtwo}
-\label{sec:answer-rqotwo}
+\label{sec:answer-rqtwo}
 
 \subsection{Answering RQ3: \textRQthree}
-\label{sec:answer-rqothree}
+\label{sec:answer-rqthree}
 
 \Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
 
