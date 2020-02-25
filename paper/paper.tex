@@ -1382,7 +1382,7 @@ would be 0.35 (=(0.2+0.5)/2).
     SYN Flood & DoS & TCP & \textbf{flags}: S,12; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
 
     JBoss JMX\MyComment{ Console Beanshell Exploit} & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
-    WeBid \MyComment{Local File Inclusion} & RFI & TCP \MyComment{& Local File Inclusion} & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
+    %% WeBid \MyComment{Local File Inclusion} & RFI & TCP \MyComment{& Local File Inclusion} & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
     ColdFusion \MyComment{Privilege Escalation} & Privilege Escalation & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
     .htaccess access\MyComment{attempted-recon} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     .idq access\MyComment{EXPLOIT ISAPI} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
@@ -1476,7 +1476,7 @@ experiments~(Section~\ref{sec:threats}).
     Ping Scan & 5 & 2 & - \\
     SYN Flood & 2 & 2 & - \\
     JBoss JMX & 23 & 381 & 23 \\
-    WeBid & 23 & - & -\\    
+    %%   WeBid & 23 & - & -\\    
     ColdFusion & 19 & 39 & 5\\
     .htaccess access & 17 & 2,458 & 2\\
     .idq access & 19 & 1,111 & 2 \\
@@ -1544,7 +1544,20 @@ command to reproduce the ICMP SYN Flood attack: \CodeIn{hping3 -d 80
 reproduces a flooding attack on a given machine
 (Section~\ref{sec:dos}).\Mar{what about the variants? where do they
   come from? this is confusing as the narrative above suggests the
-  attack is hardcoded in the tool.}
+  attack is hardcoded in the tool.}\Luc{O trafego de um ataque 
+  normalmente possui varios pacotes, entre esses varios pacotes alguns 
+  deles possuem um padrao. As regras sao criadas descrevendo esse padrao,
+  com isso um unico ataque pode disparar varios alertas.
+  
+  Porem, existem ataques q so produzem um alerta, ou seja, a regra criada 
+  so detecta um dos pacotes do trafego. Nesses casos, procuramos na internet 
+  datasets (arquivos pcap) que contivessem mais pacotes desses ataques.
+  Fizemos isso tambem para ataques q nos ja tinhamos variacoes, pois
+  (teoricamente) quanto mais variacoes, melhor. Existem alguns sites onde 
+  eh possivel encontrar pcaps com o trafego de alguns ataques, n consegui
+  adicionar nas referencias: 
+  https://www.netresec.com/?page=PcapFiles
+}
 
 %% On each execution, we captured
 %% the incoming traffic to the web server with
