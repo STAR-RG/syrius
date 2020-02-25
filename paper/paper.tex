@@ -1417,8 +1417,8 @@ ranking produced by \tname\ is a proxy measure to the effort of a
 system administrator in finding the rule that fits the purpose.
 
 
-\newcommand{\textRQtwo}{What is the importance of heuristic functions
-  on \tname's performance?}
+\newcommand{\textRQtwo}{How important are the heuristic functions
+  to \tname's performance?}
 \vspace{0.2cm}
 \begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ2.}} \textRQtwo\
@@ -1433,8 +1433,8 @@ Section~\ref{sec:ranking}). It is therefore important to understand
 the extent to which each function contributes to the overall
 performance of the technique.
 
-\newcommand{\textRQthree}{What is the importance of the benign and
-  malicious traffic on \tname's performance?}
+\newcommand{\textRQthree}{How important are the benign and
+  malicious traffic to \tname's performance?}
 \vspace{0.2cm}
 \begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ3.}} \textRQthree\
@@ -1559,46 +1559,19 @@ reproduces a flooding attack on a given machine
   https://www.netresec.com/?page=PcapFiles
 }
 
-%% On each execution, we captured
-%% the incoming traffic to the web server with
-%% Wireshark~\cite{wireshark-net-monitor} and used the corresponding pcap
-%% files as an input to
-
-%% \tname.\Mar{@Lucas, eu traduzi o que vc. falou
-%%   para ingles. Mas, aparentemente, isto esta **inconsistente** com o
-%%   que eh dito na Secao~\ref{attack-reproduction}. Por favor,
-%%   esclareca!}  \Luc{Essa descrição é referente aos ataques HTTP/TCP da
-%%   tabela. O hping3 gera apenas o trafego do SYN Flood. Ambas as
-%%   explicações estão corretas. Creio q a descrição da seção 5.2.1 tenha
-%%   q ser movida para cá pois está explicando como capturamos o trafego
-%%   malicioso. Nós executamos o Nikto e o hping3 uma unica vez para
-%%   capturar com o wireshark o trafego q eles geram. O trafego produzido
-%%   pelo Nikto ja inclui todos os ataques que utilizamos, nós separamos
-%%   os pacotes de cada um deles manualmente utilizando o
-%%   wireshark.}\Mar{Fiquei na duvida se o hping soh serve para o SYN
-%%   Flood e se/porque o Nikto nao eh usado neste caso...Enfim, nao
-%%   precisa responder por aqui. Mova o texto deixando-o *consistente*.}
-%%   \tname{} requires the attack to
-%% be replayed in order to check whether or not the rule it generates
-%% captures the attack.  See function $\mathit{isPlausible}$, used in the
-%% minimization algorithm from Section~\ref{sec:minimization}. For all
-%% attacks listed on Table~\ref{table:attacks}, we found scripts
-%available on the web to replay the attacks. For example, 
-
-\Mar{--------------------------- estou aqui!}
-
-\subsubsection{Benign traffic.}\tname{} uses public databases storing benign
-traffic for all protocols covered by Suricata (see
-Figure~\ref{fig:distribution-rules-protocol}). We used two data sets of
-benign traffic. The Bigflows.pcap data set is part of the
-TcpReplay~\cite{tcpreplay} open source project. This data set includes
-real network traffic of a busy private network access point to the
-Internet. According to the TcpReplay web site ``This capture is much
-larger and has a smaller average packet size than the previous capture
-(smallFlows.pcap). It also has many more flows and different
-applications.''. In addition to the Bigflows.pcap data set, we also
-used data sets of normal traffic made available by Stratosphere
-Lab~\cite{stratosphere-normal}.
+\subsubsection{Benign traffic.}~Security
+tools (e.g., perforation testing tools) often use benign traffic to
+evaluate false positive rates. Consequently, different public options
+exist. We used two popular public sources. The Bigflows.pcap data set
+is part of the TcpReplay~\cite{tcpreplay} open source project. This
+data set includes real network traffic of a busy private network
+access point to the Internet. According to the TcpReplay web site
+``This capture is much larger and has a smaller average packet size
+than the previous capture (smallFlows.pcap). It also has many more
+flows and different applications.''. In addition to the Bigflows.pcap
+data set, we also used data sets\Mar{more than one?} made available by
+Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
+  of the traffic? as the description for Bigflows.pcap?}.
 
 \subsubsection{Ground Truth.}To evaluate precision of \tname\ we
 need rules that are considered correct to use as reference. The rules
