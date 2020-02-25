@@ -53,12 +53,11 @@
   aboveskip=0pt,
   belowskip=0pt,
   breaklines=true,           % sets automatic line breaking
-  breakatwhitespace=false,   % sets if automatic breaks should only happen at
+  breakatwhitespace=true,   % sets if automatic breaks should only happen at
   showspaces=false,
   %numbersep=5pt,              % Abstand der Nummern zum Text
   %tabsize=2,                  % Groesse von Tabs
   %extendedchars=true,         %
-  %breaklines=true,            % Zeilen werden Umgebrochen
   keywords=[2]{tcp, flag, threshold, track, count, seconds, classtype, sid}
 }
 \usepackage{balance}
@@ -366,7 +365,7 @@ the Open Information Security Foundation (OISF)~\cite{oisf}.
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
   \vspace{-2ex}
-  \caption{Suricata rule for SYN Flood attack.}
+  \caption{\suri\ rule for SYN Flood attack.}
   \label{fig:synflood-example}
 \end{figure}
 \vspace{-2ex}
@@ -735,40 +734,43 @@ obtained the mapping of network fields to options manually, from the
 \suri\ documentation.
 
 Unfortunately, the relevant data for the option may be at the message
-payload not the fields. We found empirically that this occurs
-frequently in http attacks. Figure~\ref{fig:rule-jboss} shows an
-example of a rule that captures traffic containing the string
-\CodeIn{"/HtmlAdaptor"} in the payload.  The content strategy focuses
-on extracting such kinds of options from the payload. It is very
-important to note that content options are prevalent in \suri\ rules
-and the majority of these rule prescribe defenses against http
-attacks. For example, \percRulesWithContent{} of the \numrulessuri{}
-rules from the public data set~\cite{emerging-threats-open} we
-analyzed contain at least one content
+payload; not the fields. We found empirically that this occurs
+frequently in http attacks, which are prevalent. For example,
+\Fix{XXX\%} of the \numrulessuri{} rules from a public data
+set~\cite{emerging-threats-open} we analyzed prescribe defenses
+against http attacks. Figure~\ref{fig:rule-jboss} shows an example of
+a rule that captures traffic containing the string
+\CodeIn{"/HtmlAdaptor"} in the payload.  Content options are very
+common in http rules---\percRulesWithContent{} of the rules from the
+data set mentioned above contain at least one content
 option. Figure~\ref{fig:distribution-contents} shows the histogram of
 the number of these options per rule for the data set mentioned
-above. We limited the number of content options per rule to 10 for
-space. Furthermore, \Fix{xxx\%} of the rules are for
-http.\MyComment{Rules without \CodeIn{content} options are an
-  exception and half of the rules contain at least two
-  \CodeIn{content} options.}  Consequently, hangling content options
-for http is very important.
+above. We limited the number of content options per rule to 10 in the
+histogram for space. \MyComment{Rules without \CodeIn{content} options
+  are an exception and half of the rules contain at least two
+  \CodeIn{content} options.}  Consequently, handling content options
+for http is important. The content strategy focuses on extracting such
+kinds of options from the payload.
 
-We observed, by inspecting existing rules, that \CodeIn{content}
-options typically refer to sequence of characters in the payload. To
-find the values associated with these options, \tname{} splits the
-payload of the malicious message in tokens using natural language
-delimiters, such as $\backslash$t, $\backslash$n, $\backslash$r, and
+We found, inspecting existing rules, that \CodeIn{content} options
+typically refer to sequence of characters in the payload. To find the
+values associated with these options, \tname{} splits the payload of
+the malicious message in tokens using natural language delimiters,
+such as $\backslash$t, $\backslash$n, $\backslash$r, and
 spaces. Considering the example from
 Section~\ref{sec:content-example}, \tname{} produced a total of 23
-content options.
+tokens, considered content option candidates.
 
 It is worth noting that we found empirically that deciding which
-reverse engineering strategy to use based on the protocol was
-effective. We used the payload strategy for http and the field
-strategy for the other protocols.\Mar{discuss flood cases...} At the end of this step,
-\tname\ produces a seed rule that captures the malicious traffic by
-definition.
+reverse engineering strategy to use based on the protocol of the input
+(malicious) messages was effective. We used the payload strategy for
+http and the field strategy for the other protocols. For flooding
+attacks, \tname\ runs the same approach for each message and
+identifies common options across all messages. For that case,
+\tname\ reports, in addition, a \CodeIn{threshold} option, as
+discussed on Section~\ref{sec:rules-and-packets}.  At the end of the
+Reverse Engineering step, \tname\ produces a seed rule that captures
+the malicious traffic.
 
 %% \Mar{Nao esta muito claro como isto funciona. Rodamos sempre as duas
 %%   estrategias (para obter field options e content options)?
@@ -1433,7 +1435,7 @@ system administrator in finding the rule that fits the purpose.
   \begin{tabular}{lrrr}
     \toprule
     \multicolumn{1}{c}{\multirow{2}{*}{Name}} &
-    \#~Options &
+    \#~Option Cand. &
     \#~Plausible Rules &    
     \multicolumn{1}{c}{Rank} \\
 
@@ -1448,10 +1450,10 @@ system administrator in finding the rule that fits the purpose.
     JBoss JMX & 23 & 381 & 23 \\
     WeBid & 23 & - & -\\    
     ColdFusion & 19 & 39 & 5\\
-    .htaccess access & 17 & 2458 & 2\\
-    .idq access & 19 & 1111 & 2 \\
+    .htaccess access & 17 & 2,458 & 2\\
+    .idq access & 19 & 1,111 & 2 \\
     iisadmin access & 17 & 861 & 1 \\
-    /system32/ in URI & 20 & 3665 & 2 \\
+    /system32/ in URI & 20 & 3,665 & 2 \\
     Script tag in URI & 22 & - & - \\
     \bottomrule
   \end{tabular}
