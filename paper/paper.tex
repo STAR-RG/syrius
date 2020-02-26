@@ -1617,10 +1617,16 @@ data set, we also used data sets\Mar{more than one?} made available by
 Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
   of the traffic? as the description for Bigflows.pcap?}.
 
-\subsubsection{Ground Truth.}To evaluate precision of \tname\ we
-need rules that are considered correct to use as reference. The rules
-that detect the attacks from Table~\ref{table:attacks} were obtained
-from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
+\subsubsection{Ground Truth.}To evaluate \tname\ objectively we need
+to compare the rules it generates with human-written rules from a
+trusted source. We used the ``Emerging Threats Open
+Ruleset''~\cite{emerging-threats-open} data set for that. After
+finding the attack and corresponding rule using the procedure
+described in Section~\ref{subsec:malicious-traffic}, we reproduced the
+attack and confirmed that the rule captures the attack. Column
+``Ground Truth'' from Table~\ref{table:attacks} only shows the
+essential relevant options. Documentation options (\eg{}, ``msg'') are
+discared.
 
 %% Note from Figure~\ref{fig:overview} that the positive traffic is an
 %% input to the technique. The negative non-malicious traffic, however,
