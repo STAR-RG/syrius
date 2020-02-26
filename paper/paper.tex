@@ -1456,6 +1456,7 @@ discuss threats to the validity of the
 experiments~(Section~\ref{sec:threats}).
 
 
+\setlength{\tabcolsep}{3pt}
 \begin{table}[h!]
   \small
   \caption{\label{table:results}Results.}
@@ -1464,7 +1465,7 @@ experiments~(Section~\ref{sec:threats}).
   \begin{tabular}{lrrrr}
     \toprule
     \multicolumn{1}{c}{\multirow{2}{*}{Name}} &
-    \multicolumn{1}{c}{\multirow{2}{*}{\# Variants}} &
+    \multicolumn{1}{c}{\multirow{2}{*}{\# Vars.}} &
     \#~Option Cand. &
     \#~Plausible Rules &    
     \multicolumn{1}{c}{Rank} \\
@@ -1520,6 +1521,9 @@ experiments~(Section~\ref{sec:threats}).
 \label{sec:dataset-benign}
 \label{attack-reproduction}
 
+This section describes the objects used in \tname{}'s evaluation.
+
+\vspace{1ex}
 \subsubsection{Attacks.}~Table~\ref{table:attacks} shows the selection
 of attacks considered in our evaluation.  Column ``Name'' shows the
 name of the attack, column ``Source'' shows the source where we
@@ -1534,11 +1538,12 @@ attacks of various protocols, and (3) to explore different features of
 types: Denial-of-Service (DoS), Active Reconnaissance (AREC),
 Privilege escalation (PESC), and Remote Code Execution (RCE). Note
 that the distribution of attacks is not uniform across types and
-protocols as they are not uniform in practice. For example, as
-per~\cite{emerging-threats-open}, RCE are the most prevalent type of
-attacks today.\Mar{please, confirm} Columns ``Protocol'' and ``Ground
-Truth'' indicate, respectively, that we analyzed attacks of different
-protocols and analyzed different features of \tname.
+protocols as these distributions are not uniform in practice. For
+example, as per~\cite{emerging-threats-open}, RCE are the most
+prevalent type of attacks today.\Mar{please, confirm} Columns
+``Protocol'' and ``Ground Truth'' indicate, respectively, that we
+analyzed attacks of different protocols and analyzed different
+features of \tname.
 
 
 %% It is important to note that this setup is \emph{not}
