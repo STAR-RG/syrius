@@ -1460,32 +1460,35 @@ experiments~(Section~\ref{sec:threats}).
   \caption{\label{table:results}Results.}
   \vspace{-2ex}
   \centering
-  \begin{tabular}{lrrr}
+  \begin{tabular}{lrrrr}
     \toprule
     \multicolumn{1}{c}{\multirow{2}{*}{Name}} &
+    \multicolumn{1}{c}{\multirow{2}{*}{\# Variants}} &
     \#~Option Cand. &
     \#~Plausible Rules &    
     \multicolumn{1}{c}{Rank} \\
 
      &
+    \multicolumn{1}{c}{} &
     \multicolumn{1}{c}{(step 1)} &
     \multicolumn{1}{c}{(step 2)} &    
     \multicolumn{1}{c}{(step 3)} \\
 
     \midrule
-    Ping Scan & 5 & 2 & - \\
-    SYN Flood & 2 & 2 & - \\
-    JBoss JMX & 23 & 381 & 23 \\
-    %%   WeBid & 23 & - & -\\    
-    ColdFusion & 19 & 39 & 5\\
-    .htaccess access & 17 & 2,458 & 2\\
-    .idq access & 19 & 1,111 & 2 \\
-    iisadmin access & 17 & 861 & 1 \\
-    /system32/ in URI & 20 & 3,665 & 2 \\
-    Script tag in URI & 22 & - & - \\
+    Ping Scan & 5 & 5 & 2 & - \\
+    SYN Flood & 3 & 2 & 2 & - \\
+    JBoss JMX & 4 & 23 & 381 & 23 \\
+    %%   WeBid & - & 23 & - & -\\    
+    ColdFusion & 6 & 19 & 39 & 5\\
+    .htaccess access & 4 & 17 & 2,458 & 2\\
+    .idq access & 13 & 19 & 1,111 & 2 \\
+    iisadmin access & 3 & 17 & 861 & 1 \\
+    /system32/ in URI & 3 & 20 & 3,665 & 2 \\
+    Script tag in URI & 22 & 22 & - & - \\
     \bottomrule
   \end{tabular}
 \end{table}
+
 
 %%\begin{table}[h!]
 %%  \small
