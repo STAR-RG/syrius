@@ -1369,14 +1369,14 @@ would be 0.35 (=(0.2+0.5)/2).
 
 \begin{table*}[t!]
   \small
-  \caption{\label{table:attacks}List of attacks.}
+  \caption{\label{table:attacks}List of attacks.\Mar{adicionar coluna ``Source''}}
   \centering
   \begin{tabular}{lllp{11cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Category} &
     \multicolumn{1}{c}{Protocol} &
-    \multicolumn{1}{c}{Groud Truth} \\
+    \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
     \midrule     
     Ping Scan & Active Recon. & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
     SYN Flood & DoS & TCP & \textbf{flags}: S,12; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
@@ -1516,48 +1516,69 @@ experiments~(Section~\ref{sec:threats}).
 \label{sec:dataset-benign}
 \label{attack-reproduction}
 
-Table~\ref{table:attacks} shows the attacks we considered in our
+\subsubsection{Attacks.}Table~\ref{table:attacks} shows the attacks we considered in our
 evaluation. These attacks cover different protocols and features of
 \tname{}. Column ``Name'' shows the name of the attack, column
 ``Protocol'' shows the protocol name, and column ``Ground Truth''
-shows the options of the rule that captures the attack.
+shows the options of the rule that captures the attack.\Mar{Explicar o
+  rationale para esta selecao de ataques!}
 
-\subsubsection{Malicious traffic.}To reproduce the malicious traffic
-for http and tcp attacks, we configured an http server (Apache2) in
-one machine and Nikto2~\cite{nikto} in a different machine. Nikto is
-an open source tool with a catalog of scripts to reproduce
-vulnerabilities. It is important to note that this setup is \emph{not}
-necessary if \emph{pcap} files---pcap is the input format used by
-\tname{}---for the attack already exist. As explained in
-Section~\ref{sec:minimization}, pcap files abstract network
-messages~\cite{pcap} and can be used to avoid network traffic during
-rule synthesis. We proceeded as follows to obtain pcap files for the
-the attacks we analyzed: we 1)~instantiated the script (\eg{}, defined
-the IP of the web server), 2)~executed the Nikto2 script, 3)~and
-monitored the traffic with the Wireshark network
-monitor~\cite{wireshark-net-monitor}. The Wireshark tool records the
-traffic and reports pcap files on output for replaying. The only
-difference in the setup of non-http non-tcp attack is in the first
-step of this procedure. For example, we used the hping3~\cite{hping3}
-command to reproduce the ICMP SYN Flood attack: \CodeIn{hping3 -d 80
-  -w 512 -S -p 80 --flood --rand-source <IP>}. This command alone
-reproduces a flooding attack on a given machine
-(Section~\ref{sec:dos}).\Mar{what about the variants? where do they
-  come from? this is confusing as the narrative above suggests the
-  attack is hardcoded in the tool.}\Luc{O trafego de um ataque 
-  normalmente possui varios pacotes, entre esses varios pacotes alguns 
-  deles possuem um padrao. As regras sao criadas descrevendo esse padrao,
-  com isso um unico ataque pode disparar varios alertas.
+%% It is important to note that this setup is \emph{not}
+%% necessary if \emph{pcap} files for the attack already exist. We
+%% proceeded as follows to obtain pcap files for the the attacks we
+%% analyzed: we 1)~instantiated the script (\eg{}, defined the IP of the
+%% web server), 2)~executed the script, 3)~and monitored the traffic with
+%% the Wireshark network monitor. The
+%% Wireshark tool records the traffic and reports pcap files on output
+%% for replaying it.
+
+
+
+\subsubsection{Malicious traffic.}~For some of the attacks listed on
+Table~\ref{table:attacks}, we obtained pcap files directly from
+trusted security websites (\eg{},
+NetReseC~\cite{pcap-attacks}). Recall that \tname\ takes pcap files on
+input. As explained in Section~\ref{sec:minimization}, these files
+abstract network messages~\cite{pcap} and can be used to avoid network
+traffic during rule synthesis. In addition to these sources, we used
+the Nikto2~\cite{nikto} open source security tool to reproduce
+attacks. To reproduce the http and tcp attacks listed on
+Table~\ref{table:attacks}, we configured an http server (Apache2) in
+one machine and ran the security tool in a different
+machine. Simultenously, we ran WireShark~\cite{wireshark-net-monitor}
+to record the network traffic and Suricata to analyze the traffic. We
+configured \suri\ with all rules from the ``Emerging Threats Open
+Ruleset''~\cite{emerging-threats-open} and ran Nikto2 with default
+parameters, which makes it replay all recorded attacks. After
+execution, we inspected the \suri\ log to identify which rules have
+been activated and which packets were involved in each
+activation. With the packet numbers, it is possible to recover the
+corresponding pcap files, using Wireshark, as to ran \tname{} on
+them. It is worth noting that some rules are triggered multiple times,
+indicating that there are multiple instances of the same attack
+encoded in Nikto2. RQ3 evaluates the importance of these variants to
+\tname{}'s performance. Finally, Nikto2 only supports tcp and http
+attacks.  We used the hping3~\cite{hping3} to reproduce the Ping Scan
+icmp attack (see Section~\ref{sec:dos}).  More precisely, we used the
+following hping3 command to reproduce that attack: \CodeIn{hping3 -d
+  80 -w 512 -S -p 80 --flood --rand-source <IP>}.
+
+%% \Mar{what about the variants? where do
+%%   they come from? this is confusing as the narrative above suggests
+%%   the attack is hardcoded in the tool.}\Luc{O trafego de um ataque
+%%   normalmente possui varios pacotes, entre esses varios pacotes alguns
+%%   deles possuem um padrao. As regras sao criadas descrevendo esse
+%%   padrao, com isso um unico ataque pode disparar varios alertas.
   
-  Porem, existem ataques q so produzem um alerta, ou seja, a regra criada 
-  so detecta um dos pacotes do trafego. Nesses casos, procuramos na internet 
-  datasets (arquivos pcap) que contivessem mais pacotes desses ataques.
-  Fizemos isso tambem para ataques q nos ja tinhamos variacoes, pois
-  (teoricamente) quanto mais variacoes, melhor. Existem alguns sites onde 
-  eh possivel encontrar pcaps com o trafego de alguns ataques, n consegui
-  adicionar nas referencias: 
-  https://www.netresec.com/?page=PcapFiles
-}
+%%   Porem, existem ataques q so produzem um alerta, ou seja, a regra criada 
+%%   so detecta um dos pacotes do trafego. Nesses casos, procuramos na internet 
+%%   datasets (arquivos pcap) que contivessem mais pacotes desses ataques.
+%%   Fizemos isso tambem para ataques q nos ja tinhamos variacoes, pois
+%%   (teoricamente) quanto mais variacoes, melhor. Existem alguns sites onde 
+%%   eh possivel encontrar pcaps com o trafego de alguns ataques, n consegui
+%%   adicionar nas referencias: 
+%%   https://www.netresec.com/?page=PcapFiles
+%% }
 
 \subsubsection{Benign traffic.}~Security
 tools (e.g., perforation testing tools) often use benign traffic to
@@ -1636,8 +1657,6 @@ from the Emerging Threats Open Ruleset~\cite{emerging-threats-open}.
 
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
-
-\Mar{Explique resumidamente o que cada ataque listado na tabela 2 faz...}
 
 
 \subsection{Threats to Validity}
