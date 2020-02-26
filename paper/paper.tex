@@ -1369,22 +1369,22 @@ would be 0.35 (=(0.2+0.5)/2).
 
 \begin{table*}[t!]
   \small
-  \caption{\label{table:attacks}List of attacks.\Mar{adicionar coluna ``Source''}}
+  \caption{\label{table:attacks}List of attacks.}
   \centering
-  \begin{tabular}{llllp{11cm}}
+  \begin{tabular}{llllp{10cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Source} &
-    \multicolumn{1}{c}{Category} &
+    \multicolumn{1}{c}{Type} &
     \multicolumn{1}{c}{Protocol} &
     \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
     \midrule     
-    Ping Scan & NMAP & Active Recon. & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
+    Ping Scan & NMAP & AREC & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
     SYN Flood & hping3 & DoS & TCP & \textbf{flags}: S,12; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
 
     JBoss JMX\MyComment{ Console Beanshell Exploit} & Nikto2 & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
     %% WeBid \MyComment{Local File Inclusion} & RFI & TCP \MyComment{& Local File Inclusion} & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
-    ColdFusion \MyComment{Privilege Escalation} & Nikto2 & Privilege Escalation & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
+    ColdFusion \MyComment{PESC} & Nikto2 & PESC & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
     .htaccess access\MyComment{attempted-recon} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     .idq access\MyComment{EXPLOIT ISAPI} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
     iisadmin access\MyComment{web-application-attack} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
@@ -1520,12 +1520,26 @@ experiments~(Section~\ref{sec:threats}).
 \label{sec:dataset-benign}
 \label{attack-reproduction}
 
-\subsubsection{Attacks.}Table~\ref{table:attacks} shows the attacks we considered in our
-evaluation. These attacks cover different protocols and features of
-\tname{}. Column ``Name'' shows the name of the attack, column
-``Protocol'' shows the protocol name, and column ``Ground Truth''
-shows the options of the rule that captures the attack.\Mar{Explicar o
-  rationale para esta selecao de ataques!}
+\subsubsection{Attacks.}~Table~\ref{table:attacks} shows the selection
+of attacks considered in our evaluation.  Column ``Name'' shows the
+name of the attack, column ``Source'' shows the source where we
+obtained data to reproduce the attack (see
+Section~\ref{subsec:malicious-traffic}), column ``Type'' shows the
+kind of attack, column ``Protocol'' shows the name of the protocol
+explored in the attack, and column ``Ground Truth'' shows the rule
+options to capture the attack. The rationale for the selection were
+(1) to cover attacks with different characteristics, (2) to cover
+attacks of various protocols, and (3) to explore different features of
+\tname. As for (1), the selection includes attacks of the following
+types: Denial-of-Service (DoS), Active Reconnaissance (AREC),
+Privilege escalation (PESC), and Remote Code Execution (RCE). Note
+that the distribution of attacks is not uniform across types and
+protocols as they are not uniform in practice. For example, as
+per~\cite{emerging-threats-open}, RCE are the most prevalent type of
+attacks today.\Mar{please, confirm} Columns ``Protocol'' and ``Ground
+Truth'' indicate, respectively, that we analyzed attacks of different
+protocols and analyzed different features of \tname.
+
 
 %% It is important to note that this setup is \emph{not}
 %% necessary if \emph{pcap} files for the attack already exist. We
@@ -1538,7 +1552,7 @@ shows the options of the rule that captures the attack.\Mar{Explicar o
 
 
 
-\subsubsection{Malicious traffic.}~For some of the attacks listed on
+\subsubsection{\label{subsec:malicious-traffic}Malicious traffic.}~For some of the attacks listed on
 Table~\ref{table:attacks}, we obtained pcap files directly from
 trusted security websites (\eg{},
 NetReseC~\cite{pcap-attacks}). Recall that \tname\ takes pcap files on
@@ -1562,11 +1576,10 @@ indicating that there are multiple instances of the same attack
 encoded in Nikto2\Mar{@Lucas, diga exatamente como vc. obtem as
   variacoes. isto eh que eh importante para a proxima sentenca.}. RQ3
 evaluates the importance of these variants to \tname{}'s
-performance. Finally, we used the hping3~\cite{hping3} to reproduce
-the Ping Scan icmp attack (see Section~\ref{sec:dos}) as Nikto2 only
-supports tcp and http attacks. More precisely, we used the following
-hping3 command to reproduce that attack: \CodeIn{hping3 -d 80 -w 512
-  -S -p 80 --flood --rand-source <IP>}.
+performance. We used NMAP~\cite{netmap} to reproduce the Ping Scan
+attack (see Section~\ref{sec:active-recon}) and hping3~\cite{hping3}
+to reproduce the SYN Flood attack (see
+Section~\ref{sec:dos}).
 
 %% \Mar{what about the variants? where do
 %%   they come from? this is confusing as the narrative above suggests
@@ -1743,6 +1756,10 @@ case. \Mar{explain syntactical difference, if exist}
 
 \subsubsection{Denial-of-Service}
 \label{sec:dos}
+
+\Mar{move from above --> We used the following hping3 command to
+  reproduce that attack: \CodeIn{hping3 -d 80 -w 512 -S -p 80 --flood
+    --rand-source <IP>}.}
 
 The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
 to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
