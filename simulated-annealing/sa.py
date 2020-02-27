@@ -12,7 +12,7 @@ import math
 from functools import partial, reduce
 from itertools import combinations
 
-open("bad.rules", 'w').close()
+#open("bad.rules", 'w').close()
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "pingscan", "synflood"]
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
