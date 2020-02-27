@@ -679,7 +679,6 @@ def evalContents(rules):
 
     with open(fitnessFile_path, "r") as fitnessFile:
         fitnessFile = fitnessFile.read()
-        print("len fitness file: ", len(fitnessFile))
     
     if len(fitnessFile) == 0 :
         return output
@@ -749,10 +748,10 @@ class Rule:
     
     def getFitness(self, weights):
         ret = 0 
-        for i in range(0, len(weights)):
+        for i in range(0, len(self.fitness)):
             ret += weights[i] * self.fitness[i]
         
-        ret = ret/len(weights)
+        ret = ret/len(self.fitness)
         
         return ret
     def getAllAttributesRaw(self):
@@ -783,7 +782,16 @@ def sortRules():
         tmp_rule.options = eval(tmp_str_rule[7])
 
         all_rules_list.append(tmp_rule)
-    
+
+    """print("regra 0:", str(all_rules_list[0]))
+    print("fit 0:", str(all_rules_list[0].getFitness([1,1])))
+    print("regra 1000:", str(all_rules_list[1000]))
+    print("fit 1000:", str(all_rules_list[1000].getFitness([1,1])))
+
+
+
+    exit()
+"""
     current_pos = 0
     best_pos = math.inf
     best_rule_list = []
@@ -794,36 +802,38 @@ def sortRules():
     print("all rules len:", all_rules_len)
     
     for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
-        w.append(w0)
+        #w.append(w0)
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
-            w.append(w1)
-            """for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
-                w.append(w2)
+            #w.append(w1)
+            for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+                #w.append(w2)
                 for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
-                    w.append(w3)
+                    #w.append(w3)
                     for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
-                        w.append(w4)
+                        #w.append(w4)
                         w = [w0,w1,w2,w3,w4]
-                        """
-            print("weights:", str(w))
-            all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+                        
+                        print("weights:", str(w))
+                        all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+                        #exit()
+                        for x, rule in enumerate(all_rules_list):
+                            if rule.sid == 1099019:
+                                golden_rule_pos = all_rules_list.index(rule)
+                            else:
+                                rule.sid=x+1
 
-            for x, rule in enumerate(all_rules_list):
-                if rule.sid == 1099019:
-                    golden_rule_pos = all_rules_list.index(rule)
-                else:
-                    rule.sid=x+1
+                        current_pos = all_rules_len-golden_rule_pos
+                        
+                        print(current_pos)
 
-            current_pos = all_rules_len-golden_rule_pos
-            
-            print(current_pos)
-
-            if current_pos <= best_pos:
-                best_pos = current_pos
-                best_rule_list = copy.deepcopy(all_rules_list)
-                best_weights = copy.deepcopy(w)
-            
-            w = []
+                        if current_pos <= best_pos:
+                            best_pos = current_pos
+                            best_rule_list = copy.deepcopy(all_rules_list)
+                            best_weights = copy.deepcopy(w)
+                    #w.pop()
+                #w.pop()
+           # w.pop()
+        #w.pop()
     
     """i = 0
     for rule in best_rule_list:
