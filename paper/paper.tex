@@ -65,6 +65,7 @@
 \usepackage{enumitem}
 \usepackage{color, colortbl}
 \definecolor{Gray}{gray}{0.9}
+\usepackage[skins]{tcolorbox}
 
 %% 
 \input{macros}
@@ -323,7 +324,8 @@ traffic and from examples of correct rules.
 
 \Fix{summarize how the technique works}
 
-\Fix{summarize results}
+\Fix{summarize results} We believe these results provide initial
+evidence on the effectiveness of \tname{}.
 
 This paper makes the following contributions.
 
@@ -1553,16 +1555,19 @@ prevalent.
 
 
 
-\subsubsection{\label{subsec:malicious-traffic}Malicious traffic.}~For some of the attacks listed on
-Table~\ref{table:attacks}, we obtained pcap files directly from
-trusted security websites (\eg{},
-NetReseC~\cite{pcap-attacks}). Recall that \tname\ takes pcap files on
-input. As explained on Section~\ref{sec:minimization}, these files
-abstract network messages~\cite{pcap} and can be used to avoid network
-traffic during rule synthesis. In addition to these sources, we used
-the Nikto2~\cite{nikto} open source security tool as follows to obtain
-pcap files for http and tcp attacks. We configured an http server
-(Apache2) and ran Nikto2 to attack that server. Simultenously, we ran
+\subsubsection{\label{subsec:malicious-traffic}Malicious traffic.}~Recall that \tname\ takes
+pcap files on input. As explained on Section~\ref{sec:minimization},
+these files abstract network messages~\cite{pcap} and can be used to
+avoid network traffic during rule synthesis. For some of the attacks
+listed on Table~\ref{table:attacks}, we obtained pcap files directly
+from trusted security websites (\eg{},
+NetReseC~\cite{pcap-attacks}\Fix{confirm}).\Mar{reminder: we still
+  don't have any example of attack listed on Table~\ref{table:attacks}
+  whose pcap file was obtained from those websites.} In addition to
+these sources, we used the Nikto2~\cite{nikto} open source security
+tool as follows to obtain pcap files for (non-flooding) http and tcp
+attacks. We configured an http server (Apache2) and ran Nikto2 to
+attack that server. Simultenously, we ran
 WireShark~\cite{wireshark-net-monitor} to record the network traffic
 and Suricata to analyze the traffic. We configured \suri\ with all
 rules from the ``Emerging Threats Open
@@ -1573,18 +1578,22 @@ been activated and which packets were involved on each
 activation. With the packet numbers, it is possible to recover the
 corresponding pcap files, using Wireshark, as to ran \tname{} on
 them. It is worth noting that some rules are triggered multiple times,
-indicating that there are multiple instances of the same attack
-encoded in Nikto2\Mar{@Lucas, diga exatamente como vc. obtem as 
-variacoes. isto eh que eh importante para a proxima sentenca.}. 
-\Luc{Eh feito da mesma forma q foi descrita acima. Quando um ataque 
-produz varios pacotes que geram alertas, nos criamos um pcap com um 
-dos pacotes e utilizamos ele como para gerar a regra maxima inicial. 
-Os outros pacotes sao salvos em um outro pcap e sao utilizados para 
-calcular o recall.} RQ3 evaluates the importance of these variants to \tname{}'s
-performance. We used NMAP~\cite{netmap} to reproduce the Ping Scan
-attack (see Section~\ref{sec:active-recon}) and hping3~\cite{hping3}
-to reproduce the SYN Flood attack (see
+indicating that Nikto2 expresses multiple variants of the same
+attack. RQ3 evaluates the importance of these variants to \tname{}'s
+performance. We used similar methodology to obtain pcap files using
+other security testing tools. We used NMAP~\cite{netmap} to reproduce
+the Ping Scan attack (see Section~\ref{sec:active-recon}) and
+hping3~\cite{hping3} to reproduce the SYN Flood attack (see
 Section~\ref{sec:dos}).
+
+%% \Mar{@Lucas, diga exatamente como vc. obtem as variacoes. isto eh que
+%%   eh importante para a proxima sentenca.}.  \Luc{Eh feito da mesma
+%%   forma q foi descrita acima. Quando um ataque produz varios pacotes
+%%   que geram alertas, nos criamos um pcap com um dos pacotes e
+%%   utilizamos ele como para gerar a regra maxima inicial.  Os outros
+%%   pacotes sao salvos em um outro pcap e sao utilizados para calcular o
+%%   recall.}
+
 
 %% \Mar{what about the variants? where do
 %%   they come from? this is confusing as the narrative above suggests
@@ -1603,30 +1612,31 @@ Section~\ref{sec:dos}).
 %%   https://www.netresec.com/?page=PcapFiles
 %% }
 
-\subsubsection{Benign traffic.}~Security
-tools (e.g., perforation testing tools) often use benign traffic to
-evaluate false positive rates. Consequently, different public options
-exist. We used two popular public sources. The Bigflows.pcap data set
-is part of the TcpReplay~\cite{tcpreplay} open source project. This
-data set includes real network traffic of a busy private network
-access point to the Internet. According to the TcpReplay web site
-``This capture is much larger and has a smaller average packet size
-than the previous capture (smallFlows.pcap). It also has many more
-flows and different applications.''. In addition to the Bigflows.pcap
-data set, we also used data sets\Mar{more than one?} made available by
+%% According to the TcpReplay web
+%% site ``This capture is much larger and has a smaller average packet
+%% size than the previous capture (smallFlows.pcap). It also has many
+%% more flows and different applications.''
+
+\subsubsection{Benign traffic.}~Public data sets of bening traffic
+exist; they are important to evaluate the rate of false positives of
+security tools. We used two popular public sources. The Bigflows.pcap
+data set is part of the TcpReplay~\cite{tcpreplay} open source
+project. It includes real network traffic of a busy private network
+access point to the Internet. In addition to the Bigflows.pcap data
+set, we also used data sets\Mar{more than one?}  made available by
 Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
-  of the traffic? as the description for Bigflows.pcap?}. \Luc{@Guilherme ...}
+  of the traffic? as the description for
+  Bigflows.pcap?}. \Luc{@Guilherme ...}
 
 \subsubsection{Ground Truth.}To evaluate \tname\ objectively we need
-to compare the rules it generates with human-written rules from a
-trusted source. We used the ``Emerging Threats Open
-Ruleset''~\cite{emerging-threats-open} data set for that. After
-finding the attack and corresponding rule using the procedure
-described in Section~\ref{subsec:malicious-traffic}, we reproduced the
-attack and confirmed that the rule captures the attack. Column
-``Ground Truth'' from Table~\ref{table:attacks} only shows the
-essential relevant options. Documentation options (\eg{}, ``msg'') are
-discared.
+to compare the rules it generates with \emph{trusted rules}. We used
+the ``Emerging Threats Open Ruleset''~\cite{emerging-threats-open} for
+that. After finding the attack and corresponding rule using the
+procedure described in Section~\ref{subsec:malicious-traffic}, we
+reproduced the attack and confirmed that the rule captures the
+attack. Column ``Ground Truth'' from Table~\ref{table:attacks} only
+shows the essential relevant options. Documentation options (\eg{},
+``msg'') are discared.
 
 %% Note from Figure~\ref{fig:overview} that the positive traffic is an
 %% input to the technique. The negative non-malicious traffic, however,
@@ -1680,6 +1690,57 @@ discared.
 
 \subsection{Answering RQ1: \textRQone}
 \label{sec:answer-rqone}
+
+This section reports on the performance evaluation of \tname. The
+evaluation metric used is the position of the golden rule at the
+ranked list of plausible rules produced by the tool implementing the
+technique (see Figure~\ref{fig:overview}). This metric is a proxy of
+human performance in analyzing the list of plausible rules that
+capture only the malicious traffic provided on input.
+
+Table~\ref{table:results} shows results. Column ``Name'' shows the
+name of the attack, column ``\#~Vars.'' shows the number of variants
+of the attack, column ``\#~Option Cand. (step 1)'' shows the number of
+option candidates reported by \tname\ at step 1, column ``\#~Plausible
+Rules (step 2)'' shows the number of plausible rules reported by
+\tname\ at step 2, column ``Rank (step 3)'' shows the position of the
+golden rule in the ranked list reported at step 3 of the technique.
+It is worth to indicate that column ``\#~Vars.'' shows the input of
+\tname\ that varies across different attacks. Although \tname\ also
+depends on the data sets of benign traffic and existing \suri\ rules,
+these inputs are constant across different executions of the tool. The
+rest of the columns show the progress of the tool at various stages
+and provide an indication of complexity of the synthesis problem.
+
+Observe that the number of option candidates is considerably higher
+for attacks captured with content options compared to attacks not
+involving content options. This happens because for content attacks
+the number of option candidates depend on the unbounded size of the
+http payload whereas for attacks of different protocols the number of
+option candidates depend on the layout of the messages. Also observe
+that the number of plausible rules is much smaller for non-content
+attacks compared to content attacks.
+
+\newcommand{\percTopFiveRanking}{\Fix{X\%}}
+
+Overall, results show that \tname\ performed very well in most of the
+cases. It reported the ground truth rule in \emph{all} cases and
+reported that rule within the top five rules of the ranking in
+\percTopFiveRanking\ of the cases. It is important to note that the
+number of options in the ground truth (Table~\ref{table:attacks},
+column ``Ground Truth'') is not an indication of difficulty to
+synthesize rules. Note that in \Fix{most?} of the cases where the
+ground truth rule contains only one content options the number of
+option candidates and plausible rules produced is high. 
+
+\begin{center}
+\begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
+\tname\ successfully synthesizes the golden rules in all cases and
+that rule is ranked among the first top five rules in
+\percTopFiveRanking\ of the cases.
+\end{tcolorbox}
+\end{center}
+
 
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
