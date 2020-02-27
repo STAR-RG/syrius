@@ -55,7 +55,7 @@ vars:
 # placed here if its not specified with a full path name. This can be
 # overridden with the -l command line parameter.
 #default-log-dir: /usr/local/var/log/suricata/
-default-log-dir: ../suricata-logs/
+default-log-dir: ./suricata-logs/
 
 # global stats configuration
 stats:
@@ -77,7 +77,7 @@ outputs:
   - fast:
       enabled: yes
       filename: script.log
-      append: yes
+      append: no
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
 
   # Extensible Event Format (nicknamed EVE) event log in JSON format
@@ -1876,7 +1876,7 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: ../attacks/
+default-rule-path: ./attacks/
 #default-rule-path: rules/emerging-threats/
 
 
@@ -1947,9 +1947,9 @@ rule-files:
 ## Auxiliary configuration files.
 ##
 
-classification-file: /usr/local/etc/suricata/classification.config
-reference-config-file: /usr/local/etc/suricata/reference.config
-# threshold-file: /usr/local/etc/suricata/threshold.config
+classification-file: config/classification.config
+reference-config-file: config/reference.config
+threshold-file: config/threshold.config
 
 ##
 ## Include other configs
