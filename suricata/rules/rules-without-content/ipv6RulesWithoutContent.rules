@@ -1,6 +1,0 @@
-alert ipv6 any any -> any any (msg:"SURICATA RH Type 0"; decode-event:ipv6.rh_type_0; sid:2200093; rev:1;)
-alert ipv6 any any -> any any (msg:"SURICATA zero length padN option"; decode-event:ipv6.zero_len_padn; sid:2200094; rev:1;)
-alert ipv6 any any -> any any (msg:"SURICATA reserved field in Frag Header not zero"; decode-event:ipv6.fh_non_zero_reserved_field; sid:2200095; rev:1;)
-alert ipv6 any any -> any any (msg:"SURICATA data after none (59) header"; decode-event:ipv6.data_after_none_header; sid:2200096; rev:1;)
-alert ipv6 any any -> any any (msg:"SURICATA unknown next header / protocol"; decode-event:ipv6.unknown_next_header; sid:2200097; rev:1;)
-alert ipv6 any any -> any any (msg:"SURICATA IPv6 with ICMPv4 header"; decode-event:ipv6.icmpv4; sid:2200090; rev:1;)

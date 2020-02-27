@@ -1,4 +1,0 @@
-sphinxcontrib-programoutput
-Sphinx
-python-dateutil
-PyYAML
