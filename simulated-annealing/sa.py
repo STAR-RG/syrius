@@ -621,8 +621,9 @@ def checkFalseNegative(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+        s = '[1:'+str(rules[i].sid)+':'
+        if s in fitnessFile :
+            output[i] = 1
             if str(rules[i].sid) == "1099019":
                 print("GOLDEN RECALL:", output[i])
         #else:
@@ -654,8 +655,9 @@ def checkPrecision(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        if fitnessFile.count('1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+        s = '[1:'+str(rules[i].sid)+':'
+        if s in fitnessFile:
+            output[i] = 1
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
@@ -676,14 +678,17 @@ def evalContents(rules):
         output.append(0)
 
     with open(fitnessFile_path, "r") as fitnessFile:
-        fitnessFile = fitnessFile.readlines()
+        fitnessFile = fitnessFile.read()
+        print("len fitness file: ", len(fitnessFile))
+    
+    if len(fitnessFile) == 0 :
+        return output
+
     for i in range(len(rules)):
-        for lines in fitnessFile:
-            s="Testing rule {}".format(i)
-            if s in lines:
-                output[i]=1
-                #print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-                break
+        s="Testing rule {} ".format(i)
+        if s in fitnessFile:
+            output[i]=1
+
     #print(output)
     return output
 
@@ -744,10 +749,10 @@ class Rule:
     
     def getFitness(self, weights):
         ret = 0 
-        for i in range(0, len(self.fitness)):
+        for i in range(0, len(weights)):
             ret += weights[i] * self.fitness[i]
         
-        ret = ret/len(self.fitness)
+        ret = ret/len(weights)
         
         return ret
     def getAllAttributesRaw(self):
@@ -784,18 +789,22 @@ def sortRules():
     best_rule_list = []
     best_weights = []
     all_rules_len = len(all_rules_list)
+    w = []
 
     print("all rules len:", all_rules_len)
     
     for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
+        w.append(w0)
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
+            w.append(w1)
             """for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+                w.append(w2)
                 for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
+                    w.append(w3)
                     for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
+                        w.append(w4)
                         w = [w0,w1,w2,w3,w4]
                         """
-            w = [w0,w1]
-
             print("weights:", str(w))
             all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
 
@@ -812,7 +821,9 @@ def sortRules():
             if current_pos <= best_pos:
                 best_pos = current_pos
                 best_rule_list = copy.deepcopy(all_rules_list)
-                best_weights = w
+                best_weights = copy.deepcopy(w)
+            
+            w = []
     
     """i = 0
     for rule in best_rule_list:
@@ -1038,6 +1049,7 @@ def optimizeRule(rule):
             else:
                 rule_list.clear()
                 rule_list=aux2.copy()
+                fitness_list.clear()
                 aux2.clear()
                 aux.clear()
     
@@ -1126,6 +1138,7 @@ def optimizeRule(rule):
             else:
                 rule_list.clear()
                 rule_list=aux2.copy()
+                fitness_list.clear()
                 aux2.clear()
                 aux.clear()
         
