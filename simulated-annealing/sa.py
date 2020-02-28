@@ -859,7 +859,7 @@ def sortMultipleAttacks():
             if i == 0:
                 print("No file was loaded, something is wrong.")
                 exit()
-            break
+            #break
  
 
     all_rules_list = []
