@@ -666,8 +666,8 @@ benign and malicious network traffic and (2) rules from public
 rulesets. \tname\ takes on input malicious and benign traffic and a
 set of rules from public rulesets and produces on output a list of
 \emph{plausible rules}---\ie{}, rules that isolate the malicious
-traffic from the benign traffic---in order of their likelihood to
-reflect user's intent. Figure~\ref{fig:overview} shows the workflow of
+traffic from the benign traffic---ranked in order of similarity with
+existing rules. Figure~\ref{fig:overview} shows the workflow of
 \tname{} as a pipeline of three components, which appear numbered in
 the figure.  Public data sets of benign
 traffic~\cite{tcpreplay,stratosphere-normal} and \nids\ rules
