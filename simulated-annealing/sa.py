@@ -801,35 +801,35 @@ def sortRules():
 
     print("all rules len:", all_rules_len)
     
-    for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
+    for w0 in [0, 0.25, 0.5, 0.75, 1]:
         #w.append(w0)
-        for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
+        for w1 in [0, 0.25, 0.5, 0.75, 1]:
             #w.append(w1)
-            for w2 in [0.01, 0.25, 0.5, 0.75, 1]:
+            for w2 in [0, 0.25, 0.5, 0.75, 1]:
                 #w.append(w2)
-                for w3 in [0.01, 0.25, 0.5, 0.75, 1]:
+                for w3 in [0, 0.25, 0.5, 0.75, 1]:
                     #w.append(w3)
-                    for w4 in [0.01, 0.25, 0.5, 0.75, 1]:
+                    for w4 in [0, 0.25, 0.5, 0.75, 1]:
                         #w.append(w4)
                         w = [w0,w1,w2,w3,w4]
-                        
-                        print("weights:", str(w))
-                        all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
-                        #exit()
-                        for x, rule in enumerate(all_rules_list):
-                            if rule.sid == 1099019:
-                                golden_rule_pos = all_rules_list.index(rule)
-                            else:
-                                rule.sid=x+1
+                        if w != [0,0,0,0]:
+                            print("weights:", str(w))
+                            all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
+                            #exit()
+                            for x, rule in enumerate(all_rules_list):
+                                if rule.sid == 1099019:
+                                    golden_rule_pos = all_rules_list.index(rule)
+                                else:
+                                    rule.sid=x+1
 
-                        current_pos = all_rules_len-golden_rule_pos
-                        
-                        print(current_pos)
+                            current_pos = all_rules_len-golden_rule_pos
+                            
+                            print(current_pos)
 
-                        if current_pos <= best_pos:
-                            best_pos = current_pos
-                            best_rule_list = copy.deepcopy(all_rules_list)
-                            best_weights = copy.deepcopy(w)
+                            if current_pos <= best_pos:
+                                best_pos = current_pos
+                                best_rule_list = copy.deepcopy(all_rules_list)
+                                best_weights = copy.deepcopy(w)
                     #w.pop()
                 #w.pop()
            # w.pop()
