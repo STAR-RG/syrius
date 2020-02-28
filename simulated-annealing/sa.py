@@ -621,17 +621,16 @@ def checkFalseNegative(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        s = '[1:'+str(rules[i].sid)+':'
-        if s in fitnessFile :
-            output[i] = 1
-            if str(rules[i].sid) == "1099019":
-                print("GOLDEN RECALL:", output[i])
+        if fitnessFile.count('[1:'+str(rules[i].sid)+':') >= 1:
+            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+            #if str(rules[i].sid) == "1099019":
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
             #print(fitnessFile)
 
     return output
+
 
 def sendTest(attack):
     subprocess.Popen(["sh", "sendTest.sh", attack], stdout=subprocess.DEVNULL).wait()
@@ -655,15 +654,15 @@ def checkPrecision(rules):
         fitnessFile = fitnessFile.read()
     
     for i in range(len(rules)):
-        s = '[1:'+str(rules[i].sid)+':'
-        if s in fitnessFile:
-            output[i] = 1
+        if fitnessFile.count('[1:'+str(rules[i].sid)+':') >= 1:
+            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
             #print(fitnessFile)
 
     return output
+
 
 def evalContents(rules):
     global fitnessFile_path
@@ -812,7 +811,7 @@ def sortRules():
                     for w4 in [0, 0.25, 0.5, 0.75, 1]:
                         #w.append(w4)
                         w = [w0,w1,w2,w3,w4]
-                        if w != [0,0,0,0]:
+                        if w != [0,0,0,0,0]:
                             print("weights:", str(w))
                             all_rules_list = sorted(all_rules_list, key=partial(callGetFitness, weights=w))
                             #exit()
@@ -907,8 +906,6 @@ def sortMultipleAttacks():
         all_rules_len.append(len(elem))
 
     print("all rules len:", all_rules_len)
-
-    
 
     for w0 in [0.01, 0.25, 0.5, 0.75, 1]:
         for w1 in [0.01, 0.25, 0.5, 0.75, 1]:
@@ -1154,9 +1151,10 @@ def optimizeRule(rule):
         
         #print(rule_list)
 
-    with open("regras_output.txt", "w+") as writer:
+    """with open("regras_output.txt", "w+") as writer:
         for x in rule_list:
             writer.write(str(x) + "\n")
+    """
     print(time.time() - start_time)
 
     """for rule in all_rule_list:
@@ -1172,8 +1170,8 @@ def optimizeRule(rule):
     golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
     golden_content["adaptor"] = {'/HtmlAdaptor':["nocase", "http_uri"], 'action=inspect':["nocase", "http_uri"], 'bean':["nocase", "http_uri"], 'name=':["http_uri"]}
     golden_content["script"] = {'</script>':["http_uri", "nocase"]}
-    golden_content["issadmin"] = {'/iisadmin':["nocase"]}
-    golden_content["idq"] = {'.idq':["nocase"]}
+    golden_content["issadmin"] = {'/iisadmin':["http_uri", "nocase"]}
+    golden_content["idq"] = {'.idq':["http_uri", "nocase"]}
     golden_content["system"] = {'/system32/':["http_uri", "nocase"]}
 
     if rule_protocol == "http":
@@ -1183,8 +1181,8 @@ def optimizeRule(rule):
     
     print("golden_rule:", golden_rule)
     #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
-    all_rule_list.append(golden_rule)
-    all_rule_list.append(final_rule)
+    all_rule_list.insert(0, golden_rule)
+    #all_rule_list.append(final_rule)
     golden_rule_pos = 0
 
     for i in range(0, len(all_rule_list)):
@@ -1225,7 +1223,7 @@ def optimizeRule(rule):
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(all_rule_list, recall, precision):
-            y=y*(100/3)
+            y=y*(100/len(allpkts))
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
@@ -1240,7 +1238,7 @@ def optimizeRule(rule):
                 fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
                 for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
-                    y=y*(100/3)
+                    y=y*(100/len(allpkts))
                     z=100-(z/20)
                     f1=2*(((z*y)/100)/((y/100)+(z/100)))
                     if x.sid == "1099019":
@@ -1279,7 +1277,7 @@ def optimizeRule(rule):
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
-            y=y*(100/3)
+            y=y*(100/len(allpkts))
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
@@ -1293,7 +1291,7 @@ def optimizeRule(rule):
             fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
             for (x, y, z) in zip(list(reversed(normal_rules_list)), list(reversed(normal_recall)), list(reversed(normal_precision))):
-                y=y*(100/3)
+                y=y*(100/len(allpkts))
                 z=100-(z/20)
                 f1=2*(((z*y)/100)/((y/100)+(z/100)))
                 if f1>90.0: 
