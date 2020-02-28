@@ -733,8 +733,8 @@ class Rule:
         str_options = str_options + ' ' + "sid:" + str(self.sid) + ';'
         
         str_protocol = str(self.protocol)
-        if str_protocol == "http":
-            str_protocol = "tcp"
+        #if str_protocol == "http":
+        #    str_protocol = "tcp"
 
         return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
 
@@ -799,7 +799,7 @@ def sortRules():
 
 
     exit()
-"""
+    """
     current_pos = 0
     best_pos = math.inf
     best_rule_list = []
@@ -836,7 +836,9 @@ def sortRules():
 
                             if current_pos <= best_pos:
                                 best_pos = current_pos
+                                print("deepcopy start")
                                 best_rule_list = copy.deepcopy(all_rules_list)
+                                print("deepcopy end")
                                 best_weights = copy.deepcopy(w)
                     #w.pop()
                 #w.pop()
@@ -1190,6 +1192,7 @@ def optimizeRule(rule):
         golden_rule.options = {'dsize':0, 'itype':8}
     
     print("golden_rule:", golden_rule)
+    print("all_rules_list len:", len(all_rule_list))
     #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.insert(0, golden_rule)
     #all_rule_list.append(final_rule)
@@ -1203,12 +1206,14 @@ def optimizeRule(rule):
             writer.write(str(all_rule_list[i])+'\n')
             raw_writer.write(str(all_rule_list[i].getAllAttributesRaw())+'\n')
 
+    regrafit=[]
+
+    """
     all_rule_list, best_weights, best_pos = sortRules()
 
     print("Best Weights:", str(best_weights))
     print("Best Pos: " + str(best_pos) + ',' + str(len(all_rule_list)))
 
-    regrafit=[]
 
     print("pegando precision")
     precision=checkPrecision(all_rule_list)
@@ -1216,7 +1221,7 @@ def optimizeRule(rule):
     recall=checkFalseNegative(all_rule_list)
     i=0
     golden_index = 0
-
+    """
     """for rule in all_rule_list:
         if "1099019" in str(rule):
             golden_index = i
@@ -1227,6 +1232,7 @@ def optimizeRule(rule):
     print('recall golden rule:', recall[golden_index])
 
     print("tamanho da variacao: {}".format(len(allpkts)))
+    """
     """
 
     with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
@@ -1261,7 +1267,7 @@ def optimizeRule(rule):
                         #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
                         fitness_writer.writerow([str(x), ruleSizeFitness(x), ruleOptionsFitness(x)])
                         regrafit.append((x, ruleSizeFitness(x), ruleOptionsFitness(x)))
-    
+    """
 
     w = [1,1,1,1,1]
     print("weights:", str(w))
