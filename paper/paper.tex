@@ -1395,6 +1395,10 @@ would be 0.35 (=(0.2+0.5)/2).
     SYN Flood & hping3 & DoS & TCP & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds
     5;\\
+    UDP Teardrop & \Fix{WireShark} & DoS & UDP & \textbf{fragbits}:M; \textbf{id}:124; \\
+    UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds
+    5; \\
+    Black Nurse & NetReseC & DoS & ICMP & \textbf{icode}:3; \textbf{itype}:3; \\
     \midrule
     JBoss JMX\MyComment{ Console Beanshell Exploit} & Nikto2 & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
     WeBid \MyComment{Local File Inclusion} & RFI & LFI & HTTP & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
@@ -1404,8 +1408,8 @@ would be 0.35 (=(0.2+0.5)/2).
     iisadmin access\MyComment{web-application-attack} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
     /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & Nikto2 & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
     Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
-    Apache Struts 2 & \Fix{Source} & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\
-    WordPress Login & \Fix{Source} & PVE & HTTP & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
+    Apache Struts 2 & WRCCDC & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\
+    WordPress Login & WRCCDC & PVE & HTTP & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1493,16 +1497,16 @@ experiments~(Section~\ref{sec:threats}).
     \multicolumn{1}{c}{(step 3)} \\
 
     \midrule
-    Ping Scan & 5 & 5 & 2 & - \\
-    SYN Flood & 3 & 2 & 2 & - \\
-    JBoss JMX & 4 & 23 & 228 & \Fix{23} \\
+    Ping Scan & 6 & 5 & 2 & - \\
+    SYN Flood & 4 & 2 & 2 & - \\
+    JBoss JMX & 5 & 23 & 228 & \Fix{23} \\
     WeBid & 1 & 23 & - & -\\    
-    ColdFusion & 6 & 19 & 34 & \Fix{5}\\
-    .htaccess access & 4 & 17 & 984 & \Fix{2}\\
-    .idq access & 13 & 19 & 511 & \Fix{2} \\
-    iisadmin access & 3 & 17 & \Fix{861} & \Fix{1} \\
-    /system32/ in URI & 3 & 20 & 1,913 & \Fix{2} \\
-    Script tag in URI & 22 & 22 & 786 & - \\
+    ColdFusion & 7 & 19 & 34 & \Fix{5}\\
+    .htaccess access & 5 & 17 & 984 & \Fix{2}\\
+    .idq access & 14 & 19 & 511 & \Fix{2} \\
+    iisadmin access & 4 & 17 & \Fix{861} & \Fix{1} \\
+    /system32/ in URI & 4 & 20 & 1,913 & \Fix{2} \\
+    Script tag in URI & 23 & 22 & 786 & - \\
     Apache Struts 2 & - & - & - & - \\
     Wordpress Login & - & - & - & - \\
     \bottomrule
@@ -1583,7 +1587,7 @@ from trusted security websites (\eg{},
 NetReseC~\cite{pcap-attacks}\Fix{confirm}).\Mar{reminder: we still
   don't have any example of attack listed on Table~\ref{table:attacks}
   whose pcap file was obtained from those websites.} \Luc{Ataques Apache 
-  e WordPress. @Guilherme adicionar fontes} In addition to
+  e WordPress. @Guilherme adicionar fontes} \Gui{O NetReseC oferece uma lista de sites que oferecem datasets, como o proprio Stratosphere, que estamos utilizando para trafego normal. Para esses dois ataques novos com content, peguei do WRCCDC - Western Regional Collegiate Cyber Defense Competition: https://archive.wrccdc.org/pcaps/}In addition to
 these sources, we used the Nikto2~\cite{nikto} open source security
 tool as follows to obtain pcap files for (non-flooding) http and tcp
 attacks. We configured an http server (Apache2) and ran Nikto2 to
@@ -1646,7 +1650,7 @@ access point to the Internet. In addition to the Bigflows.pcap data
 set, we also used data sets\Mar{more than one?}  made available by
 Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
   of the traffic? as the description for
-  Bigflows.pcap?}. \Luc{@Guilherme ...}
+  Bigflows.pcap?}. \Luc{@Guilherme ...} \Gui{The Stratosphere IPS Project has a sister project called the Malware Capture Facility Project that is responsible for making the long-term captures. This project is continually obtaining malware and normal data to feed the Stratosphere IPS (copy paste do site). No site tem uma lista de datasets, e embaixo dele descricao da origem desses datasets, como de uma rede universitaria, um usuario normal, etc. https://www.stratosphereips.org/datasets-normal}
 
 \subsubsection{Ground Truth.}To evaluate \tname\ objectively we need
 to compare the rules it generates with \emph{trusted rules}. We used
