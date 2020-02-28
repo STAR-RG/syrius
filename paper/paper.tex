@@ -293,22 +293,22 @@ set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
 of Suricata~\cite{suricata}, a popular open-source \nids{}. This
 particular rule prescribes a method to capture an Active
 Reconnaissance attack for discovering which ports of a publicly
-accessible machine are open for connection. Rulesets exist for
-Snort~\cite{snort} and Suricata~\cite{suricata}, providing protection
-against existing attacks. Unfortunately, attackers actively look for
-new mechanisms to exploit systems. For example, Figure~\Fix{plot}
-shows the increase in number of rules added to the ``Emerging Threats
-Open Ruleset''---a popular public data set of \suri\ rules---in the
-past 12 months.
+accessible machine are open for connection (see
+Section~\ref{sec:active-recon}). Rulesets exist for Snort~\cite{snort}
+and Suricata~\cite{suricata}, providing protection against existing
+attacks. Unfortunately, attackers actively look for new mechanisms to
+exploit systems. For example, Figure~\Fix{plot} shows the increase in
+number of rules added to the ``Emerging Threats Open Ruleset''---a
+popular public data set of \suri\ rules---in the past 12 months.
 
 \Fix{add figure here}
 
 Intuitively, rulesets need to be constantly revised to protect a
 system against attackers. Unfortunately, creating these rules is
-time-consuming as the language for describing rules is non-trivial
-(see Section~\ref{sec:example-suricata-rules}) and it is error-prone
-as checking whether the rule captures only malicious traffic is
-non-trivial.
+time-consuming and error-prone. The language for describing rules is
+non-trivial (see Section~\ref{sec:example-suricata-rules}) and testing
+correctness of a rule requires data and careful inspection.
+
 
 %% IT-security companies capitalize on this phenomena and
 %% offer rulesets on the
@@ -318,9 +318,9 @@ This paper proposes \tname{}\footnote{Abbreviation for
   \textbf{Sy}nthesis of Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a
 technique that uses machine intelligence to automatically synthesize
 rules for rule-based \nids. Our goal is to facilitate the creation of
-rules and, consequently, harden the protection of \nids\ to network
-attacks. \tname{} synthesizes rules from malicious and benign traffic
-and from examples of correct rules.
+rules and, consequently, help system administrators to harden the
+protection of \nids\ to network attacks. \tname{} synthesizes rules
+from malicious and benign traffic and from examples of correct rules.
 
 \Fix{
 denial-of-service
