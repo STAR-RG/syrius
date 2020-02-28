@@ -43,6 +43,8 @@ contents_dict["idq"] = {'GET':[], '/scripts':[], '/samples':[], '/search':[], '/
 
 contents_dict["system"] = {'GET':[], '/c':[], '/winnt':[], '/system32/':["http_uri", "nocase"], 'cmd.exe?':[], '/c+dir+':[], '/OG':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
 
+contents_dict["wordpress"] = {'POST':[], 'deflate': [], 'Hungry4Apples%21': [], '&pwd=': [], '58.0)': [], '10.47.26.186': [], 'Gecko': [], 'Win64': [], 'log=': [], 'application': [], '1': [], '/x-www-form-urlencoded': [], 'Accept-Language:': [], '&wp-submit=': [], 'Firefox': [], '0.9,*': [], 'WP+Cookie+check': [], 'admin': [], '%2Fwordpress%2Fwp-admin%2F': [], 'testcookie=': [], '/html,application': [], 'Connection:': [], 'gzip,': [], '/58.0': [], '/wordpress': [], '/20100101': [], '/xml': [], '0.5': [], 'wordpress_test_cookie=': [], 'x64': [], '10.0': [], 'ess': [], '(Windows': [], 'text': [], '/5.0': [], 'Log+In': [], 'Content-Type:': [], 'Cookie:': [], '/xhtml+xml,application': [], 'Referer:': [], '/10.47.26.186': [], 'HTTP/1.1': [], 'Host:': [], 'en-US,en': [], 'Mozilla': [], 'NT': [], '99': [], 'Accept-Encoding:': [], 'rv:': [], 'Accept:': [], 'redirect_to=': [], 'Content-Length:': [], '/wp-login.php': [], 'User-Agent:': [], 'http:': [], '0.8': [], 'q=': [], 'keep-alive': [], 'Upgrade-Insecure-Requests:': []}
+
 if args.attack in contents_dict:
     contents = contents_dict[args.attack]
 else:
@@ -65,9 +67,6 @@ if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "scr
 else:
     pcapAttack = "Datasets/" + str(args.attack) + ".pcap"
 
-if args.attack == "pingscan":
-    pcapAttack = "Datasets/pingscan.pcap"
-
 pcapVariations = "Datasets/all-" + str(args.attack) + ".pcap"
 pkts = pyshark.FileCapture(pcapAttack)
 pkts.load_packets()
@@ -75,6 +74,9 @@ allpkts = pyshark.FileCapture(pcapVariations)
 allpkts.load_packets()
 print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
+if rule_protocol in ["urlencoded-form"]:
+    rule_protocol = "http"
+
 print(rule_protocol)
 
 def getContentsPerModifiers():
@@ -198,9 +200,16 @@ def getTokens():
         if aux != '':
             tokens[aux] = []
 
-    #print(tokens)
+    print(tokens)
+
+    print(len(tokens))
 
     return tokens
+
+"""getTokens()
+
+exit()
+"""
 
 def getRuleSize(rule):
     global keyword_list
@@ -1173,6 +1182,7 @@ def optimizeRule(rule):
     golden_content["issadmin"] = {'/iisadmin':["http_uri", "nocase"]}
     golden_content["idq"] = {'.idq':["http_uri", "nocase"]}
     golden_content["system"] = {'/system32/':["http_uri", "nocase"]}
+    golden_content["wordpress"] = {"log=": ["http_client_body"], "&pwd=": ["http_client_body"], "&wp-submit=": ["http_client_body"]}
 
     if rule_protocol == "http":
         golden_rule.options["content"] = golden_content[args.attack]
