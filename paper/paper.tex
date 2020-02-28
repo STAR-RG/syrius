@@ -389,7 +389,11 @@ options~\cite{suri-rule-format}. The action part appears as the first
 word in the rule description. An action denotes the task that needs to
 be executed if the rule pattern is satisfied.  In this example, a
 message will be sent to system administrators if the rule pattern is
-satisfied. The header comes after the action in the rule
+satisfied\footnote{Technically, an IPS (Intrusion Prevention System)
+  differs from an IDS in the action taken when an intrusion is
+  observed. IPS systems block malicous traffic. However, IDS and IPS
+  do not differ in the approaches that can be used to detect the
+  intrusion~\cite{ids-ips}.\Mar{check}}. The header comes after the action in the rule
 description. It restricts the information flow covered by the
 rule. The header of this rule is \CodeIn{icmp any any -> any
   any}. It instructs Suricata to inspect \CodeIn{icmp} traffic flowing
@@ -534,14 +538,14 @@ from a single message.
 \label{sec:active-recon}
 
 This section briefly shows how \tname{} synthesizes rules for one
-example attack. Active Reconnaissance is a method used by malicious
-individuals to collect information about a computing system to
-determine potential vulnerabilities. This method is used as a
-preliminary step towards an actual attack. For example, Ping Scan
-scans the network for IPs of accessible hosts. An attacker sends
-several ICMP Echo requests to a range of IP addresses in the network
-and checks which ones respond to these requests. This method enables
-an attacker to know which machines are active in the network.
+example attack. Active Reconnaissance is typically used as a
+preliminary step towards an actual attack. It is a method to collect
+information about a computing system to determine potential
+vulnerabilities. For example, Ping Scan scans the network for IPs of
+accessible hosts. An attacker sends several ICMP Echo requests to a
+range of IP addresses in the network and checks which ones respond to
+these requests. This method enables an attacker to discover which
+machines are active in the network.
 
 %\vspace{-1ex}
 \begin{figure}[h!]
@@ -553,36 +557,31 @@ an attacker to know which machines are active in the network.
 \vspace{-3ex}
 
 Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
-a Ping Scan attempt, as documented in NMAP~\cite{netmap}, a network
-discovery and security auditing open-source tool. The relevant options
-(see Section~\ref{sec:example-suricata-rules}) are in bold---the
-option \CodeIn{dsize: 0} indicates that the packet has no bytes in the
-payload and the option \CodeIn{itype: 8} indicates that the packet to
-be captured are ICMP Echo requests.
-
+a Ping Scan, as documented in NMAP~\cite{netmap}, a network discovery
+and security auditing open-source tool. The essential options to
+capture the attack (see Section~\ref{sec:example-suricata-rules}) are
+in bold---the option \CodeIn{dsize: 0} indicates that the packet has
+no bytes in the payload and the option \CodeIn{itype: 8} indicates
+that the packet to be captured are ICMP Echo requests.
 
 In the following, we briefly show how \tname{} synthesizes rules for
-this attack. The action and the header of the rules that \tname{}
-creates are either inferred or left constant. For example, in this
-case, \tname{} sets the action to \CodeIn{alert} and sets the header
-to \CodeIn{<proto> any any -> any any}, indicating that it infers the
-target protocol and uses the most general flow description possible,
-\ie{}, it instructs the \nids\ to analyze the traffic flowing from/to
-any address and port.  The rationale for this decision is that the
-choice of these parameters are domain-specific and subject to change
-by the system administrator.  The main challenge in synthesizing rules
-is to discover the set of options in a rule that blocks the malicious
-traffic, but allows the benign traffic to pass. \Luc{O Suricata normalmente 
-nao bloqueia trafego, apenas gera alertas sobre ele. Para bloquear um 
-pacote ele precisa ser configurado no modo Intrusion Prevention System 
-(IPS) ao inves de IDS: https://blog.starti.com.br/ids-ips/}
+this attack. The action is left constant (\CodeIn{alert}) and the
+header is inferred from the protocol. For example, in this case,
+\tname{} sets the header to \CodeIn{icmp any any -> any any},
+indicating that the rule applies to \CodeIn{icmp} messages and applies
+to the most general flow description, \ie{}, it instructs the
+\nids\ to analyze the traffic flowing from/to any address and port.
+The rationale for this decision is that the choice of these parameters
+are domain-specific and subject to change by the system administrator.
 
-\tname{} proceeds as follows to synthesize rules. First, it analyzes
-the malicious traffic and extracts options expressed in that
-traffic. Recall from Section~\ref{sec:rules-and-packets} that some
-options can be inferred from packet contents. \tname{} finds the
-following options at this stage:
-{\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
+The main challenge in synthesizing rules is to discover the set of
+rule options that capture the malicious traffic, but allow the benign
+traffic to pass. \tname{} proceeds as follows to synthesize rule
+options. First, it analyzes the malicious traffic to extract options
+expressed in that traffic. Recall from
+Section~\ref{sec:rules-and-packets} that some options can be inferred
+from packet contents. \tname{} finds the following five options at
+this stage: {\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
       \textbf{icode:}0; \textbf{icmp\_id:}23570;
       \textbf{icmp\_seq:}3439;}}}.  By construction, a rule that uses
 this set of options captures the malicious traffic. Unfortunately, the
@@ -602,18 +601,21 @@ Figure~\ref{fig:pingscan-example}), the others are not.
 
 
 Second, \tname{} uses the benign traffic to mitigate the overfitting
-issue. In this step, \tname{} searches for alternative rules that
+problem. In this step, \tname{} searches for alternative rules that
 preserve the invariant to capture the positive malicious traffic but
 not capture the negative benign traffic. It uses the rule obtained in
 the previous step as seed to bootstrap the search for alternative
 plausible rules, \ie{}, rules that satisfy the aforementioned
 invariant. The search is designed to generate rules containing subsets
-of the options from the seed rule. Considering this example, \tname{}
-produces a total of \pingscanplausible{} plausible rules at the end of
-the search.  In the worst case, \tname{} produces $2^n$ plausible
-rules, where $n$ is the number of options contained in the inferred
-rule ($n=5$, in this case). Rules are discared in the search process
-as they are found to be implausible.
+of the options declared in the seed rule. Considering this example,
+\tname{} produces a total of \pingscanplausible{}\Fix{check!}
+plausible rules at the end of the search.  Note that there are $2^n$
+possible plausible rules, where $n$ is the number of options contained
+in the seed rule ($n=5$, in this case). \tname{} is able to prune the
+search space and discard many implausible rules. It is worth noting
+that the number of plausible rules that \tname\ produces at this step
+can be very high for other example attacks (see column ``\#~Plausible
+Rules'' on Table~\ref{table:results}).
 
 %% \Mar{Technically, there are $32 (=2^5)$ subsets for a set
 %%   with 5 elements. So, it is important to indicate why Table 3 shows
@@ -621,21 +623,20 @@ as they are found to be implausible.
 %%   (for illustration).}
 
 Finally, \tname{} ranks plausible rules according to heuristics
-learned from a database of existing rules. The intuition is that new
-rules should share characteristics with pre-existing rules. For
-example, one heuristic function used by \tname{} leverages the
-\emph{size of a rule} for that. The score of a rule given by such a
-function is proportional to the popularity of the number of options
-declared in rules of a given
-protocol. Figure~\ref{fig:distribution-rule-size} shows the
-distribution of the number of content options associated with rules
-from a public data set~\cite{emerging-threats-open}. Note that rules
-with 2 to 6 options are more common. At the end of this step, \tname{}
-ranks the golden rule at the top of the ranking, including
-\pingscanplausible{} rules. It is worth noting that
-\tname\ consistently ranks the golden rule very high in most of the
-cases even when the seed rule, produced at the first step, contains a
-large number of options (see Table~\ref{table:results}).
+obtained by analyzing a database of existing rules. The general
+intuition is that new rules should share characteristics with
+pre-existing rules. For example, one heuristic function used by
+\tname{} leverages the \emph{size of a rule} for ranking.  The score
+of a rule $r$ that this function produces is proportional to the
+popularity of the number of options in
+$r$. Figure~\ref{fig:distribution-rule-size} shows the distribution of
+the number of content options associated with rules from a public data
+set~\cite{emerging-threats-open}. Note that rules with 2 to 6 options
+are more common. At the end of this step, \tname{} ranks the golden
+rule at the top of the ranking, including \pingscanplausible{}
+rules. It is worth noting that \tname\ consistently ranks the golden
+rule very high in most of the cases even when the technique produces a
+large number of plausible rules (see Table~\ref{table:results}).
 
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step to create a potentially overspecified seed rule. Then, it
