@@ -77,7 +77,7 @@ outputs:
   - fast:
       enabled: yes
       filename: system.log
-      append: no
+      append: yes
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
 
   # Extensible Event Format (nicknamed EVE) event log in JSON format
