@@ -1609,30 +1609,30 @@ the SYN Flood attack (see Section~\ref{sec:dos}).
 
 \vspace{1ex}
 \subsubsection{Benign traffic.}~Public data sets of bening traffic
-exist; they are important to evaluate the rate of false positives of
+exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
 project. It includes real network traffic of a busy private network
-access point to the Internet. We also used the 
+access point to the Internet. We also used data sets from the
+Stratosphere IPS Project~\cite{stratosphere-normal} including, for
+example, the regular traffic of a university network.
 
-
-\Fix{---------------- estou aqui}
-
-In addition to the Bigflows.pcap data
-set, we also used data sets\Mar{more than one?}  made available by
-Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
-  of the traffic? as the description for
-  Bigflows.pcap?}. \Luc{@Guilherme ...} \Gui{The Stratosphere IPS Project has a sister project called the Malware Capture Facility Project that is responsible for making the long-term captures. This project is continually obtaining malware and normal data to feed the Stratosphere IPS (copy paste do site). No site tem uma lista de datasets, e embaixo dele descricao da origem desses datasets, como de uma rede universitaria, um usuario normal, etc. https://www.stratosphereips.org/datasets-normal}
+%% In addition to the Bigflows.pcap data
+%% set, we also used data sets\Mar{more than one?}  made available by
+%% Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
+%%   of the traffic? as the description for
+%%   Bigflows.pcap?}. \Luc{@Guilherme ...} \Gui{The Stratosphere IPS Project has a sister project called the Malware Capture Facility Project that is responsible for making the long-term captures. This project is continually obtaining malware and normal data to feed the Stratosphere IPS (copy paste do site). No site tem uma lista de datasets, e embaixo dele descricao da origem desses datasets, como de uma rede universitaria, um usuario normal, etc. https://www.stratosphereips.org/datasets-normal}
 
 \subsubsection{Ground Truth.}To evaluate \tname\ objectively we need
 to compare the rules it generates with \emph{trusted rules}. We used
 the ``Emerging Threats Open Ruleset''~\cite{emerging-threats-open} for
-that. After finding the attack and corresponding rule using the
-procedure described in Section~\ref{subsec:malicious-traffic}, we
-reproduced the attack and confirmed that the rule captures the
-attack. Column ``Ground Truth'' from Table~\ref{table:attacks} only
-shows the essential relevant options. Documentation options (\eg{},
-``msg'') are discared.
+that. After finding a matching pair of attack and corresponding rule
+using the procedure described in
+Section~\ref{subsec:malicious-traffic}, we reproduced the attack to
+confirm the rule captures the attack in isolation (and no noise was
+introduced in the process). Column ``Ground Truth'' from
+Table~\ref{table:attacks} only shows the essential
+options. Documentation options (\eg{}, ``msg'') are discared.
 
 %% Note from Figure~\ref{fig:overview} that the positive traffic is an
 %% input to the technique. The negative non-malicious traffic, however,
