@@ -1877,7 +1877,7 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: ./attacks
+default-rule-path: ./attacks/
 #default-rule-path: rules/emerging-threats/
 
 
