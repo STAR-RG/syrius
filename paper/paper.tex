@@ -1381,7 +1381,8 @@ would be 0.35 (=(0.2+0.5)/2).
 
 \begin{table*}[t!]
   \small
-  \caption{\label{table:attacks}List of attacks.}
+  \caption{\label{table:attacks}List of attacks. Non-http attacks
+    appear at the top andcontent-based http attacks appear at the bottom.}
   \centering
   \begin{tabular}{llllp{10cm}}
     \toprule
@@ -1390,27 +1391,26 @@ would be 0.35 (=(0.2+0.5)/2).
     \multicolumn{1}{c}{Type} &
     \multicolumn{1}{c}{Protocol} &
     \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
-    \midrule     
-    Ping Scan & NMAP & AREC & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
-    SYN Flood & hping3 & DoS & TCP & \textbf{flags}: S,12;
+    \midrule
+    Black Nurse & \cite{pcap-attacks} & DoS & ICMP & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
+    Ping Scan & \cite{netmap} & AREC & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
+    SYN Flood & \cite{hping3} & DoS & TCP & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds
     5;\\
     UDP Teardrop & \Fix{WireShark} & DoS & UDP & \textbf{fragbits}:M; \textbf{id}:124; \\
     UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds
     5; \\
-    Black Nurse & NetReseC & DoS & ICMP & \textbf{icode}:3; \textbf{itype}:3;\textbf{threshold}: type both, track by\_dst, count 250, seconds
-    1; \\
     \midrule
-    JBoss JMX\MyComment{ Console Beanshell Exploit} & Nikto2 & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
-    WeBid \MyComment{Local File Inclusion} & RFI & LFI & HTTP & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
-    ColdFusion \MyComment{PESC} & Nikto2 & PESC & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
-    .htaccess access\MyComment{attempted-recon} & Nikto2 & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
-    .idq access\MyComment{EXPLOIT ISAPI} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
-    iisadmin access\MyComment{web-application-attack} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
-    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & Nikto2 & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
-    Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & Nikto2 & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
-    Apache Struts 2 & WRCCDC & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\
-    WordPress Login & WRCCDC & PVE & HTTP & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
+    Apache Struts 2 & \cite{wrccdc} & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
+    ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
+    iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
+    JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
+    Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
+    WeBid \MyComment{Local File Inclusion} & \cite{nikto} & LFI & HTTP & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
+    WordPress Login & \cite{wrccdc} & PVE & HTTP & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
+    .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
+    .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
+    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1498,25 +1498,25 @@ experiments~(Section~\ref{sec:threats}).
     \multicolumn{1}{c}{(step 3)} \\
 
     \midrule
+    Black Nurse & - & - & - & - \\    
     Ping Scan & 6 & 5 & 2 & - \\
     SYN Flood & 4 & 2 & 2 & - \\
     UDP Teardrop & - & - & - & - \\
     UDP Flood & - & - & - & - \\
-    Black Nurse & - & - & - & - \\
-    JBoss JMX & 5 & 23 & 228 & \Fix{23} \\
-    WeBid & 1 & 23 & - & -\\    
+    \midrule
+    Apache Struts 2 & - & - & - & - \\
     ColdFusion & 7 & 19 & 34 & \Fix{5}\\
+    iisadmin access & 4 & 17 & \Fix{861} & \Fix{1} \\        
+    JBoss JMX & 5 & 23 & 228 & \Fix{23} \\
+    Script tag in URI & 23 & 22 & 786 & - \\
+    WeBid & 1 & 23 & - & -\\    
+    Wordpress Login & 8 & 59 & - & - \\
     .htaccess access & 5 & 17 & 984 & \Fix{2}\\
     .idq access & 14 & 19 & 511 & \Fix{2} \\
-    iisadmin access & 4 & 17 & \Fix{861} & \Fix{1} \\
     /system32/ in URI & 4 & 20 & 1,913 & \Fix{2} \\
-    Script tag in URI & 23 & 22 & 786 & - \\
-    Apache Struts 2 & - & - & - & - \\
-    Wordpress Login & 8 & 59 & - & - \\
     \bottomrule
   \end{tabular}
 \end{table}
-
 
 %%\begin{table}[h!]
 %%  \small
@@ -1570,87 +1570,47 @@ attacks of the following types: Denial-of-Service
 is not uniform across protocols as these distributions are not uniform
 in practice---http attacks are prevalent.
 
-
-%% It is important to note that this setup is \emph{not}
-%% necessary if \emph{pcap} files for the attack already exist. We
-%% proceeded as follows to obtain pcap files for the the attacks we
-%% analyzed: we 1)~instantiated the script (\eg{}, defined the IP of the
-%% web server), 2)~executed the script, 3)~and monitored the traffic with
-%% the Wireshark network monitor. The
-%% Wireshark tool records the traffic and reports pcap files on output
-%% for replaying it.
-
-
-
+\vspace{1ex}
 \subsubsection{\label{subsec:malicious-traffic}Malicious traffic.}~Recall that \tname\ takes
 pcap files on input. As explained on Section~\ref{sec:minimization},
 these files abstract network messages~\cite{pcap} and can be used to
 avoid network traffic during rule synthesis. For some of the attacks
 listed on Table~\ref{table:attacks}, we obtained pcap files directly
 from trusted security websites (\eg{},
-NetReseC~\cite{pcap-attacks}\Fix{confirm}).\Mar{reminder: we still
-  don't have any example of attack listed on Table~\ref{table:attacks}
-  whose pcap file was obtained from those websites.} \Luc{Ataques Apache 
-  e WordPress. @Guilherme adicionar fontes} \Gui{O NetReseC possui uma lista de sites (alem dos pcaps que o proprio site ja oferece, como foi obtido o Black Nurse) que oferecem datasets, como o proprio Stratosphere, que estamos utilizando para trafego normal. Para esses dois ataques novos com content, peguei do WRCCDC - Western Regional Collegiate Cyber Defense Competition: https://archive.wrccdc.org/pcaps/}In addition to
-these sources, we used the Nikto2~\cite{nikto} open source security
-tool as follows to obtain pcap files for (non-flooding) http and tcp
-attacks. We configured an http server (Apache2) and ran Nikto2 to
-attack that server. Simultenously, we ran
+NetReseC~\cite{pcap-attacks}). In addition to these sources, we used
+the Nikto2~\cite{nikto} open source security tool as follows to obtain
+pcap files for some of the http attacks. We configured an http server
+(Apache2) and ran Nikto2 to attack that server. Simultenously, we ran
 WireShark~\cite{wireshark-net-monitor} to record the network traffic
 and Suricata to analyze the traffic. We configured \suri\ with all
 rules from the ``Emerging Threats Open
 Ruleset''~\cite{emerging-threats-open} and configured Nikto2 with
-default parameters, which makes it replay all recorded attacks. After
-execution, we inspected the \suri\ log to identify which rules have
-been activated and which packets were involved on each
-activation. With the packet numbers, it is possible to recover the
-corresponding pcap files, using Wireshark, as to ran \tname{} on
-them. It is worth noting that some rules are triggered multiple times,
-indicating that Nikto2 expresses multiple variants of the same
-attack. RQ3 evaluates the importance of these variants to \tname{}'s
-performance. We used similar methodology to obtain pcap files using
-other security testing tools. We used NMAP~\cite{netmap} to reproduce
-the Ping Scan attack (see Section~\ref{sec:active-recon}) and
-hping3~\cite{hping3} to reproduce the SYN Flood attack (see
-Section~\ref{sec:dos}).
+default parameters, which makes it replay all recorded attacks from
+its benchmark. After execution, we inspected the \suri\ log to
+identify which rules have been activated and which packets were
+involved on each activation. With the packet numbers, it is possible
+to recover the corresponding pcap files, using Wireshark, as to ran
+\tname{} on them separately. It is worth noting that some rules are
+triggered multiple times, indicating that Nikto2 expresses multiple
+variants of the same attack. RQ3 evaluates the importance of these
+variants to \tname{}'s performance. We used similar methodology to
+obtain pcap files using other security testing tools. For example, we
+used NMAP~\cite{netmap} to reproduce the Ping Scan attack (see
+Section~\ref{sec:active-recon}) and hping3~\cite{hping3} to reproduce
+the SYN Flood attack (see Section~\ref{sec:dos}).
 
-%% \Mar{@Lucas, diga exatamente como vc. obtem as variacoes. isto eh que
-%%   eh importante para a proxima sentenca.}.  \Luc{Eh feito da mesma
-%%   forma q foi descrita acima. Quando um ataque produz varios pacotes
-%%   que geram alertas, nos criamos um pcap com um dos pacotes e
-%%   utilizamos ele como para gerar a regra maxima inicial.  Os outros
-%%   pacotes sao salvos em um outro pcap e sao utilizados para calcular o
-%%   recall.}
-
-
-%% \Mar{what about the variants? where do
-%%   they come from? this is confusing as the narrative above suggests
-%%   the attack is hardcoded in the tool.}\Luc{O trafego de um ataque
-%%   normalmente possui varios pacotes, entre esses varios pacotes alguns
-%%   deles possuem um padrao. As regras sao criadas descrevendo esse
-%%   padrao, com isso um unico ataque pode disparar varios alertas.
-  
-%%   Porem, existem ataques q so produzem um alerta, ou seja, a regra criada 
-%%   so detecta um dos pacotes do trafego. Nesses casos, procuramos na internet 
-%%   datasets (arquivos pcap) que contivessem mais pacotes desses ataques.
-%%   Fizemos isso tambem para ataques q nos ja tinhamos variacoes, pois
-%%   (teoricamente) quanto mais variacoes, melhor. Existem alguns sites onde 
-%%   eh possivel encontrar pcaps com o trafego de alguns ataques, n consegui
-%%   adicionar nas referencias: 
-%%   https://www.netresec.com/?page=PcapFiles
-%% }
-
-%% According to the TcpReplay web
-%% site ``This capture is much larger and has a smaller average packet
-%% size than the previous capture (smallFlows.pcap). It also has many
-%% more flows and different applications.''
-
+\vspace{1ex}
 \subsubsection{Benign traffic.}~Public data sets of bening traffic
 exist; they are important to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
 project. It includes real network traffic of a busy private network
-access point to the Internet. In addition to the Bigflows.pcap data
+access point to the Internet. We also used the 
+
+
+\Fix{---------------- estou aqui}
+
+In addition to the Bigflows.pcap data
 set, we also used data sets\Mar{more than one?}  made available by
 Stratosphere Lab~\cite{stratosphere-normal}\Mar{is there a description
   of the traffic? as the description for
