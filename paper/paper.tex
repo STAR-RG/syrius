@@ -285,31 +285,53 @@ today. These systems are very popular in industry to secure local
 computer networks given the amount of potential malicious traffic that
 exist on the Internet.
 
-This paper focuses on rule-based \nids{}, which is a very popular kind
-of NIDS used in industry (see Section~\ref{sec:background}). A
+This paper focuses on rule-based \nids{}, which are very popular in
+industry~\cite{proofpoint-etpro,snort-rule-subscriptions}. A
 \emph{rule-based intrusion detector}\footnote{\aka\ signature-based
   intrusion detector.} checks if the network traffic matches a fixed
-set of rules. Figure~\ref{fig:synflood-example} shows an example rule
+set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
 of Suricata~\cite{suricata}, a popular open-source \nids{}. This
-particular rule prescribes a method to capture a denial-of-service
+particular rule prescribes a method to capture an Active
+Reconnaissance attack for discovering which ports of a publicly
+accessible machine are open for connection. Rulesets exist for
+Snort~\cite{snort} and Suricata~\cite{suricata}, providing protection
+against existing attacks. Unfortunately, attackers actively look for
+new mechanisms to exploit systems. For example, Figure~\Fix{plot}
+shows the increase in number of rules added to the ``Emerging Threats
+Open Ruleset''---a popular public data set of \suri\ rules---in the
+past 12 months.
+
+\Fix{add figure here}
+
+Intuitively, rulesets need to be constantly revised to protect a
+system against attackers. Unfortunately, creating these rules is
+time-consuming as the language for describing rules is non-trivial
+(see Section~\ref{sec:example-suricata-rules}) and it is error-prone
+as checking whether the rule captures only malicious traffic is
+non-trivial.
+
+%% IT-security companies capitalize on this phenomena and
+%% offer rulesets on the
+%% market.
+
+This paper proposes \tname{}\footnote{Abbreviation for
+  \textbf{Sy}nthesis of Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a
+technique that uses machine intelligence to automatically synthesize
+rules for rule-based \nids. Our goal is to facilitate the creation of
+rules and, consequently, harden the protection of \nids\ to network
+attacks. \tname{} synthesizes rules from malicious and benign traffic
+and from examples of correct rules.
+
+\Fix{
+denial-of-service
 attack to a server by matching specific conditions about the network
 traffic~\cite{understanding-dos}. Relevant properties about the
 traffic of interest appear in bold in this rule (see
 Section~\ref{sec:suri-metas-coverage}). Deployments of rule-based
 \nids\ are restricted to a fixed set of rules defined by the network
-system administrator. Updating these rules is tedious and error-prone,
-but it is important as attackers constantly create new strategies to
-circumvent existing rules. IT-security companies capitalize on this
-phenomena and offer rulesets on the
-market~\cite{proofpoint-etpro,snort-rule-subscriptions}.
+system administrator.}\Mar{check...}
 
-This paper proposes \tname{}\footnote{Abbreviation for
-  \textbf{Sy}nthesis of Su\textbf{ri}cata R\textbf{u}le\textbf{s}.}, a
-technique that uses machine intelligence to automatically synthesize
-rules for rule-based \nids. Our goal is to facilitate the creation
-process of rules and, consequently, harden the protection of \nids\ to
-network attacks. \tname{} synthesizes rules from malicious and benign
-traffic and from examples of correct rules.
+
 
 %% Note that anomaly-based \nids are evolving pretty quick with the
 %% advances in machine learning, but rule-based \nids are still extremely
@@ -361,43 +383,31 @@ Snort~\cite{snort}).
 
 Figure~\ref{fig:synflood-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
-the Open Information Security Foundation (OISF)~\cite{oisf}. 
-
-\vspace{-1ex}
-\begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
-  \vspace{-2ex}
-  \caption{\suri\ rule for SYN Flood attack.}
-  \label{fig:synflood-example}
-\end{figure}
-\vspace{-2ex}
-
-A
-Suricata rule is divided in three parts---action, header, and rule
+the Open Information Security Foundation (OISF)~\cite{oisf}.
+A Suricata rule is divided in three parts---action, header, and rule
 options~\cite{suri-rule-format}. The action part appears as the first
 word in the rule description. An action denotes the task that needs to
-be executed if the rule pattern is satisfied.
-In this example, a
+be executed if the rule pattern is satisfied.  In this example, a
 message will be sent to system administrators if the rule pattern is
 satisfied. The header comes after the action in the rule
 description. It restricts the information flow covered by the
-rule. For this rule, the header is \CodeIn{tcp \$HOME\_NET any ->
-  \$EXTERNAL\_NET any}. It instructs Suricata to inspect \CodeIn{tcp}
-traffic flowing from any port in the home network to any other address
-outside the home network. The variables \CodeIn{\$HOME\_NET} and
-\CodeIn{\$EXTERNAL\_NET} are configurable. The rule options come after
-the header. It is a semi-colon-separated sequence of key-value
-pairs. Rule options serve to document the analyzed traffic (\eg{},
-``msg'', ``classtype'', and ``sid'') and to characterize the attack
-pattern (\eg, ``flags'', ``threshold'', and ``content''). \tname{}
-produces options of the second kind, which are \emph{relevant} to
-capture the attack. For example, the option \CodeIn{content:<arg>} checks if
-the argument is present in the payload of the message.
+rule. The header of this rule is \CodeIn{icmp any any -> any
+  any}. It instructs Suricata to inspect \CodeIn{icmp} traffic flowing
+from any machine and port to any machine and port.\MyComment{ The variables
+\CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are
+configurable.} The rule options come after the header. It is a
+semi-colon-separated sequence of key-value pairs. Rule options serve
+to document the analyzed traffic (\eg{}, ``msg'', ``classtype'', and
+``sid'') and to characterize the attack pattern (\eg, ``flags'',
+``threshold'', and ``content''). \tname{} produces options of the
+second kind, which are \emph{relevant} to capture the attack. For
+example, the option \CodeIn{content:<arg>} checks if the argument is
+present in the payload of the message.
 
 \vspace{-1ex}
 \begin{table}[h!]
   \footnotesize
-  \caption{\label{table:rules}Example options of Suricata.}
+  \caption{\label{table:rules}Example of non-documentation options of Suricata.}
   \vspace{-2ex}
   \centering
   \begin{tabular}{clp{5.5cm}}
@@ -419,12 +429,11 @@ the argument is present in the payload of the message.
 \end{table}
 %\vspace{-1ex}
 
-Table~\ref{table:rules} shows a sample of the options of
+Table~\ref{table:rules} shows a sample of non-documentation options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
-the name of the option, and column ``Description'' presents a short
-description of the option purpose. We found that the option
-\CodeIn{content} is particularly prevalent in rules from public
-databases\MyComment{ (see Figure~\ref{fig:distribution-contents})}. This
+the name of the option, and column ``Description'' summarizes
+purpose. The option \CodeIn{content} is very common in rules to
+capture http attacks, which are the most common kind of rules. This
 option takes a sequence of bytes as argument (\eg{},
 \CodeIn{content:''SELECT ''}) and checks if that sequence is present
 in the payload of the message. Detailed description of the Suricata
@@ -479,15 +488,6 @@ covering \numproto\ distinct protocols.
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-\begin{figure}[t!]
-\centering
-\includegraphics[scale=0.28]{figs/ICMP-packet-structure.png}
-\vspace{-2ex}
-\caption{Layout of an ICMP packet.}
-\label{fig:icmp-packet-layout}
-\end{figure}
-%\vspace{-2ex}
-
 Rule options are often associated with specific fields of network
 packets. Let's consider the ICMP protocol as an
 example. Figure~\ref{fig:icmp-packet-layout} shows the layout of an
@@ -510,6 +510,14 @@ over sequence of messages as opposed to a single
 message. Consequently, it is not possible to determined its values
 from a single message.
 
+\begin{figure}[t!]
+\centering
+\includegraphics[scale=0.28]{figs/ICMP-packet-structure.png}
+\vspace{-2ex}
+\caption{Layout of an ICMP packet.}
+\label{fig:icmp-packet-layout}
+\end{figure}
+%\vspace{-2ex}
 
 %% More precisely, to trigger an action on a rule
 %% containing that option a \nids\ tool needs to monitor several
@@ -535,7 +543,7 @@ several ICMP Echo requests to a range of IP addresses in the network
 and checks which ones respond to these requests. This method enables
 an attacker to know which machines are active in the network.
 
-\vspace{-1ex}
+%\vspace{-1ex}
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
   \vspace{-2ex}  
@@ -1845,6 +1853,16 @@ server responds with a SYN-ACK packet, the client keeps sending other
 SYN packets to avoid the connection to time out. Without proper
 protection, the server accepts these malicious requests and eventually
 legitimate requests cannot be satisfied due to resource exhaustion.
+
+\vspace{-1ex}
+\begin{figure}[h!]
+  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
+  \vspace{-2ex}
+  \caption{\suri\ rule for SYN Flood attack.}
+  \label{fig:synflood-example}
+\end{figure}
+\vspace{-2ex}
+
 Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
 this attack. This rule was obtained from the Emerging Threats Open
 Ruleset~\cite{emerging-threats-open}. The relevant options in the
