@@ -1160,6 +1160,34 @@ with the following formula:
   \caption{\label{fig:distribution-content_modifiers}Content modifiers
     frequency.}
 \end{subfigure}%
+%\vspace{1ex}
+\\
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \scalebox{1.2}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=6pt,
+          scaled ticks=false,
+          tick label style={/pgf/number format/fixed},
+          ybar stacked,
+          enlargelimits=0.15,
+          legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},
+          xtick=data,
+          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+        ]
+        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode, 108) (flags, 97) (tls.fingerprint, 61)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-3ex}  
+  \caption{\label{fig:distribution-strings}Option Frequency.}
+\end{subfigure}%
 \vspace{-1ex}
   \caption{Distribution of features.}
 \end{figure*}
@@ -1323,6 +1351,8 @@ case, the contribution of modifiers to this content option would be
 $0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
 used in a rule, the aggregated contribution of this heuristic function
 would be 0.35 (=(0.2+0.5)/2).
+\Gui{A quinta heuristica que utilizamos considera a popularidade das opcoes. Primeiro pegamos a quantidade de vezes que uma opcao eh utilizada (sem considerar repeticoes numa unica regra). Dividimos o valor encontrado para cada opcao pelo maior valor encontrado, encontrando sempre valores de no maximo 1. Entao na regra nos somamos os valores de cada opcao, dividido pelo numero de opcoes, chegando a um numero de no maximo 1, que representa a popularidade das opcoes na regra.
+\[\frac{\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}}{N}\]}
 
 \Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
