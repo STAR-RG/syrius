@@ -801,13 +801,12 @@ the malicious traffic.
 \subsection{Step 2: Rule Minimization}
 \label{sec:minimization}
 
-\Mar{------------------------------------------- Eu estou aqui}
-
-The rule reported in the first step satisfies the criterion to only
-capture positive traffic. Unfortunately, that rule is overconstrained.
-The rule can include options that are irrelevant for the input
-message. Consequently, the \nids\ may be unable to capture a different
-manifestation of the same attack.
+The seed rule produced in the first step satisfies the criterion to
+only capture positive traffic. However, that rule is overconstrained.
+It could include options that are irrelevant to capturing the attack
+and could lead to false negatives---the \nids\ may be unable to
+capture manifestations of the same attack whose messages do not
+exhibit the data satisfying irrelevant options.
 
 %%  Some options added to the rule
 %% during the first step are irrelevant for determining the attack and
@@ -818,17 +817,15 @@ to guide the search for more general rules, hence addressing the
 overffiting issue. To that end, \tname{} \emph{minimizes} the rules
 produced in the previous step, preserving the invariant of \emph{only}
 capturing the positive malicious traffic. We say that a rule is
-minimal if discarding any option results in capturing negative (\ie{},
-benign) traffic.  The minimization procedure we propose in this step
-builds on the observation that all options from the rule produced in
-the previous step are satisifed by the positive traffic. Consequently,
-any subset of these options also captures the positive traffic. The
-procedure iteratively discards options from the candidate rule until
-it detects that the rule is minimal, \ie{}, it finds that no other
-option can be removed. The procedure uses negative traffic to guide
-the search.
-
-
+minimal if discarding any option results in the capture of negative
+(\ie{}, benign) traffic.  The minimization procedure we propose in
+this step builds on the observation that all options from the rule
+produced in the previous step are satisifed by the positive
+traffic. Consequently, any subset of these options also captures the
+positive traffic. The minimization procedure that we describe in the
+following iteratively discards options from visited rules---derived
+from the seed rule---using the negative traffic to guide the search
+for minimal rules.
 
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 \algnewcommand\algorithmicforeach{\textbf{for each}}
@@ -864,6 +861,8 @@ the search.
   \doWhile{$\mathcal R\not= \{\}$}\Comment{repeat until reaching a fixpoint}\label{end-do-while}
 \end{algorithmic}
 \end{algorithm}
+
+\Mar{--------------------------------------- estou aqui}
 
 Algorithm~\ref{algo1} shows the pseudocode of the \tname{}
 minimization algorithm. The algorithm takes as input the
