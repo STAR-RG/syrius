@@ -801,6 +801,7 @@ the malicious traffic.
 \subsection{Step 2: Rule Minimization}
 \label{sec:minimization}
 
+\Fix{consider changing the name of this step}
 The seed rule produced in the first step satisfies the criterion to
 only capture positive traffic. However, that rule is overconstrained.
 It could include options that are irrelevant to capturing the attack
@@ -901,50 +902,53 @@ element to the set $\mathcal{R'}$. Consequently, as $\mathcal{R'}$ is
 initialized empty that set will remain empty at the end of an
 iteration of the outer loop.
 
-\Mar{--------------------------------------- estou aqui}
-
-Note that no rules are produced in the last iteration of the
-algorithm. Minimal rules are produced in the second-to-last
-iteration. In the other iterations, intermediate rules are
+Note that the algorithm produces no rules in the last iteration. Rules
+with a single option are produced in the second-to-last iteration. In
+other iterations, ules with more than one option are
 produced. Conceptually, the search induces a search tree with the seed
-rule $sr$ as the root, minimal rules as child nodes, and intermediate
-rules as internal nodes. The edges of the tree denote the ancestor
-relation between two rules. Note also that the algorithm reports every
-rule in the tree instead of only minimal rules. The reason is that the
-correct rule may be non-minimal. In summary, this algorithm reports
-many rules that are plausible by using benign traffic to minimize an
-overconstrained rule that is focused on the malicious traffic. In the
-following step, \tname{} ranks the rules this algorithm reports by
-their similarity with previous rules.
+rule $sr$ as the root, single-option rules as child nodes, and rules
+with more options as internal nodes. The edges of the tree denote the
+ancestor relation between two rules.
 
-
-
-\begin{theorem}
-  The minimization algorithm computes rules that capture only
-  the positive traffic.
-\end{theorem}
-\begin{proof}
-  Every rule created during the search captures the positive traffic
-  as every rule contains a proper subset of the option from the
-  original rule and all those options are satisfied by the positive
-  traffic. By definition of function $\mathit{isPlausible}$, these rules
-  also capture \emph{only} the positive traffic. If some negative
-  traffic was captured, a rule would not be added to $\mathcal
-  R'$.
-\end{proof}
+It is also worth noting that the algorithm reports every rule in the
+tree instead of only those that are surely minimal, \ie{} rules with
+one option. The reason is that the the traffic used to check
+plausibility is limited by definition---reporting only minimal rules
+with respect to that traffic could discard the correct rule. In
+summary, this algorithm reports many rules that are plausible by using
+the benign traffic to reduce the overconstrained rule produced at the
+\reveng\ step. In the following step, \tname{} ranks the rules this
+algorithm reports by their similarity to existing trusted
+rules. Intuitively, rules that do not look alike to rules written by
+humans and previously used rank low.
 
 \begin{proposition}
-  The minimization algorithm may not produce minimal rules.
+  The minimization algorithm reports rules that capture only the
+  positive traffic.
 \end{proposition}
-
 \begin{proof}
-The output of the minimization algorithm may contain rules that are
-not minimal given the non-determinism of the algorithm. In principle,
-it is possible that options that could be discarded are not selected
-in the loop from lines~\ref{start-for}--\ref{end-for}. However, we
-found empirically that a small value of $N$ suffices to discard those
-options from a rule.
+  Every rule created during the search captures the positive malicious
+  traffic as every rule contains a proper subset of the options from
+  the original rule and all those options are satisfied by the
+  malicious traffic. By definition of function $\mathit{isPlausible}$,
+  these rules also capture \emph{only} the positive traffic. If
+  negative traffic is captured, a rule is not added to $\mathcal R'$;
+  consequently, it cannot be an element of $\mathcal O$ and reported
+  on the output.
 \end{proof}
+
+%% \begin{proposition}
+%%   The minimization algorithm may not produce minimal rules.
+%% \end{proposition}
+
+%% \begin{proof}
+%% The output of the minimization algorithm may contain rules that are
+%% not minimal given the non-determinism of the algorithm. In principle,
+%% it is possible that options that could be discarded are not selected
+%% in the loop from lines~\ref{start-for}--\ref{end-for}. However, we
+%% found empirically that a small value of $N$ suffices to discard those
+%% options from a rule.
+%% \end{proof}
 
 %% Public databases of negative traffic with
 %% \Fix{thousands} of messages exist  and can be used to
@@ -954,27 +958,32 @@ options from a rule.
 
 \textbf{Implementation details.} We implemented function
 \emph{isPlausible} by 1)~updating Suricata to only monitor the rule
-that is passed as parameter, 2)~replaying the negative traffic (see
+that is passed as parameter\Mar{isto realmente eh necessario? se sim,
+  explique. me pareceu que o que vc. precisa ate aqui jah estaria no
+  log do \suri}, 2)~replaying the negative benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
 check if any benign message was captured by the rule. It is worth
 noting that the benign traffic is stored in \emph{pcap}
 files~\cite{pcap} and Suricata can process those files very
 efficiently compared to analyzing network messages directly. Instead
 of sending traffic to a machine with a deployed server (\eg{}, web
-server) that \suri\ monitors, our setup calls Suricata directly
-through an API. Suricata is invoked multiple times in the process of
+server) that \suri\ would monitor, our setup calls \suri\ directly
+through an API. \suri\ is invoked multiple times in the process of
 minimizing the rule.  \textbf{Limitations.} It is worth noting that
 although \tname{} is accurate for generating rules that discrimate
 positive and negative traffic, the quality of these rules is limited
 by the quality of the training data it uses. For the positive traffic,
 \tname{} only requires one sample, but can benefit of several
-samples. The same applies for the negative traffic. In this case,
-however, \tname{} can use public data sets available online.
-  
-
+samples\Mar{como? nao estah claro. por favor expliquem.}. The same
+applies to the negative traffic. However, in this case, \tname{} uses
+different public data sets available online (see
+Section~\ref{sec:objectanalysis-benign}).
 
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
+
+
+\Mar{----------------------------- estou aqui}
 
 \tname{} uses a composition of heurisitc functions to sort the rules
 it produces. Each function uses a different criterion to estimate how
@@ -1607,7 +1616,7 @@ Section~\ref{sec:active-recon}) and hping3~\cite{hping3} to reproduce
 the SYN Flood attack (see Section~\ref{sec:dos}).
 
 \vspace{1ex}
-\subsubsection{Benign traffic.}~Public data sets of bening traffic
+\subsubsection{\label{sec:objectanalysis-benign}Benign traffic.}~Public data sets of bening traffic
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
