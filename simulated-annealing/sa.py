@@ -52,9 +52,9 @@ else:
 
 keyword_list=("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
 
-content_modifiers = ("http_uri", "http_raw_uri", "http_method", "http_request_line", "http_client_body", "http_header", "http_raw_header", "http_cookie", "http_user_agent", "http_host", "http_raw_host", "http_accept", "http_accept_lang", "http_accept_enc", "http_referer", "http_connection", "http_content_type", "http_content_len", "http_start", "http_protocol", "http_header_names", "http_stat_msg", "http_stat_code", "http_response_line", "http_server_body", "file_data")
+content_modifiers = ("http_uri", "http_raw_uri", "http_method", "http_request_line", "http_client_body", "http_header", "http_raw_header", "http_cookie", "http_user_agent", "http_host", "http_raw_host", "http_accept", "http_accept_lang", "http_accept_enc", "http_referer", "http_connection", "http_content_type", "http_content_len", "http_start", "http_protocol", "http_header_names", "http_stat_msg", "http_stat_code", "http_response_line", "http_server_body", "file_data", "nocase")
 
-html_modifiers = ["http_method", "http_uri", "http_user_agent", "http_protocol", "http_host", "http_connection", "http_header", "http_request_line"]
+html_modifiers = ["http_method", "http_uri", "http_user_agent", "http_protocol", "http_host", "http_connection", "http_header", "http_request_line", "nocase"]
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
@@ -76,6 +76,8 @@ print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
 if rule_protocol in ["urlencoded-form"]:
     rule_protocol = "http"
+if args.attack == "teardrop":
+    rule_protocol = "udp"
 
 print(rule_protocol)
 
@@ -235,18 +237,20 @@ def getKeywordsFrequency():
                 line = line.strip()
                 for keyword in keyword_list:
                     aux_key = ' ' + keyword + ':'
-                    if keyword in keywords_freq:
-                        keywords_freq[keyword] += line.count(aux_key)
-                    else:
-                        keywords_freq[keyword] = line.count(aux_key)
+                    if aux_key in line:
+                        if keyword in keywords_freq:
+                            keywords_freq[keyword] += 1
+                        else:
+                            keywords_freq[keyword] = 1
                 
                 for modifier in content_modifiers:
                     aux_modifier = modifier + ';'
 
-                    if modifier in keywords_freq:
-                        keywords_freq[modifier] += line.count(aux_modifier)
-                    else:
-                        keywords_freq[modifier] = line.count(aux_modifier)
+                    if aux_modifier in line:    
+                        if modifier in keywords_freq:
+                            keywords_freq[modifier] += 1
+                        else:
+                            keywords_freq[modifier] = 1
     
     return keywords_freq
 
@@ -428,15 +432,16 @@ i=0
 
 sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
 
-for content in sd:
+"""for content in sd:
     i += 1
     print(content)
     if i == 10:
         break    
+"""
 
+#print("keyword_freq:", keywords_freq)
+#print("http uti", keywords_freq["http_uri"])
 
-print("keyword_freq:", keywords_freq)
-#exit()
 
 html_modifiers_freq = {}
 def getHtmlModifiersFreq(keywords_freq):
@@ -465,10 +470,12 @@ if rule_protocol == "http":
     pkt_content_modifiers = getContentsPerModifiers()
     html_modifiers_freq = getHtmlModifiersFreq(keywords_freq)
 
-    print("pkt_content_modifiers", pkt_content_modifiers)
-    print()
-    print("html_modifiers_freq:", html_modifiers_freq)
-    print()
+    #print("pkt_content_modifiers", pkt_content_modifiers)
+    #print()
+    #print("html_modifiers_freq:", html_modifiers_freq)
+    #print()
+
+    #exit()
     
     low_case_contents_dict = getLowerCaseContentsDict()
 
@@ -1192,6 +1199,9 @@ def optimizeRule(rule):
     elif rule_protocol == "icmp":
         golden_rule.options = {'dsize':0, 'itype':8}
     
+    if args.attack == "teardrop":
+        golden_rule.options = {'fragbits':'M', 'id':242}
+    
     print("golden_rule:", golden_rule)
     print("all_rules_list len:", len(all_rule_list))
     #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
@@ -1384,8 +1394,13 @@ else:
     elif rule_protocol == "icmp":
         pingscan_options = {'dsize':0, 'itype':8, 'icode':0, 'icmp_id':23570, 'icmp_seq':3439}
         final_rule.options = pingscan_options
+    
+    if args.attack == "teardrop":
+        teardrop_options = {'dsize':0, 'fragbits':'M', 'id':242, 'ttl':64}
+        final_rule.options = teardrop_options
         
-    print(final_rule)
+    print("initial rule:\n", final_rule)
+    #exit()
     #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
     #quit()
     final_rule = optimizeRule(final_rule)
