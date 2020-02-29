@@ -722,48 +722,50 @@ used to approximate user's intent.
 \label{sec:reverse-engineering}
 
 The first step in the \tname's workflow is Reverse Engineering. The
-goal of this step is to extract options from the malicious traffic. A
-rule that contains these options, by construction, captures the
-malicious traffic. \tname\ uses two strategies to extract options:
-1)~field (for any protocol) and 2)~payload (for http only). We
-elaborate these strategies in the following.
+goal of this step is to extract options from the malicious
+traffic. Consequently, a rule that contains these options captures the
+malicious traffic. \tname\ uses different strategies to extract
+options based on the protocol detected in the input traffic: 1)~the
+field strategy applies to any protocol and 2)~the payload strategy
+applies only to http. We elaborate these strategies in the following.
 
 For the field strategy, \tname{} parses the input messages looking for
-options associated with the data in the fields of a network
-message. Section~\ref{sec:rules-and-packets} shows the correspondence
-between packet fields and some of the rule options from
-\suri. Section~\ref{sec:active-recon} shows a concrete example where
-the values for options are directly extracted from packet fields. We
-obtained the mapping of network fields to options manually, from the
+options associated with the network message field
+data. Section~\ref{sec:rules-and-packets} shows the correspondence
+between packet fields and some of the rule options from \suri and
+Section~\ref{sec:active-recon} shows a concrete example where the
+values for options are directly extracted from the fields of
+messages. We obtained the option-field mapping manunually, from the
 \suri\ documentation.
 
 Unfortunately, the relevant data for the option may be at the message
 payload; not the fields. We found empirically that this occurs
 frequently in http attacks, which are prevalent. For example,
-\Fix{\Luc{53\%}} of the \numrulessuri{} rules from a public data
+\percHttp\ of the \numrulessuri{} rules from a public data
 set~\cite{emerging-threats-open} we analyzed prescribe defenses
-against http attacks. Figure~\ref{fig:rule-jboss} shows an example of
-a rule that captures traffic containing the string
-\CodeIn{"/HtmlAdaptor"} in the payload.  Content options are very
-common in http rules---\percRulesWithContent{} of the rules from the
-data set mentioned above contain at least one content
-option. Figure~\ref{fig:distribution-contents} shows the histogram of
-the number of these options per rule for the data set mentioned
+against http attacks and the majority of these rules use content
+options. Figure~\ref{fig:rule-jboss} shows an example of a rule that
+captures traffic containing the string \CodeIn{"/HtmlAdaptor"} in the
+payload.  Content options are very common in http
+rules---\percRulesWithContent{} of the rules from the data set
+mentioned above contain at least one content
+option. Figure~\ref{fig:distribution-contents} shows the distribution
+of number of content options per rule for the data set mentioned
 above. We limited the number of content options per rule to 10 in the
 histogram for space. \MyComment{Rules without \CodeIn{content} options
   are an exception and half of the rules contain at least two
-  \CodeIn{content} options.}  Consequently, handling content options
-for http is important. The content strategy focuses on extracting such
-kinds of options from the payload.
+  \CodeIn{content} options.}  To sum up, handling content options for
+http is very important.
 
-We found, inspecting existing rules, that \CodeIn{content} options
-typically refer to sequence of characters in the payload. To find the
-values associated with these options, \tname{} splits the payload of
-the malicious message in tokens using natural language delimiters,
-such as $\backslash$t, $\backslash$n, $\backslash$r, and
-spaces. Considering the example from
-Section~\ref{sec:content-example}, \tname{} produced a total of 23
-tokens, considered content option candidates.
+The content strategy focuses on extracting content options from the
+message payload. Inspecting existing rules, we found that these
+options refer, in the payload, to sequences of characters separated by
+typical natural language delimiters such as $\backslash$t,
+$\backslash$n, $\backslash$r, and spaces. To find the values
+associated with these options, \tname{} splits the payload of the
+malicious message in tokens using these delimiters.  Considering the
+example from Section~\ref{sec:content-example}, \tname{} produced a
+total of 23 tokens, considered content option candidates.
 
 It is worth noting that we found empirically that deciding which
 reverse engineering strategy to use based on the protocol of the input
