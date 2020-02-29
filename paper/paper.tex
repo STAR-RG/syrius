@@ -831,6 +831,7 @@ for minimal rules.
 \algnewcommand\algorithmicforeach{\textbf{for each}}
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
 \algnewcommand\And{\textbf{and} }%
+\setlength{\textfloatsep}{3pt}% Remove \textfloatsep
 \begin{algorithm}[t!]
   \noindent\hspace{-25ex}
   \textbf{INPUT:} (overconstrained) seed rule $sr$ \\
@@ -847,10 +848,10 @@ for minimal rules.
       \State $\mathcal R' \gets \emptyset$ \Comment{new iteration. reset.}\label{init-rprime}
       \ForEach {$ro \in \mathcal R $}\Comment{analyze each candidate rule.}\label{start-foreach}
            \For {$i \gets 1$ to $N$}\Comment{mutate each rule $N$ times.}\label{start-for}
-               \State $r \gets copy(ro)$      
-               \State $j\gets \mathit{rand}(0,\mathit{len}(r))$
-               \State $r[j]\gets 0$\Comment{discard option $j$ in $r$}
-               \If{$\mathit{isNew(r)} \And \mathit{isPlausible}(r)$} 
+               \State $r \gets copy(ro)$\label{copy}
+               \State $j\gets \mathit{rand}(0,\mathit{len}(r))$\label{choose-index}
+               \State $r[j]\gets 0$\Comment{discard option $j$ in $r$}\label{delete-option}
+               \If{$\mathit{isNew(r)} \And\mathit{isPlausible}(r)$} 
                    \State $\mathcal R' \gets \mathcal R' \cup \{r\}$\label{line-progress}
                \EndIf
            \EndFor\label{end-for}
@@ -862,38 +863,45 @@ for minimal rules.
 \end{algorithmic}
 \end{algorithm}
 
-\Mar{--------------------------------------- estou aqui}
-
-Algorithm~\ref{algo1} shows the pseudocode of the \tname{}
-minimization algorithm. The algorithm takes as input the
-overconstrained rule produced by the reverse engineering step and
-produces a set $\mathcal R$ of minimized rules. Line~\ref{line-init}
-initializes the set $\mathcal{R}$ of candidate solutions with the seed
+Algorithm~\ref{algo1} shows the pseudocode for \tname{}'s rule
+minimization. The algorithm takes as input an overconstrained rule
+produced by the reverse engineering step and produces a set $\mathcal
+O$ of minimized rules. Line~\ref{line-init} initializes the current
+population of individuals (\ie{}, rules) $\mathcal{R}$ with the seed
 rule $sr$. We encode a rule as a bitvector where each index in the
 vector represents one option; the value assigned at a given position
-indicates whether or not the option is present in the rule. Each
+indicates whether or not the option is present in the rule. One
 iteration of the outer loop
-(lines~\ref{start-do-while}-\ref{end-do-while}) represents one
-generation of the population of individuals produced by the
-search. The algorithm terminates when no rule in the current
+(lines~\ref{start-do-while}-\ref{end-do-while}) processes the current
+population of individuals $\mathcal R$ and creates the next generation
+$\mathcal R'$. Line~\ref{init-rprime} initializes the population of
+individuals for the next generation. The inner loop
+(lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
+candidate rule in $\mathcal R$. The algorithm mutates each of these
+rules for $N$ times, discarding one option of the rule each
+time. Line~\ref{copy} assigns a copy of the bitvector encoding a rule
+in $\mathcal R$ to variable $r$. Function $\mathit{len}$ returns the
+length of a vector and function $\mathit{rand}$ randomly chooses one
+integer value in the range defined by its parameters. So, the
+expression $\mathit{rand(0, len(r))}$, appearing at
+line~\ref{choose-index}, returns an index of the option in $r$ to
+delete at line~\ref{delete-option}. The call to $\mathit{isNew}$
+checks if $r$ has not been previously generated through another path
+whereas the call to $\mathit{isPlausible}$ checks if the rule only
+captures positive traffic. If $r$ satisfies both criteria, it is added
+to $\mathcal R'$, which denotes the next generation of individuals in
+the search.
+
+The algorithm terminates when no rule in the current
 generation of individuals could be further reduced without violating
 the property that a candidate solution should only capture positive
 traffic. This means that execution of one iteration has not reached
-the statement declared at line~\ref{line-progress}, which adds an
-element to the set $\mathcal{R'}$. Consequently, that set will be
-empty at the end of one iteration of the outer
-loop. Line~\ref{init-rprime} initializes the new generation of
-candidate rules. The inner loop
-(lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
-candidate rule in $\mathcal R$. Note that these rules have been found
-in the previous generation. The algorithm mutates each of these rules
-for $N$ times, discarding one option of the rule each time. The call
-to $\mathit{isNew}$ checks if $r$ has not been previously generated
-through another path whereas the call to $\mathit{isPlausible}$ checks
-if the rule only captures positive traffic. Function $\mathit{copy}$
-creates a copy of the bitvector of a rule, function $\mathit{len}$
-returns the length of the vector, and function $\mathit{rand}$
-randomly chooses one index of the vector.
+the statement declared at line~\ref{line-progress}, which adds one
+element to the set $\mathcal{R'}$. Consequently, as $\mathcal{R'}$ is
+initialized empty that set will remain empty at the end of an
+iteration of the outer loop.
+
+\Mar{--------------------------------------- estou aqui}
 
 Note that no rules are produced in the last iteration of the
 algorithm. Minimal rules are produced in the second-to-last
