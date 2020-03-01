@@ -13,7 +13,7 @@ from functools import partial, reduce
 from itertools import combinations
 
 #open("bad.rules", 'w').close()
-attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan"]
+attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop"]
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
@@ -25,11 +25,11 @@ fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 time_begin = time.time()
 
 contents_dict = {}
-contents_dict["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], 'http:':[], '/cirt.net':[], '/rfiinc':[], '../':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
+contents_dict["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], 'http:':[], '/cirt.net':[], '/rfiinc':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
 
 contents_dict["htaccess"] = {'GET':[], '/Ud3uMSnb':[], '.htaccess':["http_uri", "nocase"], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], 'map_codes)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[]}
 
-contents_dict["jsp"] = {'GET':[], '/examples':[], '/jsp/snp/':["http_uri"], 'anything':[], '.snp':["http_uri"], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '001001)':[], 'Content-Length:':[], '1':[], 'Content-Type:':[], 'application':[], '/x-':[], 'www-':[], 'form-':[], 'urlencoded':[], 'Host:':[], '192.168.1.108': [], 'Connection:':[], 'Keep-Alive':[]}
+contents_dict["jsp"] = {'Keep-Alive': [], '/x-www-form-urlencoded': [], '(Nikto': [], '/2.1.5)': [], 'Mozilla': [], 'None)': [], 'User-Agent:': [], '001001)': [], 'Host:': [], '(Test:': [], '/jsp/snp': ["http_uri"], '/anything':[], '.snp': ["http_uri"], '(Evasions:': [], 'Content-Type:': [], '192.168.1.108': [], 'application': [], '/examples': [], 'HTTP/1.1': [], 'Content-Length:': [], '/5.00': [], '1': [], 'Connection:': [], 'GET': []}
 
 contents_dict["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"], '/index':[], '.cfm':[], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], '003067)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[], '192.168.1.108': []}
 
@@ -44,6 +44,8 @@ contents_dict["idq"] = {'GET':[], '/scripts':[], '/samples':[], '/search':[], '/
 contents_dict["system"] = {'GET':[], '/c':[], '/winnt':[], '/system32/':["http_uri", "nocase"], 'cmd.exe?':[], '/c+dir+':[], '/OG':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
 
 contents_dict["wordpress"] = {'POST':[], 'deflate': [], 'Hungry4Apples%21': [], '&pwd=': ["http_client_body"], '58.0)': [], '10.47.26.186': [], 'Gecko': [], 'Win64': [], 'log=': ["http_client_body"], 'application': [], '1': [], '/x-www-form-urlencoded': [], 'Accept-Language:': [], '&wp-submit=': ["http_client_body"], 'Firefox': [], '0.9,*': [], 'WP+Cookie+check': [], 'admin': [], '%2Fwordpress%2Fwp-admin%2F': [], 'testcookie=': [], '/html,application': [], 'Connection:': [], 'gzip,': [], '/58.0': [], '/wordpress': [], '/20100101': [], '/xml': [], '0.5': [], 'wordpress_test_cookie=': [], 'x64': [], '10.0': [], 'ess': [], '(Windows': [], 'text': [], '/5.0': [], 'Log+In': [], 'Content-Type:': [], 'Cookie:': [], '/xhtml+xml,application': [], 'Referer:': [], 'HTTP/1.1': [], 'Host:': [], 'en-US,en': [], 'Mozilla': [], 'NT': [], '99': [], 'Accept-Encoding:': [], 'rv:': [], 'Accept:': [], 'redirect_to=': [], 'Content-Length:': [], '/wp-login.php': [], 'User-Agent:': [], 'http:': [], '0.8': [], 'q=': [], 'keep-alive': [], 'Upgrade-Insecure-Requests:': []}
+
+contents_dict["process"] = {'<is class=': [], '/bin': [], '8080': [], '<next': [], '/string>': [], '/struts2-rest-showcase/orders/3': [], '<redirectErrorStream>false<': [], 'User-Agent:': [], '/opmode>': [], '/iter>': [], 'Mozilla': [], '10.47.27.150:': [], 'java.lang.ProcessBuilder': [], 'BEGIN{s=': [], '<filter': [], '<value': [], 'java.util.Collections$EmptyIterator': [], '/inet/tcp': [], 'Windows NT 5.1': [], '<dataSource': [], '<command>': [], '/21509/0/0': [], 'c;close(c))while(c|getline)print|': [], '<serviceIterator': [], 'HTTP/1.1': [], '/string><string>-c<': [], '<map>': [], 'for(;': [], '<method>': [], '<cipher': [], '/command>': [], '<jdk.nashorn.internal.objects.NativeString>': [], '/next>': [], 'Host:': [], 'POST': [], '<iter': [], 'getline': [], '/redirectErrorStream>': [], '(compatible;': [], 'Content-Length:': [], 'application': [], '<string>': [], '2495': [], '/flags>': [], '<opmode>0<': [], '<': [], '<entry>': [], 's|amp;': [], 'MSIE 6.0': [], '<dataHandler>': [], '/xml': [], 'com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource': [], 'javax.crypto.NullCipher>': [], '<initialized>false<': [], 'com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data': [], '/sh<': [], 'javax.imageio.spi.FilterIterator>': [], '<flags>0<': [], '/initialized>': [], 'Content-Type:': [], 's;close(s)}': [], '/string><string>awk': [], 'javax.imageio.ImageIO$ContainsFilter>': [], 'javax.crypto.CipherInputStream>': [], '/4.0': []}
 
 if args.attack in contents_dict:
     contents = contents_dict[args.attack]
@@ -208,10 +210,10 @@ def getTokens():
 
     return tokens
 
-"""getTokens()
+#getTokens()
 
-exit()
-"""
+#exit()
+
 
 def getRuleSize(rule):
     global keyword_list
@@ -1183,7 +1185,7 @@ def optimizeRule(rule):
     golden_rule = copy.deepcopy(all_rule_list[0])
     golden_rule.sid= 1099019
     golden_content = {}
-    golden_content["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], '../':[]} # cron.php
+    golden_content["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"]} # cron.php
     golden_content["htaccess"] = {'.htaccess':["nocase", "http_uri"]}
     golden_content["jsp"] = {'/jsp/snp/':["http_uri"], '.snp':["http_uri"]}
     golden_content["coldfusion"] = {'GET':["http_method", "nocase"], '/CFIDE/administrator':["http_uri", "nocase"]}
@@ -1193,13 +1195,16 @@ def optimizeRule(rule):
     golden_content["idq"] = {'.idq':["http_uri", "nocase"]}
     golden_content["system"] = {'/system32/':["http_uri", "nocase"]}
     golden_content["wordpress"] = {"log=": ["http_client_body"], "&pwd=": ["http_client_body"], "&wp-submit=": ["http_client_body"]}
+    golden_content["process"] = {'POST':["http_method"], 'java.lang.ProcessBuilder':["nocase", "http_client_body", "fast_pattern"], '/struts2-rest-showcase/orders/3':["http_uri"]}
 
-    if rule_protocol == "http":
+    if rule_protocol == "http" or args.attack == "process":
         golden_rule.options["content"] = golden_content[args.attack]
-    elif rule_protocol == "icmp":
-        golden_rule.options = {'dsize':0, 'itype':8}
     
-    if args.attack == "teardrop":
+    if args.attack == "pingscan":
+        golden_rule.options = {'dsize':0, 'itype':8}
+    elif args.attack == "blacknurse":
+        golden_rule.options = {'itype':3, 'icode':3}
+    elif args.attack == "teardrop":
         golden_rule.options = {'fragbits':'M', 'id':242}
     
     print("golden_rule:", golden_rule)
@@ -1305,7 +1310,7 @@ def optimizeRule(rule):
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
-            y=y*(100/len(allpkts))
+            y=y*(100/1)
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
@@ -1320,7 +1325,7 @@ def optimizeRule(rule):
                 fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
                 for (x, y, z) in zip(list(reversed(normal_rules_list)), list(reversed(normal_recall)), list(reversed(normal_precision))):
-                    y=y*(100/len(allpkts))
+                    y=y*(100/1)
                     z=100-(z/20)
                     f1=2*(((z*y)/100)/((y/100)+(z/100)))
                     if f1>90.0: 
@@ -1368,11 +1373,16 @@ exit()
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
-    synflood_options = {'window':512, 'flags':'S'}
-    final_rule.options = synflood_options
+    if args.attack == "synflood":
+        synflood_options = {'window':512, 'flags':'S'}
+        final_rule.options = synflood_options
+    elif args.attack == "blacknurse":
+        blacknurse_options = {'dsize':28, 'ttl':64, 'itype':3, 'icode':3}
+        final_rule.options = blacknurse_options
+
     final_rule.threshold = {'type':'both', 'track':'by_dst', 'count':len(pkts._packets), 'seconds': 5}
     print(final_rule)
-
+    #exit()
     final_rule = optimizeRule(final_rule)
     #final_rule = evolveRuleFlood(init_rule)
 else:
@@ -1391,16 +1401,16 @@ else:
 
     if rule_protocol == "http":
         final_rule.options["content"] = contents
-    elif rule_protocol == "icmp":
+    
+    if args.attack == "pingscan":
         pingscan_options = {'dsize':0, 'itype':8, 'icode':0, 'icmp_id':23570, 'icmp_seq':3439}
         final_rule.options = pingscan_options
-    
-    if args.attack == "teardrop":
+    elif args.attack == "teardrop":
         teardrop_options = {'dsize':0, 'fragbits':'M', 'id':242, 'ttl':64}
         final_rule.options = teardrop_options
         
     print("initial rule:\n", final_rule)
-    #exit()
+    exit()
     #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
     #quit()
     final_rule = optimizeRule(final_rule)
