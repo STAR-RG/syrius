@@ -636,11 +636,12 @@ def checkFalseNegative(rules):
         output.append(0)
 
     with open(fitnessFile_path, "r") as fitnessFile:
-        fitnessFile = fitnessFile.read()
-    
-    for i in range(len(rules)):
-        if fitnessFile.count('[1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+        line = fitnessFile.readline()
+
+        while line:
+            if line.count('[1:'+str(rules[i].sid)+':') >= 1:
+                output[i] = line.count('[1:'+str(rules[i].sid)+':')
+            line = fitnessFile.readline()
             #if str(rules[i].sid) == "1099019":
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
@@ -669,11 +670,12 @@ def checkPrecision(rules):
         output.append(0)
 
     with open(fitnessFile_path, "r") as fitnessFile:
-        fitnessFile = fitnessFile.read()
-    
-    for i in range(len(rules)):
-        if fitnessFile.count('[1:'+str(rules[i].sid)+':') >= 1:
-            output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+        line = fitnessFile.readline()
+
+        while line:   
+            if line.count('[1:'+str(rules[i].sid)+':') >= 1:
+                output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+            line = fitnessFile.readline()
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
             #print("False negative rule:", rules[i])
