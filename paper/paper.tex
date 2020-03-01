@@ -982,17 +982,17 @@ Section~\ref{sec:objectanalysis-benign}).
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
 
-
-\Mar{----------------------------- estou aqui}
-
-\tname{} uses a composition of heurisitc functions to sort the rules
-it produces. Each function uses a different criterion to estimate how
-similar a rule, created in the previous step, is to rules from a
-public database~\cite{emerging-threats-open} including a total of
-\numrulessuri\ rules. We describe in the following each of these
-heuristic functions. The codomain of each function ranges in the 0-1
-interval. The score of a rule is the average across the values
-produced by each function.
+\tname{} uses a composition of heurisitic functions to sort the rules
+produced in the previous step. Each of these functions uses a
+different criterion to estimate how similar a created rule is to those
+from public rulesets~\cite{emerging-threats-open}. The
+intuition is that rules that look more similar to existing trusted
+rules rank higher and could catch the attention of a system
+administrator. The score of a rule is the weighted average across the
+values produced by each heuristic function. The codomain of each
+function ranges on the 0-1 interval. Hence, the score of a rule also
+ranges on the 0-1 interval. We describe in the following each of these
+heuristic functions.
 
 %% \Luc{atualmente eh uma
 %%   média simples e não ponderada ja q as funções tem o mesmo
@@ -1001,10 +1001,11 @@ produced by each function.
 %%   outras atividades que definimos.} $\sum{f_i}/|f_i|$.
 
 \subsubsection{Size of a rule}
+\label{sec:heuristic-size-of-rule}
 One element that \tname{} uses to measure similarity between a
 synthesized and a human-created rule is the size of the synthetic
 rule, \ie{}, the number of options it contains. Informally, rules with
-popular sizes score high whereas inpopular rules score
+popular sizes score high whereas unpopular rules score
 low. Figure~\ref{fig:distribution-rule-size} shows the histogram of
 rule sizes for our rule data set. The x-axis shows the number of
 options included in a rule (up to 10) while the y-axis shows the
@@ -1012,101 +1013,84 @@ number of rules with the corresponding number of options. Note that
 there are 11 rules with no options. These rules only use the header to
 signal a traffic as malicious. Also note that most rules have 2 to 6
 options. \tname{} values rules in that size range higher compared to
-other sizes.
-
-%\tname{} uses this information to rank rules.
-
-
-
-
-
-More precisely, we calculate the contribution of size of a given rule
-$r$ with the following formula:
-
-\[\frac{\mathit{rules\_per\_size}[\mathit{len(r)}]}{\mathit{max(rules\_per\_size})}\]
-
-\noindent
-, where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
-$\mathit{rules\_per\_size}$ encodes distribution of sizes as a
+other sizes. We calculate the contribution of size of a given rule
+$r$ with the following formula $\mathit{rules\_per\_size}[\mathit{len(r)}]/\mathit{max(rules\_per\_size)}$, where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
+$\mathit{rules\_per\_size}$ encodes the distribution of sizes as a
 dictionary mapping sizes to number of associated rules, and
 $\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
-for any dictionary entry. Consequently, the contribution of size is
-proportional to its popularity. For example, the contribution of this
-heuristic for a rule with three options would be 0.684 (=3,662/5,353)
-whereas the contribution of a rule with nine options would be 0.028
-(=154/5,353). Note that the measurement is normalized in the 0-1
-range.
+for any dictionary entry as to normalize the measurement in the 0-1
+range. Consequently, the contribution of size is proportional to its
+popularity. The contribution of this heuristic would be 0.684
+(=3,662/5,353) to a rule with three options and 0.028 (=154/5,353) to
+a rule with nine options.
 
-\subsubsection{Number of content options.} We empirically observed that content options are very
-common. \Luc{Se for preciso temos numeros para fundamentar isso
-  melhor, sao cerca de 70K contents nas 28K regras do
-  data set}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
-  (\%) das 28K regras tem contents.} \Luc{92\%} As consequence, we defined a
-heuristic function that takes the number of content options into
-account. We calculate the contribution of number of content options
-with the following formula:
+
+%% \vspace{-2ex}
+%% \[\]
+%% \vspace{-2ex}
+%\noindent
+
+%% \Luc{Se for preciso temos numeros para fundamentar isso
+%%   melhor, sao cerca de 70K contents nas 28K regras do
+%%   data set}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
+%%   (\%) das 28K regras tem contents.} \Luc{92\%}
 
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
 
-
-
 \begin{figure*}[t!]
-\centering
-\begin{subfigure}{.5\textwidth}
   \centering
-  \scalebox{1.2}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-1ex}
-  \caption{\label{fig:distribution-contents}Number of content options.}
-\end{subfigure}% <---- don't forget this %
-%\vspace{1ex}
-%\\
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \scalebox{1.2}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
-          ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          xtick=data,
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          nodes near coords align={vertical},
-        ]
-        \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-1ex}
-  \caption{\label{fig:distribution-rule-size}Rule sizes.}
-\end{subfigure}%
-%\vspace{1ex}
-\\
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \scalebox{1.2}{
+      \begin{tikzpicture}
+        \begin{axis}[
+            bar width=6pt,
+            scaled ticks=false,
+            tick label style={/pgf/number format/fixed},
+            ybar stacked,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+              anchor=north,legend columns=-1},
+            symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+            xtick=data,
+            nodes near coords,
+            every node near coord/.append style={font=\tiny},
+            nodes near coords align={vertical},
+          ]
+          \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \vspace{-1ex}
+    \caption{\label{fig:distribution-rule-size}Rule sizes.}
+  \end{subfigure}%  
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \scalebox{1.2}{  
+      \begin{tikzpicture}
+        \begin{axis}[
+            bar width=6pt,
+            scaled ticks=false,
+            tick label style={/pgf/number format/fixed},
+            ybar stacked,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+              anchor=north,legend columns=-1},
+            symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+            xtick=data,
+            nodes near coords,
+            every node near coord/.append style={font=\tiny},
+            nodes near coords align={vertical},
+          ]
+          \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \vspace{-1ex}
+    \caption{\label{fig:distribution-contents}Number of content options.}
+  \end{subfigure}% <---- don't forget this %
+  \\
 \begin{subfigure}{.5\textwidth}
   \centering
   \scalebox{1.2}{  
@@ -1192,16 +1176,34 @@ with the following formula:
   \caption{Distribution of features.}
 \end{figure*}
 
+\subsubsection{Number of content options.} We observed
+that \percContentOptions\ of the rules from the ruleset we are
+analyzing contain content options, but the distribution of those
+contents per rule is not uniform. Figure~\ref{} shows the
+corresponding distribution. Given the importance of this kind of
+option to the definition of rules, we defined a heuristic function
+focused on the typical number of content options in a rule. We
+calculate the contribution of this function as described on previous
+Section~\ref{sec:heuristic-size-of-rule}. 
 
-\[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
+%% to the score of a rule
+%% with the following formula:
 
-\noindent
-Note that the only difference of this formula compared to the formula
-to compute contribution of size is the distribution used, which is
-given by the term $\mathit{rules\_per\_number\_of\_contents}$ denoting
-a dictionary of number of content options to number of rules that
-contain that number of content options.
+%% \vspace{-2ex}
+%% \[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
+%% \vspace{-2ex}
 
+%% \noindent
+%% The only difference of this formula compared to the one defined on
+%% Section~\ref{sec:heuristic-size-of-rule} is the distribution used. The
+%% distribution is given by the term
+%% $\mathit{rules\_per\_number\_of\_contents}$ denoting a dictionary of
+%% number of content options to number of rules that contain that number
+%% of content options.
+
+
+
+\Mar{------------------------------------------- estou aqui}
 \subsubsection{Popularity of content strings.} 
 This heuristic weighs higher rules that use popular strings in content
 options. For a given rule \tname{} takes the arithmetic mean of the
@@ -1224,8 +1226,6 @@ function, let us consider a rule with two content options, using the
 strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
 (=(1+.203)/2).
-
-
 
 \subsubsection{Popularity of content modifiers.} As previously
 mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
