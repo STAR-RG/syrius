@@ -674,7 +674,7 @@ def checkPrecision(rules):
 
         while line:   
             if line.count('[1:'+str(rules[i].sid)+':') >= 1:
-                output[i] = fitnessFile.count('[1:'+str(rules[i].sid)+':')
+                output[i] = line.count('[1:'+str(rules[i].sid)+':')
             line = fitnessFile.readline()
         #else:
             #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
