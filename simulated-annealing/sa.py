@@ -697,15 +697,18 @@ def evalContents(rules):
         output.append(0)
 
     with open(fitnessFile_path, "r") as fitnessFile:
-        fitnessFile = fitnessFile.read()
-    
-    if len(fitnessFile) == 0 :
-        return output
+        line = fitnessFile.readline()
 
-    for i in range(len(rules)):
-        s="Testing rule {} ".format(i)
-        if s in fitnessFile:
-            output[i]=1
+        if not line :
+            return output
+
+        while line:
+            for i in range(len(rules)):
+                s="Testing rule {} ".format(i)
+                if s in line:
+                    output[i]=1
+
+            line = fitnessFile.readline()
 
     #print(output)
     return output
