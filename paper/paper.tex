@@ -1147,9 +1147,9 @@ bar width=4pt,
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},
           nodes near coords align={vertical},
-          symbolic x coords={method, uri, user\_agent, header, host, connection, request\_line},          
+          symbolic x coords={uri, header, method, user\_agent, host, connection, request\_line},          
         ]
-        \addplot coordinates {(method,3821) (uri,10111) (user\_agent,1022) (header,4089) (host,224) (connection,29) (request\_line,11)};
+        \addplot coordinates {(uri,10111) (method,3821) (user\_agent,1022) (header,4089) (host,224) (connection,29) (request\_line,11)};
       \end{axis}
     \end{tikzpicture}
   }
@@ -1245,29 +1245,28 @@ rule for the computation of similarity score would be 0.601
 (=(1+.203)/2). The relatively high weight reflects the fact that
 ``GET'' and ``ID'' are popular contents.
 
-\Mar{----------------------------------------------------------- estou
-aqui}
-\subsubsection{Popularity of content modifiers.} As previously
-mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
-rules involve content options. Furthermore, of the 26K rules that use
-content options, 13K use HTTP modifiers\Mar{@Lucas, pode dar o numero
-  desconsiderando HTTP? Esta parte eh generica.}. \Luc{Posso, mas nessa função nós consideramos apenas os modificadores http.} Content modifiers
-serve to indicate what part of a network packet the string mentioned
-in the content option should appear. For example, the modifier
-\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
-  http\_header} states the requirement that the string ``keep-alive''
-be present in the header of the message. (A keep-alive connection
-attribute indicates that a single TCP connection should remain open
-for multiple HTTP requests/responses.)
-Figure~\ref{fig:http-header-example} illustrates possible content
-options used to match against certain strings that appear in an HTTP
-message. A check (resp., cross) mark indicates a match (resp.,
-unmatch).
+\subsubsection{Popularity of http content modifiers.} As previously
+mentioned, \percRulesWithContent\ of \suri\ rules involve content
+options. Furthermore, nearly half of the rules that use content
+options, use content modifiers on http message payloads. Content
+modifiers serve to indicate what part of a network packet the string
+mentioned in the content option should appear. For example, the
+modifier \CodeIn{http\_header} in the option \CodeIn{content:
+  ``keep-alive''; http\_header} indicates that the string
+``keep-alive'' should be present in the header of the
+message\footnote{A keep-alive connection attribute indicates that a
+  single TCP connection should remain open for multiple HTTP
+  requests/responses.}.  Figure~\ref{fig:http-header-example}
+illustrates possible content options used to match against certain
+strings that appear in an http message. A check mark (resp., cross)
+indicates a match (resp., no match).
 
 \begin{figure}[t!]
 \centering
 \includegraphics[scale=0.5]{figs/http_header-example.png}
-\caption{\CodeIn{http\_header} example.}
+\caption{\CodeIn{http\_header} example.\Mar{Lucas, simplifique esta
+    figura (reduza o tamanho da imagem). Mostre apenas os casos onde ha um match, por exemplo,
+    com host=www.google.com e connection=keep-alive.}}
 \label{fig:http-header-example}
 \end{figure}
 
@@ -1284,21 +1283,23 @@ unmatch).
 %% content options often use modifiers\Mar{assumindo que eh
 %%   verdade. confirmar estat. solicitada acima...},
 
-\tname{} leverages the fact that these modifiers are commonly used to
-define rules as to better rank the rules it synthesizes. More
-precisely, it builds on the observation that strings acessible in
-positions associated with content modifiers (\eg{}, GET, Host,
-Connection) are more likely to produce useful rules. \tname\ uses the
-frequency of content modifiers to discriminate rules that are more or
-less likely to reflect actual rules. For example, historical data
-indicates that content options that use the \CodeIn{http\_connection}
-modifier are much less likely than content options that use the
-modifier
+%\tname\ uses the
+%frequency of content modifiers to discriminate rules that are more or
+%less likely to reflect actual rules. 
+
+\tname{} builds on our observation that these modifiers are commonly
+used to define existing rules. More precisely, \tname\ builds on the
+observation that the strings accessible in positions associated with
+content modifiers (\eg{}, GET, Host, Connection) are more common. For
+example, historical data indicates that content options that use the
+modifier \CodeIn{http\_connection} are much less likely than content
+options that use the modifier
 \CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
-shows the histogram of content modifiers for http. Although content
-modifiers are applicable to rules of any protocol supported by
-Suricata, currently, \tname\ only supports tcp and http. These are the
-protocols involving ~80\% of the rules from our data set.
+shows the histogram of content modifiers for http. (We removed the
+prefix ``http'' on the modifier for space.) Although content modifiers
+are applicable to rules of any protocol supported by Suricata,
+currently, \tname\ only supports this features for tcp and http. But
+these rules comprise $\sim$80\% of the rules of our data set.
 
 %% and
 %% (2) the payload of messages of different protocols are not as
@@ -1306,16 +1307,15 @@ protocols involving ~80\% of the rules from our data set.
 %% not refer to specific parts of the payload as often as the task o and
 %% more challenging for
 
-Similarly to the the previous heuristic functions, this function uses
-the frequency of content modifiers to calibrate the score of each
-rule. More precisely, we compute this function with the following
-formula:
+
+We compute the heuristic function for content modifiers with the
+following formula:
 
 \[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
 
 \noindent
-, where $N$ is the number of contents options, $g(i)$ is the
-contribution of content option $i$ to the score,
+, where $N$ is the number of contents options present in a rule,
+$g(i)$ is the contribution of content option $i$ to the score,
 $\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
 of a modifier $j$ to content option $i$,
 $\mathit{max(modifier\_frequency)}$ refers to the modifier with
@@ -1351,28 +1351,44 @@ $i$.
 %% incluem os modificadores, elas n incluem.
 %\Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}
     
-Consider a rule containing the option \CodeIn{content:
-  ``/HtmlAdaptor''}. The contribution of this option to the score of
-the rule that uses it would be $0.5$
-(=$\frac{10,111+11}{10,111*2}$). The value of $M_i$ for this case is 2
-as the field of the HTTP message \CodeIn{Request URI}---holding the
-string ``/HtmlAdaptor''---can be accessed through the modifiers
-\CodeIn{http\_uri} and \CodeIn{http\_request\_line}. The relatively
-high heuristic value given to this option suggests it is a plausible
-option to be used in rules---the string used in the content option
-(``/HtmlAdaptor'') is stored in a specific field of the HTTP message
-(\CodeIn{Request URI}) and can be accessed by two content modifiers,
-namely (\CodeIn{http\_uri} and \CodeIn{http\_request\_line}). For the
-option \CodeIn{content: ``keep-alive''}, either the modifier
-\CodeIn{http\_header} or the modifier \CodeIn{http\_connection} could
-be used to locate the string ``keep-alive'' stored in the field
-\CodeIn{Connection} (see Figurgure~\ref{fig:http-header-example}). Consequently, for this
-case, the contribution of modifiers to this content option would be
-$0.2$ (=$\frac{4089+29}{10111*2}$). Assuming that both options are
-used in a rule, the aggregated contribution of this heuristic function
-would be 0.35 (=(0.2+0.5)/2).
-\Gui{A quinta heuristica que utilizamos considera a popularidade das opcoes. Primeiro pegamos a quantidade de vezes que uma opcao eh utilizada (sem considerar repeticoes numa unica regra). Dividimos o valor encontrado para cada opcao pelo maior valor encontrado, encontrando sempre valores de no maximo 1. Entao na regra nos somamos os valores de cada opcao, dividido pelo numero de opcoes, chegando a um numero de no maximo 1, que representa a popularidade das opcoes na regra.
+To illustrate this function, consider a rule containing the option
+\CodeIn{content: ``/HtmlAdaptor''}. The contribution of this option to
+the score of the rule is $0.5$ (=$\frac{10,111+11}{10,111*2}$). The
+value of $M_i$ for this case is 2 as the string ``/HtmlAdaptor'' could
+be accessed through the modifiers \CodeIn{http\_uri} and
+\CodeIn{http\_request\_line} as that string is stored on the
+\CodeIn{Request URI} field of the http message\Mar{how do we know
+  that?}. The relatively high heuristic value reflects the fact that
+the string ``/HtmlAdaptor'', stored at \CodeIn{Request URI}, could be
+accessed by two content modifiers, namely (\CodeIn{http\_uri} and
+\CodeIn{http\_request\_line}).  For the option \CodeIn{content:
+  ``keep-alive''}, either the modifier \CodeIn{http\_header} or the
+modifier \CodeIn{http\_connection} could be used to locate the string
+``keep-alive'' stored in the field \CodeIn{Connection} (see
+Figure~\ref{fig:http-header-example}). Consequently, for this case,
+the contribution of modifiers to this content option would be $0.2$
+(=$\frac{4089+29}{10111*2}$). Assuming that both options are used in a
+rule, the aggregated contribution of this heuristic function would be
+0.35 (=(0.2+0.5)/2).
+
+
+\subsubsection{Popularity of options.}
+
+\Mar{--------------------------------------------------------- estou aqui}
+
+
+\Gui{A quinta heuristica que utilizamos
+  considera a popularidade das opcoes. Primeiro pegamos a quantidade
+  de vezes que uma opcao eh utilizada (sem considerar repeticoes numa
+  unica regra). Dividimos o valor encontrado para cada opcao pelo
+  maior valor encontrado, encontrando sempre valores de no maximo
+  1. Entao na regra nos somamos os valores de cada opcao, dividido
+  pelo numero de opcoes, chegando a um numero de no maximo 1, que
+  representa a popularidade das opcoes na regra.
 \[\frac{\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}}{N}\]}
+
+
+
 
 \Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
