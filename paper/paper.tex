@@ -1450,6 +1450,7 @@ would be 0.35 (=(0.2+0.5)/2).
     .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
     /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
+    Tomcat server snoop access & \cite{nikto} & AREC & HTTP & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1553,6 +1554,7 @@ experiments~(Section~\ref{sec:threats}).
     .htaccess access & 5 & 17 & 984 & 2\\
     .idq access & 14 & 19 & 511 & 1 \\
     /system32/ in URI & 4 & 20 & 1,913 & 1 \\
+    Tomcat server snoop access & 1 & - & - & - \\
     \bottomrule
   \end{tabular}
 \end{table}
