@@ -1412,7 +1412,7 @@ else:
         final_rule.options = teardrop_options
         
     print("initial rule:\n", final_rule)
-    exit()
+    #exit()
     #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
     #quit()
     final_rule = optimizeRule(final_rule)
