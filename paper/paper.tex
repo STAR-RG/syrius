@@ -923,10 +923,12 @@ rules. Intuitively, rules that do not look alike to rules written by
 humans and previously used rank low.
 
 \begin{proposition}
+  \vspace{-1ex}  
   The minimization algorithm reports rules that capture only the
   positive traffic.
 \end{proposition}
 \begin{proof}
+  \vspace{-1.5ex}
   Every rule created during the search captures the positive malicious
   traffic as every rule contains a proper subset of the options from
   the original rule and all those options are satisfied by the
@@ -935,6 +937,7 @@ humans and previously used rank low.
   negative traffic is captured, a rule is not added to $\mathcal R'$;
   consequently, it cannot be an element of $\mathcal O$ and reported
   on the output.
+  \vspace{-1ex}    
 \end{proof}
 
 %% \begin{proposition}
@@ -1038,25 +1041,28 @@ a rule with nine options.
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
 
-\begin{figure*}[t!]
+\begin{figure}[t!]
   \centering
-  \begin{subfigure}{.5\textwidth}
+  \begin{subfigure}{.25\textwidth}
     \centering
-    \scalebox{1.2}{
+    \scalebox{0.8}{
       \begin{tikzpicture}
         \begin{axis}[
-            bar width=6pt,
-            scaled ticks=false,
-            tick label style={/pgf/number format/fixed},
-            ybar stacked,
-            enlargelimits=0.15,
-            legend style={at={(0.5,-0.15)},
-              anchor=north,legend columns=-1},
-            symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-            xtick=data,
-            nodes near coords,
-            every node near coord/.append style={font=\tiny},
-            nodes near coords align={vertical},
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          enlargelimits=0.08,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+%          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           ]
           \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
         \end{axis}
@@ -1064,24 +1070,27 @@ a rule with nine options.
     }
     \vspace{-1ex}
     \caption{\label{fig:distribution-rule-size}Rule sizes.}
-  \end{subfigure}%  
-  \begin{subfigure}{.5\textwidth}
+  \end{subfigure}%
+  \begin{subfigure}{.25\textwidth}
     \centering
-    \scalebox{1.2}{  
+    \scalebox{0.8}{  
       \begin{tikzpicture}
         \begin{axis}[
-            bar width=6pt,
-            scaled ticks=false,
-            tick label style={/pgf/number format/fixed},
-            ybar stacked,
-            enlargelimits=0.15,
-            legend style={at={(0.5,-0.15)},
-              anchor=north,legend columns=-1},
-            symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-            xtick=data,
-            nodes near coords,
-            every node near coord/.append style={font=\tiny},
-            nodes near coords align={vertical},
+bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          enlargelimits=0.08,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+%          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          nodes near coords align={vertical},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           ]
           \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
         \end{axis}
@@ -1091,95 +1100,100 @@ a rule with nine options.
     \caption{\label{fig:distribution-contents}Number of content options.}
   \end{subfigure}% <---- don't forget this %
   \\
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{1.2}{  
+  \scalebox{0.8}{  
     \begin{tikzpicture}
       \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},
+          enlargelimits=0.08,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
           xtick=data,
-          xticklabel style={rotate=45},          
+          xticklabel style={rotate=35},          
           nodes near coords,
           every node near coord/.append style={font=\tiny},
           nodes near coords align={vertical},
+          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},          
         ]
         \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387) (INSERT, 386) (200, 352) (/index.php?, 273)};
       \end{axis}
     \end{tikzpicture}
   }
-  \vspace{-3ex}  
-  \caption{\label{fig:distribution-strings}Strings used as parameters of content options.}
+  \vspace{-2ex}  
+  \caption{\label{fig:distribution-strings}Strings used in content options.}
 \end{subfigure}%
-%\vspace{1ex}
-%\\
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{1.2}{
+  \scalebox{0.8}{
     \begin{tikzpicture}
       \begin{axis}[
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          %          ylabel={\#rules},
-          symbolic x coords={http\_method, http\_uri, http\_user\_agent, http\_header, http\_host, http\_connection, http\_request\_line},
+          enlargelimits=0.08,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
           xtick=data,
-          xticklabel style={rotate=45},          
+          xticklabel style={rotate=35},          
           nodes near coords,
-          every node near coord/.append style={font=\scriptsize},        
+          every node near coord/.append style={font=\scriptsize},
           nodes near coords align={vertical},
+          symbolic x coords={method, uri, user\_agent, header, host, connection, request\_line},          
         ]
-        \addplot coordinates {(http\_method,3821) (http\_uri,10111) (http\_user\_agent,1022) (http\_header,4089) (http\_host,224) (http\_connection,29) (http\_request\_line,11)};
+        \addplot coordinates {(method,3821) (uri,10111) (user\_agent,1022) (header,4089) (host,224) (connection,29) (request\_line,11)};
       \end{axis}
     \end{tikzpicture}
   }
-  \vspace{-1ex}
-  \caption{\label{fig:distribution-content_modifiers}Content modifiers
-    frequency.}
+  \vspace{-2ex}
+  \caption{\label{fig:distribution-content_modifiers}Http content modifiers.}
 \end{subfigure}%
-%\vspace{1ex}
 \\
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.2\textwidth}
   \centering
-  \scalebox{1.2}{  
+  \scalebox{0.8}{  
     \begin{tikzpicture}
       \begin{axis}[
-          bar width=6pt,
-          scaled ticks=false,
-          tick label style={/pgf/number format/fixed},
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.15,
-          legend style={at={(0.5,-0.15)},
-            anchor=north,legend columns=-1},
-          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},
+          enlargelimits=0.08,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
           xtick=data,
-          xticklabel style={rotate=45},          
+          xticklabel style={rotate=35},          
           nodes near coords,
-          every node near coord/.append style={font=\tiny},
+          every node near coord/.append style={font=\scriptsize},
           nodes near coords align={vertical},
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
         ]
         \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode, 108) (flags, 97) (tls.fingerprint, 61)};
       \end{axis}
     \end{tikzpicture}
   }
-  \vspace{-3ex}  
-  \caption{\label{fig:distribution-strings}Option Frequency.}
+  \vspace{-5ex}      
+  \caption{\label{fig:distribution-strings}Options.}
+%  \vspace{-1ex}    
 \end{subfigure}%
 \vspace{-1ex}
-  \caption{Distribution of features.}
-\end{figure*}
+\caption{Distribution of features.}
+\end{figure}
 
 \subsubsection{Number of content options.} We observed
 that \percContentOptions\ of the rules from the ruleset we are
 analyzing contain content options, but the distribution of those
-contents per rule is not uniform. Figure~\ref{} shows the
+contents per rule is not uniform. Figure~\ref{fig:distribution-contents} shows the
 corresponding distribution. Given the importance of this kind of
 option to the definition of rules, we defined a heuristic function
 focused on the typical number of content options in a rule. We
@@ -1203,30 +1217,36 @@ Section~\ref{sec:heuristic-size-of-rule}.
 
 
 
-\Mar{------------------------------------------- estou aqui}
 \subsubsection{Popularity of content strings.} 
-This heuristic weighs higher rules that use popular strings in content
-options. For a given rule \tname{} takes the arithmetic mean of the
-popularity scores of each string used in contents in that rule. More
-precisely, we calculate the contribution of content rarity with the
+The heuristic described in this section leverages content rarity to
+discriminate rules---it weighs higher (respectively, lower) rules that
+use popular (respectively, unpopular) strings in content options. The
+score of a rule $r$ on this function is given by the arithmetic mean
+of the popularity scores of each string used in contents in $r$. More
+precisely, the contribution of content rarity is given by the
 following formula:
 
+\vspace{-2.5ex}
 \[\frac{\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}}{N}\]
+\vspace{-2.5ex}
 
 \noindent
-, where the term $\mathit{content_i}$ denotes the $i$-th xcontent in a
-given rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
+, where $\mathit{content_i}$ denotes the $i$-th content in a given
+rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
 denotes the frequency of the string used in the $i$-th content, the
 term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
 observed across all strings appearing as content parameters, and $N$
 is the number of content options in a given
 rule. Figure~\ref{fig:distribution-strings} shows the distribution of
-the ten most popular strings in our rule data set. To illustrate this
+the ten most popular strings in our ruleset. To illustrate this
 function, let us consider a rule with two content options, using the
 strings ``GET'' and ``ID'', respectively. The contribution of that
 rule for the computation of similarity score would be 0.601
-(=(1+.203)/2).
+(=(1+.203)/2). The relatively high weight reflects the fact that
+``GET'' and ``ID'' are popular contents.
 
+\Mar{----------------------------------------------------------- estou
+aqui}
 \subsubsection{Popularity of content modifiers.} As previously
 mentioned, \percRulesWithContent\ (=26K/\numrulessuri) of Suricata
 rules involve content options. Furthermore, of the 26K rules that use
