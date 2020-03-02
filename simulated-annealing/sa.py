@@ -1398,8 +1398,8 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-sortMultipleAttacks()
-exit()
+#sortMultipleAttacks()
+#exit()
 
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
 
