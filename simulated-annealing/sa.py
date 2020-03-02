@@ -13,7 +13,9 @@ from functools import partial, reduce
 from itertools import combinations
 
 #open("bad.rules", 'w').close()
-attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop"]
+attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc"]
+
+http_attacks = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "jsp", "inc", "wordpress"]
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
@@ -1207,7 +1209,7 @@ def optimizeRule(rule):
     golden_content["process"] = {'POST':["http_method"], 'java.lang.ProcessBuilder':["nocase", "http_client_body", "fast_pattern"], '/struts2-rest-showcase/orders/3':["http_uri"]}
     golden_content["inc"] = {'GET':["http_method"], '/main.inc.php?':["nocase", "http_uri"], 'mj_config[src_path]=': ["nocase", "http_uri"]}
 
-    if args.attack == "htaccess":
+    if args.attack in http_attacks:
         golden_rule.options["content"] = golden_content[args.attack]
     
     if args.attack == "pingscan":
