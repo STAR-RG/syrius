@@ -47,6 +47,8 @@ contents_dict["wordpress"] = {'POST':[], 'deflate': [], 'Hungry4Apples%21': [], 
 
 contents_dict["process"] = {'<is class=': [], '/bin': [], '8080': [], '<next': [], '/string>': [], '/struts2-rest-showcase/orders/3': [], '<redirectErrorStream>false<': [], 'User-Agent:': [], '/opmode>': [], '/iter>': [], 'Mozilla': [], '10.47.27.150:': [], 'java.lang.ProcessBuilder': [], 'BEGIN{s=': [], '<filter': [], '<value': [], 'java.util.Collections$EmptyIterator': [], '/inet/tcp': [], 'Windows NT 5.1': [], '<dataSource': [], '<command>': [], '/21509/0/0': [], 'c;close(c))while(c|getline)print|': [], '<serviceIterator': [], 'HTTP/1.1': [], '/string><string>-c<': [], '<map>': [], 'for(;': [], '<method>': [], '<cipher': [], '/command>': [], '<jdk.nashorn.internal.objects.NativeString>': [], '/next>': [], 'Host:': [], 'POST': [], '<iter': [], 'getline': [], '/redirectErrorStream>': [], '(compatible;': [], 'Content-Length:': [], 'application': [], '<string>': [], '2495': [], '/flags>': [], '<opmode>0<': [], '<': [], '<entry>': [], 's|amp;': [], 'MSIE 6.0': [], '<dataHandler>': [], '/xml': [], 'com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource': [], 'javax.crypto.NullCipher>': [], '<initialized>false<': [], 'com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data': [], '/sh<': [], 'javax.imageio.spi.FilterIterator>': [], '<flags>0<': [], '/initialized>': [], 'Content-Type:': [], 's;close(s)}': [], '/string><string>awk': [], 'javax.imageio.ImageIO$ContainsFilter>': [], 'javax.crypto.CipherInputStream>': [], '/4.0': []}
 
+contents_dict["inc"] = {'mj_config[src_path]=': ['nocase', 'http_uri'], 'HTTP/1.1': [], '(Nikto': [], 'User-Agent:': [], '004284)': [], '(Test:': [], '/basebuilder': [], '/rfiinc.txt': [], 'Connection:': [], 'Mozilla': [], '(Evasions:': [], 'Keep-Alive': [], 'Host:': [], '/main.inc.php?': ['nocase', 'http_uri'], 'http:': [], '/cirt.net': [], '/2.1.5)': [], '192.168.1.108': [], '/5.00': [], 'None)': [], '/src': [], 'GET': ['http_method']}
+
 if args.attack in contents_dict:
     contents = contents_dict[args.attack]
 else:
@@ -64,7 +66,7 @@ default_rule_message = "msg:\"Testing rule\";"
 rule_options = {}
 default_rule_sid = 1
 
-if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq", "system"]:
+if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq", "system", "inc"]:
     pcapAttack = "Datasets/nikto-" + str(args.attack) + ".pcap"
 else:
     pcapAttack = "Datasets/" + str(args.attack) + ".pcap"
@@ -637,17 +639,18 @@ def checkFalseNegative(rules):
 
     with open(fitnessFile_path, "r") as fitnessFile:
         line = fitnessFile.readline()
+        
+        if not line :
+            return output
 
         while line:
-            if line.count('[1:'+str(rules[i].sid)+':') >= 1:
-                output[i] = line.count('[1:'+str(rules[i].sid)+':')
+            for i in range(len(rules)):
+                if ('[1:'+str(rules[i].sid)+':') in line:
+                    output[i] += 1
+                    break
+            
             line = fitnessFile.readline()
-            #if str(rules[i].sid) == "1099019":
-        #else:
-            #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
-            #print("False negative rule:", rules[i])
-            #print(fitnessFile)
-
+           
     return output
 
 
@@ -672,14 +675,17 @@ def checkPrecision(rules):
     with open(fitnessFile_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
-        while line:   
-            if line.count('[1:'+str(rules[i].sid)+':') >= 1:
-                output[i] = line.count('[1:'+str(rules[i].sid)+':')
+        if not line :
+            return output
+
+        while line:
+            for i in range(len(rules)):
+                if ('[1:'+str(rules[i].sid)+':') in line:
+                    output[i] += 1
+                    break
+        
             line = fitnessFile.readline()
-        #else:
-            #print("fitness file count", ':'+str(rules[i].sid)+':', fitnessFile.count(str(rules[i].sid)))
-            #print("False negative rule:", rules[i])
-            #print(fitnessFile)
+
 
     return output
 
@@ -703,10 +709,8 @@ def evalContents(rules):
             return output
 
         while line:
-            for i in range(len(rules)):
-                s="Testing rule {} ".format(i)
-                if s in line:
-                    output[i]=1
+            rule_number = int(line.split("Testing rule ")[1].split(" ")[0])            
+            output[rule_number] = 1
 
             line = fitnessFile.readline()
 
@@ -1201,8 +1205,9 @@ def optimizeRule(rule):
     golden_content["system"] = {'/system32/':["http_uri", "nocase"]}
     golden_content["wordpress"] = {"log=": ["http_client_body"], "&pwd=": ["http_client_body"], "&wp-submit=": ["http_client_body"]}
     golden_content["process"] = {'POST':["http_method"], 'java.lang.ProcessBuilder':["nocase", "http_client_body", "fast_pattern"], '/struts2-rest-showcase/orders/3':["http_uri"]}
+    golden_content["inc"] = {'GET':["http_method"], '/main.inc.php?':["nocase", "http_uri"], 'mj_config[src_path]=': ["nocase", "http_uri"]}
 
-    if rule_protocol == "http" or args.attack == "process":
+    if args.attack == "htaccess":
         golden_rule.options["content"] = golden_content[args.attack]
     
     if args.attack == "pingscan":
@@ -1311,11 +1316,13 @@ def optimizeRule(rule):
     print("pegando recall")
     normal_recall=checkFalseNegative(normal_rules_list)
 
+    print('recall golden rule:', normal_recall[golden_rule_pos])
+
     with open("result_"+str(args.attack)+"2.csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
-            y=y*(100/1)
+            y=y*(100/len(allpkts))
             z=100-(z/20)
             f1=2*(((z*y)/100)/((y/100)+(z/100)))
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
@@ -1330,7 +1337,7 @@ def optimizeRule(rule):
                 fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
 
                 for (x, y, z) in zip(list(reversed(normal_rules_list)), list(reversed(normal_recall)), list(reversed(normal_precision))):
-                    y=y*(100/1)
+                    y=y*(100/len(allpkts))
                     z=100-(z/20)
                     f1=2*(((z*y)/100)/((y/100)+(z/100)))
                     if f1>90.0: 
