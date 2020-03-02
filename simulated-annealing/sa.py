@@ -13,9 +13,9 @@ from functools import partial, reduce
 from itertools import combinations
 
 #open("bad.rules", 'w').close()
-attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc"]
+attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
-http_attacks = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "jsp", "inc", "wordpress"]
+http_attacks = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "jsp", "inc", "wordpress", "sanny"]
 parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
@@ -50,6 +50,8 @@ contents_dict["wordpress"] = {'POST':[], 'deflate': [], 'Hungry4Apples%21': [], 
 contents_dict["process"] = {'<is class=': [], '/bin': [], '8080': [], '<next': [], '/string>': [], '/struts2-rest-showcase/orders/3': [], '<redirectErrorStream>false<': [], 'User-Agent:': [], '/opmode>': [], '/iter>': [], 'Mozilla': [], '10.47.27.150:': [], 'java.lang.ProcessBuilder': [], 'BEGIN{s=': [], '<filter': [], '<value': [], 'java.util.Collections$EmptyIterator': [], '/inet/tcp': [], 'Windows NT 5.1': [], '<dataSource': [], '<command>': [], '/21509/0/0': [], 'c;close(c))while(c|getline)print|': [], '<serviceIterator': [], 'HTTP/1.1': [], '/string><string>-c<': [], '<map>': [], 'for(;': [], '<method>': [], '<cipher': [], '/command>': [], '<jdk.nashorn.internal.objects.NativeString>': [], '/next>': [], 'Host:': [], 'POST': [], '<iter': [], 'getline': [], '/redirectErrorStream>': [], '(compatible;': [], 'Content-Length:': [], 'application': [], '<string>': [], '2495': [], '/flags>': [], '<opmode>0<': [], '<': [], '<entry>': [], 's|amp;': [], 'MSIE 6.0': [], '<dataHandler>': [], '/xml': [], 'com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource': [], 'javax.crypto.NullCipher>': [], '<initialized>false<': [], 'com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data': [], '/sh<': [], 'javax.imageio.spi.FilterIterator>': [], '<flags>0<': [], '/initialized>': [], 'Content-Type:': [], 's;close(s)}': [], '/string><string>awk': [], 'javax.imageio.ImageIO$ContainsFilter>': [], 'javax.crypto.CipherInputStream>': [], '/4.0': []}
 
 contents_dict["inc"] = {'mj_config[src_path]=': ['nocase', 'http_uri'], 'HTTP/1.1': [], '(Nikto': [], 'User-Agent:': [], '004284)': [], '(Test:': [], '/basebuilder': [], '/rfiinc.txt': [], 'Connection:': [], 'Mozilla': [], '(Evasions:': [], 'Keep-Alive': [], 'Host:': [], '/main.inc.php?': ['nocase', 'http_uri'], 'http:': [], '/cirt.net': [], '/2.1.5)': [], '192.168.1.108': [], '/5.00': [], 'None)': [], '/src': [], 'GET': ['http_method']}
+
+contents_dict["sanny"] = {'0.8,image': [], 'Gecko': [], '/20081217': [], '/plain;': [], ',ko;': [], 'EUC-KR,utf-8;': [], 'Windows NT 5.1': [], '/html;': [], 'text': [], '300': [], '/xml,application': [], 'Keep-Alive:': [], '/*;': [], 'q=': [], 'gzip,deflate': [], '0.3': [], '/png,*': [], 'Accept-Encoding:': [], '1': [], 'Connection:': [], 'Accept:': [], 'Mozilla': [], 'Accept-Language: ko-kr': [], '/5.0': [], '1.8.1.20)': [], 'Accept-Charset:': [], 'rv:': [], 'p': [], 'ko;': [], '0.5': [], 'kbaksan_1': [], 'Host:': [], 'board.nboard.net': [], 'U;': [], 'Firefox': [], 'keep-alive': [], '0.7,*;': [], '(Windows;': [], 'p=': [], 'User-Agent:': [], '0.8,en-us;': [], 'HTTP/1.1': [], '/2.0.0.20': [], '/xhtml+xml,text': [], '0.7': [], '0.9,text': [], '0.5,en;': [], 'GET':[], '/list.php?db=':[]}
 
 if args.attack in contents_dict:
     contents = contents_dict[args.attack]
@@ -931,6 +933,7 @@ def sortMultipleAttacks():
     all_pos_sum = 0
     best_all_pos_sum = math.inf
     best_all_weights = []
+    best_all_pos = []
     
     for elem in all_rules_list:
         all_rules_len.append(len(elem))
@@ -958,27 +961,50 @@ def sortMultipleAttacks():
 
                                 current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
                                 all_pos_sum += current_pos[i]
-                                print("current pos", i, ":", current_pos[i])
-                                print("best pos:", best_pos[i])
+                                #print("current pos", i, ":", current_pos[i])
+                                #print("best pos:", best_pos[i])
                                 
                                 if current_pos[i] <= best_pos[i]:
                                     best_pos[i] = current_pos[i]
-                                    #best_rule_list[i] = copy.deepcopy(all_rules_list[i])
+                                    best_rule_list[i] = all_rules_list[i].copy()
                                     best_weights[i] = w
                                 
                                 i += 1
                             
                             #print("all pos sum:", all_pos_sum)
                             if all_pos_sum <= best_all_pos_sum:
+                                best_all_pos = current_pos.copy()
                                 best_all_pos_sum = all_pos_sum
+                                best_rule_list = all_rules_list.copy()
                                 best_all_weights = w
     
     print(attacks_list)
+    
     print("best pos:", best_pos)
     print("best weights indiv:", best_weights)
     print("best all:", best_all_pos_sum)
     print("best all weights:", best_all_weights)
+
+    for i in range(len(best_all_pos)):
+        print(attacks_list[i]+' - '+str(best_all_pos[i]))
     
+    w = best_all_weights
+
+    print('sorting again - best all weights')
+
+    for i in range(len(all_rules)) :
+        all_rules_list[i] = sorted(all_rules_list[i], key=partial(callGetFitness, weights=w))
+
+        for x, rule in enumerate(all_rules_list[i]):
+            if rule.sid == 1099019:
+                golden_rule_pos[i] = all_rules_list[i].index(rule)
+            else:
+                rule.sid=x+1
+
+        current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
+
+        print(attacks_list[i]+' - '+str(current_pos[i]))
+
     i = 0
     for rule in best_rule_list:
         i += 1
@@ -1372,8 +1398,8 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-#sortMultipleAttacks()
-#exit()
+sortMultipleAttacks()
+exit()
 
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
 
