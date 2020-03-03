@@ -1589,7 +1589,7 @@ discuss threats to the validity of the
 experiments~(Section~\ref{sec:threats}).
 
 
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{table}[h!]
   \small
   \caption{\label{table:results}Results.}
@@ -1854,39 +1854,39 @@ that rule is ranked among the first top five rules in
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
 
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{5pt}
 \begin{table}[h!]
   \small
-  \caption{\label{table:results}Results.}
+  \caption{\label{table:results}Weights}
   \vspace{-2ex}
   \centering
   \begin{tabular}{lrrrrrr}
     \toprule
     Name &
-    Opt weights &
-    4.3.2 &
-    4.3.3 &    
-    4.3.4 &
-    4.3.5 \\ 
-    Black Nurse & 2 & 2 & 2 & 2 & 7 \\    
-    Ping Scan & 2 & 2 & 2 & 2 & 8 \\
+    Opt. &
+    -f2 &
+    -f3 &    
+    -f4 &
+    -f5 \\ 
+    Black Nurse & 2 & 2 & 2 & 2 & 7$\uparrow$ \\    
+    Ping Scan & 2 & 2 & 2 & 2 &  8$\uparrow$\\
     SYN Flood & 2 & 2 & 2 & 2 & 2 \\
     UDP Teardrop & 4 & 4 & 4 & 4 & 4 \\
     %%UDP Flood & - & - & - & - & - \\
 
 
     %%Apache Struts 2 & - & - & - & - & - & -\\
-    ColdFusion & 3 & 2 & 12 & 5 & 3 \\
-    iisadmin access & 1 & 1 & 1 & 8 & 1 \\        
-    JBoss JMX & 45 & 5 & 45 & 111 & 45 \\
-    Script tag in URI & 1 & 4 & 1 & 8 & 1 \\
-    WeBid LFI & 10 & 77 & 28 & 32 & 10 \\    
+    ColdFusion & 3 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ & 3 \\
+    iisadmin access & 1 & 1 & 1 & 8$\uparrow$ & 1 \\        
+    JBoss JMX & 45 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ & 45 \\
+    Script tag in URI & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ & 1 \\
+    WeBid LFI & 10 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ & 10 \\    
     %%Wordpress Login & 8 & - & - & - & - \\
-    .htaccess access & 2 & 2 & 2 & 17 & 2 \\
-    .idq access & 2 & 2 & 2 & 12 & 2 \\
-    /system32/ in URI & 4 & 20 & 1 & 58 & 4 \\
-    Basebuilder LFI & 34 & 117 & 57 & 183 & 34 \\
-    Tomcat Snoop Access & 32 & 828 & 2 & 2564 & 32 \\
+    .htaccess access & 2 & 2 & 2 & 17$\uparrow$ & 2 \\
+    .idq access & 2 & 2 & 2 & 12$\uparrow$ & 2 \\
+    /system32/ in URI & 4 & 20$\uparrow$ & 1\cellcolor{lightgray}$\downarrow$ & 58$\uparrow$ & 4 \\
+    Basebuilder LFI & 34 & 117$\uparrow$ & 57$\uparrow$ & 183$\uparrow$ & 34 \\
+    Tomcat Snoop Access & 32 & 828$\uparrow$ & 2\cellcolor{lightgray}$\downarrow$ & 2564$\uparrow$ & 32 \\
     \bottomrule
   \end{tabular}
 \end{table}
