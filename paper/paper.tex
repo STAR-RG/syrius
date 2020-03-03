@@ -301,7 +301,35 @@ exploit systems. For example, Figure~\Fix{plot} shows the increase in
 number of rules added to the ``Emerging Threats Open Ruleset''---a
 popular public data set of \suri\ rules---in the past 12 months.
 
-\Fix{add figure here}
+\begin{wrapfigure}[9in]{r}{0.22\textwidth}
+    \vspace{-2ex}  
+    \centering
+    \scalebox{0.9}{  
+      \begin{tikzpicture}
+        \begin{axis}[
+            width = 0.3\textwidth,
+            height = 0.2\textwidth,            
+            bar width=4pt,
+            scaled ticks=false,
+            ymajorticks=false,
+            ybar stacked,
+            enlargelimits=0.05,
+            clip=true,
+            legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+            xtick=data,
+            xticklabel style={rotate=45, font=\tiny},
+            tick pos=left,
+            nodes near coords,
+            every node near coord/.append style={font=\tiny},
+            nodes near coords align={vertical},
+            symbolic x coords={Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec},]
+            \addplot coordinates {(Jan, 114) (Feb, 155) (Mar, 117) (Apr, 159) (May, 110) (Jun, 231) (Jul, 122) (Aug, 167) (Sep, 107) (Oct, 225) (Nov, 148) (Dec, 127)};
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \vspace{-3ex}
+    \caption{\label{fig:distribution-rules-per-month}2019 new rules.}
+\end{wrapfigure}% <---- don't forget this %
 
 Intuitively, rulesets need to be constantly revised to protect a
 system against attackers. Unfortunately, creating these rules is
@@ -1196,33 +1224,7 @@ bar width=4pt,
 \caption{Distribution of features.}
 \end{figure}
 
-\begin{figure}
-    \centering
-    \scalebox{1.5}{  
-      \begin{tikzpicture}
-        \begin{axis}[
-bar width=4pt,
-            scaled ticks=true,
-            ymajorticks=false,
-            ybar stacked,
-            enlargelimits=0.08,
-    %          enlargelimits=false,
-    %          axis equal,
-            clip=false,
-            legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-            xtick=data,
-            xticklabel style={rotate=45, font=\tiny},          
-            nodes near coords,
-            every node near coord/.append style={font=\tiny},
-            nodes near coords align={vertical},
-            symbolic x coords={Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec},]
-            \addplot coordinates {(Jan, 114) (Feb, 155) (Mar, 117) (Apr, 159) (May, 110) (Jun, 231) (Jul, 122) (Aug, 167) (Sep, 107) (Oct, 225) (Nov, 148) (Dec, 127)};
-        \end{axis}
-      \end{tikzpicture}
-    }
-    \vspace{-1ex}
-    \caption{\label{fig:distribution-rules-per-month}Rules per month - 2019.}
-\end{figure}% <---- don't forget this %
+
 
 \subsubsection{Number of content options.} We observed
 that \percContentOptions\ of the rules from the ruleset we are
