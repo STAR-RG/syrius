@@ -1506,11 +1506,9 @@ rule, the aggregated contribution of this heuristic function would be
     Black Nurse & \cite{pcap-attacks} & DoS & ICMP & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
     Ping Scan & \cite{netmap} & AREC & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
     SYN Flood & \cite{hping3} & DoS & TCP & \textbf{flags}: S,12;
-    \textbf{threshold}: type both, track by\_dst, count 5000, seconds
-    5;\\
+    \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
     UDP Teardrop & \Fix{WireShark} & DoS & UDP & \textbf{fragbits}:M; \textbf{id}:124; \\
-    %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds
-    5; \\
+    %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
     \midrule
     %%Apache Struts 2 & \cite{wrccdc} & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
     ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
@@ -1522,6 +1520,7 @@ rule, the aggregated contribution of this heuristic function would be
     .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
     /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
+    Basebuilder LFI & \cite{nikto} & LFI & HTTP & \textbf{content}:"GET"; http\_method; \textbf{content}:"/main.inc.php?"; nocase; http\_uri; \textbf{content}:"mj\_config[src\_path]="; nocase; http\_uri; \\
     Tomcat server snoop access & \cite{nikto} & AREC & HTTP & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
     \bottomrule
   \end{tabular}
