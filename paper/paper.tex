@@ -292,14 +292,16 @@ industry~\cite{proofpoint-etpro,snort-rule-subscriptions}. A
 set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
 of Suricata~\cite{suricata}, a popular open-source \nids{}. This
 particular rule prescribes a method to capture an Active
-Reconnaissance attack for discovering which ports of a publicly
-accessible machine are open for connection (see
+Reconnaissance attack for discovering IPS of hosts in a network (see
 Section~\ref{sec:active-recon}). Rulesets exist for Snort~\cite{snort}
 and Suricata~\cite{suricata}, providing protection against existing
 attacks. Unfortunately, attackers actively look for new mechanisms to
-exploit systems. For example, Figure~\Fix{plot} shows the increase in
-number of rules added to the ``Emerging Threats Open Ruleset''---a
-popular public data set of \suri\ rules---in the past 12 months.
+exploit systems. For example,
+Figure~\ref{fig:distribution-rules-per-month} shows the number of
+rules added per month in the year of 2019 to the ``Emerging Threats
+Open Ruleset'', a popular public data set of \suri\ rules. We used the
+``creation-date'' field associated with each entry in the ruleset. The
+data provides some evidence that new rules are created often.
 
 \begin{wrapfigure}[9in]{r}{0.22\textwidth}
     \vspace{-2ex}  
@@ -347,8 +349,10 @@ This paper proposes \tname{}\footnote{Abbreviation for
 technique that uses machine intelligence to automatically synthesize
 rules for rule-based \nids. Our goal is to facilitate the creation of
 rules and, consequently, help system administrators to harden the
-protection of \nids\ to network attacks. \tname{} synthesizes rules
-from malicious and benign traffic and from examples of correct rules.
+protection of \nids\ to network attacks. \tname{} synthesizes rules to
+protect against a given attack from 1) malicious traffic (\ie{},
+examples of the attack to protect against), 2) benign traffic, and 3)
+trusted rules.
 
 \Fix{
 denial-of-service
