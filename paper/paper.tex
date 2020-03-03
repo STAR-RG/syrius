@@ -834,12 +834,14 @@ for minimal rules.
 \algnewcommand\And{\textbf{and} }%
 \setlength{\textfloatsep}{3pt}% Remove \textfloatsep
 \begin{algorithm}[t!]
-  \noindent\hspace{-25ex}
-  \textbf{INPUT:} (overconstrained) seed rule $sr$ \\
+  \noindent\hspace{-2ex}
+  \textbf{INPUT:} (overconstrained) seed rule $sr$, bening traffic
+  $\mathit{bT}$, malli-\\
+  cious traffic $\mathit{mT}$ \\
   \noindent\hspace{-27.5ex} 
   \textbf{OUTPUT:} Set of minimized rules $\mathcal O$\\
 %\vspace{-3ex}
-\captionof{algorithm}{Minimization algorithm}\label{algo1}
+\captionof{algorithm}{Rule creation algorithm}\label{algo1}
 \begin{algorithmic}[1]
   \State $\mathcal R \gets \{\mathit{sr}\}$\Comment{initial population
     of candidate solutions contains only the input
@@ -852,7 +854,7 @@ for minimal rules.
                \State $r \gets copy(ro)$\label{copy}
                \State $j\gets \mathit{rand}(0,\mathit{len}(r))$\label{choose-index}
                \State $r[j]\gets 0$\Comment{discard option $j$ in $r$}\label{delete-option}
-               \If{$\mathit{isNew(r)} \And\mathit{isPlausible}(r)$} 
+               \If{$\mathit{isNew(r)} \And\mathit{isPlausible}(r, bt)$} 
                    \State $\mathcal R' \gets \mathcal R' \cup \{r\}$\label{line-progress}
                \EndIf
            \EndFor\label{end-for}
