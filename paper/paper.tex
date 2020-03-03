@@ -1852,6 +1852,43 @@ that rule is ranked among the first top five rules in
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
 
+\setlength{\tabcolsep}{3pt}
+\begin{table}[h!]
+  \small
+  \caption{\label{table:results}Results.}
+  \vspace{-2ex}
+  \centering
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    Name &
+    Opt weights &
+    4.3.2 &
+    4.3.3 &    
+    4.3.4 &
+    4.3.5 \\ 
+    Black Nurse & 2 & 2 & 2 & 2 & 7 \\    
+    Ping Scan & 2 & 2 & 2 & 2 & 8 \\
+    SYN Flood & 2 & 2 & 2 & 2 & 2 \\
+    UDP Teardrop & 4 & 4 & 4 & 4 & 4 \\
+    %%UDP Flood & - & - & - & - & - \\
+
+
+    %%Apache Struts 2 & - & - & - & - & - & -\\
+    ColdFusion & 3 & 2 & 12 & 5 & 3 \\
+    iisadmin access & 1 & 1 & 1 & 8 & 1 \\        
+    JBoss JMX & 45 & 5 & 45 & 111 & 45 \\
+    Script tag in URI & 1 & 4 & 1 & 8 & 1 \\
+    WeBid LFI & 10 & 77 & 28 & 32 & 10 \\    
+    %%Wordpress Login & 8 & - & - & - & - \\
+    .htaccess access & 2 & 2 & 2 & 17 & 2 \\
+    .idq access & 2 & 2 & 2 & 12 & 2 \\
+    /system32/ in URI & 4 & 20 & 1 & 58 & 4 \\
+    Basebuilder LFI & 34 & 117 & 57 & 183 & 34 \\
+    Tomcat Snoop Access & 32 & 828 & 2 & 2564 & 32 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
 
