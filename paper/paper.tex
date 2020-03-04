@@ -205,6 +205,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
+  \Fix{revise}
 Network Intrusion Detection Systems (\nids{}) are a popular mechanism
 used by system administrators to defend against network attacks. These
 systems monitor the network traffic and flag suspicious network
@@ -265,7 +266,11 @@ set of attacks. Results indicate that \Fix{...}
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{\nids, synthesis, search}
+% \keywords{\nids, synthesis, search}
+
+%% remove on camera-ready
+\settopmatter{printacmref=false}
+
 
 %% This command processes the author and affiliation and title
 %% information and builds the first part of the formatted document.
@@ -304,33 +309,35 @@ Open Ruleset'', a popular public data set of \suri\ rules. We used the
 ``creation-date'' field associated with each entry in the ruleset. The
 data provides some evidence that new rules are created often.
 
-\begin{wrapfigure}[9in]{r}{0.22\textwidth}
-    \vspace{-2ex}  
+\begin{wrapfigure}[8in]{r}{0.24\textwidth}
+    \vspace{-5ex}  
     \centering
     \scalebox{0.9}{  
       \begin{tikzpicture}
         \begin{axis}[
+%            label style={font=\scriptsize},
+%            tick label style={font=\scriptsize}
             width = 0.3\textwidth,
             height = 0.2\textwidth,            
             bar width=4pt,
             scaled ticks=false,
             ymajorticks=false,
             ybar stacked,
-            enlargelimits=0.05,
+            enlargelimits=0.09,
             clip=true,
             legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
             xtick=data,
-            xticklabel style={rotate=45, font=\tiny},
+            xticklabel style={rotate=45, font=\footnotesize},
             tick pos=left,
             nodes near coords,
-            every node near coord/.append style={font=\tiny},
+            every node near coord/.append style={font=\footnotesize},
             nodes near coords align={vertical},
             symbolic x coords={Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec},]
             \addplot coordinates {(Jan, 114) (Feb, 155) (Mar, 117) (Apr, 159) (May, 110) (Jun, 231) (Jul, 122) (Aug, 167) (Sep, 107) (Oct, 225) (Nov, 148) (Dec, 127)};
         \end{axis}
       \end{tikzpicture}
     }
-    \vspace{-3ex}
+    \vspace{-4ex}
     \caption{\label{fig:distribution-rules-per-month}2019 new rules.}
 \end{wrapfigure}% <---- don't forget this %
 
