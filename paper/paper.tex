@@ -582,7 +582,7 @@ values from a single message.
 
 \section{Illustrative Example}
 \label{sec:suri-metas-coverage}
-\label{sec-:active-recon}
+\label{sec:active-recon}
 
 This section briefly shows how \tname{} synthesizes rules for one
 example attack. Active Reconnaissance is typically used as a
@@ -699,58 +699,63 @@ existing rules to learn heuristics to rank plausible rules.
 \section{Technique}
 \label{sec:technique}
 
-\tname{} is a technique to synthesize rules for signature-based
+\tname{} is a technique to synthesize rules for rule-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
-goal is to create rules that capture \emph{only} the
+goal is to automatically create rules that capture \emph{only} the
 malicious traffic.
 
 \vspace{1ex}
-\noindent\textbf{Overview.}~To create rules, \tname\ leverages (1)
-benign and malicious network traffic and (2) rules from public
-rulesets. \tname\ takes on input malicious and benign traffic and a
-set of rules from public rulesets and produces on output a list of
+\noindent\textbf{Overview.}~\tname\ takes on input one or more
+examples of attacks and produces on output a ranked list of
 \emph{plausible rules}---\ie{}, rules that isolate the malicious
-traffic from the benign traffic---ranked in order of similarity with
-existing rules. Figure~\ref{fig:overview} shows the workflow of
-\tname{} as a pipeline of three components, which appear numbered in
-the figure.  Public data sets of benign
-traffic~\cite{tcpreplay,stratosphere-normal} and \nids\ rules
+traffic produced by the attacks from the benign
+traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
+pipeline of three components, appearing numbered in the figure.
+Public data sets of benign
+traffic~\cite{tcpreplay,stratosphere-normal} and rules
 exist~\cite{emerging-threats-open}. Consequently, a user of \tname{}
-only needs to provide the malicious traffic on input.
+only needs to provide examples of attacks on input.
 
-\begin{figure}[h!]
+%% To create rules, \tname\ leverages (1)
+%% benign and malicious network traffic and (2) rules from public
+%% rulesets. 
+
+\begin{figure}[t!]
   \centering
   \includegraphics[trim=0 395 50 0,clip,width=0.48\textwidth]{figs/nids-workflow}
+  \vspace{-4ex}  
   \caption{The \tname\ workflow.\Mar{revisar}}
   \label{fig:overview}
-  \vspace{-2ex}
+  \vspace{-3ex}
 \end{figure}
 
-\tname\ works as follows. First, it produces a rule that captures the
-malicious traffic. In this step, \tname\ detects options directly from
-the input messages (see Section~\ref{sec:rules-and-packets}). More
-precisely, it produces a rule containing all possible options
-satisfied by the traffic. Let us refer to that rule as the \emph{seed
-  rule} and its corresponding set of options as \emph{seed
-  options}. Note that, as only the malicious traffic is considered in
-this step, the seed rule is likely overspecified, \ie{}, it may be
-more restrictive than the golden rule. Consequently, the use of that
-rule could result in false negatives. Second, \tname\ generates
-alternative rules that 1) weaken the constraints expressed in the seed
-rule while 2) still capturing the malicious traffic. Given that every
-option declared in a rule needs to be satisfied for a rule to capture
-an attack, any subset of the set of seed options, by definition,
-captures the attack characterized by the malicious traffic. \tname{}
-leverages that observation to search for rules containing a proper
-subset of options from the seed options. However, note that that
-approach alone could result in false positives as it imposes no limit
-on to what extent a rule can be relaxed. \tname{} uses benign traffic
-for that purpose. More precisely, it uses a gradient descent-like
-search to find plausible rules derived from the seed rule, obtained in
-the previous step. Finally, \tname{} uses several heuristic functions
-derived from a data set of existing rules to rank the generated
-plausible rules by their similarity with existing rules. Similarity is
-used to approximate user's intent.
+\tname\ works as follows. First, it creates a rule that captures the
+malicious traffic produced by the examples provided on input. In this
+step, \tname\ detects options directly from the input messages (see
+Section~\ref{sec:rules-and-packets}). More precisely, it creates a
+rule containing options that are guaranteed to be satisfied by the
+malicious traffic. Let us refer to that rule as the \emph{seed rule}
+and its corresponding set of options as \emph{seed options}. Note
+that, as only the malicious traffic is considered in this step, the
+seed rule is likely overspecified, \ie{}, it may be more restrictive
+than the golden rule. Consequently, the use of that rule could result
+in false negatives. Second, \tname\ generates alternative rules that
+1) weaken the constraints expressed in the seed rule while 2) still
+capturing the malicious traffic. Given that every option declared in a
+rule needs to be satisfied for a rule to capture an attack, any subset
+of the set of seed options, by definition, captures the attack
+characterized by the malicious traffic. \tname{} leverages that
+observation to search for plausible rules containing a proper subset
+of options from the seed options. However, note that that approach
+alone could result in false positives as it imposes no limit on to
+what extent a the constraints induced from the rule can be
+weakened. \tname{} uses benign traffic for that purpose. More
+precisely, it searches for plausible rules derived from the seed rule
+obtained in the previous step. Finally, \tname{} uses heuristic
+functions obtained from a data set of existing rules to rank the
+generated plausible rules by their similarity to existing
+rules. Similarity is used to approximate user's intent. The following
+sections detail each component of \tname.
 
 %%  As the generation
 %% procedure discards options from the initial rule, the rules \tname{}
@@ -778,36 +783,35 @@ used to approximate user's intent.
 \subsection{Step 1: Reverse Engineering}
 \label{sec:reverse-engineering}
 
-The first step in the \tname's workflow is Reverse Engineering. The
-goal of this step is to extract options from the malicious
-traffic. Consequently, a rule that contains these options captures the
-malicious traffic. \tname\ uses different strategies to extract
-options based on the protocol detected in the input traffic: 1)~the
+The goal of the Reverse Engineering step is to extract options from
+the malicious traffic produced by the input example attacks. A rule
+that contains these options captures the malicious traffic by
+construction. \tname\ uses two strategies to extract options: 1)~the
 field strategy applies to any protocol and 2)~the payload strategy
-applies only to http. We elaborate these strategies in the following.
+applies only to http.  The decision of which strategy to use is based
+on the protocol associated with input traffic--the technique uses the
+payload strategy if http is detected; otherwise, it uses the field
+strategy. We elaborate these strategies in the following.
 
 For the field strategy, \tname{} parses the input messages looking for
-options associated with the network message field
-data. Section~\ref{sec:rules-and-packets} shows the correspondence
-between packet fields and some of the rule options from \suri and
-Section~\ref{sec:active-recon} shows a concrete example where the
-values for options are directly extracted from the fields of
-messages. We obtained the option-field mapping manunually, from the
-\suri\ documentation.
+options associated with the data in the fields of
+messages. Section~\ref{sec:rules-and-packets} shows the correspondence
+between packet fields and some of the rule options from \suri\ and
+Section~\ref{sec:active-recon} shows a concrete example illustrating a
+case of this strategy. We obtained the option-field mapping
+manunually, from the \suri\ documentation.
 
 Unfortunately, the relevant data for the option may be at the message
-payload; not the fields. We found empirically that this occurs
-frequently in http attacks, which are prevalent. For example,
-\percHttp\ of the \numrulessuri{} rules from a public data
-set~\cite{emerging-threats-open} we analyzed prescribe defenses
-against http attacks and the majority of these rules use content
-options. Figure~\ref{fig:rule-jboss} shows an example of a rule that
-captures traffic containing the string \CodeIn{"/HtmlAdaptor"} in the
-payload.  Content options are very common in http
-rules---\percRulesWithContent{} of the rules from the data set
-mentioned above contain at least one content
-option. Figure~\ref{fig:distribution-contents} shows the distribution
-of number of content options per rule for the data set mentioned
+payload; not the fields. By analyzing our data set of rules, we found
+that this occurs frequently in http attacks, which are prevalent. For
+example, \percHttp\ of the \numrulessuri{} rules from the ruleset we
+analyzed~\cite{emerging-threats-open} prescribe defenses against http
+attacks. In addition, \percRulesWithContent{} of these rules contain
+at least one content option. Figure~\ref{fig:rule-jboss} shows an
+example of a rule that captures traffic containing the string
+\CodeIn{"/HtmlAdaptor"} in the payload.
+Figure~\ref{fig:distribution-contents} shows the distribution of
+number of content options per rule for the data set mentioned
 above. We limited the number of content options per rule to 10 in the
 histogram for space. \MyComment{Rules without \CodeIn{content} options
   are an exception and half of the rules contain at least two
@@ -815,17 +819,18 @@ histogram for space. \MyComment{Rules without \CodeIn{content} options
 http is very important.
 
 The content strategy focuses on extracting content options from the
-message payload. Inspecting existing rules, we found that these
-options refer, in the payload, to sequences of characters separated by
-typical natural language delimiters such as $\backslash$t,
-$\backslash$n, $\backslash$r, and spaces. To find the values
-associated with these options, \tname{} splits the payload of the
-malicious message in tokens using these delimiters.  Considering the
-example from Section~\ref{sec:content-example}, \tname{} produced a
-total of 23 tokens, considered content option candidates.
+message payload. By inspecting existing rules, we found that these
+options refer to sequences of characters separated by typical natural
+language delimiters such as $\backslash$t, $\backslash$n,
+$\backslash$r, and spaces. To find the values associated with these
+options, \tname{} splits the payload in tokens using these delimiters.
+Considering the example from Section~\ref{sec:content-example},
+\tname{} produced a total of 23 tokens\Mar{@Lucas, isto estah certo?
+  Se sim, como isto cai para 5 (pela Tabela 3)}, considered content
+option candidates.
 
-It is worth noting that we found empirically that deciding which
-reverse engineering strategy to use based on the protocol of the input
+It is worth noting that we found that deciding which reverse
+engineering strategy to use based on the protocol of the input
 (malicious) messages was effective. We used the payload strategy for
 http and the field strategy for the other protocols. For flooding
 attacks, \tname\ runs the same approach for each message and
