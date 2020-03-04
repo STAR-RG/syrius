@@ -422,32 +422,34 @@ principles we used are general to any other signature-based
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
 
-Figure~\ref{fig:synflood-example} shows an example rule of
+Figure~\ref{fig:pingscan-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
-the Open Information Security Foundation (OISF)~\cite{oisf}.
-A Suricata rule is divided in three parts---action, header, and rule
-options~\cite{suri-rule-format}. The action part appears as the first
-word in the rule description. An action denotes the task that needs to
-be executed if the rule pattern is satisfied.  In this example, a
-message will be sent to system administrators if the rule pattern is
+the Open Information Security Foundation (OISF)~\cite{oisf}.  A
+Suricata rule is divided in three parts---action, header, and rule
+options~\cite{suri-rule-format}. The \emph{action} appears as the
+first word in the rule description (an \CodeIn{alert}, in this
+case). An action denotes the task that needs to be executed if the
+rule pattern is satisfied.  In this example, an alert message will be
+sent to system administrators if the rule pattern is
 satisfied\footnote{Technically, an IPS (Intrusion Prevention System)
   differs from an IDS in the action taken when an intrusion is
-  observed. IPS systems block malicous traffic. However, IDS and IPS
-  do not differ in the approaches that can be used to detect the
-  intrusion~\cite{ids-ips}.\Mar{check}}. The header comes after the action in the rule
-description. It restricts the information flow covered by the
-rule. The header of this rule is \CodeIn{icmp any any -> any
-  any}. It instructs Suricata to inspect \CodeIn{icmp} traffic flowing
-from any machine and port to any machine and port.\MyComment{ The variables
-\CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are
-configurable.} The rule options come after the header. It is a
-semi-colon-separated sequence of key-value pairs. Rule options serve
-to document the analyzed traffic (\eg{}, ``msg'', ``classtype'', and
-``sid'') and to characterize the attack pattern (\eg, ``flags'',
-``threshold'', and ``content''). \tname{} produces options of the
-second kind, which are \emph{relevant} to capture the attack. For
-example, the option \CodeIn{content:<arg>} checks if the argument is
-present in the payload of the message.
+  observed. IPS systems block malicous traffic whereas IDS system only
+  alert them. However, IDS and IPS do not differ in the approaches
+  used to detect the intrusion~\cite{ids-ips}.\Mar{check}}. The
+\emph{header} comes after the action in the rule description. It
+restricts the information flow covered by the rule. The header of this
+rule is \CodeIn{icmp any any -> any any}. It instructs Suricata to
+inspect \CodeIn{icmp} traffic flowing from any machine and port to any
+machine and port.\MyComment{ The variables \CodeIn{\$HOME\_NET} and
+  \CodeIn{\$EXTERNAL\_NET} are configurable.} Finally, \emph{rule
+  options} come after the header. It is a semi-colon-separated
+sequence of key-value pairs. Rule options serve to document the
+analyzed traffic (\eg{}, ``msg'', ``classtype'', and ``sid'') and to
+characterize the attack pattern (\eg, ``flags'', ``threshold'', and
+``content''). \tname{} produces options of the second kind, which are
+\emph{relevant} to capture the attack. For example, the option
+\CodeIn{content:<arg>} checks if the argument is present in the
+payload of the message.
 
 \vspace{-1ex}
 \begin{table}[h!]
