@@ -42,6 +42,7 @@
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usetikzlibrary{matrix,fit,shapes,calc,positioning,shadows,arrows,shapes,backgrounds,decorations.markings,fadings}
+\usepgfplotslibrary{statistics}
 \usepackage{listings}
 %\usepackage[caption=false, font=footnotesize]{subfig}
 \renewcommand{\ttdefault}{pcr}
@@ -831,7 +832,7 @@ the malicious traffic.
 %% }
 
 
-\subsection{Step 2: Rule Creation}
+\subsection{Step 2: Rules Creation}
 \label{sec:minimization}
 
 The seed rule produced in the first step satisfies the criterion to
@@ -1571,8 +1572,8 @@ Section~\ref{sec:ranking}). It is therefore important to understand
 the extent to which each function contributes to the overall
 performance of the technique.
 
-\newcommand{\textRQthree}{How important are the benign and
-  malicious traffic to \tname's performance?}
+\newcommand{\textRQthree}{How sensitive \tname\ is to the amount of
+  positive examples?}
 \vspace{0.2cm}
 \begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ3.}} \textRQthree\
@@ -1858,16 +1859,36 @@ that rule is ranked among the first top five rules in
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
 
+This section evaluates the importance of each proposed heuristic
+function. More precisely, we evaluated the use of \tname{} without
+each of those functions with the goal of checking whether or not each
+of them contributes to the overall performance of the technique. We
+conducted that experiment by assigning the weight of the corresponding
+function to zero---effectively, disabling the function---and comparing
+the result with \tname\ using default weights, obtained with the
+procedure described on Section~\Fix{xxx}.
+
+
+Table~\ref{table:weights} shows results. Column ``Name'' shows the
+name of the attack and column ``All'' shows the result of \tname\ with
+all heuristic functions enabled (same as column ``Rank (step 3)'' from
+Table~\Fix{xxx}). The remaining columns show results supressing one
+heuristic function. An up arrow indicates that, considering that
+particular data point, the performance of \tname{} on that
+configuration is worse when compared to \tname's default
+configuration. A down arrow, appearing highlighted in the table,
+indicates the contrary.
+
 \setlength{\tabcolsep}{5pt}
 \begin{table}[h!]
   \small
-  \caption{\label{table:results}Weights}
+  \caption{\label{table:weights}Contribution of heuristic functions.}
   \vspace{-2ex}
   \centering
   \begin{tabular}{lrrrrrr}
     \toprule
     Name &
-    Opt. &
+    All &
     -f2 &
     -f3 &    
     -f4 &
@@ -1895,8 +1916,100 @@ that rule is ranked among the first top five rules in
   \end{tabular}
 \end{table}
 
+Note that the number of up arrows is relatively high and the magnitude
+of the degradation can be very high in some cases. Basebuilder and
+Tomcat are two cases where results get much worse when supressing one
+of the functions. Also note that the number of down arrows is
+relatively small. Recall that the optimization of weights looks for
+global optimum and cannot avoid those cases. Finally, note that every
+function contributed. Some functions contributed in more cases than
+others, namely \Fix{xxx}, and one of the functions, namely \Fix{xxx},
+only contributed to the performance of \tname{} on attacks involving
+non-http protocols.
+
+
+\begin{center}
+\begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
+..........................
+\end{tcolorbox}
+\end{center}
+
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
+
+This section evaluates sensitivity of \tname{} to the number of
+attacks provided on input. Recall that \tname\ uses one example attack
+to generate the seed rule (at the Reverse Engineering step) and the
+remaining attacks to evaluate soundness of the rule (at the Rules
+Creations step). It is expected that the number and variety of
+attacks---of the same kind---plays an important role in the
+performance of the technique. To answer this research question, we
+selected the cases with the highest number of examples of attacks (see
+coolumn ``\#~Vars'' on Table~\ref{table:results}), varied the number of
+examples, and measured the position of the golden rule at the
+rank. For each number of variants $N$, we sampled five sets of size
+$N$ to provide as input to the technique.
+x
+
+\Mar{coloquem os numeros aqui para que eu gere o boxplot amanha,
+  depois da aula. 
+
+  *** posicao no ranking (numeros artificais. por favor, substituam) ***
+
+  ataque 1:
+
+    1 variacao:  10, 20, 4, 2, 5
+
+    5 variacoes: 5, 4, 4, 2, 3
+
+    10 variacoes: 1, 2, 1, 2, 1
+
+    (ate numero de variacoes que aparece na Tabela 3)
+
+    
+  ataque 2:
+     ...
+
+}
+
+%% \pgfplotsset{
+%%   box plot width/.initial=0.5em
+%% }
+%% \begin{tikzpicture}
+%%   \begin{axis}
+%%     [
+%%     ytick={1,2,3},
+%%     yticklabels={Index 0, Index 1, Index 2},
+%%     ]
+%%     \addplot+[
+%%     boxplot prepared={
+%%       median=1,
+%%       upper quartile=1.2,
+%%       lower quartile=0.4,
+%%       upper whisker=1.5,
+%%       lower whisker=0.2
+%%     },
+%%     ] coordinates {};
+%%     \addplot+[
+%%     boxplot prepared={
+%%       median=2,
+%%       upper quartile=2.3,
+%%       lower quartile=1.5,
+%%       upper whisker=2.7,
+%%       lower whisker=1
+%%     },
+%%     ] coordinates {};
+%%     \addplot+[
+%%     boxplot prepared={
+%%       median=0.7,
+%%       upper quartile=1.4,
+%%       lower quartile=0.5,
+%%       upper whisker=1.9,
+%%       lower whisker=0.1
+%%     },
+%%     ] coordinates {};
+%%   \end{axis}
+%% \end{tikzpicture}
 
 
 \subsection{Threats to Validity}
