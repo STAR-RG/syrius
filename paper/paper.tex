@@ -395,28 +395,28 @@ This paper makes the following contributions.
 \section{Network Intrusion Detection Systems (\nids)}
 \label{sec:background}
 
+This section presents background used in the next sections.
+
 \subsection{Rule-based and Anomaly-based \nids}
 
 \sloppy \nids{} are typically categorized in two
-groups~\cite{kumar2007survey}: rule-based (see
-Section~\ref{sec:intro}) and anomaly-based \nids. An
-\emph{anomaly-based intrusion detector} learn usage behavior from
-benign traffic and, based on that, alert uncommon
+groups~\cite{kumar2007survey}: rule-based, as briefly described on
+Section~\ref{sec:intro}, and anomaly-based \nids. An
+\emph{anomaly-based intrusion detector} learns usage behavior from
+benign traffic and, based on that, alerts uncommon
 behavior~\cite{7579764,kumar2007survey,Mitchell:2014:SID:2597757.2542049,cordy-etal-issta19}. More
 precisely, an anomaly-based \nids{} flags an attack when the network
 traffic manifests different characteristics compared to those of the
-benign traffic.
-
-Rule-based \nids\ can miss attacks as rulesets can become outdated
-whereas anomaly-based \nids\ can report false alarms as learning
-algorithms that generalize observations from bening traffic are
-approximate. To sum up, rule-based \nids{} and anomaly-based \nids{}
-are complementary---a rule-based \nids{} focuses on known attacks
-whereas anomaly-based \nids{} focuses on unknown potential attacks.
+benign traffic. Rule-based \nids{} and anomaly-based \nids{} are
+complementary. A rule-based \nids{} focuses on known attacks whereas
+anomaly-based \nids{} focuses on unknown potential attacks. Rule-based
+\nids\ can miss attacks as rulesets can become obsolete whereas
+anomaly-based \nids\ can report false alarms as learning algorithms
+that generalize observations from bening traffic are approximate.
 This paper focuses on rule-based \nids\ for its tremendous popularity
-in industry. Although we focused on the Suricata \nids, the principles
-we used are general to any other signature-based \nids~(\eg{},
-Snort~\cite{snort}).
+in industry\Fix{cite or tone down}. Although we used Suricata, the
+principles we used are general to any other signature-based
+\nids~(\eg{}, Snort~\cite{snort}).
 
 
 \subsection{Suricata Rules}
