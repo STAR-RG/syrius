@@ -305,9 +305,10 @@ attacks. Unfortunately, attackers actively look for new mechanisms to
 exploit systems. For example,
 Figure~\ref{fig:distribution-rules-per-month} shows the number of
 rules added per month in the year of 2019 to the ``Emerging Threats
-Open Ruleset'', a popular public data set of \suri\ rules. We used the
-``creation-date'' field associated with each entry in the ruleset. The
-data provides some evidence that new rules are created often.
+Open Ruleset''~\cite{emerging-threats-open}, a popular public data set
+of \suri\ rules. We used the ``creation-date'' field associated with
+each entry in the ruleset. The data provides some evidence that new
+rules are created often.
 
 \begin{wrapfigure}[8in]{r}{0.24\textwidth}
     \vspace{-5ex}  
@@ -449,7 +450,7 @@ characterize the attack pattern (\eg, ``flags'', ``threshold'', and
 ``content''). \tname{} produces options of the second kind, which are
 \emph{relevant} to capture the attack. For example, the option
 \CodeIn{content:<arg>} checks if the argument is present in the
-payload of the message.
+payload of a message.
 
 \vspace{-1ex}
 \begin{table}[h!]
@@ -479,14 +480,16 @@ payload of the message.
 Table~\ref{table:rules} shows a sample of non-documentation options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
 the name of the option, and column ``Description'' summarizes
-purpose. The option \CodeIn{content} is very common in rules to
-capture http attacks, which are the most common kind of rules. This
-option takes a sequence of bytes as argument (\eg{},
-\CodeIn{content:''SELECT ''}) and checks if that sequence is present
-in the payload of the message. Detailed description of the Suricata
-rules can be found elsewhere~\cite{suri-rule-format}. It is worth
-noting that Suricata supports a total of \totoptions\ distinct options
-covering \numproto\ distinct protocols.
+purpose. The option \CodeIn{content} is common in rules to capture
+http attacks and http rules are the most common in the Emerging
+Threats Open Ruleset~\cite{emerging-threats-open}. The content option
+takes a sequence of bytes as argument and checks if that sequence is
+present in the payload of the message.  For example, the option
+\CodeIn{content:''SELECT''} checks if the string ``SELECT'' is present
+in the payload.  Detailed description of the Suricata rules can be
+found elsewhere~\cite{suri-rule-format}. It is worth noting that
+Suricata supports a total of \totoptions\ distinct options covering
+\numproto\ distinct network protocols.
 
 
 %% A total of 9 of these options
@@ -535,27 +538,28 @@ covering \numproto\ distinct protocols.
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-Rule options are often associated with specific fields of network
-packets. Let's consider the ICMP protocol as an
-example. Figure~\ref{fig:icmp-packet-layout} shows the layout of an
-ICMP packet. The packet fields ``Flags'' and ``Time to Live'',
-declared in the IP header, are mapped to the options \CodeIn{flagbits}
-and \CodeIn{ttl}, respectively. Likewise, the fields ``Type'' and
-``Code'', declared in the ICMP header, are mapped to the options
-\CodeIn{itype} and \CodeIn{icode}. The values of the options ``ttl'',
-``itype'', and ``icode'' are the same as the value of the
-corresponding fields in the ICMP packet. For the field ``Flags'' the
-value of the corresponding option is encoded in a bitvector. For
-example, if the ``Flags'' field stores the value 1010, the
-corresponding rule option will be \CodeIn{flagbits:RM}, as each
+We mentioned above that http rules often used content options, which
+associate with the message payload. For non-http rules, options are
+often associated with packet fields. Let us consider a rule for an
+ICMP attack as example. Figure~\ref{fig:icmp-packet-layout} shows the
+layout of an ICMP packet. The packet fields ``Flags'' and ``Time to
+Live'', declared in the IP header, are mapped to the \suri\ options
+\CodeIn{flagbits} and \CodeIn{ttl}, respectively. Likewise, the fields
+``Type'' and ``Code'', declared in the ICMP header, are mapped to the
+options \CodeIn{itype} and \CodeIn{icode}, respectively. The values of
+the options ``ttl'', ``itype'', and ``icode'' are the same as the
+value of the corresponding fields in the ICMP packet. For the field
+``Flags'' the value of the corresponding option is encoded in a
+bitvector. For example, if the ``Flags'' field stores the value 1010,
+the corresponding rule option will be \CodeIn{flagbits:RM}, as each
 position of the vector encodes a different character in the
-\CodeIn{flagbits} rule option. The value of several options can be
-determined through transformation functions, as those described
-above. One exception to this is the option \CodeIn{threshold}, which
-is typically used in denial-of-service attacks. That option operates
-over sequence of messages as opposed to a single
-message. Consequently, it is not possible to determined its values
-from a single message.
+\CodeIn{flagbits} rule option. In summary, the value of several
+options can be determined through transformation functions, as those
+informally described above. One exception to this is the option
+\CodeIn{threshold}, which is typically used in denial-of-service
+attacks. That option operates over sequence of messages as opposed to
+a single message. Consequently, it is not possible to determine its
+values from a single message.
 
 \begin{figure}[t!]
 \centering
@@ -1109,7 +1113,8 @@ a rule with nine options.
           xtick=data,
 %          xticklabel style={rotate=45},          
           nodes near coords,
-          every node near coord/.append style={font=\tiny},
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           ]
@@ -1137,7 +1142,8 @@ bar width=4pt,
           xtick=data,
 %          xticklabel style={rotate=45},          
           nodes near coords,
-          every node near coord/.append style={font=\tiny},
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
           ]
@@ -1166,7 +1172,8 @@ bar width=4pt,
           xtick=data,
           xticklabel style={rotate=35},          
           nodes near coords,
-          every node near coord/.append style={font=\tiny},
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},          
         ]
@@ -1195,6 +1202,7 @@ bar width=4pt,
           xticklabel style={rotate=35},          
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           symbolic x coords={uri, header, method, user\_agent, host, connection, request\_line},          
         ]
@@ -1224,6 +1232,7 @@ bar width=4pt,
           xticklabel style={rotate=35},          
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
         ]
