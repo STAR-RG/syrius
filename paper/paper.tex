@@ -458,7 +458,7 @@ payload of a message.
   \caption{\label{table:rules}Example of non-documentation options of Suricata.}
   \vspace{-2ex}
   \centering
-  \begin{tabular}{clp{5.5cm}}
+  \begin{tabular}{clp{6cm}}
     \toprule
     \multicolumn{1}{c}{\#} & \multicolumn{1}{c}{Name} &  \multicolumn{1}{c}{Description}\\
     \midrule     
@@ -469,7 +469,7 @@ payload of a message.
     5 & icmp\_id & matches on specific ICMP id-values\\
     6 & window & checks the size of the TCP window\\
     7 & flags & matches on TCP flags\\
-    8 & fragbits & checks if the fragmentation or reserved bits are set in the IP header\\
+    8 & fragbits & checks if the frag. or reserved bits are set in the IP header\\
     9 & threshold & minimum threshold for a rule before it generates alerts\\
     10 & content & checks if argument is present on the payload\\
     \bottomrule
@@ -563,9 +563,10 @@ values from a single message.
 
 \begin{figure}[t!]
 \centering
-\includegraphics[scale=0.28]{figs/ICMP-packet-structure.png}
+\includegraphics[scale=0.27]{figs/ICMP-packet-structure.png}
 \vspace{-2ex}
 \caption{Layout of an ICMP packet.}
+\vspace{-2ex}
 \label{fig:icmp-packet-layout}
 \end{figure}
 %\vspace{-2ex}
