@@ -1364,9 +1364,9 @@ precisely, the contribution of content rarity is given by the
 following formula:
 
 {\small
-\vspace{-1ex}
+\vspace{-1.5ex}
 \[\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N\]
-\vspace{-1ex}
+\vspace{-0.5ex}
 }
 \noindent
 , where $\mathit{content_i}$ denotes the $i$th content in a given
@@ -1404,7 +1404,8 @@ cross) indicates a match (respectively, no match).
 \begin{figure}[t!]
 \centering
 \includegraphics[scale=0.5]{figs/http_header-example.png}
-\caption{\CodeIn{http\_header} example.}
+\vspace{-2ex}
+\caption{Content modifiers.}
 \label{fig:http-header-example}
 \end{figure}
 
@@ -1455,12 +1456,26 @@ of this heuristic function to the corresponding rule would be $0.2$
 the two content options mentioned aboved, the aggregated contribution
 of this heuristic function to the rule would be 0.35 (=(0.2+0.5)/2).
 
-\subsubsection{Optimization}
+\subsubsection{Weight Optimization}
 \label{sec:weight-optimization}
-
-
-
-\Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
+We optimized the weights of these heuristic functions as follows. We
+ran \tname{} using different combinations of weights on a sample of
+attacks and chose the combination that offered the best overall
+performance, which we computed with the sum of the rankings of the
+golden rule on each attack. The weight combination that led to the
+smaller sum of positions (of the golden rule) in the rakings was
+considered the best choice. We considered \emph{all} combinations of
+the following weights 0, 0.25, 0.5, 0.75, and 1. Given that we have
+four different functions and five possible weight values, we needed to
+run \tname{} on the sample of attacks for 625 (=$5^4$) times. In the
+end of the process, the weight combination $\langle{}x,y,z,w\rangle$
+was the best we found. \Mar{$\leftarrow$indique aqui quais foram os
+  pesos que a gente usar para cada funcao.} Although empirical results
+showed that this strategy results in good performance, we remain to
+evaluate other optimization strategies, such as evolutionary
+alternatives as AVM~\cite{10.1109/32.57624}, to find better weights.
+ 
+%\Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
 
 \setlength{\tabcolsep}{5pt}
