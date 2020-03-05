@@ -1045,7 +1045,8 @@ that is passed as parameter\Mar{isto realmente eh necessario? se sim,
   explique. me pareceu que o que vc. precisa ate aqui jah estaria no
   log do \suri}, 2)~replaying the negative benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
-check if any benign message was captured by the rule. It is worth
+check if any benign message was captured by the rule. \Mar{discuss
+  filter function.} It is worth
 noting that the benign traffic is stored in \emph{pcap}
 files~\cite{pcap} and Suricata can process those files very
 efficiently compared to analyzing network messages directly. Instead
@@ -1067,14 +1068,13 @@ Section~\ref{sec:objectanalysis-benign}).
 \tname{} uses a composition of heurisitic functions to sort the rules
 produced in the previous step. Each of these functions uses a
 different criterion to estimate how similar a created rule is to those
-from public rulesets~\cite{emerging-threats-open}. The
-intuition is that rules that look more similar to existing trusted
-rules rank higher and could catch the attention of a system
-administrator. The score of a rule is the weighted average across the
-values produced by each heuristic function. The codomain of each
-function ranges on the 0-1 interval. Hence, the score of a rule also
-ranges on the 0-1 interval. We describe in the following each of these
-heuristic functions.
+from public rulesets~\cite{emerging-threats-open}. The intuition is
+that rules that look more similar to existing trusted rules are more
+likely to be useful. The aggregated score of a rule is the weighted
+average across the values produced by each heuristic function. The
+codomain of each function ranges on the 0-1 interval. Hence, the score
+of a rule also ranges on the 0-1 interval. We describe in the
+following each of these heuristic functions.
 
 %% \Luc{atualmente eh uma
 %%   média simples e não ponderada ja q as funções tem o mesmo
@@ -1082,29 +1082,71 @@ heuristic functions.
 %%   para cada função, mas n sei quão prioritário eh isso comparado as
 %%   outras atividades que definimos.} $\sum{f_i}/|f_i|$.
 
-\subsubsection{Size of a rule}
-\label{sec:heuristic-size-of-rule}
-One element that \tname{} uses to measure similarity between a
-synthesized and a human-created rule is the size of the synthetic
-rule, \ie{}, the number of options it contains. Informally, rules with
-popular sizes score high whereas unpopular rules score
-low. Figure~\ref{fig:distribution-rule-size} shows the histogram of
-rule sizes for our rule data set. The x-axis shows the number of
-options included in a rule (up to 10) while the y-axis shows the
-number of rules with the corresponding number of options. Note that
-there are 11 rules with no options. These rules only use the header to
-signal a traffic as malicious. Also note that most rules have 2 to 6
-options. \tname{} values rules in that size range higher compared to
-other sizes. We calculate the contribution of size of a given rule
-$r$ with the following formula $\mathit{rules\_per\_size}[\mathit{len(r)}]/\mathit{max(rules\_per\_size)}$, where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
-$\mathit{rules\_per\_size}$ encodes the distribution of sizes as a
-dictionary mapping sizes to number of associated rules, and
-$\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
-for any dictionary entry as to normalize the measurement in the 0-1
-range. Consequently, the contribution of size is proportional to its
-popularity. The contribution of this heuristic would be 0.684
-(=3,662/5,353) to a rule with three options and 0.028 (=154/5,353) to
-a rule with nine options.
+%% Note that there are 11 rules with no
+%% options. These rules only use the header to signal a traffic as
+%% malicious. Also note that most rules have 2 to 6 options. 
+
+\subsubsection{Popularity of options.}
+One heuristic function that \tname{} uses to measure similarity
+between a synthesized rule and a human-created rule is the popularity
+of the options used in those rules. According to this heuristic, rules
+containing popular options score higher compared to those containing
+unpopular rules. Figure~\ref{fig:distribution-options} shows the
+histogram of rule options for the ruleset we
+used~\cite{emerging-threats-open}. The x-axis shows the options used
+in rules (the 10 most common) and the y-axis shows the number of rules
+using the corresponding option. Note that the options
+\CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce} are very
+popular. \tname\ uses the following formula to compute the
+contribution of option popularity to the score of a rule $r$:
+
+\vspace{-2ex}
+\[\frac{\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}}{N}\]
+\vspace{-2ex}
+
+\noindent
+The term $\mathit{option_i}$ denotes the $i$th option in the bitvector
+encoding $r$. The term $\mathit{option\_frequency}$ encodes the
+distribution of option popularity as a dictionary mapping
+numbers---indicating popularity---to corresponding
+options. Consequently, the term $\mathit{option\_frequency[option_i]}$
+denotes the number of rules, from our dataset, containing
+$\mathit{option\_i}$. The term $\mathit{max(option\_frequency)}$
+refers to the maximum number of rules for any dictionary entry (to
+normalize the measurement in the 0-1 range), and $N$ is the number of
+options in $r$. To illustrate, the contribution of this function to
+the score of a rule would be $0.26$ ($=(10181+3049)/(2*25699)$) for a
+rule with options \CodeIn{prce} and \CodeIn{flowbits} and $0.01$
+($=(155+108)/(2*25699)$) for a rule with options \CodeIn{itype} and
+\CodeIn{icode}.
+
+%% \Gui{A quinta heuristica que utilizamos
+%%   considera a popularidade das opcoes. Primeiro pegamos a quantidade
+%%   de vezes que uma opcao eh utilizada (sem considerar repeticoes numa
+%%   unica regra). Dividimos o valor encontrado para cada opcao pelo
+%%   maior valor encontrado, encontrando sempre valores de no maximo
+%%   1. Entao na regra nos somamos os valores de cada opcao, dividido
+%%   pelo numero de opcoes, chegando a um numero de no maximo 1, que
+%%   representa a popularidade das opcoes na regra.}
+
+%% \subsubsection{Size of a rule}
+%% \label{sec:heuristic-size-of-rule}
+%% \tname{} values rules in that size range higher compared to
+%% other sizes.
+
+%% We calculate the contribution of size of a given rule
+%% $r$ with the  $\mathit{rules\_per\_size}[\mathit{len(r)}]/\mathit{max(rules\_per\_size)}$, where $\mathit{len(r)}$ denotes the number of options of a rule $r$,
+%% $\mathit{rules\_per\_size}$ encodes the distribution of sizes as a
+%% dictionary mapping sizes to number of associated rules, and
+%% $\mathit{max(rules\_per\_size)}$ returns the maximum number of rules
+%% for any dictionary entry as to normalize the measurement in the 0-1
+%% range. 
+%% Consequently, the contribution of size is proportional to its
+%% popularity. The contribution of this heuristic would be 0.684
+%% (=3,662/5,353) to a rule with three options and 0.028 (=154/5,353) to
+%% a rule with nine options.
+
+
 
 
 %% \vspace{-2ex}
@@ -1120,13 +1162,43 @@ a rule with nine options.
 \pgfplotsset{width=6cm,compat=1.8}
 \pgfplotsset{every tick label/.append style={font=\tiny}}
 
+%%   \begin{subfigure}{.25\textwidth}
+%%     \centering
+%%     \scalebox{0.8}{
+%%       \begin{tikzpicture}
+%%         \begin{axis}[
+%%           bar width=4pt,
+%%           scaled ticks=true,
+%%           ymajorticks=false,
+%%           ybar stacked,
+%%           enlargelimits=0.08,
+%% %          enlargelimits=false,
+%% %          axis equal,
+%%           clip=false,
+%%           legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+%%           xtick=data,
+%% %          xticklabel style={rotate=45},          
+%%           nodes near coords,
+%%           every node near coord/.append style={font=\scriptsize},
+%%           xticklabel style={font=\footnotesize},          
+%%           nodes near coords align={vertical},
+%%           symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+%%           ]
+%%           \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
+%%         \end{axis}
+%%       \end{tikzpicture}
+%%     }
+%%     \vspace{-1ex}
+%%     \caption{\label{fig:distribution-rule-size}Rule sizes.}
+%%   \end{subfigure}%
+
 \begin{figure}[t!]
   \centering
-  \begin{subfigure}{.25\textwidth}
-    \centering
-    \scalebox{0.8}{
-      \begin{tikzpicture}
-        \begin{axis}[
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \scalebox{0.8}{  
+    \begin{tikzpicture}
+      \begin{axis}[
           bar width=4pt,
           scaled ticks=true,
           ymajorticks=false,
@@ -1137,20 +1209,22 @@ a rule with nine options.
           clip=false,
           legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
           xtick=data,
-%          xticklabel style={rotate=45},          
+          xticklabel style={rotate=30},
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},
           xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          ]
-          \addplot coordinates {(0,11) (1,1301) (2,4910) (3,3662) (4,3250) (5,5353) (6,2911) (7, 1337) (8, 1246) (9,763) (10, 495)};
-        \end{axis}
-      \end{tikzpicture}
-    }
-    \vspace{-1ex}
-    \caption{\label{fig:distribution-rule-size}Rule sizes.}
-  \end{subfigure}%
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
+        ]
+        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode, 108) (flags, 97) (tls.fingerprint, 61)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-5ex}
+  \hspace{4ex}
+  \caption{\label{fig:distribution-options}Option popularity.}
+%  \vspace{-1ex}    
+\end{subfigure}%  
   \begin{subfigure}{.25\textwidth}
     \centering
     \scalebox{0.8}{  
@@ -1239,43 +1313,13 @@ bar width=4pt,
   \vspace{-2ex}
   \caption{\label{fig:distribution-content_modifiers}Http content modifiers.}
 \end{subfigure}%
-\\
-\begin{subfigure}{.2\textwidth}
-  \centering
-  \scalebox{0.8}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=4pt,
-          scaled ticks=true,
-          ymajorticks=false,
-          ybar stacked,
-          enlargelimits=0.08,
-%          enlargelimits=false,
-%          axis equal,
-          clip=false,
-          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-          xtick=data,
-          xticklabel style={rotate=35},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          xticklabel style={font=\footnotesize},          
-          nodes near coords align={vertical},
-          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
-        ]
-        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode, 108) (flags, 97) (tls.fingerprint, 61)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-5ex}      
-  \caption{\label{fig:distribution-options}Options.}
-%  \vspace{-1ex}    
-\end{subfigure}%
 \vspace{-1ex}
 \caption{Distributions.}
 \end{figure}
 
 
 
+\Mar{------------------------------------------ estou aqui}
 \subsubsection{Number of content options.} We observed
 that \percContentOptions\ of the rules from the ruleset we are
 analyzing contain content options, but the distribution of those
@@ -1458,21 +1502,7 @@ rule, the aggregated contribution of this heuristic function would be
 0.35 (=(0.2+0.5)/2).
 
 
-\subsubsection{Popularity of options.}
-
-\Mar{--------------------------------------------------------- estou aqui}
-
-
-\Gui{A quinta heuristica que utilizamos
-  considera a popularidade das opcoes. Primeiro pegamos a quantidade
-  de vezes que uma opcao eh utilizada (sem considerar repeticoes numa
-  unica regra). Dividimos o valor encontrado para cada opcao pelo
-  maior valor encontrado, encontrando sempre valores de no maximo
-  1. Entao na regra nos somamos os valores de cada opcao, dividido
-  pelo numero de opcoes, chegando a um numero de no maximo 1, que
-  representa a popularidade das opcoes na regra.
-\[\frac{\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}}{N}\]}
-
+\subsubsection{Optimization}
 
 
 
@@ -1540,12 +1570,13 @@ rule, the aggregated contribution of this heuristic function would be
 %% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
 %% receberia a pontuação correspondente a esses dois modificadores.
 
+\setlength{\tabcolsep}{5pt}
 \begin{table*}[t!]
   \small
   \caption{\label{table:attacks}List of attacks. Non-http attacks
     appear at the top; http attacks appear at the bottom.}
   \centering
-  \begin{tabular}{llllp{10cm}}
+  \begin{tabular}{llllp{8cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Source} &
