@@ -1510,6 +1510,7 @@ rule, the aggregated contribution of this heuristic function would be
 
 
 \subsubsection{Optimization}
+\label{sec:weight-optimization}
 
 
 
@@ -1732,7 +1733,7 @@ experiments~(Section~\ref{sec:threats}).
 %%    Ping Scan & - & - \\
 %%    SYN Flood & - & - \\
 %%    JBoss JMX & 1,0,1,1 & 107 \\
-%%    WeBid & - & - \\    
+%%    WetedhhtedBid & - & - \\    
 %%    ColdFusion & 0,1,1,1 & 7 \\
 %%    .htaccess access & 0,1,1,1 & 11 \\
 %%    .idq access & 0,1,1,1 & 7 \\
@@ -1942,24 +1943,32 @@ that rule is ranked among the first top five rules in
 \label{sec:answer-rqtwo}
 
 This section evaluates the importance of each proposed heuristic
-function. More precisely, we evaluated the use of \tname{} without
-each of those functions with the goal of checking whether or not each
-of them contributes to the overall performance of the technique. We
-conducted that experiment by assigning the weight of the corresponding
-function to zero---effectively, disabling the function---and comparing
-the result with \tname\ using default weights, obtained with the
-procedure described on Section~\Fix{xxx}.
-
+function. To that end, we evaluated the use of \tname{} without each
+of these functions with the goal of checking how much each of them
+contributes to the overall performance of the technique. Recall that
+the score a function $r$ is given by the weigthed average of the
+values given by each heuristic function, \ie{} the score of $r$ is
+obtained with the aggregate function $f(r)=\sum_{i}^{N}
+w_i*f_i(r)/N;$, where $w_i$ is the weight of heuristic $i$, $f_i(r)$
+is the score of heuristic $i$ on $r$, and $N$ is the number of
+heuristic---four, in our case. To assess the value of each heuristic
+function, we assigned its weight to zero---effectively, disabling the
+function---and compared the result with \tname\ using default weights,
+obtained with the procedure described on
+Section~\ref{sec:weight-optimization}.
 
 Table~\ref{table:weights} shows results. Column ``Name'' shows the
 name of the attack and column ``All'' shows the result of \tname\ with
-all heuristic functions enabled (same as column ``Rank (step 3)'' from
-Table~\Fix{xxx}). The remaining columns show results supressing one
-heuristic function. An up arrow indicates that, considering that
-particular data point, the performance of \tname{} on that
-configuration is worse when compared to \tname's default
+all heuristic functions enabled; as in column ``Rank (step 3)'' from
+Table~\ref{table:results}. The remaining columns show results obtained
+by running the same experiment as in Section~\ref{sec:answer-rqone},
+but supressing one heuristic function. An up arrow indicates that,
+considering that particular data point, the performance of \tname{} on
+that configuration is worse when compared to \tname's default
 configuration. A down arrow, appearing highlighted in the table,
 indicates the contrary.
+
+\Mar{--------------------------------- estou aqui}
 
 \setlength{\tabcolsep}{5pt}
 \begin{table}[h!]
