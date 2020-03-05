@@ -701,12 +701,12 @@ existing rules to learn heuristics to rank plausible rules.
 
 \tname{} is a technique to synthesize rules for rule-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
-goal is to automatically create rules that capture \emph{only} the
-malicious traffic.
+goal is to automatically create rules that capture an attack of
+interest.
 
 \vspace{1ex}
 \noindent\textbf{Overview.}~\tname\ takes on input one or more
-examples of attacks and produces on output a ranked list of
+examples of the same attack and produces on output a ranked list of
 \emph{plausible rules}---\ie{}, rules that isolate the malicious
 traffic produced by the attacks from the benign
 traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
@@ -864,27 +864,31 @@ the malicious traffic.
 \label{sec:minimization}
 
 The seed rule produced in the first step satisfies the criterion to
-only capture positive traffic. However, that rule is overconstrained.
-It could include options that are irrelevant to capturing the attack
-and could lead to false negatives---the \nids\ may be unable to
-capture manifestations of the same attack whose messages do not
-exhibit the data satisfying irrelevant options.
+capture the traffic produced by the example attacks. However, that
+rule is overconstrained.  It may include options that are irrelevant
+to capture the attack and lead to false negatives---the \nids\ may be
+unable to capture manifestations of the same attack whose messages do
+not exhibit the data satisfying irrelevant options. For example, the
+seed rule produced after the Reverse Engineering step on the Ping Scan
+example from Section~\ref{sec:active-recon} contains options
+\CodeIn{icode:0}, \CodeIn{icmp\_id:23570}, and
+\CodeIn{icmp\_seq:3439}, which are irrelevant to capture that attack.
 
 %%  Some options added to the rule
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-\tname{} leverages public data sets of benign traffic~\cite{tcpreplay}
-and additional examples of the attack to guide the search for more
-general rules to address the overffiting issue. To that end, \tname{}
-\emph{minimizes} the rules produced in the previous step, preserving
-the invariant of \emph{only} capturing the positive malicious
-traffic. We say that a rule is minimal if discarding any option
-results in the capture of negative (\ie{}, benign) traffic.  The
-procedure we propose in this step builds on the observation that all
-options from the rule produced in the previous step are satisifed by
-the traffic produced by the attack. Consequently, any subset of these
-options also captures the attack. The rule creation procedure
+To address the overffiting issue, \tname{} leverages public data sets
+of benign traffic~\cite{tcpreplay} and additional examples of the
+attack to guide the search for more general rules. To that end,
+\tname{} \emph{minimizes} the rules produced in the previous step,
+preserving the invariant of \emph{only} capturing the positive
+malicious traffic. We say that a rule is minimal if discarding any
+option results in the capture of negative (\ie{}, benign) traffic.
+The procedure we propose in this step builds on the observation that
+all options from the rule produced in the previous step are satisifed
+by the traffic produced by the attack. Consequently, any subset of
+these options also captures the attack. The rule creation procedure
 iteratively discards options from visited rules---derived from the
 seed rule---using the negative traffic to guide the search for minimal
 rules.
@@ -896,9 +900,9 @@ rules.
 \setlength{\textfloatsep}{3pt}% Remove \textfloatsep
 \begin{algorithm}[t!]
   %\noindent\hspace{-2ex}
-  \flushleft{}\textbf{INPUT:} (overconstrained) seed rule $sr$, bening traffic
-  $\mathit{bTr}$, malli-\\
-  cious traffic $\mathit{mTr}$\\
+  \flushleft{}\textbf{INPUT:} (overconstrained) seed rule $sr$, pcap
+  files for bening traffic\\
+  ($\mathit{bTr}$), pcap files for mallicious traffic ($\mathit{mTr}$)\\
   %\noindent\hspace{-27.5ex} 
   \textbf{OUTPUT:} Set of minimized rules $\mathcal O$\\
 %\vspace{-3ex}
@@ -927,11 +931,13 @@ rules.
 \end{algorithm}
 
 Algorithm~\ref{algo1} shows the pseudocode for deriving rules from the
-seed rule produced at the reverse engineering step. The algorithm
-takes as input an overconstrained rule $sr$, produced by the reverse
-engineering step, and produces on output a set of alternative rules to
-$sr$ that captures every instance of the attack ($\mathit{mTr}$), but
-does not capture any message from the benign traffic ($\mathit{bTr}$).
+seed rule produced at the Reverse Engineering step. The algorithm
+takes as input an overconstrained rule $sr$ and pcap files~\cite{pcap}
+to reconstruct the benign ($\mathit{bTr}$) and malicious traffic
+($\mathit{mTr}$). The algorithm produces on output a set of
+alternative rules to $sr$ that captures every instance of the attack
+(as per $\mathit{mTr}$), but does not capture any message from the
+benign traffic (as per $\mathit{bTr}$).
 
 Line~\ref{line-init} initializes the current population of individuals
 (\ie{}, rules) $\mathcal{R}$ with the seed rule $sr$. We encode a rule
@@ -946,46 +952,49 @@ individuals for the next generation. The inner loop
 candidate rule in $\mathcal R$. The algorithm mutates each of these
 rules for $N$ times, discarding one option of the rule each
 time. Line~\ref{copy} assigns a copy of the bitvector, encoding
-$\mathcal R$, to variable $r$. Function $\mathit{len}$ returns the
+$\mathit{ro}$, to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand}$ randomly chooses one
 integer value in the range defined by its parameters. So, the
 expression $\mathit{rand(0, len(r))}$, appearing at
 line~\ref{choose-index}, returns an index of the option in $r$ to
 delete at line~\ref{delete-option}. The call to $\mathit{isNew}$
-checks if $r$ has not been previously generated through another path
+checks if $r$ has not been previously generated in another iteration
 whereas the call to $\mathit{isPlausible}$ checks if the rule only
-captures positive traffic, \ie{} no message present in $\mathit{bTr}$
-is captured by $r$. If $r$ satisfies both criteria, it is added to
-$\mathcal R'$, which denotes the next generation of individuals in the
-search. After processing every candidate rule in $\mathcal R$, the
-next generation of individuals is defined (line~\ref{define-next-gen})
-and the set of discovered rules is updated (at
-line~\ref{output-accum}).
+captures positive traffic, \ie{}, it checks that no message present in
+$\mathit{bTr}$ is captured by $r$. If $r$ satisfies both criteria, it
+is added to $\mathcal R'$, which denotes the next generation of
+individuals in the search. After processing every candidate rule in
+$\mathcal R$, the next generation of individuals is defined
+(line~\ref{define-next-gen}) and the set of discovered rules is
+updated (at line~\ref{output-accum}).
 
-The algorithm terminates when no rule in the current generation of
-individuals can be further reduced without violating the property that
-a candidate solution should only capture positive traffic. This means
-that execution of one iteration has not reached the statement declared
-at line~\ref{line-progress}, which adds one element to the set
-$\mathcal{R'}$. As $\mathcal{R'}$ is initialized empty that set will
-remain empty at the end of an iteration of the outer loop.
+The do-while loop terminates when no rule in the current generation of
+individuals can be further reduced without violating the invariant
+that a candidate solution should only capture positive traffic. This
+means that execution of one iteration of the do-while loop has not
+reached the statement declared at line~\ref{line-progress}, which adds
+one element to the set $\mathcal{R'}$. As $\mathcal{R'}$ is
+initialized empty, that set will remain empty at the end of the
+execution of the loop from
+lines~\ref{start-foreach}-\ref{end-foreach}. The algorithm returns the
+rules from $\mathcal O$ that capture \emph{all} example attacks
+provided on input (line~\ref{filtering}).
 
 Note that the algorithm produces no rules in the last iteration. Rules
 with a single option are produced in the second-to-last iteration. In
 other iterations, rules with more than one option are
 produced. Conceptually, the search induces a search tree with the seed
-rule $sr$ as the root, single-option rules as child nodes, and rules
-with more options as internal nodes. The edges of the tree denote the
-ancestor relation between two rules.
-
-It is also worth noting that the algorithm reports every rule in the
-tree instead of only those that are surely minimal, \ie{} rules with
-one option. The reason is that the the traffic used to check
+rule $sr$ as root, single-option rules as child nodes, and rules with
+more options as internal nodes. The edges of the tree denote the
+ancestor relation between a pair of rules. It is also worth noting
+that the algorithm reports every rule in the tree instead of only
+those with one option. The reason is that the traffic used to check
 plausibility is limited by definition---reporting only minimal rules
-with respect to that traffic could discard the correct rule. In
-summary, this algorithm reports many rules that are plausible by using
-the benign traffic to reduce the overconstrained rule produced at the
-\reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
+with respect to that traffic could discard the correct rule.
+
+In summary, this algorithm reports many rules that are plausible by
+using the benign traffic to reduce the overconstrained rule produced
+at the \reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
 \tname{} ranks the rules this algorithm reports by their similarity to
 existing trusted rules. Intuitively, rules that do not look like those
 trusted rules rank low.
@@ -997,15 +1006,17 @@ trusted rules rank low.
 \end{proposition}
 \begin{proof}
   \vspace{-1.5ex} Every rule created during the search captures the
-  attack, provided as example on step one, as every rule contains a
-  proper subset of the options from the original rule and all those
-  options are satisfied by the traffic produced by the attack. By
-  definition of function $\mathit{isPlausible}$, these rules also
-  capture \emph{only} the positive traffic. If negative traffic is
-  captured, a rule is not added to $\mathcal R'$. Consequently, it
-  cannot be an element of $\mathcal O$ and reported on the
-  output. Finally, only the rules in $\mathcal O$ that capture all the
-  instances of the attack (\ie{}, variants) are reported on output.
+  attack provided as example on step one as every created rule
+  contains a proper subset of the options from the original rule and
+  all those options are, by definition, satisfied by the traffic
+  produced by the original attack. In addition, from the definition of
+  function $\mathit{isPlausible}$, reported rules capture \emph{only}
+  the positive traffic. If negative traffic is captured, a rule is not
+  added to $\mathcal R'$. Consequently, it cannot be an element of
+  $\mathcal O$ and reported on the output. Finally, from the
+  definition of function $\mathit{filter}$, only the rules in
+  $\mathcal O$ that capture all the instances of the attack (\ie{},
+  variants) are reported on output.
   \vspace{-1ex}    
 \end{proof}
 
