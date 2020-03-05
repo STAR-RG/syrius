@@ -706,7 +706,7 @@ interest.
 
 \vspace{1ex}
 \noindent\textbf{Overview.}~\tname\ takes on input one or more
-examples of the same attack and produces on output a ranked list of
+examples of an attack and produces on output a ranked list of
 \emph{plausible rules}---\ie{}, rules that isolate the malicious
 traffic produced by the attacks from the benign
 traffic. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
@@ -722,9 +722,9 @@ only needs to provide examples of attacks on input.
 
 \begin{figure}[t!]
   \centering
-  \includegraphics[trim=0 395 50 0,clip,width=0.48\textwidth]{figs/nids-workflow}
+  \includegraphics[trim=0 340 50 0,clip,width=0.48\textwidth]{figs/nids-workflow}
   \vspace{-4ex}  
-  \caption{The \tname\ workflow.\Mar{revisar}}
+  \caption{The \tname\ workflow.}
   \label{fig:overview}
   \vspace{-3ex}
 \end{figure}
@@ -738,24 +738,23 @@ malicious traffic. Let us refer to that rule as the \emph{seed rule}
 and its corresponding set of options as \emph{seed options}. Note
 that, as only the malicious traffic is considered in this step, the
 seed rule is likely overspecified, \ie{}, it may be more restrictive
-than the golden rule. Consequently, the use of that rule could result
-in false negatives. Second, \tname\ generates alternative rules that
-1) weaken the constraints expressed in the seed rule while 2) still
+than necessary. Consequently, the use of that rule could result in
+false negatives. Second, \tname\ generates alternative rules that 1)
+weaken the constraints expressed in the seed rule while 2) still
 capturing the malicious traffic. Given that every option declared in a
 rule needs to be satisfied for a rule to capture an attack, any subset
 of the set of seed options, by definition, captures the attack
 characterized by the malicious traffic. \tname{} leverages that
 observation to search for plausible rules containing a proper subset
 of options from the seed options. However, note that that approach
-alone could result in false positives as it imposes no limit on to
-what extent a the constraints induced from the rule can be
-weakened. \tname{} uses benign traffic for that purpose. More
-precisely, it searches for plausible rules derived from the seed rule
-obtained in the previous step. Finally, \tname{} uses heuristic
-functions obtained from a data set of existing rules to rank the
-generated plausible rules by their similarity to existing
-rules. Similarity is used to approximate user's intent. The following
-sections detail each component of \tname.
+alone could result in false positives as it imposes no limit on the
+extent the constraints induced from the rule can be weakened. \tname{}
+uses benign traffic for that purpose. More precisely, it searches for
+plausible rules derived from the seed rule obtained in the previous
+step. Finally, \tname{} uses heuristic functions, obtained from a data
+set of existing rules, to rank the generated plausible rules by their
+similarity to existing rules. Similarity is used to approximate user's
+intent. The following sections detail each component of \tname.
 
 %%  As the generation
 %% procedure discards options from the initial rule, the rules \tname{}
