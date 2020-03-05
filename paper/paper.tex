@@ -1086,7 +1086,7 @@ following each of these heuristic functions.
 %% options. These rules only use the header to signal a traffic as
 %% malicious. Also note that most rules have 2 to 6 options. 
 
-\subsubsection{Popularity of options.}
+\subsubsection{\label{sec:popularity-options}Popularity of options.}
 One heuristic function that \tname{} uses to measure similarity
 between a synthesized rule and a human-created rule is the popularity
 of the options used in those rules. According to this heuristic, rules
@@ -1101,7 +1101,7 @@ popular. \tname\ uses the following formula to compute the
 contribution of option popularity to the score of a rule $r$:
 
 \vspace{-2ex}
-\[\frac{\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}}{N}\]
+\[\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N\]
 \vspace{-2ex}
 
 \noindent
@@ -1319,23 +1319,29 @@ bar width=4pt,
 
 
 
-\Mar{------------------------------------------ estou aqui}
 \subsubsection{Number of content options.} We observed
-that \percContentOptions\ of the rules from the ruleset we are
-analyzing contain content options, but the distribution of those
-contents per rule is not uniform. Figure~\ref{fig:distribution-contents} shows the
-corresponding distribution. Given the importance of this kind of
-option to the definition of rules, we defined a heuristic function
-focused on the typical number of content options in a rule. We
-calculate the contribution of this function as described on previous
-Section~\ref{sec:heuristic-size-of-rule}. 
-
-%% to the score of a rule
-%% with the following formula:
-
-%% \vspace{-2ex}
-%% \[\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}\]
-%% \vspace{-2ex}
+that \percContentOptions\ of the rules from the ruleset we analyzed
+contain content options, but the distribution of those contents per
+rule is not uniform. Figure~\ref{fig:distribution-contents} shows the
+distribution of number of contents in a rule. Results indicate nearly
+73\% of the rules from our ruleset contain one to three content
+options. Hence, we found that that information could help
+\tname\ discriminate useful rules. \tname{} computes the contribution
+of the number of content options to the score of a rule $r$ with the
+fraction
+$\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}$,
+where $\mathit{len(r)}$ denotes the number of content options in $r$
+and $\mathit{rules\_per\_number\_of\_contents}$ denotes the
+distribution of number of contents (encoded with a dictionary as in
+the function described on
+Section~\ref{sec:popularity-options}). Consequently the term
+$\mathit{rules\_per\_number\_of\_contents[len(r)]}$ corresponds to the
+number of rules in the ruleset with the same number of contents as
+$r$. The denominator of the fraction normalizes the contribution in
+the 0-1 range. To illustrate, the contribution of this heuristic
+function to the score a rule would be $.64$ $(=5841/9164)$ to a rule
+with 3 content options and $.18$ $(=1622/9164)$ to a rule with 5
+content options.
 
 %% \noindent
 %% The only difference of this formula compared to the one defined on
@@ -1346,34 +1352,35 @@ Section~\ref{sec:heuristic-size-of-rule}.
 %% of content options.
 
 
-
 \subsubsection{Popularity of content strings.} 
-The heuristic described in this section leverages content rarity to
-discriminate rules---it weighs higher (respectively, lower) rules that
-use popular (respectively, unpopular) strings in content options. The
-score of a rule $r$ on this function is given by the arithmetic mean
-of the popularity scores of each string used in contents in $r$. More
+This heuristic leverages content rarity to discriminate rules---it
+weighs higher (respectively, lower) rules that use popular
+(respectively, unpopular) strings in content options. The score of a
+rule $r$ on this function is given by the arithmetic mean of the
+popularity scores of each string used in contents in $r$. More
 precisely, the contribution of content rarity is given by the
 following formula:
 
-\vspace{-2.5ex}
-\[\frac{\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}}{N}\]
-\vspace{-2.5ex}
+\vspace{-1ex}
+\[\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N\]
+\vspace{-1ex}
 
 \noindent
-, where $\mathit{content_i}$ denotes the $i$-th content in a given
+, where $\mathit{content_i}$ denotes the $i$th content in a given
 rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
-denotes the frequency of the string used in the $i$-th content, the
+denotes the frequency of the string used in the $i$th content, the
 term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
 observed across all strings appearing as content parameters, and $N$
 is the number of content options in a given
 rule. Figure~\ref{fig:distribution-strings} shows the distribution of
-the ten most popular strings in our ruleset. To illustrate this
-function, let us consider a rule with two content options, using the
-strings ``GET'' and ``ID'', respectively. The contribution of that
-rule for the computation of similarity score would be 0.601
-(=(1+.203)/2). The relatively high weight reflects the fact that
-``GET'' and ``ID'' are popular contents.
+the ten most popular strings in our ruleset. To illustrate, let us
+consider a rule with whose content options use the strings ``GET'' and
+``ID'', respectively. The contribution of that rule for the
+computation of similarity score would be 0.601 (=(1+.203)/2). The
+relatively high weight reflects the fact that ``GET'' and ``ID'' are
+popular content strings.
+
+\Mar{------------------------------------------------ estou aqui}
 
 \subsubsection{Popularity of http content modifiers.} As previously
 mentioned, \percRulesWithContent\ of \suri\ rules involve content
