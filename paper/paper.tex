@@ -1100,9 +1100,11 @@ using the corresponding option. Note that the options
 popular. \tname\ uses the following formula to compute the
 contribution of option popularity to the score of a rule $r$:
 
+{\small
 \vspace{-2ex}
 \[\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N\]
 \vspace{-2ex}
+}
 
 \noindent
 The term $\mathit{option_i}$ denotes the $i$th option in the bitvector
@@ -1361,10 +1363,11 @@ popularity scores of each string used in contents in $r$. More
 precisely, the contribution of content rarity is given by the
 following formula:
 
+{\small
 \vspace{-1ex}
 \[\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N\]
 \vspace{-1ex}
-
+}
 \noindent
 , where $\mathit{content_i}$ denotes the $i$th content in a given
 rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
@@ -1380,23 +1383,23 @@ computation of similarity score would be 0.601 (=(1+.203)/2). The
 relatively high weight reflects the fact that ``GET'' and ``ID'' are
 popular content strings.
 
-\Mar{------------------------------------------------ estou aqui}
-
 \subsubsection{Popularity of http content modifiers.} As previously
 mentioned, \percRulesWithContent\ of \suri\ rules involve content
 options. Furthermore, nearly half of the rules that use content
-options, use content modifiers on http message payloads. Content
-modifiers serve to indicate what part of a network packet the string
-mentioned in the content option should appear. For example, the
-modifier \CodeIn{http\_header} in the option \CodeIn{content:
-  ``keep-alive''; http\_header} indicates that the string
-``keep-alive'' should be present in the header of the
-message\footnote{A keep-alive connection attribute indicates that a
-  single TCP connection should remain open for multiple HTTP
-  requests/responses.}.  Figure~\ref{fig:http-header-example}
+options use content modifiers to qualify the search. Http modifiers
+typically serve to specify parts of the message payloads that the
+input string should be matched against. For example, the modifier
+\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
+  http\_header} indicates that the string ``keep-alive'' should be
+present in the header of the http message\footnote{A keep-alive
+  connection attribute indicates that a single tcp connection should
+  remain open for multiple http requests/responses.}. Note that, in
+this case, the content modifier refers to a field of an http message,
+which appears in the payload of a tcp message, which is the target of
+the option \CodeIn{content}. Figure~\ref{fig:http-header-example}
 illustrates possible content options used to match against certain
-strings that appear in an http message. A check mark (resp., cross)
-indicates a match (resp., no match).
+strings that appear in an http message. A check mark (respectively,
+cross) indicates a match (respectively, no match).
 
 \begin{figure}[t!]
 \centering
@@ -1407,107 +1410,52 @@ indicates a match (resp., no match).
 \label{fig:http-header-example}
 \end{figure}
 
-%% we observed---by analyzing
-%% the data set of existing rules (see
-%% Section~\ref{sec:data set-benign})---that these rules often indicate
-%% what part of the message the content string should be checked
-%% against. For example,
-%% For example, the
-%% creator of the rule may want to indicate that a specific string be
-%% present in the header of an HTTP request message. Content
-%% \emph{modifiers} serve this purpose.
-%% Suricata supports content modifiers for tcp and http. \Luc{Eh possivel utilizar os modificadores em qualquer protocolo. Nós consideramos apenas tcp e http pois são os protocolos que possuem payloads legiveis, assim conseguimos saber melhor como tokenizar o conteudo. O payload de pacotes de outros protocolos, em geral, são um conjunto de bytes sem significado para nós. Existem diversos outros modificadores q não estamos considerando e q tambem permitem procurar numa determinada posição para os casos em q o conteudo do pacote n eh legivel, não citei pq não suportamos isso. Se necessário posso explicar.} Given that
-%% content options often use modifiers\Mar{assumindo que eh
-%%   verdade. confirmar estat. solicitada acima...},
-
-%\tname\ uses the
-%frequency of content modifiers to discriminate rules that are more or
-%less likely to reflect actual rules. 
-
-\tname{} builds on our observation that these modifiers are commonly
-used to define existing rules. More precisely, \tname\ builds on the
-observation that the strings accessible in positions associated with
-content modifiers (\eg{}, GET, Host, Connection) are more common. For
-example, historical data indicates that content options that use the
-modifier \CodeIn{http\_connection} are much less likely than content
-options that use the modifier
-\CodeIn{http\_uri}. Figure~\ref{fig:distribution-content_modifiers}
-shows the histogram of content modifiers for http. (We removed the
-prefix ``http'' on the modifier for space.) Although content modifiers
+\tname\ builds on the observation that the strings commonly accessed
+at positions associated with content modifiers (\eg{}, host,
+connection) are more common. For example, historical data indicates
+that content options that use the modifier \CodeIn{connection} are
+much less likely than content options that use the modifier
+\CodeIn{uri}. Figure~\ref{fig:distribution-content_modifiers} shows
+the histogram of content modifiers for http. (We removed the prefix
+\CodeIn{http} on the modifier for space.) Although content modifiers
 are applicable to rules of any protocol supported by Suricata,
-currently, \tname\ only supports this features for tcp and http. But
-these rules comprise $\sim$80\% of the rules of our data set.
-
-%% and
-%% (2) the payload of messages of different protocols are not as
-%% segmented as the case of tcp and http. Consequently, rule writers do
-%% not refer to specific parts of the payload as often as the task o and
-%% more challenging for
-
-
-We compute the heuristic function for content modifiers with the
-following formula:
+currently, \tname\ only supports this features for tcp and http; these
+rules comprise $\sim$80\% of the rules of our data set. We compute the
+heuristic function for content modifiers with the following formula:
 
 \[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
 
 \noindent
-, where $N$ is the number of contents options present in a rule,
-$g(i)$ is the contribution of content option $i$ to the score,
+, where $g(i)$ is the contribution of content option $i$ to the score,
+$N$ is the number of contents options present in a rule,
 $\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
 of a modifier $j$ to content option $i$,
 $\mathit{max(modifier\_frequency)}$ refers to the modifier with
 maximum popularity (for normalization), and $M_i$ is the number of
 content modifiers that could access the string associated with content
 $i$.
-
-
-%% \Mar{Qual o rationale para considerar as varias
-%%   alternativas de acesso ao inves de apenas a alternativa que eh mencionada?}0
-%%   \Luc{Vc está supondo que as regras que geramos incluem os modificadores e que deveriamos pontuar somente de acordo com os que estão presentes? Não eh o caso. A ideia aqui basicamente eh: se um certo content do payload está numa posição q eh muito verificada nas regras, possivelmente esse content eh mais relevante do q outro q está numa posição q raramente eh verificada. Para avaliar isso nós só precisamos saber quantas vezes os modificadores que acessam essas posições aparecem no data set.}
-%%   \Luc{Uma coisa que pensei agora foi de considerar apenas o modificador mais comum entre aqueles que acessam a posição de um content. Como a pontuação de um content eh dado pela media das ocorrencias dos modificadores que conseguem acessá-lo, se houver um modificador muito comum e varios modificadores raros a pontuação dada será baixa.}
-                                                                             
-%% \Luc{$M_i$ eh o numero de modificadores que podem referenciar a posição em q se encontra o $content_i$}\Mar{isto eh confuso. vc. esta dizendo que
-%%   o mesmo content pode ter mais de um modificador? ou a string poderia
-%%   ser acessada por mais de um modificador. se for este o caso,
-%%   sinceramente, achei isto bem confuso. afinal, a regra jah indica
-%%   qual o modificador foi escolhido para acessar a string.}.\Luc{Cada content em uma regra só pode possuir um modificador para indicar a posição onde ele deve ser procurado. Entretanto sim, uma "string poderia
-%%   ser acessada por mais de um modificador", foi o caso daquele exemplo com o http\_header.} \Luc{M eh
-%%   o numero de modificadores associados a cada content. Temos
-%%   content[1], content[2], ..., content[N]. Cada um desses contents tem
-%%   modificadores associados content[i][1], content[i][2], ...,
-%%   content[i][M].}\Mar{Lucas, e se nao houver modificador algum em um
-%%   content. a frequencia seria 0, correto?} \Luc{Sim}
-
-
-%\Mar{what about ``none'' (no modifier)?}}
-%  \Luc{Uma regra pode sim ter contents sem modificadores, mas isso n
-    %% vem ao caso aqui. Nessa heuristica toda string do payload vai ter
-    %% associada a ela os modificadores q podem acessar a sua
-    %% posição. Portanto, não vai existir o caso de não haver
-    %% modificador. Atenção: isso não quer dizer q as regras q geramos
-%% incluem os modificadores, elas n incluem.
-%\Luc{Inclui esse modificador pq ele tambem pode acessar o campo Request URI. Isso eh um problema? O http\_uri eh o modificador mais comum, mas o fato de haver o modificador http\_request\_line que tambem accessa a mesma posição faz com que o fitness maximo seja 0.5, pois a ocorrencia de http\_request\_line eh irrelevante no calculo.}
     
-To illustrate this function, consider a rule containing the option
-\CodeIn{content: ``/HtmlAdaptor''}. The contribution of this option to
+To illustrate, consider a rule containing the option
+\CodeIn{content:``/HtmlAdaptor''} (see Section~\ref{sec:jboss}). The
+contribution of this option---\ie{}, the value of $\mathit{g(i)}$---to
 the score of the rule is $0.5$ (=$\frac{10,111+11}{10,111*2}$). The
-value of $M_i$ for this case is 2 as the string ``/HtmlAdaptor'' could
-be accessed through the modifiers \CodeIn{http\_uri} and
-\CodeIn{http\_request\_line} as that string is stored on the
-\CodeIn{Request URI} field of the http message\Mar{how do we know
-  that?}. The relatively high heuristic value reflects the fact that
-the string ``/HtmlAdaptor'', stored at \CodeIn{Request URI}, could be
-accessed by two content modifiers, namely (\CodeIn{http\_uri} and
-\CodeIn{http\_request\_line}).  For the option \CodeIn{content:
-  ``keep-alive''}, either the modifier \CodeIn{http\_header} or the
-modifier \CodeIn{http\_connection} could be used to locate the string
-``keep-alive'' stored in the field \CodeIn{Connection} (see
-Figure~\ref{fig:http-header-example}). Consequently, for this case,
-the contribution of modifiers to this content option would be $0.2$
-(=$\frac{4089+29}{10111*2}$). Assuming that both options are used in a
-rule, the aggregated contribution of this heuristic function would be
-0.35 (=(0.2+0.5)/2).
-
+value of $M_i$, in this case, is 2 as the string ``/HtmlAdaptor''
+could be accessed through the modifiers \CodeIn{uri} and
+\CodeIn{request\_line}. The reason is that \tname\ identifies that
+that string appears in the field \CodeIn{Request URI} (of an http
+message from the malicous traffic) and that field is accessible
+through these two modifiers. The relatively high heuristic value
+reflects the fact that the string could be accessed by two popular
+content modifiers.  As another example, consider the option
+\CodeIn{content: ``keep-alive''}. In this case, either the modifier
+\CodeIn{header} or the modifier \CodeIn{connection} could be used to
+locate the string ``keep-alive'', stored in the field
+\CodeIn{Connection} from an http message (see
+Figure~\ref{fig:http-header-example}). Consequently the contribution
+of this heuristic function to the corresponding rule would be $0.2$
+(=$\frac{4089+29}{10111*2}$), in this case. Assuming that a rule uses
+the two content options mentioned aboved, the aggregated contribution
+of this heuristic function to the rule would be 0.35 (=(0.2+0.5)/2).
 
 \subsubsection{Optimization}
 \label{sec:weight-optimization}
@@ -1516,67 +1464,6 @@ rule, the aggregated contribution of this heuristic function would be
 
 \Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
-%% \section{Modificadores}É possivel deixar que uma regra verifique todo o payload do pacote em busca de um match com um content ou especificar partes do payload onde esse content deve ser procurado. Essa definição é feita utilizando os chamados modificadores de content, eles adicionam mais detalhes/informações sobre a detecção de um determinado content. Os modificadores que estamos considerando são validos apenas para regras dos protocolos tcp e http.
-
-%% Exemplo do payload "cru" de um pacote http:\\
-%% Aqui, todas as informações do pacote estão juntas.
-
-%% \begin{figure}[h!]
-%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example.payload}
-%% \end{figure}
-
-%% O mesmo payload interpretado pelo Wireshark:\\
-%% Aqui, o wireshark interpreta as informações dos pacotes e as divide para melhor visualização e entendimento.
-
-%% \begin{figure}[H]
-%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-example-wireshark.payload}
-%% \end{figure}
-
-%% O que o suricata faz eh identificar os campos e seus valores e com isso permite que as regras façam referencia direta a eles. Por exemplo, na figura do payload "cru" não conseguimos identificar facilmente oq eh o "Request URI Path:", já na segunda figura isso está explícito.
-
-%% Eu disse que o "GET" estava associado tambem ao http\_header, mas não está, me enganei. Mas sim, pode haver interseção entre os campos que dois ou mais modificadores referenciam. O seguinte trecho do payload é acessado pelo modificador http\_header:
-
-%% \begin{figure}[H]
-%%   \lstinputlisting[language=C,numbers=none,keywords={content}]{http-header.payload}
-%% \end{figure}
-
-%% Entretando, tambem existem os modificadores http\_host,
-%% http\_accept\_enc, http\_connection e http\_accept que permitem
-%% acessar diretamente cada uma das linhas acima.
-
-%% \Mar{Lucas, use uma regra concreta com a regra da Secao 3.3 (assumindo
-%% que vai mante-la) e mostre como eh feito o calculo da regra desta
-%% funcao heuristica para regra inteira.}\\
-%% \Luc{-------------}
-
-
-
-%% A avaliação que fazemos aqui pontua um dado content de acordo com quantas vezes o campo em que ele se encontra eh referenciado nas regras. Por exemplo, vamos supor que o tokenizer produziu a opção content: "/HtmlAdaptor". Essa string pertence ao campo "Request URI:". Esse campo pode ser acessado pelo modificador http\_uri. O tokenizer associa o content a esse modificador. 
-%% Posteriormente, esse content vai receber uma pontuação
-%% correspondente a popularidade desse modificador:\\
-
-
-%% A multiplicação por 1 no denominador eh referente a quantidade de
-%% modificadores que estão associadas a esse content.\Luc{O correto eh ser dividido pela quantidade de modificadores. Atualizei a formula para tentar representar isso. Considere que no exemplo acima o content pudesse ser acessado por mais de um modificador. A pontuação dele então seria $\frac{10,111+x}{10,111*1}$ > 1. Para manter a pontuação entre 0-1, o certo nesse caso seria fazer $\frac{10,111+x}{10,111*2}$}\Mar{nao foi isto
-%%   que vc. disse acima, Lucas. foi dito que N (=2) era o numero de
-%%   contents e o exemplo acima tem apenas 1 content.}  
-
-%% Content options are
-%% associated with specific packets fields\Mar{or modifiers?}.\Mar{why
-%%   GET is associated with http\_method and http\_header?}\Mar{are all
-%%   content associated with one or many fields or positions in a packet?
-%%   can you give examples other than GET to explain this? if yes,
-%%   shouldn't this be discussed before? Maybe Section 2.3?}\Mar{Also, it
-%%   is important to justify (to explain rationale)---how is it different
-%%   from counting rarity?}
-
-
-%% Esse componente pontua um content de acordo com o campo ao qual ele pertence no pacote. Contents que pertencem a campos mais comuns (campos que são mais referenciados nas regras) recebem maior pontuação.
-%% Modificadores diferentes podem acessar campos iguais em um pacote. Por
-%% exemplo os modificadores http\_method e http\_header, o http\_method
-%% acessa apenas o metodo do pacote http, mas o http\_header acessa todo
-%% o cabeçalho (incluindo o proprio metodo). Com isso, a string "GET"
-%% receberia a pontuação correspondente a esses dois modificadores.
 
 \setlength{\tabcolsep}{5pt}
 \begin{table*}[t!]
