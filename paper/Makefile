@@ -12,7 +12,7 @@ OUTPUTS_SPELL := $(TEMP_TXTS)
 
 pdf:
 #	latexmk -bibtex -pdf $(NAME)
-	latexmk -pdf $(NAME)
+	latexmk -f -pdf $(NAME)
 
 final: pdf
 	@echo '******** Did you spell-check the paper? ********'
