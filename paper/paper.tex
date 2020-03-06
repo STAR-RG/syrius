@@ -1517,14 +1517,14 @@ weights.
     ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & http \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
     iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
     JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & http \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
-    Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
+    scripttag\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
     WeBid LFI \MyComment{Local File Inclusion} & \cite{nikto} & LFI & http & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
     %%WordPress Login & \cite{wrccdc} & PVE & http & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
     .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
     .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
     /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
     Basebuilder LFI & \cite{nikto} & LFI & http & \textbf{content}:"GET"; http\_method; \textbf{content}:"/main.inc.php?"; nocase; http\_uri; \textbf{content}:"mj\_config[src\_path]="; nocase; http\_uri; \\
-    Tomcat server snoop access & \cite{nikto} & AREC & http & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
+    Tomcat Snoop Access & \cite{nikto} & AREC & http & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1622,7 +1622,7 @@ experiments~(Section~\ref{sec:threats}).
     ColdFusion & 7 & 19 & 34 & 3\\
     iisadmin access & 3 & 17 & 408 & 1 \\        
     JBoss JMX & 5 & 23 & 228 & 45 \\
-    Script tag in URI & 23 & 22 & 786 & 1 \\
+    scripttag & 23 & 22 & 786 & 1 \\
     WeBid LFI & 1 & 23 & 11,100 & 10\\    
     %%Wordpress Login & 8 & 59 & - & - \\
     .htaccess access & 5 & 17 & 984 & 2\\
@@ -1653,7 +1653,7 @@ experiments~(Section~\ref{sec:threats}).
 %%    .idq access & 0,1,1,1 & 7 \\
 %%    iisadmin access & 0,1,1,1 & 2 \\
 %%    /system32/ in URI & 0,1,1,1 & 11 \\
-%%    Script tag in URI & 0,1,1,1 & 9 \\
+%%    scripttag & 0,1,1,1 & 9 \\
 %%    \bottomrule
 %%  \end{tabular}
 %%\end{table}
@@ -1859,7 +1859,7 @@ the table, indicates the contrary.
     ColdFusion & 3 & 3 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ \\
     iisadmin access & 1  & 1 & 1 & 1 & 8$\uparrow$\\        
     JBoss JMX & 45 & 45 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ \\
-    Script tag in URI & 1 & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ \\
+    scripttag & 1 & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ \\
     WeBid LFI & 10 & 10 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ \\    
     %%Wordpress Login & 8 & - & - & - & - \\
     .htaccess access & 2  & 2 & 2 & 2 & 17$\uparrow$\\
