@@ -1600,7 +1600,7 @@ experiments~(Section~\ref{sec:threats}).
     \midrule
     Black Nurse & 1 & 4 & 9 & 2 \\    
     Ping Scan & 6 & 5 & 9 & 2 \\
-    SYN Flood & 4 & 2 & 2 & 2 \\
+    SYN Flood & 4 & 2 & 2 & 1 \\
     UDP Teardrop & 1 & 4 & 8 & 4 \\
     %%UDP Flood & - & - & - & - \\
     \midrule
@@ -1887,7 +1887,7 @@ the table, indicates the contrary.
     \midrule
     Black Nurse & 2 & 7$\uparrow$ & 2 & 2 & 2 \\    
     Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
-    SYN Flood & 2 & 2 & 2 & 2 & 2 \\
+    SYN Flood & 1 & 1 & 1 & 1 & 1 \\
     UDP Teardrop & 4 & 4 & 4 & 4 & 4 \\
     %%UDP Flood & - & - & - & - & - \\
     \midrule
@@ -2191,7 +2191,7 @@ of messages.
   exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
   \begin{figure}[h]
     \vspace{-2ex}
-    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags}]{top-synflood.rules}
+    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags, threshold}]{top-synflood.rules}
     \vspace{-3ex}  
   \end{figure}
 
@@ -2200,6 +2200,7 @@ of messages.
   desta secao). tambem nao entendo porque window---que a gente disse
   acima que *nao* era relevante---aparece nas duas regras
   geradas. enfim, isto esta inconsistente com nosso discurso.}
+  \Luc{Coloquei o threshold em destaque tambem. O window nas duas regras foi um erro, corrigi.}
 
 \vspace{1ex}
 \noindent
