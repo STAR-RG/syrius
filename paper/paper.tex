@@ -541,14 +541,14 @@ Suricata supports a total of \totoptions\ distinct options covering
 We mentioned above that http rules often used content options, which
 associate with the message payload. For non-http rules, options are
 often associated with packet fields. Let us consider a rule for an
-ICMP attack as example. Figure~\ref{fig:icmp-packet-layout} shows the
-layout of an ICMP packet. The packet fields ``Flags'' and ``Time to
-Live'', declared in the IP header, are mapped to the \suri\ options
+icmp attack as example. Figure~\ref{fig:icmp-packet-layout} shows the
+layout of an icmp packet. The packet fields ``Flags'' and ``Time to
+Live'', declared in the ip header, are mapped to the \suri\ options
 \CodeIn{flagbits} and \CodeIn{ttl}, respectively. Likewise, the fields
-``Type'' and ``Code'', declared in the ICMP header, are mapped to the
+``Type'' and ``Code'', declared in the icmp header, are mapped to the
 options \CodeIn{itype} and \CodeIn{icode}, respectively. The values of
 the options ``ttl'', ``itype'', and ``icode'' are the same as the
-value of the corresponding fields in the ICMP packet. For the field
+value of the corresponding fields in the icmp packet. For the field
 ``Flags'' the value of the corresponding option is encoded in a
 bitvector. For example, if the ``Flags'' field stores the value 1010,
 the corresponding rule option will be \CodeIn{flagbits:RM}, as each
@@ -565,7 +565,7 @@ values from a single message.
 \centering
 \includegraphics[scale=0.27]{figs/ICMP-packet-structure.png}
 \vspace{-2ex}
-\caption{Layout of an ICMP packet.}
+\caption{Layout of an icmp packet.}
 \vspace{-2ex}
 \label{fig:icmp-packet-layout}
 \end{figure}
@@ -1479,13 +1479,15 @@ alternatives as AVM~\cite{10.1109/32.57624}, to find better weights.
 %\Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
 
-\setlength{\tabcolsep}{5pt}
+%\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{0.9}
 \begin{table*}[t!]
   \small
   \caption{\label{table:attacks}List of attacks. Non-http attacks
     appear at the top; http attacks appear at the bottom.}
+  \vspace{-2ex}
   \centering
-  \begin{tabular}{llllp{8cm}}
+  \begin{tabular}{lcccp{10cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Source} &
@@ -1493,25 +1495,25 @@ alternatives as AVM~\cite{10.1109/32.57624}, to find better weights.
     \multicolumn{1}{c}{Protocol} &
     \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
     \midrule
-    Black Nurse & \cite{pcap-attacks} & DoS & ICMP & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
-    Ping Scan & \cite{netmap} & AREC & ICMP & \textbf{dsize}:0; \textbf{itype}:8; \\
-    SYN Flood & \cite{hping3} & DoS & TCP & \textbf{flags}: S,12;
+    Black Nurse & \cite{pcap-attacks} & DoS & icmp & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
+    Ping Scan & \cite{netmap} & AREC & icmp & \textbf{dsize}:0; \textbf{itype}:8; \\
+    SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
-    UDP Teardrop & \Fix{WireShark} & DoS & UDP & \textbf{fragbits}:M; \textbf{id}:124; \\
+    UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
     %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
     \midrule
-    %%Apache Struts 2 & \cite{wrccdc} & RCE & HTTP & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
-    ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & HTTP \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
-    iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
-    JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & HTTP \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
-    Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
-    WeBid LFI \MyComment{Local File Inclusion} & \cite{nikto} & LFI & HTTP & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
-    %%WordPress Login & \cite{wrccdc} & PVE & HTTP & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
-    .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
-    .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & HTTP \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
-    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & HTTP \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
-    Basebuilder LFI & \cite{nikto} & LFI & HTTP & \textbf{content}:"GET"; http\_method; \textbf{content}:"/main.inc.php?"; nocase; http\_uri; \textbf{content}:"mj\_config[src\_path]="; nocase; http\_uri; \\
-    Tomcat server snoop access & \cite{nikto} & AREC & HTTP & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
+    %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
+    ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & http \MyComment{& Privilege Escalation} & \textbf{content}:"GET"; http\_method; nocase; \textbf{content}:"/CFIDE/administrator"; http\_uri; nocase; \\
+    iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:"/iisadmin"; nocase; http\_uri; \\
+    JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & http \MyComment{& Remote Code Execution} & \textbf{content}:"/HtmlAdaptor"; nocase; http\_uri; \textbf{content}:"action=inspect"; nocase; http\_uri; \textbf{content}:"bean"; nocase; http\_uri; \textbf{content}:"name="; http\_uri; \\
+    Script tag in URI\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:"</script>"; nocase; http\_uri; \\
+    WeBid LFI \MyComment{Local File Inclusion} & \cite{nikto} & LFI & http & \textbf{content}:"GET "; depth:4; \textbf{content}:"/cron.php?"; http\_uri; nocase; \textbf{content}:"include\_path="; http\_uri; nocase; \textbf{content}:"../"; \\
+    %%WordPress Login & \cite{wrccdc} & PVE & http & \textbf{content}:"log="; http\_client\_body; \textbf{content}:"\&pwd="; http\_client\_body; \textbf{content}:"\&wp-submit="; http\_client\_body; \\
+    .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:".htaccess"; nocase; http\_uri; \\
+    .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:".idq"; nocase; http\_uri; \\
+    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:"/system32/"; nocase; http\_uri; \\
+    Basebuilder LFI & \cite{nikto} & LFI & http & \textbf{content}:"GET"; http\_method; \textbf{content}:"/main.inc.php?"; nocase; http\_uri; \textbf{content}:"mj\_config[src\_path]="; nocase; http\_uri; \\
+    Tomcat server snoop access & \cite{nikto} & AREC & http & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1577,7 +1579,7 @@ and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), and
 discuss threats to the validity of the
 experiments~(Section~\ref{sec:threats}).
 
-
+\renewcommand{\arraystretch}{0.9}
 \setlength{\tabcolsep}{2pt}
 \begin{table}[h!]
   \small
@@ -1610,13 +1612,13 @@ experiments~(Section~\ref{sec:threats}).
     iisadmin access & 3 & 17 & 408 & 1 \\        
     JBoss JMX & 5 & 23 & 228 & 45 \\
     Script tag in URI & 23 & 22 & 786 & 1 \\
-    WeBid LFI & 1 & 23 & 11100 & 10\\    
+    WeBid LFI & 1 & 23 & 11,100 & 10\\    
     %%Wordpress Login & 8 & 59 & - & - \\
     .htaccess access & 5 & 17 & 984 & 2\\
     .idq access & 14 & 19 & 511 & 2 \\
     /system32/ in URI & 4 & 20 & 1,913 & 4 \\
-    Basebuilder LFI & 1 & 22 & 18133 & 34 \\
-    Tomcat Snoop Access & 1 & 24 & 29830 & 32 \\
+    Basebuilder LFI & 1 & 22 & 18,133 & 34 \\
+    Tomcat Snoop Access & 1 & 24 & 29,830 & 32 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1736,74 +1738,23 @@ introduced in the process). Column ``Ground Truth'' from
 Table~\ref{table:attacks} only shows the essential
 options. Documentation options (\eg{}, ``msg'') are discared.
 
-%% Note from Figure~\ref{fig:overview} that the positive traffic is an
-%% input to the technique. The negative non-malicious traffic, however,
-%% is not.
-
-
-%subsection{Methodology}
-
-
-%% \Gui{
-%% O procedimento que já tínhamos representa a etapa de treinamento. Toda aquela parte que foi explicada na apresentação para os outros professores e descrito no paper. Descreverei novamente pra confirmar, e também foi adicionado uma pequena etapa.
-
-%% TREINAMENTO
-
-%% ->Syrius recebe como input um pcap contendo o ataque (no caso de ataques com content, usamos ataques do Nikto), um pcap benígno (usamos o bigflows.pcap) e um pcap contendo as variações de ataque (isso pode ser otimizado unificando com o pcap de ataque, mas por agora está assim)
-%% ->É gerado a regra máxima através do tokenizer e engenharia reversa.
-%% ->Syrius remove UM content de uma regra da lista de regras atuais (inicialmente apenas a regra máxima) e checa se a regra criada já existe na lista. Se não, a regra é adicionada à lista de regras-não-testadas. Syrius faz isso duas vezes por regra, para todas as regras da lista.
-%% ->A lista de regras-não-testadas é inicializada no suricata e então o rodamos com o pcap benígno de treinamento (75porcento do total). Verificando no arquivo de log do suricata, caso a regra alerte, ela é removida da lista. As regras restantes vão para a lista de regras atuais.
-%% ->Quando não houver alterações, retornamos a lista com todas as regras que deram certo.
-%% ->Opcionalmente, ainda rodamos no final uma variação de ataque (no momento apenas um pacote devido ao número limitado que temos do ataque). Ao contrário do método com pacotes benígnos, se a regra NÃO alertar, ela é removida.
-%% ->Calculamos o fitness de cada regra e ordenamos de acordo com o fitness resultante. Esta lista ordenada é o fim do treinamento.
-
-%% TESTE
-
-%% ->Inicializamos a lista de regras ordenadas no suricata e rodamos o pcap benígno de teste (25porcento restantes) para cálculo do precision. O cálculo ficou basicamente, por regra: [100 - (numero-de-alertas/total-de-pacotes)]
-
-%% ->Inicializamos a lista de regras ordenadas no suricata e rodamos o pcap com variações de ataque (caso a etapa opcional ocorrer, não usamos aquele pacote especifico) para cálculo do recall. O cálculo ficou basicamente, por regra: [(100/total-de-pacotes) * n-alertas].
-
-%% ->Por final calculamos o F1 Score por regra: [2*((precision*recall)/(precision+recall))]
-
-%% ->O teste retorna um csv contendo a lista de regras ordenadas com seus respectivos precision, recall e f1 score.
-%% }
-
-%% \Gui{We are using the bigflows.pcap provided by tcpreplay on http://tcpreplay.appneta.com/wiki/captures.html "This is a capture of real network traffic on a busy private network’s access point to the Internet"
-%%  }
-
-%% \Luc{entrada: utilizamos a ferramenta hping3 para executar o ataque em um alvo arbitrario dentro da rede (n ha necessidade de haver um alvo real para executar o hping3) e capturamos o trafego gerado com o wireshark. o comando utilizado foi:\\*
-%% \texttt{\# hping3 -d 80 -w 64 -S -p 80 --flood --rand-source 192.138.1.115} \\*
-%% que envia pacotes de 80 bytes (-d 80), com a flag SYN habilitada (-S), tamanho de janela de 64 bytes (-w 64), direcionados a porta 80 (-p 80). A flag --flood indica q o hping3 vai enviar os pacotes o mais rápido possível. a flag --rand-source indica que cada pacote vai ter um ip de origem aleatorio. 192.138.1.115 é o alvo.\\*
-%% O trafego armazenado contem 40 mil pacotes SYN, enviados no intervalo de 1 segundo,  pegamos uma amostra de 20 desses pacotes para representar o flood e servir como entrada.\\*
-%% O wireshark armazena os pacotes no formato pcap, utilizamos a ferramenta tcpreplay para reproduzir o trafego com o comando:\\*
-%% \texttt{\# tcpreplay --pps 200 --intf1=wlp2s0 Datasets/syn-flood-sample.pcap}\\*
-%% Nesse caso, estamos enviando os pacotes armazenados em \texttt{Datasets/syn-flood-sample.pcap} a uma taxa de 200 pacotes por segundo (\texttt{-pps 200}) utilizando a interface wlp2s0 (\texttt{--intf1 wlp2s0})\\* 
-%% Há diferenças entre os pacotes na opção ack.\\* 
-%% Por que 20? Apenas para gerar a regra mais rapidamente, poderia ser qualquer valor maior ou menor. No final, o parâmetro \texttt{count} da opção \texttt{threshold} vai ser alterado pelo adm da rede.\\*
-%% Intervalo de reprodução: 0.005 segundo
-
-%% }
-
-%% \Fix{any other detail we should consider?}
-
 \subsection{Answering RQ1: \textRQone}
 \label{sec:answer-rqone}
 
-This section reports on the performance evaluation of \tname. The
-evaluation metric used is the position of the golden rule at the
-ranked list of plausible rules produced by the tool implementing the
-technique (see Figure~\ref{fig:overview}). This metric is a proxy of
-human performance in analyzing the list of plausible rules that
-capture only the malicious traffic provided on input.
+RQ1 addresses the performance of \tname. The metric we use is the
+position of the golden rule at the ranked list of plausible rules
+reported by \tname\ (see Figure~\ref{fig:overview}). This metric is a
+proxy of human performance in analyzing the list of plausible rules.
+
 
 Table~\ref{table:results} shows results. Column ``Name'' shows the
 name of the attack, column ``\#~Vars.'' shows the number of variants
 of the attack, column ``\#~Option Cand. (step 1)'' shows the number of
 option candidates reported by \tname\ at step 1, column ``\#~Plausible
 Rules (step 2)'' shows the number of plausible rules reported by
-\tname\ at step 2, column ``Rank (step 3)'' shows the position of the
-golden rule in the ranked list reported at step 3 of the technique.
-It is worth to indicate that column ``\#~Vars.'' shows the input of
+\tname\ at step 2, and column ``Rank (step 3)'' shows the position of the
+golden rule in the ranked list reported at step 3.
+It is important to indicate that column ``\#~Vars.'' shows the input of
 \tname\ that varies across different attacks. Although \tname\ also
 depends on the data sets of benign traffic and existing \suri\ rules,
 these inputs are constant across different executions of the tool. The
@@ -1819,17 +1770,19 @@ option candidates depend on the layout of the messages. Also observe
 that the number of plausible rules is much smaller for non-content
 attacks compared to content attacks.
 
-\newcommand{\percTopFiveRanking}{\Fix{X\%}}
+\newcommand{\percTopFiveRanking}{66.7\% (=10/15)}
 
 Overall, results show that \tname\ performed very well in most of the
 cases. It reported the ground truth rule in \emph{all} cases and
 reported that rule within the top five rules of the ranking in
-\percTopFiveRanking\ of the cases. It is important to note that the
-number of options in the ground truth (Table~\ref{table:attacks},
-column ``Ground Truth'') is not an indication of difficulty to
-synthesize rules. Note that in \Fix{most?} of the cases where the
-ground truth rule contains only one content options the number of
-option candidates and plausible rules produced is high. 
+\percTopFiveRanking\ of the cases. 
+
+%% It is important to note that the
+%% number of options in the ground truth (Table~\ref{table:attacks},
+%% column ``Ground Truth'') is not an indication of difficulty to
+%% synthesize rules. In facto, note that in  of the cases where the
+%% ground truth rule contains only one content options the number of
+%% option candidates and plausible rules produced is high. 
 
 \begin{center}
 \begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
@@ -1954,7 +1907,7 @@ of the golden rule and x-axis denotes the number of attack examples
 used to synthesize rules. Each point in the x-axis is associated with
 the boxplot of the distribution of results for the corresponding
 number of variants.
-
+ 
 \begin{figure}[h!]
   \centering
   \begin{subfigure}{.2\textwidth}
@@ -1967,8 +1920,10 @@ number of variants.
     \includegraphics[scale=0.4,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
     \caption{scripttag}    
   \end{subfigure}%
+\vspace{-2ex}  
 \caption{Impact of number of positive examples.}
 \label{fig:impact-number-attacks}
+\vspace{-2ex}
 \end{figure}
 
 Results indicate that 1) the number of examples is important, 2) the
@@ -2114,8 +2069,9 @@ case. \Mar{explain syntactical difference, if exist}
   reproduce that attack: \CodeIn{hping3 -d 80 -w 512 -S -p 80 --flood
     --rand-source <IP>}.}
 
-The SYN Flood attack is a denial-of-service attack that exploits a vulnerability in the TCP/IP handshake
-to establish a TCP connection~\cite{cloudfare-synflood}. The handshake
+The SYN Flood attack is a denial-of-service attack that exploits a
+vulnerability in the tcp/ip handshake
+to establish a tcp connection~\cite{cloudfare-synflood}. The handshake
 works as follows in normal circumstances. First, a client sends a SYN
 packet to the server, requesting a connection. Second, the server
 responds with a SYN-ACK packet to the client. Third, the client
@@ -2140,7 +2096,7 @@ Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
 this attack. This rule was obtained from the Emerging Threats Open
 Ruleset~\cite{emerging-threats-open}. The relevant options in the
 rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
-SYN packet in a TCP packet and the option \CodeIn{threshold: type
+SYN packet in a tcp packet and the option \CodeIn{threshold: type
   both, track by\_dst, count 5000, seconds 5} indicates that a high
 volume of such packets should be requested in a short period of
 time. The other options are for documentation purposes.
