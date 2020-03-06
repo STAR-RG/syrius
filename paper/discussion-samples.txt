@@ -1,0 +1,100 @@
+...........
+In this case, however, that information alone is
+insufficient as the malicious traffic is characterized as a sequence
+of messages. 
+...........
+
+
+%% \Mar{...and where did they come from?} \Luc{Sim, floods podem ser
+%% compostos por milhares de pacotes, um dos data sets q encontrei
+%% possui mais de 500k pacotes de flood. Os data set  s foram encontrados na internet.}
+
+\begin{figure}[h]
+  \vspace{-2ex}
+  \lstinputlisting[language=C,numbers=none,frame=none,keywords={flags,threshold,window}]{synflood.suricata.synth}
+%  \caption{Suricata rule for SYN Flood Attacks.}
+  %  \label{fig:synflood-example-synt}
+  \vspace{-2ex}  
+\end{figure}
+
+%% \Mar{@Lucas/Guilheme, há algo o que remover? talvez ``window:64''?
+%%   Qual a correspondencia de ``flags:S,12'' com ``flags:S''? Por favor,
+%%   respondam isto logo.}  \Gui{O window:64 seria removido
+%%   sim.}\Mar{ok. vou explicar isto.}
+  %% \Luc{O segundo campo da opção flags define flags que serão
+  %%   ignoradas. Nesse caso a regra procura por pacotes onde apenas a
+  %%   flag S está 'setada', independentemente do valor das flags 1 e
+  %%   2. Portanto a regra gerada pode capturar coisas diferentes da
+  %%   regra original. A inferencia do "12" n pode ser feita apenas a
+  %%   partir do pacote de entrada, precisariamos tratar
+  %%   isso.}\Mar{vc. pode explicar isto **mais detalhadamente** \Luc{a opção flags pode ter dois campos separados por virgula (ex: flags:S,12). o primeiro campo indica quais flags devem estar ativas em um pacote para que o suricata gere um alerta. se uma ou mais flags forem irrelevantes para a detecção de um determinado ataque (ou seja, se n importa se a flag está ou não ativa), elas serão adicionadas ao segundo campo.} E (1)
+  %%   explicar que isto eh uma limitacao \Luc{n entendi exatamente oq explicar aqui.} e (2) indicar a possivel consequencia
+  %%   disto? \Luc{a consequencia sao possiveis falsos negativos. ao não incluir flags no segundo campo podemos descartar pacotes por conta da presença de flags q n são relevantes (ou seja, vamos levar em conta flags q n deveriam interferir na detecção).}}
+
+\noindent
+
+.....
+
+ The list below shows the rule options for the top-5 rules
+\tname{} produces for this attack.\Mar{algum problema em fazer isto?
+  exemplos concretos ajudam muito!} \Luc{No caso desse ataque, a regra inicial possui apenas duas opcoes (sem contar o threshold). Entao existem apenas 3 combinacoes possiveis, dessas 3 apenas 2 sao capazes de isolar o ataque do trafego normal. Portanto, o top-2 eh:
+  \begin{figure}[h]
+    \vspace{-2ex}
+    \lstinputlisting[language=C,numbers=none,frame=none,keywords={window,flags, threshold}]{top-synflood.rules}
+    \vspace{-3ex}  
+  \end{figure}
+
+   }\Mar{Lucas, eu nao entendo porque vc. desconsiderou threshold da
+  discussao (afinal, a gente destaca thrshold como relevante no inicio
+  desta secao). tambem nao entendo porque window---que a gente disse
+  acima que *nao* era relevante---aparece nas duas regras
+  geradas. enfim, isto esta inconsistente com nosso discurso.}
+  \Luc{Coloquei o threshold em destaque tambem. O window nas duas regras foi um erro, corrigi.}
+
+\vspace{1ex}
+\noindent
+\textbf{Differences.}~Note that there are differences between the
+options produced in the first step of \tname{} and the options from
+the golden rule, as per Figure~\ref{fig:synflood-example}. The option
+\CodeIn{flags} does not mention parameters \CodeIn{1 2}, there is an
+extra option \CodeIn{window}, and there are differences in the option
+\CodeIn{threshold}. Considering the option \CodeIn{flags}, the first
+parameter of that option indicates what flags in the packet must be
+set while the second parameter indicates non-mandatory flags (\ie{},
+``don't cares''). More specifically, the option \CodeIn{flags: S}
+indicates that the flag ``S'' must be set and all flags not mentioned
+(including ``1'' and ``2'') must be unset for the \nids\ to capture
+the traffic. Consequently, that choice of option alone could result in
+false negatives and false positives. An attack that satisfies all
+other conditions in a rule and has flags ``1'' or ``2'' set would be
+captured by the original rule but not captured by the inferred rule---a case of
+false negative. Likewise, an attack that satisfies all conditions and
+have flags ``1'' and ``2'' unset would be captured by the inferred
+rule but not captured by the original rule---a case of false positive. The set of
+positive examples is to blame in this case. To mitigate this issue,
+the input messages should have covered cases with options ``1'' or
+``2'' set. Considering option \CodeIn{window: 512}, \tname{} is able
+to generate rules without that option, as discussed above. Considering
+option \CodeIn{threshold}, the values used in the golden rule are
+domain-specific. \tname{} uses default values for these options. We
+conjecture that the system administrator would be able to configure
+this option.
+
+
+%% \begin{table}[h]
+%%   \caption{\label{table:rules}Rule evolution}  
+%%   \centering
+%%   \begin{tabular}{lllll}
+%%     \toprule
+%%     \multicolumn{1}{c}{Iteration} & \multicolumn{1}{c}{Rule} \\
+%%     \midrule     
+%%     0 & (ack:0; seq:0; window:0; flags:F;)\\
+%%     5 & (window:0; flags:F;)\\
+%%     68 & (window:64; flags:F;)\\
+%%     73 & (window:64; flags:S,12;)\\
+%%     94 & (window:64; flags:S,12; threshold: type both, track by\_dst, count 20, seconds 1;)\\
+%%     \bottomrule
+%%   \end{tabular}
+%% \end{table}
+
+
