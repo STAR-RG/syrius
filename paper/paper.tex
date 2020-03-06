@@ -1044,7 +1044,7 @@ trusted rules rank low.
 \emph{isPlausible} by 1)~updating Suricata to only monitor the rule
 that is passed as parameter\Mar{isto realmente eh necessario? se sim,
   explique. me pareceu que o que vc. precisa ate aqui jah estaria no
-  log do \suri}, 2)~replaying the negative benign traffic (see
+  log do \suri} \Luc{Nao precisa desse ponto. Para essa etapa foi preciso modificar o codigo do suricata para q ele fosse capaz de gerar mais de 15 alertas para um unico pacote. Durante a execução do Syrius pode ser gerada uma grande quantidade de regras q causam falsos positivos, eventualmente podem haver 15 delas q detectam erroneamente um mesmo pacote. Sem essa alteração, algumas regras q geram falso positivo n seriam eliminadas.}, 2)~replaying the negative benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
 check if any benign message was captured by the rule. \Mar{discuss
   filter function.} It is worth
