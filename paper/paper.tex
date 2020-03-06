@@ -824,17 +824,15 @@ options refer to sequences of characters separated by typical natural
 language delimiters such as $\backslash$t, $\backslash$n,
 $\backslash$r, and spaces. To find the values associated with these
 options, \tname{} splits the payload in tokens using these delimiters.
-Considering the example from Section~\ref{sec:content-example},
-\tname{} produced a total of 23 tokens\Mar{@Lucas, isto estah certo?
-  Se sim, como isto cai para 5 (pela Tabela 3)} \Luc{6.1.1 eh o ataque 
-JBoss. Na tabela constam 23 tokens.}, considered content
-option candidates.
+
+%Considering the example from Section~\ref{sec:active-recon},
+%\tname{} produced a total of 5 tokens.
 
 It is worth noting that we found that deciding which reverse
 engineering strategy to use based on the protocol of the input
-(malicious) messages was effective. We used the payload strategy for
-http and the field strategy for the other protocols. For flooding
-attacks, \tname\ runs the same approach for each message and
+(malicious) messages showed to be effective. We used the payload
+strategy for http and the field strategy for the other protocols. For
+flooding attacks, \tname\ runs the same approach for each message and
 identifies common options across all messages. For that case,
 \tname\ reports, in addition, a \CodeIn{threshold} option, as
 discussed on Section~\ref{sec:rules-and-packets}.  At the end of the
@@ -1041,27 +1039,27 @@ trusted rules rank low.
 %\Fix{...}
 
 \textbf{Implementation details.} We implemented function
-\emph{isPlausible} by 1)~updating Suricata to only monitor the rule
-that is passed as parameter\Mar{isto realmente eh necessario? se sim,
-  explique. me pareceu que o que vc. precisa ate aqui jah estaria no
-  log do \suri} \Luc{Nao precisa desse ponto. Para essa etapa foi preciso modificar o codigo do suricata para q ele fosse capaz de gerar mais de 15 alertas para um unico pacote. Durante a execução do Syrius pode ser gerada uma grande quantidade de regras q causam falsos positivos, eventualmente podem haver 15 delas q detectam erroneamente um mesmo pacote. Sem essa alteração, algumas regras q geram falso positivo n seriam eliminadas.}, 2)~replaying the negative benign traffic (see
+\emph{isPlausible} by 1)~spawning Suricata to monitor a specified
+rule, 2)~replaying the negative benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
-check if any benign message was captured by the rule. \Mar{discuss
-  filter function.} It is worth
-noting that the benign traffic is stored in \emph{pcap}
-files~\cite{pcap} and Suricata can process those files very
-efficiently compared to analyzing network messages directly. Instead
-of sending traffic to a machine with a deployed server (\eg{}, web
-server) that \suri\ would monitor, our setup calls \suri\ directly
-through an API. \suri\ is invoked multiple times in the process of
-minimizing the rule.  \textbf{Limitations.} It is worth noting that
-the performance of \tname{} depends on the quality of inputs. For the
-positive malicious traffic, \tname{} only requires one sample (as
-input to step one), but can benefit of several samples (see
-line~\ref{filtering} of Algorithm~\ref{algo1}). The same applies to
-the negative traffic. However, in this case, \tname{} can use a large
-variety of public data sets available online (see
-Section~\ref{sec:objectanalysis-benign}).
+check if any benign message was captured by the rule. The function
+\emph{filter} is implemented similarly. It returns a projection of the
+set $\mathcal O$ where every rule captures the attacks characterized
+by $\mathit{mTr}$. It is worth noting that Suricata can process
+\emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
+network messages directly. Instead of sending traffic to a machine
+with a deployed server (\eg{}, web server) that \suri\ would monitor,
+our setup calls \suri\ directly through an API. \suri\ is invoked
+multiple times for creating rules.
+
+%% \textbf{Limitations.} It is worth
+%% noting that the performance of \tname{} depends on the quality of
+%% inputs. For the positive malicious traffic, \tname{} only requires one
+%% sample (as input to step one), but can benefit of several samples (see
+%% line~\ref{filtering} of Algorithm~\ref{algo1}). The same applies to
+%% the negative traffic. However, in this case, \tname{} can use a large
+%% variety of public data sets available online (see
+%% Section~\ref{sec:objectanalysis-benign}).
 
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
@@ -1469,12 +1467,14 @@ considered the best choice. We considered \emph{all} combinations of
 the following weights 0, 0.25, 0.5, 0.75, and 1. Given that we have
 four different functions and five possible weight values, we needed to
 run \tname{} on the sample of attacks for 625 (=$5^4$) times. In the
-end of the process, the weight combination $\langle{}x,y,z,w\rangle$
-was the best we found. \Mar{$\leftarrow$indique aqui quais foram os
-  pesos que a gente usar para cada funcao.} \Luc{f1: 1, f2: 0.25, f3: 0.25, f4: 1} Although empirical results
-showed that this strategy results in good performance, we remain to
-evaluate other optimization strategies, such as evolutionary
-alternatives as AVM~\cite{10.1109/32.57624}, to find better weights.
+end of the process, the weight combination
+$\langle{}1,0.25,0.25,1\rangle$ was the best choice we found. Although
+results showed that this strategy results in good performance, we
+remain to evaluate other optimization strategies to find better
+weights.
+
+%% , such as evolutionary alternatives as
+%% AVM~\cite{10.1109/32.57624}.
  
 %\Gui{Fizemos um teste para encontrar melhores pesos para cada ataque. Calculamos o fitness de cada regra atribuindo diferentes pesos para cada função heurística. Os valores atribuídos foram 0, 0.25, 0.5, 0.75 e 1. Depois de calculado, ordenamos todas as listas criadas e pegamos a posição da Golden Rule. As melhores combinações de pesos (que conseguiram melhor posição da golden rule) estão na tabela 4, onde na coluna "Weights", há quatro números separados por vírgula, cada um deles representando o peso de uma função (na ordem que é representado no paper. O total de regras criadas é igual ao da Tabela 3.}
 
