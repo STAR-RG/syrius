@@ -395,7 +395,7 @@ This paper makes the following contributions.
 \item[\Contrib{}]\textbf{Data.} A data set of artifacts involved in
   the evaluation of \tname\ (\eg{}, pcap files of example attacks, list
   of plausible rules generated, etc.). The data set is available at
-  the following URL~\url{https://zenodo.org/record/3698366}.
+  the following URL~\ourdataset.
   
 \end{itemize}
 
@@ -421,8 +421,8 @@ anomaly-based \nids{} focuses on unknown potential attacks. Rule-based
 \nids\ can miss attacks as rulesets can become obsolete whereas
 anomaly-based \nids\ can report false alarms as learning algorithms
 that generalize observations from benign traffic are approximate.
-This paper focuses on rule-based \nids\ for its tremendous popularity
-in industry\Fix{cite or tone down}. Although we used Suricata, the
+This paper focuses on rule-based \nids\ for its popularity
+in industry. Although we used Suricata, the
 principles we used are general to any other signature-based
 \nids~(\eg{}, Snort~\cite{snort}).
 
@@ -480,7 +480,7 @@ argument is present in the payload of a message.
     10 & content & checks if argument is present on the payload\\
     \bottomrule
   \end{tabular}
-  \vspace{-3ex}  
+%  \vspace{-3ex}  
 \end{table}
 
 Table~\ref{table:rules} shows a sample of non-documentation options of
@@ -547,7 +547,19 @@ Suricata supports a total of \totoptions\ distinct options covering
 We mentioned above that http rules often used content options, which
 associate with the message payload. For non-http rules, options are
 often associated with packet fields. Let us consider a rule for an
-icmp attack as example. Figure~\ref{fig:icmp-packet-layout} shows the
+icmp attack as example.
+
+\begin{figure}[h!]
+  \centering
+  \vspace{-2ex}  
+  \includegraphics[scale=0.27]{figs/ICMP-packet-structure.png}
+  \vspace{-2ex}
+  \caption{Layout of an icmp packet.}
+  \vspace{-2ex}
+  \label{fig:icmp-packet-layout}
+\end{figure}
+
+Figure~\ref{fig:icmp-packet-layout} shows the
 layout of an icmp packet. The packet fields ``Flags'' and ``Time to
 Live'', declared in the ip header, are mapped to the \suri\ options
 \CodeIn{flagbits} and \CodeIn{ttl}, respectively. Likewise, the fields
@@ -564,18 +576,11 @@ options can be determined through transformation functions, as those
 informally described above. One exception to this is the option
 \CodeIn{threshold}, which is typically used in denial-of-service
 attacks. That option operates over sequence of messages as opposed to
-a single message. Consequently, it is not possible to determine its
-values from a single message.
+single messages.
 
-\begin{figure}[t!]
-\centering
-\includegraphics[scale=0.27]{figs/ICMP-packet-structure.png}
-\vspace{-2ex}
-\caption{Layout of an icmp packet.}
-\vspace{-2ex}
-\label{fig:icmp-packet-layout}
-\end{figure}
-%\vspace{-2ex}
+%Consequently, it is not possible to determine its
+%values from a single message.
+
 
 %% More precisely, to trigger an action on a rule
 %% containing that option a \nids\ tool needs to monitor several
@@ -606,9 +611,9 @@ an attacker to discover which machines are active in the network.
   \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
   \vspace{-2ex}  
   \caption{Suricata rule for Ping Scan attack.}
+  \vspace{-4ex}  
   \label{fig:pingscan-example}
 \end{figure}
-\vspace{-3ex}
 
 Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
 a Ping Scan, as documented in NMAP~\cite{netmap}, a network discovery
@@ -1899,19 +1904,23 @@ Creations step). It is expected that the number and variety of
 attacks---of the same kind---plays an important role in the
 performance of the technique.
 
+%%---and the case where \tname\ performs worst---jboss \Fix{Remover jboss}
+
 To answer this research question, we selected two cases with the
 highest number of examples (see column ``\#~Vars'' on
-Table~\ref{table:results})---idqaccess and scripttag---and the case
-where \tname\ performs worst---jboss \Fix{Remover jboss}. We measured the position of the
-golden rule at the rank for an increasing number of of examples
-provided to \tname. For each number of variants, we sampled five sets
-of that size to provide as input to the
+Table~\ref{table:results})---idqaccess and scripttag. We measured the
+position of the golden rule at the rank for an increasing number of
+examples provided to \tname. For each number of variants, we sampled
+five sets of that size to provide as input to the
 technique. Figure~\ref{fig:impact-number-attacks} shows the results
 for each attack we selected. The y-axis of each plot denotes the rank
 of the golden rule and x-axis denotes the number of attack examples
 used to synthesize rules. Each point in the x-axis is associated with
 the boxplot of the distribution of results for the corresponding
-number of variants.
+number of variants. Results indicate that 1) the number of examples is
+important, 2) the choice of examples is important, and 3) a small
+number of examples suffices to reach the best results.
+
  
 \begin{figure}[t!]
   \centering
@@ -1931,9 +1940,6 @@ number of variants.
 \vspace{1ex}
 \end{figure}
 
-Results indicate that 1) the number of examples is important, 2) the
-choice of examples is important, and 3) a small number of examples
-suffices to reach the best results.
 
 \begin{center}
 \begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
@@ -2028,14 +2034,6 @@ execution of code on the JBoss application server.
 %% cyberattack can take place from any geophysical location."\\
 
 
-\begin{figure}[H]
-  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
-  \vspace{-2ex}  
-  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code
-    Execution.}
-  \vspace{-3ex}
-\end{figure}
-
 %A opção  define que o match só será feito em pacotes que fazem parte
 %de uma conexão já estabelecida entre um cliente e um servidor. Além
 %disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente.
@@ -2053,12 +2051,16 @@ script~\cite{nikto}. Similar attacks are also available on the
 Metasploit database~\cite{metasploit}. This is a case where
 \tname\ performed poorly. Of the 228 plausible rules it generated for
 this attack, the ground truth was located at position 45 in the ranked
-list. The reason for that is that \Fix{...xxx...}
+list.
 
-
-%% \Mar{move from above --> We used the following hping3 command to
-%%   reproduce that attack: \CodeIn{hping3 -d 80 -w 512 -S -p 80 --flood
-%%     --rand-source <IP>}.}
+\begin{figure}[t!]
+%  \vspace{-1ex}    
+  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
+  \vspace{-2ex}  
+  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code
+    Execution.}
+%  \vspace{-1ex}
+\end{figure}
 
 \textbf{Denial-of-Service.}~
 The SYN Flood attack is a denial-of-service attack that exploits a
@@ -2111,17 +2113,17 @@ derive rules for Snort, which are very similar to \suri's.  Their
 approach focuses on icmp attacks. It models every field of the icmp
 packet in the chromosome of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
-that randomly combine options, model-ling the packet fields. They show
+that randomly combine options, modelling the packet fields. They show
 that they were able to generate rules without false negatives and only
 3 false positives across 33K benign packets. The key differences
 between our work and Vollmer~\etal{}'s are 1) the support of different
 protocols and 2) the use of ranking to discriminate alternative
 plausible rules. As for 1, our approach supports a variety of
 protocols and options that refer to message payloads which
-significantly increase the search space. Note that icmp rules only
-refer to message fields (see Section~\ref{sec:rules-and-packets})
-\Luc{eh possivel incluir contents em regras icmp tb. o q a secao 2.3 
-diz q \textbf{geralmente} as regras nao-http possuem apenas field options}. 
+significantly increase the search space. The icmp rules they generate only
+refer to message fields (see Section~\ref{sec:rules-and-packets}).
+\MyComment{\Luc{eh possivel incluir contents em regras icmp tb. o q a secao 2.3 
+diz q \textbf{geralmente} as regras nao-http possuem apenas field options}. }
 As for 2, our solution additionally ranks plausible options, which
 contain \emph{no} false positives or negatives with respect to the
 benign and mallicious traffic considered. Muthuregunathan
@@ -2169,19 +2171,13 @@ be used for repair.
 
 \noindent
 \textbf{Anomaly-based intrusion detection.}
-Cordy~\etal{}\cite{cordy-etal-issta19} propose the use of
-\Fix{...what...} to \Fix{...calibrate parameters of?....}
-anomaly-based \nids. Although our approach and theirs use machine
-intelligence to detect attacks, as discussed on
-Section~\ref{sec:background} anomaly-based and rule-based \nids\ are
-complementary.
-\Gui{Anomaly-based intrusion detection. Cordy and colleagues[28] 
-propose the use of a search-based genetic algorithm to not only 
-generate attack schemes capable of penetrating the tested anomaly-based 
-NIDS, but also repairing the NIDS to identify the given attack scheme. 
-Although our approach and theirs use machine intelligence to detect 
-attacks, as discussed on Section 2 anomaly-based and rule-based NIDS 
-are complementary.}
+Cordy~\etal{}\cite{cordy-etal-issta19} propose the use of a genetic
+algorithm to not only generate attack schemes capable of penetrating
+the tested anomaly-based NIDS, but also repairing the NIDS to identify
+the given attack scheme. Although our approach and theirs use machine
+intelligence to detect attacks, anomaly-based and rule-based
+\nids\ are complementary, as discussed on
+Section~\ref{sec:background}.
 
 %% \Gui{\textbf{Automated Repair By Example for Firewalls -} Ruzica repara e modifica regras de firewall a partir de uma entrada contendo exemplos ou behaviour. Embora firewalls e NIDS nao sejam exatamente a mesma coisa, a estrutura de regras contem muitas semelhancas, e a utilizacao de exemplos para modificar a regra pode ser comparado com nosso metodo de criacao de regras a partir de um pacote maligno (para ser sincero, nao vi muitas semelhancas com nosso paper, nao sei descrever mais)}
 
@@ -2198,7 +2194,8 @@ rules. \tname{} is organized as a pipeline of three components that
 the seed, and 3)~rank plausible rules. Experimental results provide
 early evidence showing that \tname\ is very promising. It was able to
 rank the correct rule among the first five rules of the reported
-ranking in \percTopFiveRanking\ of the cases we analyzed.
+ranking in \percTopFiveRanking\ of the cases we analyzed. The data set
+containing our experimental artifacts is publicly accessible at \ourdataset.
 
 %% \section*{Acknowledgments}
 %% This work is partially supported by RNP grant number 002951.
