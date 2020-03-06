@@ -2134,12 +2134,52 @@ of the ranking.
 
 \section{Related Work}
 
-\Luc{\textbf{Autonomous Rule Creation for Intrusion Detection} - Usam o Snort e geram regras apenas para pacotes ICMP. O pacote maligno tb eh sabido previamente e, assim como nos, eles identificam todas as opcoes q podem ser usadas para identificar esse pacote. A tecnica proposta utiliza algoritmos geneticos onde a populacao inicial eh formada por regras q combinam aleatoriamente todas essas opcoes. Eles foram capazes de gerar regras q n geram falsos negativos e apenas 3 positivos entre 33k pacotes.}
+This section elaborates on the most similar work.
 
-\Gui{\textbf{Efficient Snort Rule Generation using Evolutionary computing for Network Intrusion Detection -} O metodo proposto por Raghavan eh baseado em Clustering utilizando algoritmos geneticos e Hill climbing para otimizar os clusters formados. Outros papers, citados no related works, tambem propuseram uma ideia semelhante, no [1][4][6] do paper de Raghban.
-A arquitetura proposta pega traffic files em intervalos de tempo constante e clusteriza os pacotes utilizando algoritmo hibrido de k means e partitioning around medoids. Com clusters formados, ele otimiza usando algoritmos geneticos e hill climbing.
-Eh entao criada uma regra que isola perfeitamente o cluster considerado como ataque. Quanto as opcoes, ele nao especifica quais, e nao deixa claro que considera content. O que ele fala eh que para lidar com dados continuos, como numero de bytes enviados numa conexao tcp, ele utiliza ranges com > e < ( maior que menor que). E para opcoes discretas sao consideradas todas e colocados como um OR.
-Ou seja, a IA serve para separar o ataque do trafego normal, e a regra eh gerada "do nada" e aparentemente eh bem especifica.}
+\noindent
+\textbf{Alternative methods for rule synthesis.} We discuss in the
+following techniques similar in goal to ours. Unfortunately, we could
+not access the tools implementing the techniques for side
+comparison. Nevertheless, we found that there are important
+differences between our work and related work. Vollmer
+\etal{}~\cite{vollmer-etal-cics2011} propose the use of search to
+derive rules for Snort, which are very similar to \suri's.  Their
+approach focuses on icmp attacks. It models every field of the icmp
+packet in the chromosome of candidate solutions (\ie{}, a rule) of a
+genetic search. The initial population is a set of candidate solutions
+that randomly combine options, modelling the packet fields. They show
+that they were able to generate rules without false negatives and only
+3 false positives across 33K benign packets. The key differences
+between our work and Vollmer~\etal{}'s are 1) the support of different
+protocols and 2) the use of ranking to discriminate alternative
+plausible rules. As for 1, our approach supports a variety of
+protocols and options that refer to message payloads which
+significantly increase the search space. Note that icmp rules only
+refer to message fields (see Section~\ref{sec:rules-and-packets}). As
+for 2, our solution additionally ranks plausible options, which
+contain \emph{no} false positives or negatives with respect to the
+benign and mallicious traffic considered. Muthuregunathan
+\etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
+create rules. They characterize candidate solutions as a set of field
+values and use a clustering algorithm---hybrid k-means partitioned
+around menoids---to isolate mallicious from benign
+traffic. Subsequently, they optimize the formed clusters using genetic
+algorithms and hill-climbing search. Ou approach differs from theirs
+in the method used, results, and support for content options.
+
+%% \Luc{\textbf{Autonomous Rule Creation for Intrusion Detection} -
+%% Usam o Snort e geram regras apenas para pacotes ICMP. O pacote
+%% maligno tb eh sabido previamente e, assim como nos, eles
+%% identificam todas as opcoes q podem ser usadas para identificar
+%% esse pacote. A tecnica proposta utiliza algoritmos geneticos onde a
+%% populacao inicial eh formada por regras q combinam aleatoriamente
+%% todas essas opcoes. Eles foram capazes de gerar regras q n geram
+%% falsos negativos e apenas 3 positivos entre 33k pacotes.}
+
+%% \Gui{\textbf{Efficient Snort Rule Generation using Evolutionary computing for Network Intrusion Detection -} O metodo proposto por Raghavan eh baseado em Clustering utilizando algoritmos geneticos e Hill climbing para otimizar os clusters formados. Outros papers, citados no related works, tambem propuseram uma ideia semelhante, no [1][4][6] do paper de Raghban.
+%% A arquitetura proposta pega traffic files em intervalos de tempo constante e clusteriza os pacotes utilizando algoritmo hibrido de k means e partitioning around medoids. Com clusters formados, ele otimiza usando algoritmos geneticos e hill climbing.
+%% Eh entao criada uma regra que isola perfeitamente o cluster considerado como ataque. Quanto as opcoes, ele nao especifica quais, e nao deixa claro que considera content. O que ele fala eh que para lidar com dados continuos, como numero de bytes enviados numa conexao tcp, ele utiliza ranges com > e < ( maior que menor que). E para opcoes discretas sao consideradas todas e colocados como um OR.
+%% Ou seja, a IA serve para separar o ataque do trafego normal, e a regra eh gerada "do nada" e aparentemente eh bem especifica.}
 
 \Gui{\textbf{Automatic NIDS Rule Generating System for Detecting HTTP-like Malware Communication -} Apresenta um sintetizador de regras para trafego HTTP. O metodo eh bem parecido com o nosso no que se trata em utilizar trafego maligno separado para a criacao de regra, e utilizacao de trafego benigno para detectar falso positivo. O ponto eh que eles nao descrevem o metodo que utilizam para separar os contents. Alem disso, caso um falso positivo seja capturado, a regra deve ser manualmente ajustadas.
 O paper possui algo interessante que o nosso nao possui. Ele eh capaz de detectar clusters nas regras criadas e pre existentes, sendo capaz de otimiza-las.}
