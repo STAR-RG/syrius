@@ -1383,7 +1383,7 @@ computation of similarity score would be 0.601 (=(1+.203)/2). The
 relatively high weight reflects the fact that ``GET'' and ``ID'' are
 popular content strings.
 
-\subsubsection{Popularity of http content modifiers.} As previously
+\subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers.} As previously
 mentioned, \percRulesWithContent\ of \suri\ rules involve content
 options. Furthermore, nearly half of the rules that use content
 options use content modifiers to qualify the search. Http modifiers
@@ -1842,33 +1842,33 @@ that rule is ranked among the first top five rules in
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
 
-This section evaluates the importance of each proposed heuristic
-function. To that end, we evaluated the use of \tname{} without each
-of these functions with the goal of checking how much each of them
+RQ2 evaluates the importance of each proposed heuristic function. To
+answer that question, we evaluated the use of \tname{} without each of
+these functions with the goal of checking how much each of them
 contributes to the overall performance of the technique. Recall that
-the score a function $r$ is given by the weigthed average of the
-values given by each heuristic function, \ie{} the score of $r$ is
-obtained with the aggregate function $f(r)=\sum_{i}^{N}
-w_i*f_i(r)/N;$, where $w_i$ is the weight of heuristic $i$, $f_i(r)$
-is the score of heuristic $i$ on $r$, and $N$ is the number of
-heuristic---four, in our case. To assess the value of each heuristic
-function, we assigned its weight to zero---effectively, disabling the
-function---and compared the result with \tname\ using default weights,
-obtained with the procedure described on
+the score a rule $r$ is given by the weigthed average of the values
+given by each heuristic function, \ie{} the score of $r$ is obtained
+with the function $f(r)=\sum_{i}^{N} w_i*f_i(r)/N$, where $w_i$ is the
+weight of heuristic $i$, $f_i(r)$ is the score of heuristic $i$ on
+$r$, and $N$ is the number of heuristics considered---four, in our
+case. To assess the value of each heuristic function, we assigned its
+weight to zero---effectively, disabling the function---and compared
+the result with \tname\ using default weights, obtained with the
+optimization procedure described on
 Section~\ref{sec:weight-optimization}.
 
 Table~\ref{table:weights} shows results. Column ``Name'' shows the
-name of the attack and column ``All'' shows the result of \tname\ with
-all heuristic functions enabled; as in column ``Rank (step 3)'' from
-Table~\ref{table:results}. The remaining columns show results obtained
-by running the same experiment as in Section~\ref{sec:answer-rqone},
-but supressing one heuristic function. An up arrow indicates that,
-considering that particular data point, the performance of \tname{} on
-that configuration is worse when compared to \tname's default
-configuration. A down arrow, appearing highlighted in the table,
-indicates the contrary.
-
-\Mar{--------------------------------- estou aqui}
+name of the attack and column ``base'' shows the result of
+\tname\ with all heuristic functions enabled, as in column ``Rank
+(step 3)'' from Table~\ref{table:results}. The remaining columns show
+results obtained by running the same experiment, as on
+Section~\ref{sec:answer-rqone}, but supressing one heuristic
+function. The number corresponds to the order the heuristic function
+is introduced on Section~\ref{sec:ranking}. The symbol of an up arrow
+($\uparrow$) indicates that the performance of \tname{} on that
+configuration is worse when compared to \tname's default
+configuration. A down arrow ($\downarrow$), appearing highlighted in
+the table, indicates the contrary.
 
 \setlength{\tabcolsep}{5pt}
 \begin{table}[h!]
@@ -1879,30 +1879,30 @@ indicates the contrary.
   \begin{tabular}{lrrrrrr}
     \toprule
     Name &
-    All &
-    -f2 &
-    -f3 &    
-    -f4 &
-    -f5 \\ 
-    Black Nurse & 2 & 2 & 2 & 2 & 7$\uparrow$ \\    
-    Ping Scan & 2 & 2 & 2 & 2 &  8$\uparrow$\\
+    base &
+    -f1 &
+    -f2 &    
+    -f3 &
+    -f4 \\
+    \midrule
+    Black Nurse & 2 & 7$\uparrow$ & 2 & 2 & 2 \\    
+    Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
     SYN Flood & 2 & 2 & 2 & 2 & 2 \\
     UDP Teardrop & 4 & 4 & 4 & 4 & 4 \\
     %%UDP Flood & - & - & - & - & - \\
-
-
+    \midrule
     %%Apache Struts 2 & - & - & - & - & - & -\\
-    ColdFusion & 3 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ & 3 \\
-    iisadmin access & 1 & 1 & 1 & 8$\uparrow$ & 1 \\        
-    JBoss JMX & 45 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ & 45 \\
-    Script tag in URI & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ & 1 \\
-    WeBid LFI & 10 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ & 10 \\    
+    ColdFusion & 3 & 3 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ \\
+    iisadmin access & 1  & 1 & 1 & 1 & 8$\uparrow$\\        
+    JBoss JMX & 45 & 45 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ \\
+    Script tag in URI & 1 & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ \\
+    WeBid LFI & 10 & 10 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ \\    
     %%Wordpress Login & 8 & - & - & - & - \\
-    .htaccess access & 2 & 2 & 2 & 17$\uparrow$ & 2 \\
-    .idq access & 2 & 2 & 2 & 12$\uparrow$ & 2 \\
-    /system32/ in URI & 4 & 20$\uparrow$ & 1\cellcolor{lightgray}$\downarrow$ & 58$\uparrow$ & 4 \\
-    Basebuilder LFI & 34 & 117$\uparrow$ & 57$\uparrow$ & 183$\uparrow$ & 34 \\
-    Tomcat Snoop Access & 32 & 828$\uparrow$ & 2\cellcolor{lightgray}$\downarrow$ & 2564$\uparrow$ & 32 \\
+    .htaccess access & 2  & 2 & 2 & 2 & 17$\uparrow$\\
+    .idq access & 2  & 2 & 2 & 2 & 12$\uparrow$ \\
+    /system32/ in URI & 4  & 4 & 20$\uparrow$ & 1\cellcolor{lightgray}$\downarrow$ & 58$\uparrow$\\
+    Basebuilder LFI & 34  & 34 & 117$\uparrow$ & 57$\uparrow$ & 183$\uparrow$\\
+    Tomcat Snoop Access & 32  & 32 & 828$\uparrow$ & 2\cellcolor{lightgray}$\downarrow$ & 2564$\uparrow$\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1913,15 +1913,19 @@ Tomcat are two cases where results get much worse when supressing one
 of the functions. Also note that the number of down arrows is
 relatively small. Recall that the optimization of weights looks for
 global optimum and cannot avoid those cases. Finally, note that every
-function contributed. Some functions contributed in more cases than
-others, namely \Fix{xxx}, and one of the functions, namely \Fix{xxx},
-only contributed to the performance of \tname{} on attacks involving
-non-http protocols.
+function contributed. Function ``Popularity of content modifiers''
+(Section~\ref{sec:popularity-content-modifiers}) was the function that
+contributed in more cases whereas function ``Popularity of options''
+(see Section~{sec:popularity-options}) only contributed to the
+performance of attacks involving non-http protocols.
 
 
 \begin{center}
 \begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
-..........................
+Every heuristic function contributed to the overall performance of
+\tname. The function that builds on the popularity of content
+modifiers was the one that affected positively the higher number of
+cases we analyzed.
 \end{tcolorbox}
 \end{center}
 
@@ -1934,17 +1938,25 @@ to generate the seed rule (at the Reverse Engineering step) and the
 remaining attacks to evaluate soundness of the rule (at the Rules
 Creations step). It is expected that the number and variety of
 attacks---of the same kind---plays an important role in the
-performance of the technique. To answer this research question, we
-selected the cases with the highest number of examples of attacks (see
-coolumn ``\#~Vars'' on Table~\ref{table:results}), varied the number of
-examples, and measured the position of the golden rule at the
-rank. For each number of variants $N$, we sampled five sets of size
-$N$ to provide as input to the technique.
+performance of the technique.
 
-Table~\ref{fig:impact-number-attacks} shows
-results. \Fix{...elaborate...}
+To answer this research question, we selected two cases with the
+highest number of examples (see column ``\#~Vars'' on
+Table~\ref{table:results})---idqaccess and scripttag---and the case
+where \tname\ performs worst---jboss. We measured the position of the
+golden rule at the rank for an increasing number of of examples
+provided to \tname. For each number of variants, we sampled five sets
+of that size to provide as input to the
+technique. Figure~\ref{fig:impact-number-attacks} shows the results
+for each attack we selected. The y-axis of each plot denotes the rank
+of the golden rule and x-axis denotes the number of attack examples
+used to synthesize rules. Each point in the x-axis is associated with
+a boxplot for the distribution of results for the corresponding number
+of variants. Note that 1) the number of examples is important, 2) the
+choice of examples is important, and 3) a small number of examples
+suffices to reach the best results.
 
-\begin{figure}[t!]
+\begin{figure}[h!]
   \centering
   \begin{subfigure}{.2\textwidth}
     \centering
