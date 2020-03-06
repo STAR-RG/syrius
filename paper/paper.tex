@@ -371,7 +371,7 @@ traffic~\cite{understanding-dos}. Relevant properties about the
 traffic of interest appear in bold in this rule (see
 Section~\ref{sec:suri-metas-coverage}). Deployments of rule-based
 \nids\ are restricted to a fixed set of rules defined by the network
-system administrator.}\Mar{check...}
+system administrator.}
 
 
 
@@ -436,7 +436,7 @@ satisfied\footnote{Technically, an IPS (Intrusion Prevention System)
   differs from an IDS in the action taken when an intrusion is
   observed. IPS systems block malicous traffic whereas IDS system only
   alert them. However, IDS and IPS do not differ in the approaches
-  used to detect the intrusion~\cite{ids-ips}.\Mar{check}}. The
+  used to detect the intrusion~\cite{ids-ips}.}. The
 \emph{header} comes after the action in the rule description. It
 restricts the information flow covered by the rule. The header of this
 rule is \CodeIn{icmp any any -> any any}. It instructs Suricata to
@@ -826,7 +826,8 @@ $\backslash$r, and spaces. To find the values associated with these
 options, \tname{} splits the payload in tokens using these delimiters.
 Considering the example from Section~\ref{sec:content-example},
 \tname{} produced a total of 23 tokens\Mar{@Lucas, isto estah certo?
-  Se sim, como isto cai para 5 (pela Tabela 3)}, considered content
+  Se sim, como isto cai para 5 (pela Tabela 3)} \Luc{6.1.1 eh o ataque 
+JBoss. Na tabela constam 23 tokens.}, considered content
 option candidates.
 
 It is worth noting that we found that deciding which reverse
@@ -1470,7 +1471,7 @@ four different functions and five possible weight values, we needed to
 run \tname{} on the sample of attacks for 625 (=$5^4$) times. In the
 end of the process, the weight combination $\langle{}x,y,z,w\rangle$
 was the best we found. \Mar{$\leftarrow$indique aqui quais foram os
-  pesos que a gente usar para cada funcao.} Although empirical results
+  pesos que a gente usar para cada funcao.} \Luc{f1: 1, f2: 0.25, f3: 0.25, f4: 1} Although empirical results
 showed that this strategy results in good performance, we remain to
 evaluate other optimization strategies, such as evolutionary
 alternatives as AVM~\cite{10.1109/32.57624}, to find better weights.
