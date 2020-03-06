@@ -2144,6 +2144,10 @@ Ou seja, a IA serve para separar o ataque do trafego normal, e a regra eh gerada
 \Gui{\textbf{Automatic NIDS Rule Generating System for Detecting HTTP-like Malware Communication -} Apresenta um sintetizador de regras para trafego HTTP. O metodo eh bem parecido com o nosso no que se trata em utilizar trafego maligno separado para a criacao de regra, e utilizacao de trafego benigno para detectar falso positivo. O ponto eh que eles nao descrevem o metodo que utilizam para separar os contents. Alem disso, caso um falso positivo seja capturado, a regra deve ser manualmente ajustadas.
 O paper possui algo interessante que o nosso nao possui. Ele eh capaz de detectar clusters nas regras criadas e pre existentes, sendo capaz de otimiza-las.}
 
+\Gui{\textbf{Automated Repair By Example for Firewalls -} Ruzica repara e modifica regras de firewall a partir de uma entrada contendo exemplos ou behaviour. Embora firewalls e NIDS nao sejam exatamente a mesma coisa, a estrutura de regras contem muitas semelhancas, e a utilizacao de exemplos para modificar a regra pode ser comparado com nosso metodo de criacao de regras a partir de um pacote maligno (para ser sincero, nao vi muitas semelhancas com nosso paper, nao sei descrever mais)}
+
+\Gui{\textbf{Search-based test and improvement of machine-learning-based anomaly detection systems -} o autor desenvolve uma ferramenta search-based que ira testar e explorar automaticamente vulnerabilidades em Anomaly-Based NIDS, e entao apresentando medidas preventivas contra o ataque recem criado atravez de attack schemes, que detectam apenas o ataque e com o minimo de falsos positivos possivel. Semelhante a nos, eles tambem utilizam trafego benigno para simular uma rede normal. (Os metodos preventivos sao para Anomaly-Based NIDS, nao sei como se encaixa no nosso paper tambem)}
+
 \section{Conclusions}
 
 \Fix{...}
