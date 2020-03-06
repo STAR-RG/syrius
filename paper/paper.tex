@@ -226,7 +226,7 @@ rules according to heuristics---drawn from a data set of existing
 rules---denoting the likelihood of those rules of being useful.
 
 We evaluated \tname{} on a diverse
-set of attacks. Results indicate that \Fix{...}
+set of attacks. Results indicate that 
 \end{abstract}
 
 %%
@@ -285,39 +285,37 @@ accordingly by blocking messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
 not block. Various open-source (\eg{}, Snort~\cite{snort} and
-Suricata~\cite{suricata}) and commercial \nids\ implementations (\eg{},
-SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar}) exist
-today. These systems are very popular in industry to secure local
-computer networks given the amount of potential malicious traffic that
-exist on the Internet.
+Suricata~\cite{suricata}) and commercial (\eg{},
+SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar})
+implementations exist.
 
 This paper focuses on rule-based \nids{}, which are very popular in
-industry~\cite{proofpoint-etpro,snort-rule-subscriptions}. A
+industry~\cite{proofpoint-etpro,snort-rule-subscriptions} given the
+amount of potential malicious traffic that exist on the Internet. A
 \emph{rule-based intrusion detector}\footnote{\aka\ signature-based
   intrusion detector.} checks if the network traffic matches a fixed
 set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
-of Suricata~\cite{suricata}, a popular open-source \nids{}. This
-particular rule prescribes a method to capture an Active
-Reconnaissance attack for discovering IPS of hosts in a network (see
-Section~\ref{sec:active-recon}). Rulesets exist for Snort~\cite{snort}
-and Suricata~\cite{suricata}, providing protection against existing
-attacks. Unfortunately, attackers actively look for new mechanisms to
-exploit systems. For example,
-Figure~\ref{fig:distribution-rules-per-month} shows the number of
-rules added per month in the year of 2019 to the ``Emerging Threats
-Open Ruleset''~\cite{emerging-threats-open}, a popular public data set
-of \suri\ rules. We used the ``creation-date'' field associated with
-each entry in the ruleset. The data provides some evidence that new
+of Suricata~\cite{suricata}, a popular open-source \nids{}. A rule
+describes a pattern in the traffic. The observation of that pattern in
+the traffic typically indicates an attempt of a mallicious individual
+to attack a local network. This particular rule prescribes a method to
+capture an Active Reconnaissance attack for discovering accessible
+hosts in a network (see Section~\ref{sec:active-recon}). Rulesets
+exist for Snort~\cite{snort} and Suricata~\cite{suricata}, providing
+protection against existing attacks. Unfortunately, attackers actively
+look for new mechanisms to exploit systems through the
+network. Figure~\ref{fig:distribution-rules-per-month} shows the
+number of rules added per month in the year of 2019 to the ``Emerging
+Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
+data set of \suri\ rules. This data provides some evidence that new
 rules are created often.
 
-\begin{wrapfigure}[8in]{r}{0.24\textwidth}
-    \vspace{-5ex}  
+\begin{wrapfigure}[8]{r}{0.24\textwidth}
+    \vspace{-3ex}  
     \centering
     \scalebox{0.9}{  
       \begin{tikzpicture}
         \begin{axis}[
-%            label style={font=\scriptsize},
-%            tick label style={font=\scriptsize}
             width = 0.3\textwidth,
             height = 0.2\textwidth,            
             bar width=4pt,
@@ -340,14 +338,14 @@ rules are created often.
     }
     \vspace{-4ex}
     \caption{\label{fig:distribution-rules-per-month}2019 new rules.}
-\end{wrapfigure}% <---- don't forget this %
+\end{wrapfigure}
 
-Intuitively, rulesets need to be continuously revised because new
-vulnerabilities are discovered and attackers can take advantage of
-them. Unfortunately, creating these rules is time-consuming and
-error-prone. The language for describing rules is non-trivial (see
-Section~\ref{sec:example-suricata-rules}) and testing correctness of a
-rule requires data and careful inspection.
+Intuitively, rulesets need to be continuously revised because the
+community finds and advertizes vulnerabilities and attackers can take
+advantage of them. Unfortunately, creating these rules is
+time-consuming and error-prone. The language for describing rules is
+non-trivial (see Section~\ref{sec:example-suricata-rules}) and testing
+correctness of a rule requires data and careful inspection.
 
 
 %% IT-security companies capitalize on this phenomena and
@@ -359,19 +357,47 @@ This paper proposes \tname{}\footnote{Abbreviation for
 technique that uses machine intelligence to automatically synthesize
 rules for rule-based \nids. Our goal is to facilitate the creation of
 rules and, consequently, help system administrators to harden the
-protection of \nids\ to network attacks. \tname{} synthesizes rules to
-protect against a given attack from 1) malicious traffic (\ie{},
-examples of the attack to protect against), 2) benign traffic, and 3)
-trusted rules.
+protection of \nids\ against network attacks.  \tname{} leverages
+different sources of information to synthesize rules for a given
+attack. It uses 1) positive examples, \ie{}, scenarios that reproduce
+the attack, 2) negative examples in the form of a data set of benign
+messages, and 3) a data set of human-written trusted rules. The
+positive and negative examples constrain the search space of rules
+that can be used to capture the attack. Intuitively, positive examples
+indicate what should be captured whereas the negative examples
+indicate what should not be captured. It is worth noting that vast
+amounts of negative data exist~\cite{tcpreplay,stratosphere-normal},
+but positive data is scarce. Consequently, classical machine learning
+techniques that require considerable amounts of training data is not
+directly applicable in this context. Furthermore, \tname\ uses public
+data sets of rules to differentiate rules by the similarity to
+human-written rules.
 
-\Fix{
-denial-of-service
-attack to a server by matching specific conditions about the network
-traffic~\cite{understanding-dos}. Relevant properties about the
-traffic of interest appear in bold in this rule (see
-Section~\ref{sec:suri-metas-coverage}). Deployments of rule-based
-\nids\ are restricted to a fixed set of rules defined by the network
-system administrator.}
+\tname{} takes on input one or more examples of an attack and produces
+on output a ranked list of rules for that attack. It uses public data
+sets of benign messages~\cite{tcpreplay,stratosphere-normal} and
+rulesets~\cite{emerging-threats-open} to create those rules. The
+technique is organized as three pipelined components. First,
+\tname\ uses the messages that manifest an attack to create a
+potentially overspecified seed rule. Then, it uses benign traffic in
+to derive from the seed rule a set of plausible rules that isolate the
+benign traffic from the malicious traffic. Finally, it uses existing
+rules to learn heuristics to rank the plausible rules.
+
+We evaluated \tname\ against 14 attacks of various kinds (see
+Table~\ref{table:attacks}). Results are encouraging--- \tname\ ranked
+the correct rule among the top five rules in \percTopFiveRanking\ of
+the cases and ranked the correct rule among the top ten rules in 11 of
+the 14 cases.
+
+%% \Fix{
+%% denial-of-service
+%% attack to a server by matching specific conditions about the network
+%% traffic~\cite{understanding-dos}. Relevant properties about the
+%% traffic of interest appear in bold in this rule (see
+%% Section~\ref{sec:suri-metas-coverage}). Deployments of rule-based
+%% \nids\ are restricted to a fixed set of rules defined by the network
+%% system administrator.}
 
 
 
@@ -386,12 +412,29 @@ system administrator.}
 %% ways to circumvent existing protections and 2) manual creation of
 %% rules is tedious and time-consuming.  
 
-\Fix{summarize how the technique works}
-
-\Fix{summarize results} We believe these results provide initial
-evidence on the effectiveness of \tname{}.
-
 This paper makes the following contributions.
+
+\newcommand{\Contrib}[1]{$\star$#1}
+\begin{itemize}[topsep=.2ex,itemsep=.2ex,leftmargin=0.8em]
+
+\item[\Contrib{}]\textbf{Approach.} A novel approach to synthesize
+  rules for \nids.
+
+\item[\Contrib{}]\textbf{Evaluation.} An evaluation of our approach on
+  attacks of various kinds. Results indicate that \tname\ is effective
+  in creating plausible rules and performs very well in ranking the
+  correct rule among those generated.
+
+\item[\Contrib{}]\textbf{Implementation.} A public implementation of
+  \tname. (Available on request to preserve double-blindness.)
+
+\item[\Contrib{}]\textbf{Data.} A data set of artifacts involved in
+  the evaluation of \tname\ (\eg{}, pcap files of example attacks, list
+  of plausible rules generated, etc.). The data set is available at
+  the following URL~\url{https://zenodo.org/record/3698366}.
+  
+\end{itemize}
+
 
 \section{\nids}
 \label{sec:background}
@@ -1769,7 +1812,6 @@ option candidates depend on the layout of the messages. Also observe
 that the number of plausible rules is much smaller for non-content
 attacks compared to content attacks.
 
-\newcommand{\percTopFiveRanking}{66.7\% (=10/15)}
 
 Overall, results show that \tname\ performed very well in most of the
 cases. It reported the ground truth rule in \emph{all} cases and
