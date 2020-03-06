@@ -186,7 +186,7 @@ existing defenses. This paper proposes \tname{}, a novel approach to
 synthesize rules for Rule-based \nids. \tname\ leverages positive and
 negative traffic and examples of trusted rules to create
 rules. \tname{} is organized as a pipeline of three components that
-1)~create an overspecified seed rule, 2)~derive plausible rules from
+1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. Experimental results provide
 early evidence showing that \tname\ is very promising. For example, it
 was able to rank the correct rule among the first five rules of the
@@ -262,7 +262,7 @@ amount of potential malicious traffic that exist on the Internet. A
 set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
 of Suricata~\cite{suricata}, a popular open-source \nids{}. A rule
 describes a pattern in the traffic. The observation of that pattern in
-the traffic typically indicates an attempt of a mallicious individual
+the traffic typically indicates an attempt of a malicious individual
 to attack a local network. This particular rule prescribes a method to
 capture an Active Reconnaissance attack for discovering accessible
 hosts in a network (see Section~\ref{sec:active-recon}). Rulesets
@@ -277,7 +277,7 @@ rules are created often.
 
 
 Intuitively, rulesets need to be continuously revised because the
-community finds and advertizes vulnerabilities and attackers can take
+community finds and advertises vulnerabilities and attackers can take
 advantage of them. Unfortunately, creating these rules is
 \begin{wrapfigure}[8]{r}{0.21\textwidth}
     \vspace{-2ex}  
@@ -343,7 +343,7 @@ sets of benign messages~\cite{tcpreplay,stratosphere-normal} and
 rulesets~\cite{emerging-threats-open} to create those rules. The
 technique is organized as three pipelined components. First,
 \tname\ uses the messages that manifest an attack to create a
-potentially overspecified seed rule. Then, it uses benign traffic in
+potentially over-specified seed rule. Then, it uses benign traffic in
 to derive from the seed rule a set of plausible rules that isolate the
 benign traffic from the malicious traffic. Finally, it uses existing
 rules to learn heuristics to rank the plausible rules.
@@ -420,7 +420,7 @@ complementary. A rule-based \nids{} focuses on known attacks whereas
 anomaly-based \nids{} focuses on unknown potential attacks. Rule-based
 \nids\ can miss attacks as rulesets can become obsolete whereas
 anomaly-based \nids\ can report false alarms as learning algorithms
-that generalize observations from bening traffic are approximate.
+that generalize observations from benign traffic are approximate.
 This paper focuses on rule-based \nids\ for its tremendous popularity
 in industry\Fix{cite or tone down}. Although we used Suricata, the
 principles we used are general to any other signature-based
@@ -441,7 +441,7 @@ rule pattern is satisfied.  In this example, an alert message will be
 sent to system administrators if the rule pattern is
 satisfied\footnote{IPS (Intrusion Prevention System) and IDS differ in
   the action taken when an intrusion is observed. IPS systems block
-  malicous traffic whereas IDS systems only alert them. However, IDS
+  malicious traffic whereas IDS systems only alert them. However, IDS
   and IPS are similar in the approaches used to detect
   intrusions~\cite{ids-ips}.}. The \emph{header} comes after the
 action in the rule description. It restricts the information flow
@@ -643,7 +643,7 @@ this stage: {\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
       \textbf{icode:}0; \textbf{icmp\_id:}23570;
       \textbf{icmp\_seq:}3439;}}}.  By construction, a rule that uses
 this set of options captures the malicious traffic. Unfortunately, the
-rule above is overspecified. Informally, the rule includes ``too
+rule above is over-specified. Informally, the rule includes ``too
 specific'' characteristics of the malicious traffic and could
 potentially result in false negatives. In this case, although the
 options \CodeIn{dsize:0} and \CodeIn{itype:8} are present in the set
@@ -658,7 +658,7 @@ Figure~\ref{fig:pingscan-example} shows---the others are not.
 %% \noindent
 
 
-Second, \tname{} uses the benign traffic to mitigate the overfitting
+Second, \tname{} uses the benign traffic to mitigate the over-fitting
 problem. In this step, \tname{} searches for alternative rules that
 preserve the invariant to capture the positive (/malicious) traffic
 but not capture the negative benign traffic. It uses the rule obtained
@@ -698,7 +698,7 @@ cases even when the technique produces a large number of plausible
 rules (see Table~\ref{table:results}).
 
 To sum up, \tname{} uses the messages that manifest an attack in the
-first step to create a potentially overspecified seed rule. Then, it
+first step to create a potentially over-specified seed rule. Then, it
 uses benign traffic in the second step to create a set of plausible
 rules from the seed rule. Finally, in the third step, \tname{} uses
 existing rules to learn heuristics to rank plausible rules.
@@ -744,7 +744,7 @@ rule containing options that are guaranteed to be satisfied by the
 malicious traffic. Let us refer to that rule as the \emph{seed rule}
 and its corresponding set of options as \emph{seed options}. Note
 that, as only the malicious traffic is considered in this step, the
-seed rule is likely overspecified, \ie{}, it may be more restrictive
+seed rule is likely over-specified, \ie{}, it may be more restrictive
 than necessary. Consequently, the use of that rule could result in
 false negatives. Second, \tname\ generates alternative rules that 1)
 weaken the constraints expressed in the seed rule while 2) still
@@ -805,7 +805,7 @@ messages. Section~\ref{sec:rules-and-packets} shows the correspondence
 between packet fields and some of the rule options from \suri\ and
 Section~\ref{sec:active-recon} shows a concrete example illustrating a
 case of this strategy. We obtained the option-field mapping
-manunually, from the \suri\ documentation.
+manually, from the \suri\ documentation.
 
 Unfortunately, the relevant data for the option may be at the message
 payload; not the fields. By analyzing our data set of rules, we found
@@ -870,7 +870,7 @@ the malicious traffic.
 
 The seed rule produced in the first step satisfies the criterion to
 capture the traffic produced by the example attacks. However, that
-rule is overconstrained.  It may include options that are irrelevant
+rule is over-constrained.  It may include options that are irrelevant
 to capture the attack and lead to false negatives---the \nids\ may be
 unable to capture manifestations of the same attack whose messages do
 not exhibit the data satisfying irrelevant options. For example, the
@@ -883,7 +883,7 @@ example from Section~\ref{sec:active-recon} contains options
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-To address the overffiting issue, \tname{} leverages public data sets
+To address the overfiting issue, \tname{} leverages public data sets
 of benign traffic~\cite{tcpreplay} and additional examples of the
 attack to guide the search for more general rules. To that end,
 \tname{} \emph{minimizes} the rules produced in the previous step,
@@ -905,9 +905,9 @@ rules.
 \setlength{\textfloatsep}{3pt}% Remove \textfloatsep
 \begin{algorithm}[t!]
   %\noindent\hspace{-2ex}
-  \flushleft{}\textbf{INPUT:} (overconstrained) seed rule $sr$, pcap
-  files for bening traffic\\
-  ($\mathit{bTr}$), pcap files for mallicious traffic ($\mathit{mTr}$)\\
+  \flushleft{}\textbf{INPUT:} (over-constrained) seed rule $sr$, pcap
+  files for benign traffic\\
+  ($\mathit{bTr}$), pcap files for malicious traffic ($\mathit{mTr}$)\\
   %\noindent\hspace{-27.5ex} 
   \textbf{OUTPUT:} Set of minimized rules $\mathcal O$\\
 %\vspace{-3ex}
@@ -937,7 +937,7 @@ rules.
 
 Algorithm~\ref{algo1} shows the pseudocode for deriving rules from the
 seed rule produced at the Reverse Engineering step. The algorithm
-takes as input an overconstrained rule $sr$ and pcap files~\cite{pcap}
+takes as input an over-constrained rule $sr$ and pcap files~\cite{pcap}
 to reconstruct the benign ($\mathit{bTr}$) and malicious traffic
 ($\mathit{mTr}$). The algorithm produces on output a set of
 alternative rules to $sr$ that captures every instance of the attack
@@ -998,7 +998,7 @@ plausibility is limited by definition---reporting only minimal rules
 with respect to that traffic could discard the correct rule.
 
 In summary, this algorithm reports many rules that are plausible by
-using the benign traffic to reduce the overconstrained rule produced
+using the benign traffic to reduce the over-constrained rule produced
 at the \reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
 \tname{} ranks the rules this algorithm reports by their similarity to
 existing trusted rules. Intuitively, rules that do not look like those
@@ -1070,14 +1070,14 @@ multiple times for creating rules.
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
 
-\tname{} uses a composition of heurisitic functions to sort the rules
+\tname{} uses a composition of heuristic functions to sort the rules
 produced in the previous step. Each of these functions uses a
 different criterion to estimate how similar a created rule is to those
 from public rulesets~\cite{emerging-threats-open}. The intuition is
 that rules that look more similar to existing trusted rules are more
 likely to be useful. The aggregated score of a rule is the weighted
 average across the values produced by each heuristic function. The
-codomain of each function ranges on the 0-1 interval. Hence, the score
+co-domain of each function ranges on the 0-1 interval. Hence, the score
 of a rule also ranges on the 0-1 interval. We describe in the
 following each of these heuristic functions.
 
@@ -1447,7 +1447,7 @@ value of $M_i$, in this case, is 2 as the string ``/HtmlAdaptor''
 could be accessed through the modifiers \CodeIn{uri} and
 \CodeIn{request\_line}. The reason is that \tname\ identifies that
 that string appears in the field \CodeIn{Request URI} (of an http
-message from the malicous traffic) and that field is accessible
+message from the malicious traffic) and that field is accessible
 through these two modifiers. The relatively high heuristic value
 reflects the fact that the string could be accessed by two popular
 content modifiers.  As another example, consider the option
@@ -1458,7 +1458,7 @@ locate the string ``keep-alive'', stored in the field
 Figure~\ref{fig:http-header-example}). Consequently the contribution
 of this heuristic function to the corresponding rule would be $0.2$
 (=$\frac{4089+29}{10111*2}$), in this case. Assuming that a rule uses
-the two content options mentioned aboved, the aggregated contribution
+the two content options mentioned above, the aggregated contribution
 of this heuristic function to the rule would be 0.35 (=(0.2+0.5)/2).
 
 \subsubsection{Weight Optimization}
@@ -1468,7 +1468,7 @@ ran \tname{} using different combinations of weights on a sample of
 attacks and chose the combination that offered the best overall
 performance, which we computed with the sum of the rankings of the
 golden rule on each attack. The weight combination that led to the
-smaller sum of positions (of the golden rule) in the rakings was
+smaller sum of positions (of the golden rule) in the rankings was
 considered the best choice. We considered \emph{all} combinations of
 the following weights 0, 0.25, 0.5, 0.75, and 1. Given that we have
 four different functions and five possible weight values, we needed to
@@ -1698,7 +1698,7 @@ from trusted security websites (\eg{},
 NetReseC~\cite{pcap-attacks}). In addition to these sources, we used
 the Nikto2~\cite{nikto} open source security tool as follows to obtain
 pcap files for some of the http attacks. We configured an http server
-(Apache2) and ran Nikto2 to attack that server. Simultenously, we ran
+(Apache2) and ran Nikto2 to attack that server. Simultaneously, we ran
 WireShark~\cite{wireshark-net-monitor} to record the network traffic
 and Suricata to analyze the traffic. We configured \suri\ with all
 rules from the ``Emerging Threats Open
@@ -1707,7 +1707,7 @@ default parameters, which makes it replay all recorded attacks from
 its benchmark. After execution, we inspected the \suri\ log to
 identify which rules have been activated and which packets were
 involved on each activation. With the packet numbers, it is possible
-to recover the corresponding pcap files, using Wireshark, as to ran
+to recover the corresponding pcap files, using WireShark, as to ran
 \tname{} on them separately. It is worth noting that some rules are
 triggered multiple times, indicating that Nikto2 expresses multiple
 variants of the same attack. RQ3 evaluates the importance of these
@@ -1718,7 +1718,7 @@ Section~\ref{sec:active-recon}) and hping3~\cite{hping3} to reproduce
 the SYN Flood attack (see Section~\ref{sec:dos}).
 
 \vspace{1ex}
-\subsubsection{\label{sec:objectanalysis-benign}Benign traffic.}~Public data sets of bening traffic
+\subsubsection{\label{sec:objectanalysis-benign}Benign traffic.}~Public data sets of benign traffic
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
@@ -1742,7 +1742,7 @@ Section~\ref{subsec:malicious-traffic}, we reproduced the attack to
 confirm the rule captures the attack in isolation (and no noise was
 introduced in the process). Column ``Ground Truth'' from
 Table~\ref{table:attacks} only shows the essential
-options. Documentation options (\eg{}, ``msg'') are discared.
+options. Documentation options (\eg{}, ``msg'') are discarded.
 
 \subsection{Answering RQ1: \textRQone}
 \label{sec:answer-rqone}
@@ -1805,7 +1805,7 @@ RQ2 evaluates the importance of each proposed heuristic function. To
 answer that question, we evaluated the use of \tname{} without each of
 these functions with the goal of checking how much each of them
 contributes to the overall performance of the technique. Recall that
-the score a rule $r$ is given by the weigthed average of the values
+the score a rule $r$ is given by the weighted average of the values
 given by each heuristic function, \ie{} the score of $r$ is obtained
 with the function $f(r)=\sum_{i}^{N} w_i*f_i(r)/N$, where $w_i$ is the
 weight of heuristic $i$, $f_i(r)$ is the score of heuristic $i$ on
@@ -1821,7 +1821,7 @@ name of the attack and column ``base'' shows the result of
 \tname\ with all heuristic functions enabled, as in column ``Rank
 (step 3)'' from Table~\ref{table:results}. The remaining columns show
 results obtained by running the same experiment, as on
-Section~\ref{sec:answer-rqone}, but supressing one heuristic
+Section~\ref{sec:answer-rqone}, but suppressing one heuristic
 function. The number corresponds to the order the heuristic function
 is introduced on Section~\ref{sec:ranking}. The symbol of an up arrow
 ($\uparrow$) indicates that the performance of \tname{} on that
@@ -1868,7 +1868,7 @@ the table, indicates the contrary.
 
 Note that the number of up arrows is relatively high and the magnitude
 of the degradation can be very high in some cases. Basebuilder and
-Tomcat are two cases where results get much worse when supressing one
+Tomcat are two cases where results get much worse when suppressing one
 of the functions. Also note that the number of down arrows is
 relatively small. Recall that the optimization of weights looks for
 global optimum and cannot avoid those cases. Finally, note that every
@@ -2111,7 +2111,7 @@ derive rules for Snort, which are very similar to \suri's.  Their
 approach focuses on icmp attacks. It models every field of the icmp
 packet in the chromosome of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
-that randomly combine options, modelling the packet fields. They show
+that randomly combine options, model-ling the packet fields. They show
 that they were able to generate rules without false negatives and only
 3 false positives across 33K benign packets. The key differences
 between our work and Vollmer~\etal{}'s are 1) the support of different
@@ -2128,12 +2128,12 @@ benign and mallicious traffic considered. Muthuregunathan
 \etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
 create rules. They characterize candidate solutions as a set of field
 values and use a clustering algorithm---hybrid k-means partitioned
-around menoids---to isolate mallicious from benign
+around menoids---to isolate malicious from benign
 traffic. Subsequently, they optimize the formed clusters using genetic
 algorithms and hill-climbing search. Ou approach differs from theirs
 in the method used, results, and support for content
 options. Kao~\etal~\cite{Kao2015AutomaticNR} proposed ARGS, a system
-to synthesize http rules that take mallicious traffic as input. ARGS
+to synthesize http rules that take malicious traffic as input. ARGS
 looks for a common pattern across the different inputs to define
 rules. It does not take existing rules as input or benign
 traffic. Consequently, false positive can be produced and need to be
@@ -2174,10 +2174,10 @@ Cordy~\etal{}\cite{cordy-etal-issta19} propose the use of
 anomaly-based \nids. Although our approach and theirs use machine
 intelligence to detect attacks, as discussed on
 Section~\ref{sec:background} anomaly-based and rule-based \nids\ are
-complemetary.
+complementary.
 \Gui{Anomaly-based intrusion detection. Cordy and colleagues[28] 
 propose the use of a search-based genetic algorithm to not only 
-generate attack shcemes capable of penetrating the tested anomaly-based 
+generate attack schemes capable of penetrating the tested anomaly-based 
 NIDS, but also repairing the NIDS to identify the given attack scheme. 
 Although our approach and theirs use machine intelligence to detect 
 attacks, as discussed on Section 2 anomaly-based and rule-based NIDS 
@@ -2194,7 +2194,7 @@ networks attacks. This paper presents \tname{}, a novel approach to
 generate rules for Rule-based \nids. \tname\ leverages positive and
 negative traffic and examples of trusted rules to synthesize
 rules. \tname{} is organized as a pipeline of three components that
-1)~create an overspecified seed rule, 2)~derive plausible rules from
+1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. Experimental results provide
 early evidence showing that \tname\ is very promising. It was able to
 rank the correct rule among the first five rules of the reported
@@ -2211,3 +2211,13 @@ ranking in \percTopFiveRanking\ of the cases we analyzed.
 \endinput
 %%
 %% End of file `sample-sigconf.tex'.
+
+%%  LocalWords:  Suricata SolarWinds QRadar Rulesets Ruleset rulesets
+%%  LocalWords:  pipelined pcap OISF IPS icmp msg classtype sid arg
+%%  LocalWords:  clp http ip bitvector flagbits IPs NMAP dsize itype
+%%  LocalWords:  icode ruleset th HtmlAdaptor pseudocode prce dataset
+%%  LocalWords:  flowbits len tcp uri RQ lrrrr Cand UDP ColdFusion
+%%  LocalWords:  iisadmin JBoss JMX WeBid LFI htaccess idq DoS AREC
+%%  LocalWords:  Basebuilder PESC RCE NetReseC Nikto WireShark hping
+%%  LocalWords:  Bigflows TcpReplay lrrrrrr boxplot Metasploit ACK
+%%  LocalWords:  Vollmer Hallahan Cordy NIDS
