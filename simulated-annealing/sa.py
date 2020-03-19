@@ -41,7 +41,7 @@ contents_dict["script"] = {'GET':[], '/themes/mambosimple.php?':[], 'detection='
 
 contents_dict["issadmin"] = {'GET':[], '/scripts':[], '/iisadmin':["nocase", "http_uri"], '/bdir.htr':[],  'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
 
-contents_dict["idq"] = {'GET':[], '/scripts':[], '/samples':[], '/search':[], '/author':[], '.idq':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
+contents_dict["idq"] = {'GET':[], '/scripts':[], '/samples':[], '/search':[], '/author':[], '.idq':["http_uri", "nocase"], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
 
 contents_dict["system"] = {'GET':[], '/c':[], '/winnt':[], '/system32/':["http_uri", "nocase"], 'cmd.exe?':[], '/c+dir+':[], '/OG':[], 'HTTP/1.1':[], '192.168.1.108':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[],  '(Evasions:':[], 'None)':[], '(Test:':[], '000121)':[], 'Connection:':[], 'Keep-Alive':[]}
 
@@ -70,7 +70,7 @@ default_rule_message = "msg:\"Testing rule\";"
 rule_options = {}
 default_rule_sid = 1
 
-if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq", "system", "inc"]:
+if str(args.attack) in ["adaptor", "coldfusion", "htaccess", "cron", "jsp", "script", "issadmin", "idq10", "system", "inc"] or "idq" in str(args.attack):
     pcapAttack = "Datasets/nikto-" + str(args.attack) + ".pcap"
 else:
     pcapAttack = "Datasets/" + str(args.attack) + ".pcap"
@@ -88,6 +88,8 @@ if args.attack == "teardrop":
     rule_protocol = "udp"
 
 print(rule_protocol)
+
+#exit()
 
 def getContentsPerModifiers():
     global pcapAttack
@@ -970,6 +972,9 @@ def sortMultipleAttacks():
                                     best_weights[i] = w
                                 
                                 i += 1
+                            for i in range(len(current_pos)):
+                                print(attacks_list[i]+': '+str(current_pos[i])+' ', end=' ')
+                            print()
                             
                             #print("all pos sum:", all_pos_sum)
                             if all_pos_sum <= best_all_pos_sum:
