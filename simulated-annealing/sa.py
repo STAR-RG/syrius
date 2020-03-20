@@ -437,21 +437,8 @@ rules_per_size = getRulesPerSize()
 rules_per_contents = getRulesPerContents()
 contents_dict = getContentsDict()
 keywords_freq = getKeywordsFrequency()
-    
-i=0
 
 sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
-
-"""for content in sd:
-    i += 1
-    print(content)
-    if i == 10:
-        break    
-"""
-
-#print("keyword_freq:", keywords_freq)
-#print("http uti", keywords_freq["http_uri"])
-
 
 html_modifiers_freq = {}
 def getHtmlModifiersFreq(keywords_freq):
@@ -615,16 +602,6 @@ def sendGoodTraffic(attack):
     subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
     #time.sleep(0.05)
 
-def isEmpty(fpath):
-    result=False
-    fpath.seek(0)
-    firstchar=fpath.read(1)
-    if firstchar:
-        result=True
-        fpath.seek(0)
-        #print("capturado")
-    return result
-
 def sendAttackVariation(attack):
     subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
     #time.sleep(0.5)
@@ -691,7 +668,6 @@ def checkPrecision(rules):
                     break
         
             line = fitnessFile.readline()
-
 
     return output
 
@@ -815,15 +791,7 @@ def sortRules():
 
         all_rules_list.append(tmp_rule)
 
-    """print("regra 0:", str(all_rules_list[0]))
-    print("fit 0:", str(all_rules_list[0].getFitness([1,1])))
-    print("regra 1000:", str(all_rules_list[1000]))
-    print("fit 1000:", str(all_rules_list[1000].getFitness([1,1])))
 
-
-
-    exit()
-    """
     current_pos = 0
     best_pos = math.inf
     best_rule_list = []
@@ -866,19 +834,7 @@ def sortRules():
                     best_rule_list = copy.deepcopy(all_rules_list)
                     print("deepcopy end")
                     best_weights = copy.deepcopy(w)
-                    #w.pop()
-                #w.pop()
-           # w.pop()
-        #w.pop()
-    
-    """i = 0
-    for rule in best_rule_list:
-        i += 1
-        if "1099019" in str(rule):
-            golden_index = i
-            print("golden index: ", end=' ')
-        print(i, " ", str(rule))
-    """
+                
 
     return best_rule_list, best_weights, best_pos
 
@@ -1180,22 +1136,8 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
-            #all_bad_rules_list = checkFalseNegative(aux)
-            #bad_rule_list = []
-            #for i, fitness in enumerate(all_bad_rules_list):
-            #    if fitness == 0:
-            #        aux3.append(aux[i])
-            #        #print("{} : {}".format(aux[i], fitness))
-            #        bad_rule_list.append(aux[i])
-            #
-            #with open("bad.rules", "a+") as writer:
-            #    for x in bad_rule_list:
-            #        writer.write(str(x) + "\n")
 
             fitness_list = evalContents(aux)
-            #print("aqui auqi auiq")
-
-            #rule_list.clear()
             for i, fitness in enumerate(fitness_list):
                 if fitness < 1.0:
                     aux2.append(aux[i])
@@ -1214,16 +1156,8 @@ def optimizeRule(rule):
         
         #print(rule_list)
 
-    """with open("regras_output.txt", "w+") as writer:
-        for x in rule_list:
-            writer.write(str(x) + "\n")
-    """
     print(time.time() - start_time)
 
-    """for rule in all_rule_list:
-        print(str(rule))
-    print("all rule len:", len(all_rule_list))
-    """
     golden_rule = copy.deepcopy(all_rule_list[0])
     golden_rule.sid= 1099019
     golden_content = {}
@@ -1252,9 +1186,7 @@ def optimizeRule(rule):
     
     print("golden_rule:", golden_rule)
     print("all_rules_list len:", len(all_rule_list))
-    #print("fit1: ", ruleSizeFitness(golden_rule), "fit2: ", ruleContentsFitness(golden_rule), "fit3: ", rareContentsFitness(golden_rule), "fit4: ", ruleContentsModifiersFitness(golden_rule))
     all_rule_list.insert(0, golden_rule)
-    #all_rule_list.append(final_rule)
     golden_rule_pos = 0
 
     for i in range(0, len(all_rule_list)):
@@ -1267,69 +1199,7 @@ def optimizeRule(rule):
 
     regrafit=[]
 
-    """
-    all_rule_list, best_weights, best_pos = sortRules()
-
-    print("Best Weights:", str(best_weights))
-    print("Best Pos: " + str(best_pos) + ',' + str(len(all_rule_list)))
-
-
-    print("pegando precision")
-    precision=checkPrecision(all_rule_list)
-    print("pegando recall")
-    recall=checkFalseNegative(all_rule_list)
-    i=0
-    golden_index = 0
-    """
-    """for rule in all_rule_list:
-        if "1099019" in str(rule):
-            golden_index = i
-            print("golden index: ", end=' ')
-        print(i, " ", str(rule))
-        i += 1
-
-    print('recall golden rule:', recall[golden_index])
-
-    print("tamanho da variacao: {}".format(len(allpkts)))
-    """
-    """
-
-    with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
-        for (x, y, z) in zip(all_rule_list, recall, precision):
-            y=y*(100/len(allpkts))
-            z=100-(z/20)
-            f1=2*(((z*y)/100)/((y/100)+(z/100)))
-            total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
-            writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
-
-    with open("result_final_"+str(args.attack)+".csv", "w+", newline='') as file:
-        with open("fitness_list_"+str(args.attack)+".csv", "w+", newline='') as fitness_file:
-            with open("all_rules_raw_"+str(args.attack)+".out", "w+") as raw_writer:
-                writer = csv.writer(file)
-                writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
-                fitness_writer = csv.writer(fitness_file)
-                fitness_writer.writerow(["Rule", "Fitness1", "Fitness2", "Fitness3", "Fitness4"])
-
-                for (x, y, z) in zip(list(reversed(all_rule_list)), list(reversed(recall)), list(reversed(precision))):
-                    y=y*(100/len(allpkts))
-                    z=100-(z/20)
-                    f1=2*(((z*y)/100)/((y/100)+(z/100)))
-                    if x.sid == "1099019":
-                        print("GOLDEN RULE IS HERE")
-                    if f1>90.0:
-                        raw_writer.write(str(x.getAllAttributesRaw())+'\n')
-                        total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
-                        writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
-                        #fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
-                        #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
-                        fitness_writer.writerow([str(x), ruleSizeFitness(x), ruleOptionsFitness(x)])
-                        regrafit.append((x, ruleSizeFitness(x), ruleOptionsFitness(x)))
-    """
-
     w = [1,1,1,1,1]
-    #w = [1,1]
     print("weights:", str(w))
     normal_rules_list = sorted(all_rule_list, key=partial(callGetFitness, weights=w))
 
@@ -1338,7 +1208,6 @@ def optimizeRule(rule):
             golden_rule_pos = normal_rules_list.index(rule)
         else:
             rule.sid=x+1
-        #print(str(rule))
 
     current_pos = len(normal_rules_list) - golden_rule_pos
 
@@ -1351,7 +1220,7 @@ def optimizeRule(rule):
 
     print('recall golden rule:', normal_recall[golden_rule_pos])
 
-    with open("result_"+str(args.attack)+"2.csv", "w+", newline='') as file:
+    with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
         for (x, y, z) in zip(normal_rules_list, normal_recall, normal_precision):
@@ -1361,7 +1230,7 @@ def optimizeRule(rule):
             total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
             writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
 
-    with open("result_final_"+str(args.attack)+"2.csv", "w+", newline='') as file:
+    with open("result_final_"+str(args.attack)+".csv", "w+", newline='') as file:
         with open("fitness_list_"+str(args.attack)+".csv", "w+", newline='') as fitness_file:
             with open("all_rules_raw_"+str(args.attack)+".out", "w+") as raw_writer:
                 writer = csv.writer(file)
@@ -1426,7 +1295,6 @@ def updateyaml():
 
 updateyaml()
 
-#print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
     if args.attack == "synflood":
@@ -1438,23 +1306,8 @@ if len(pkts._packets) > 1:
 
     final_rule.threshold = {'type':'both', 'track':'by_dst', 'count':len(pkts._packets), 'seconds': 5}
     print(final_rule)
-    #exit()
     final_rule = optimizeRule(final_rule)
-    #final_rule = evolveRuleFlood(init_rule)
 else:
-    #pingscan_options = {'dsize':0, 'itype':8, 'icode': 0, 'icmp_id':23570, 'icmp_seq': 3439}
-    #final_rule.options = pingscan_options
-    #final_rule.options["content"] = {'get':["http_method", "nocase"], '/CfiDE/administrator':["http_uri", "nocase"]}
-    #final_rule.options["content"] = contents
-    
-    """w = [1,1,1,1]
-    final_rule.calculateFitness()
-    print(final_rule.getFitness(w))
-    print(newRuleFitness(final_rule,w))
-    print(callGetFitness(final_rule, [0.5,0.5,0.5,0.5]))
-    exit()
-    """
-
     if rule_protocol == "http":
         final_rule.options["content"] = contents
     
@@ -1466,9 +1319,7 @@ else:
         final_rule.options = teardrop_options
         
     print("initial rule:\n", final_rule)
-    #exit()
-    #print("fit1: ", ruleSizeFitness(final_rule), "fit2: ", ruleContentsFitness(final_rule), "fit3: ", rareContentsFitness(final_rule), "fit4: ", #ruleContentsModifiersFitness(final_rule))
-    #quit()
+
     final_rule = optimizeRule(final_rule)
 
 if final_rule.threshold != {} and final_rule.threshold["count"] == 1:
