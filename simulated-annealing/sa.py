@@ -1415,6 +1415,17 @@ print(ruleContentsModifiersFitness(init_rule))
 exit()
 """
 
+def updateyaml():
+    with open("inputs/suricata.yaml", 'r') as yaml:
+        lines = yaml.readlines()
+        lines[78] = "      filename: " + str(args.attack) + '.log\n'
+        lines[1884] = "- " + str(args.attack) + ".rules\n"
+    
+    with open("inputs/suricata.yaml", 'w') as yaml:
+        yaml.writelines(lines)
+
+updateyaml()
+
 #print("initial rule: " + str(init_rule))
 final_rule = init_rule
 if len(pkts._packets) > 1:
