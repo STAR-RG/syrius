@@ -9,10 +9,9 @@ import binascii
 import argparse
 import csv
 import math
-from functools import partial, reduce
-from itertools import combinations
+from functools import partial
+from snortparser import Parser
 
-#open("bad.rules", 'w').close()
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
 http_attacks = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "jsp", "inc", "wordpress", "sanny"]
@@ -20,7 +19,6 @@ parser = argparse.ArgumentParser(description="Description.")
 parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
-#ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
 ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
 fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 
@@ -66,7 +64,7 @@ html_modifiers = ["http_method", "http_uri", "http_user_agent", "http_protocol",
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
-default_rule_message = "msg:\"Testing rule\";"
+default_rule_message = "\"Testing rule\""
 rule_options = {}
 default_rule_sid = 1
 
@@ -221,7 +219,6 @@ def getTokens():
 #getTokens()
 
 #exit()
-
 
 def getRuleSize(rule):
     global keyword_list
@@ -704,7 +701,7 @@ class Rule:
         self.protocol = protocol
         self.action = action
         self.header = header
-        self.message = message
+        self.message = "msg:" + message
         self.sid = sid
         self.threshold = {}
         self.fitness = []
@@ -714,7 +711,7 @@ class Rule:
         str_options = ""
         for option in self.options:
             if option == "content":
-                contents = self.options[option]
+                contents = self.options["content"]
                 str_content = ""
                 for content in contents:
                     str_content = str_content + ' ' + str(option) + ':' + ' \"' + str(content) + '\"' + ';'
@@ -730,13 +727,13 @@ class Rule:
             for option in self.threshold:
                 str_options = str_options + ' ' + str(option) + ' ' + str(self.threshold[option]) + ','
             str_options = str_options[:-1] + ';'
-        str_options = str_options + ' ' + "sid:" + str(self.sid) + ';'
+        str_options = str_options + " sid:" + str(self.sid) + ';'
         
         str_protocol = str(self.protocol)
         #if str_protocol == "http":
         #    str_protocol = "tcp"
 
-        return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + str_options + ')')
+        return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + ';' + str_options + ')')
 
     def calculateFitness(self):
         global max_fitness
@@ -1026,7 +1023,7 @@ def optimizeRule(rule):
                         for c in op:
                             new_sid += int(ord(c))
 
-                    tmp.message = "msg:\"Testing rule {}\";".format(counter)
+                    tmp.message = "\"Testing rule {}\"".format(counter)
                     
                     if new_sid>0:
                         tmp.sid=new_sid
@@ -1115,7 +1112,7 @@ def optimizeRule(rule):
                         for g in z:
                             new_sid+=int(ord(g))
 
-                    temp.message = "msg:\"Testing rule {}\";".format(counter)
+                    temp.message = "\"Testing rule {}\"".format(counter)
                     if new_sid>0:
                         temp.sid=new_sid
                     else:
@@ -1294,6 +1291,23 @@ def updateyaml():
         yaml.writelines(lines)
 
 updateyaml()
+
+with open("attacks/htaccess.rules", 'r') as rule_file:
+    rules = []
+    for line in rule_file:
+        rules.append(Parser(line))
+    
+    for rule in rules:
+        print(str(rule.header))
+    print()
+
+    test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[16][1][0])
+
+    print(test_rule)
+
+    print(rule.options)
+
+exit()
 
 final_rule = init_rule
 if len(pkts._packets) > 1:
