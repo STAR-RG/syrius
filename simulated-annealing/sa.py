@@ -1292,20 +1292,30 @@ def updateyaml():
 
 updateyaml()
 
-with open("attacks/htaccess.rules", 'r') as rule_file:
-    rules = []
-    for line in rule_file:
-        rules.append(Parser(line))
-    
-    for rule in rules:
-        print(str(rule.header))
-    print()
-
-    test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[16][1][0])
-
-    print(test_rule)
-
-    print(rule.options)
+def parseRules():
+    with open("attacks/htaccess.rules", 'r') as rule_file:
+        rules = []
+        for line in rule_file:
+            print("input rule:", line)
+            rules.append(Parser(line))
+        
+        for rule in rules:
+            test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[max(rule.options.keys())][1][0])
+            
+            contents = {}
+            for r in rule.options:
+                if r != 0 and r != max(rule.options.keys()):
+                    key, value = rule.options[r]
+                    
+                    if key == "content":
+                        modifiers = []
+                        for i in range(1, len(value)):
+                            modifiers.append(value[i])   
+                        contents[value[0]] = modifiers
+            
+            test_rule.options["content"] = contents
+            print("output rule:", test_rule)
+            print()
 
 exit()
 
