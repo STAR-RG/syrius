@@ -11,6 +11,7 @@ import csv
 import math
 from functools import partial
 from snortparser import Parser
+from idstools import rule
 
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
@@ -720,6 +721,8 @@ class Rule:
                             str_content = str_content + ' ' + str(contents[content][i]) + ';'
                 str_options = str_options + ' ' + str_content
             else:
+                if option == "pcre":
+                    self.options[option] = "\"" + self.options[option] + "\""
                 str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
 
         if self.threshold != {}:
@@ -1293,30 +1296,76 @@ def updateyaml():
 updateyaml()
 
 def parseRules():
-    with open("attacks/htaccess.rules", 'r') as rule_file:
+    with open("Datasets/all_rules.txt", 'r') as rule_file:
+    #with open("attacks/htaccess.rules", 'r') as rule_file:
         rules = []
         for line in rule_file:
-            print("input rule:", line)
-            rules.append(Parser(line))
+           # print("input rule:", line)
+            supported_protocol = False
+            for p in ["tcp","udp","icmp","http","ip"]:
+                if "alert "+p+' ' in line:
+                    supported_protocol = True
+                    break
+            if supported_protocol:
+                rules.append(Parser(line))
+            
+        print("len rules: ", len(rules))
         
         for rule in rules:
-            test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[max(rule.options.keys())][1][0])
+            for op in rule.options:
+                if "sid" == rule.options[op][0]:
+                    sid_index = op
+            
+            test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[sid_index][1][0])
             
             contents = {}
             for r in rule.options:
                 if r != 0 and r != max(rule.options.keys()):
                     key, value = rule.options[r]
-                    
+            
                     if key == "content":
                         modifiers = []
                         for i in range(1, len(value)):
                             modifiers.append(value[i])   
                         contents[value[0]] = modifiers
+                    elif key == "flow":
+                        test_rule.options[key] = value[0] + ": " + value[1]
+                    elif key == "pcre":
+                        value[len(value)-1] = value[len(value)-1][:-1]
+                        print(value)
+                        pcre_str = ""
+                        for v in value:
+                            pcre_str += v
+                        test_rule.options[key] = pcre_str
+                    elif key == "reference":
+                        if len(value) != 2:
+                            print(key, value)
+                            exit()
+                        test_rule.options[key] = value[0] + ", " + value[1]
+                    elif key in ["threshold", "flowbits", "isdataat"]:
+                        value_str = ""
+                        for v in value:
+                            value_str += v + ','
+                        value_str = value_str[:-1]
+                        test_rule.options[key] = value_str
+                    elif key not in ["sid", "nocase"]:
+                        if len(value) > 1:
+                            print(key, value)
+                            print(rule)
+                            exit()
+                        
+                        try:
+                            test_rule.options[key] = value[0]
+                        except:
+                            print(key, value)
+                            print(str(rule.rule))
+                            exit()
             
             test_rule.options["content"] = contents
             print("output rule:", test_rule)
-            print()
-
+            #print("done")
+        
+parseRules()
 exit()
 
 final_rule = init_rule

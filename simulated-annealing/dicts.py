@@ -451,7 +451,8 @@ class Dicts():
 
     @staticmethod
     def non_payload_options(option: str = None) -> Any:
-        non_payload_detect = {"fragoffset",
+        non_payload_detect = {"app-layer-protocol",
+                              "fragoffset",
                               # The fragoffset keyword allows one to compare
                               # the IP fragment offset field against a
                               # decimal value.

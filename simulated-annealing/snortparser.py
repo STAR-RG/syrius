@@ -60,6 +60,7 @@ class Parser(object):
             "tcp",
             "udp",
             "icmp",
+            "http",
             "ip"
         }
 
@@ -123,14 +124,14 @@ class Parser(object):
             "$DNS_SERVERS",
             "$HOME_NET",
             "HOME_NET",
+            "$AIM_SERVERS",
+            "$TELNET_SERVERS",
             "any"
         }
 
         for item in ips:
-
             if isinstance(item, bool):
                 pass
-
             if isinstance(item, list):
                 for ip in item:
                     self.__validate_ip(ip)
