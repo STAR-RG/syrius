@@ -11,7 +11,7 @@ import csv
 import math
 from functools import partial
 from snortparser import Parser
-from idstools import rule
+from ctypes import *
 
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
@@ -1295,11 +1295,25 @@ def updateyaml():
 
 updateyaml()
 
+class go_string(Structure):
+    _fields_ = [
+        ("p", c_char_p),
+        ("n", c_int)]
+
 def parseRules():
+    lib = cdll.LoadLibrary("./parser.so")
+    lib.Parser.argtypes = [c_char_p]
+    lib.Parser.restype = c_char_p
+
     with open("Datasets/all_rules.txt", 'r') as rule_file:
     #with open("attacks/htaccess.rules", 'r') as rule_file:
         rules = []
         for line in rule_file:
+            line = line.rstrip()
+            line_b = bytes(line, 'utf-8')
+            go_out = lib.Parser(c_char_p(line_b)).decode()[:-1]
+            print(go_out)
+            exit()
            # print("input rule:", line)
             supported_protocol = False
             for p in ["tcp","udp","icmp","http","ip"]:
