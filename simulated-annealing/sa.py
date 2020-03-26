@@ -699,8 +699,8 @@ def evalContents(rules):
 
 class Rule:    
     def __init__(self, action, protocol, header, message, sid):
-        self.protocol = protocol
         self.action = action
+        self.protocol = protocol
         self.header = header
         self.message = "msg:" + message
         self.sid = sid
@@ -1308,21 +1308,22 @@ def parseRules():
     with open("Datasets/all_rules.txt", 'r') as rule_file:
     #with open("attacks/htaccess.rules", 'r') as rule_file:
         rules = []
+        r_count = 0
         for line in rule_file:
-            line = line.rstrip()
-            line_b = bytes(line, 'utf-8')
-            go_out = lib.Parser(c_char_p(line_b)).decode()[:-1]
-            print(go_out)
-            exit()
-           # print("input rule:", line)
-            supported_protocol = False
-            for p in ["tcp","udp","icmp","http","ip"]:
-                if "alert "+p+' ' in line:
-                    supported_protocol = True
-                    break
-            if supported_protocol:
-                rules.append(Parser(line))
+            if line != "\n":
+                line = line.rstrip()
+                line_b = bytes(line, 'utf-8')
+                go_out = lib.Parser(c_char_p(line_b)).decode()[:-1]
+                if go_out == "error":
+                    print(line)
+                    print()
+                    #break
+                else:
+                    r_count += 1
+                exit()
             
+        print("rules: ", r_count)
+        exit()
         print("len rules: ", len(rules))
         
         for rule in rules:

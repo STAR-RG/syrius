@@ -7,35 +7,58 @@ import ("C"
 )
 
 //export Parser
-func Parser(crule *C.char) *C.char {
-	rule := C.GoString(crule)
-
+func Parser(c_rule *C.char) *C.char {
+	rule := C.GoString(c_rule)
 	r, err := gonids.ParseRule(rule)
     if err != nil {
 		fmt.Println("GO Error")
+		return C.CString("error\n")
     // Handle parse error
 	}
 
 	var str_out strings.Builder
 
-	str_out.WriteString(r.Action+"\n")
-	str_out.WriteString(r.Protocol+"\n")
-	str_out.WriteString(r.Source.String()+"\n")
-	str_out.WriteString(r.Destination.String()+"\n")
-	str_out.WriteString("msg:\""+r.Description+"\""+"\n")
-
-	for i := range r.Flowbits{
-		str_out.WriteString(r.Flowbits[i].String()+"\n")
-		//fmt.Println(r.Flowbits[i])
+	str_out.WriteString("{")
+	str_out.WriteString("\"action\": \"" + r.Action+"\", ")
+	str_out.WriteString("\"protocol\": \"" + r.Protocol+"\", ")
+	str_out.WriteString("\"header\": \"" + r.Source.String())
+	if r.Bidirectional {
+		str_out.WriteString(" <-> ")
+	} else {
+		str_out.WriteString(" -> ")
+	}
+	
+	str_out.WriteString(r.Destination.String()+"\", ")
+	str_out.WriteString("\"msg\": \""+r.Description+"\", ")
+	
+	if r.Flowbits != nil {
+		str_out.WriteString("\"flowbits\": [")
+		for i := range r.Flowbits{
+			aux_flowbits := strings.Split(r.Flowbits[i].String(), ":")
+			str_out.WriteString("\"" + aux_flowbits[1][:len(aux_flowbits[1])-1]+"\"")
+			if i != len(r.Flowbits)-1{
+				str_out.WriteString(", ")
+			}
+			//fmt.Println(r.Flowbits[i])
+		}
+		str_out.WriteString("]")
 	}
 
 	for i := range r.Matchers{
 		if !strings.Contains(fmt.Sprintf("%s",r.Matchers[i]), "content"){
-			str_out.WriteString(r.Matchers[i].String()+"\n")
-			//fmt.Println(r.Matchers[i])
+			aux_matchers := strings.Split(r.Matchers[i].String(), ":")
+			str_out.WriteString("\"" + aux_matchers[0] + "\": " + "\"" + aux_matchers[1] + "\"")
+			if i != len(r.Matchers)-1{
+				str_out.WriteString(", ")
+			}
+			fmt.Println(aux_matchers)
 		}
 	}
 	
+	fmt.Println(str_out.String())
+	return C.CString("\n")
+
+
 	for i := range r.Statements{
 		str_out.WriteString(r.Statements[i]+"\n")
 		//fmt.Println(r.Statements[i])
@@ -46,7 +69,7 @@ func Parser(crule *C.char) *C.char {
 		//fmt.Println(i+":", r.Tags[i])
 	}
 	
-	fmt.Println(r.StreamMatch)
+	//fmt.Println(r.StreamMatch)
 	if r.StreamMatch != nil{
 		str_out.WriteString(r.StreamMatch.String()+"\n")
 	}
@@ -78,9 +101,9 @@ func Parser(crule *C.char) *C.char {
 }
 
 func main() {
-	//rule := `alert tcp $HOME_NET any -> $EXTERNAL_NET !$HTTP_PORTS (msg:"ET TROJAN [PTsecurity] pkt checker 0"; flow:established, to_server; dsize:200<>513; stream_size:client,>,0; stream_size:server,=,1; stream_size:client, <,513; flowbits:noalert; flowbits:set,FB180732_0; metadata: former_category TROJAN; classtype:trojan-activity; sid:2024694; rev:1; metadata:affected_product Windows_XP_Vista_7_8_10_Server_32_64_Bit, attack_target Client_Endpoint, deployment Perimeter, signature_severity Major, created_at 2017_09_11, malware_family Remcos, performance_impact Moderate, updated_at 2017_09_11;)`
-	
-	//parsed_rule := Parser(rule)
+	rule := `alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"ET MALWARE Win32.Magania"; flow: established,to_server; flowbits:set,EXE2; flowbits:noalert; content:"GET"; http_method; content:".txt"; http_uri; content:"EXE2"; depth:4; fast_pattern; nocase; http_user_agent; content:!"Accept|3a| "; nocase; http_header; content:!"Referer|3a| "; nocase; http_header; content:!"Connection|3a| "; nocase; http_header; metadata: former_category ADWARE_PUP; reference:md5,112c6db4fb8a9aa18d0cc105662af5a4; classtype:trojan-activity; sid:2018050; rev:5; metadata:created_at 2014_01_31, updated_at 2014_01_31;)`
+	c_rule := C.CString(rule)
+	parsed_rule := Parser(c_rule)
 
-	//fmt.Print("parsed rule:", parsed_rule)
+	fmt.Print("parsed rule:", C.GoString(parsed_rule))
 }
