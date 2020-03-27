@@ -9,6 +9,7 @@ import binascii
 import argparse
 import csv
 import math
+import ast
 from functools import partial
 from snortparser import Parser
 from ctypes import *
@@ -65,7 +66,7 @@ html_modifiers = ["http_method", "http_uri", "http_user_agent", "http_protocol",
 
 default_rule_action = "alert"
 default_rule_header = "any any -> any any"
-default_rule_message = "\"Testing rule\""
+default_rule_message = "Testing rule"
 rule_options = {}
 default_rule_sid = 1
 
@@ -702,7 +703,7 @@ class Rule:
         self.action = action
         self.protocol = protocol
         self.header = header
-        self.message = "msg:" + message
+        self.message = "msg: \"" + message + "\""
         self.sid = sid
         self.threshold = {}
         self.fitness = []
@@ -720,9 +721,17 @@ class Rule:
                         for i in range(0, len(contents[content])):
                             str_content = str_content + ' ' + str(contents[content][i]) + ';'
                 str_options = str_options + ' ' + str_content
+            elif option == "flowbits": 
+                flowbits = self.options[option]
+                str_flowbits = ""
+
+                for fb in flowbits:
+                    str_flowbits = str_flowbits + ' ' + str(option) + ':' + str(fb) + ';'
+                str_options = str_options + ' ' + str_flowbits
             else:
                 if option == "pcre":
                     self.options[option] = "\"" + self.options[option] + "\""
+                
                 str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
 
         if self.threshold != {}:
@@ -1026,7 +1035,7 @@ def optimizeRule(rule):
                         for c in op:
                             new_sid += int(ord(c))
 
-                    tmp.message = "\"Testing rule {}\"".format(counter)
+                    tmp.message = "Testing rule {}".format(counter)
                     
                     if new_sid>0:
                         tmp.sid=new_sid
@@ -1115,7 +1124,7 @@ def optimizeRule(rule):
                         for g in z:
                             new_sid+=int(ord(g))
 
-                    temp.message = "\"Testing rule {}\"".format(counter)
+                    temp.message = "Testing rule {}".format(counter)
                     if new_sid>0:
                         temp.sid=new_sid
                     else:
@@ -1305,80 +1314,51 @@ def parseRules():
     lib.Parser.argtypes = [c_char_p]
     lib.Parser.restype = c_char_p
 
-    with open("Datasets/all_rules.txt", 'r') as rule_file:
-    #with open("attacks/htaccess.rules", 'r') as rule_file:
+    #with open("Datasets/all_rules.txt", 'r') as rule_file:
+    with open("attacks/htaccess.rules", 'r') as rule_file:
         rules = []
         r_count = 0
         for line in rule_file:
             if line != "\n":
                 line = line.rstrip()
                 line_b = bytes(line, 'utf-8')
-                go_out = lib.Parser(c_char_p(line_b)).decode()[:-1]
-                if go_out == "error":
-                    print(line)
-                    print()
-                    #break
+                go_out = lib.Parser(c_char_p(line_b)).decode()
+                raw_rule = {}
+                if go_out != "error":
+                    try:
+                        raw_rule = ast.literal_eval(go_out)
+                        r_count += 1
+                    except:
+                        continue
                 else:
-                    r_count += 1
-                exit()
+                    continue
+
+                rule = Rule(raw_rule["action"], raw_rule["protocol"], raw_rule["header"], raw_rule["msg"], raw_rule["sid"])
+                
+                
+                if "threshold" in raw_rule:
+                    rule.threshold = raw_rule["threshold"]
+                
+                for key in raw_rule :
+                    if key not in ["metadata", "reference"]:
+                        if key not in ["action", "protocol", "header", "msg", "sid", "threshold", "content", "modifiers", "sticky_buffers", "threshold"]:
+                            rule.options[key] = raw_rule[key]
+                        elif key == "metadata" or key == "reference":
+                            rule.options[key] = ", ".join(raw_rule[key])
+                        elif key == "content" :
+                            contents = {}
+                            i = 0
+                            for c in raw_rule[key]:
+                                if raw_rule["modifiers"][i] != []:
+                                    contents[c] = raw_rule["modifiers"][i]
+                                i += 1
+                            rule.options["content"] = contents
+                        elif key == "threshold" :
+                            rule.threshold = raw_rule[key]
+                
+                print(rule)
             
         print("rules: ", r_count)
-        exit()
-        print("len rules: ", len(rules))
-        
-        for rule in rules:
-            for op in rule.options:
-                if "sid" == rule.options[op][0]:
-                    sid_index = op
-            
-            test_rule = Rule(rule.header["action"], rule.header["proto"], str(rule.header["source"][1]) + ' ' + str(rule.header["src_port"][1]) + ' ' + str(rule.header["arrow"]) + ' ' + str(rule.header["destination"][1]) + ' ' + str(rule.header["dst_port"][1]), rule.options[0][1][0], rule.options[sid_index][1][0])
-            
-            contents = {}
-            for r in rule.options:
-                if r != 0 and r != max(rule.options.keys()):
-                    key, value = rule.options[r]
-            
-                    if key == "content":
-                        modifiers = []
-                        for i in range(1, len(value)):
-                            modifiers.append(value[i])   
-                        contents[value[0]] = modifiers
-                    elif key == "flow":
-                        test_rule.options[key] = value[0] + ": " + value[1]
-                    elif key == "pcre":
-                        value[len(value)-1] = value[len(value)-1][:-1]
-                        print(value)
-                        pcre_str = ""
-                        for v in value:
-                            pcre_str += v
-                        test_rule.options[key] = pcre_str
-                    elif key == "reference":
-                        if len(value) != 2:
-                            print(key, value)
-                            exit()
-                        test_rule.options[key] = value[0] + ", " + value[1]
-                    elif key in ["threshold", "flowbits", "isdataat"]:
-                        value_str = ""
-                        for v in value:
-                            value_str += v + ','
-                        value_str = value_str[:-1]
-                        test_rule.options[key] = value_str
-                    elif key not in ["sid", "nocase"]:
-                        if len(value) > 1:
-                            print(key, value)
-                            print(rule)
-                            exit()
-                        
-                        try:
-                            test_rule.options[key] = value[0]
-                        except:
-                            print(key, value)
-                            print(str(rule.rule))
-                            exit()
-            
-            test_rule.options["content"] = contents
-            print("output rule:", test_rule)
-            #print("done")
         
 parseRules()
 exit()
