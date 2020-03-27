@@ -12,9 +12,9 @@ func Parser(c_rule *C.char) *C.char {
 	rule := C.GoString(c_rule)
 	r, err := gonids.ParseRule(rule)
     if err != nil {
-		fmt.Println("GO Error")
-		return C.CString("error\n")
-    // Handle parse error
+		//fmt.Println("GO Error")
+		return C.CString("error")
+    	// Handle parse error
 	}
 
 	var str_out strings.Builder
@@ -43,14 +43,20 @@ func Parser(c_rule *C.char) *C.char {
 		}
 		str_out.WriteString("]")
 	}
-
+	
 	for i := range r.Matchers{
 		if !strings.Contains(fmt.Sprintf("%s",r.Matchers[i]), "content"){
 			aux_matchers := strings.Split(r.Matchers[i].String(), ":")
 			key := aux_matchers[0]
 			value := aux_matchers[1]
 			value = value[:len(value)-1]
-			str_out.WriteString(", \"" + key + "\": " + "\"" + value + "\"")
+			if strings.Contains(fmt.Sprintf("%s",r.Matchers[i]), "pcre"){
+				value = strings.Replace(value, "\\", "\\\\",999)
+				str_out.WriteString(", \"" + key + "\": " + value)	
+			} else {
+				str_out.WriteString(", \"" + key + "\": " + "\"" + value + "\"")
+			}
+			
 		}
 	}
 
@@ -66,7 +72,33 @@ func Parser(c_rule *C.char) *C.char {
 	}
 
 	for i := range r.Tags{
-		str_out.WriteString(", \""+i+"\": \""+ r.Tags[i]+"\"")
+		if i == "threshold" {
+			aux_value := strings.Split(r.Tags[i], ",")
+			aux_threshold := [][]string{}
+			for j := range aux_value {
+				aux_threshold = append(aux_threshold, strings.Split(aux_value[j], " "))
+			}
+			
+			for j := range aux_threshold {
+				if aux_threshold[j][0] == "" {
+					aux_threshold[j] = aux_threshold[j][1:]
+				}
+			}
+			str_out.WriteString(", \"" + i + "\": {")
+
+			for j := range aux_threshold {
+				if aux_threshold[j][0] == " " {
+					aux_threshold[j][0] = aux_threshold[j][0][1:]
+				}
+				str_out.WriteString("\""+aux_threshold[j][0]+"\": \""+aux_threshold[j][1]+"\"")
+				if j != len(aux_threshold) - 1 {
+					str_out.WriteString(", ")
+				}
+			}
+			str_out.WriteString("}")
+		} else {
+			str_out.WriteString(", \""+i+"\": \""+ r.Tags[i]+"\"")
+		}
 	}
 
 	if r.StreamMatch != nil{
@@ -85,7 +117,7 @@ func Parser(c_rule *C.char) *C.char {
 			aux_content := strings.Split(r.Contents()[i].String(), ":")
 			value := aux_content[1]
 			content_str := strings.Split(value, ";")[0]
-			content_str = strings.Replace(content_str, "\"", "\\\"",2)
+			content_str = strings.Replace(content_str, "\"", "",2)
 			
 			aux_modifiers := strings.Split(value, ";")[1:]
 			
@@ -174,8 +206,8 @@ func Parser(c_rule *C.char) *C.char {
 }
 
 func main() {
-	rule := `alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"ET TROJAN [PTsecurity] JS.Trojan-Downloader.Nemucod.yo HTTP POST (:Exec:)"; flow: established, to_server;  content:!"Referer|3a|"; http_header; content:"|3a 3a 3a|Exec|3a 3a 3a|http"; http_client_body; depth:40; fast_pattern; content:"|3a|//"; http_client_body; distance:0; within:4; content:".exe|3a 3a|";http_client_body; distance:0; within:100; threshold:type limit, track by_src, count 1, seconds 30; metadata: former_category TROJAN; classtype:trojan-activity; sid:2024701; rev:2; metadata:affected_product Windows_XP_Vista_7_8_10_Server_32_64_Bit, attack_target Client_Endpoint, deployment Internet, signature_severity Major, created_at 2017_09_12, malware_family Nemucod, performance_impact Moderate, updated_at 2017_09_12;)`
-	c_rule := C.CString(rule)
+	test_rule := `alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"ET WEB_CLIENT Fake AV Phone Scam Landing Nov 20"; flow:established,from_server; file_data; content:"<title>VIRUS WARNING"; fast_pattern; nocase; content:"onload=|22|myFunction()|22|"; nocase; content:"YOUR COMPUTER HAS BEEN BLOCKED"; nocase; content:"CALL IMMEDIATLY"; nocase; content:"|5c 6e 5c 6e 5c 6e 5c 6e 5c 6e 5c 6e 5c 6e 5c 6e 5c 6e|"; nocase; metadata: former_category WEB_CLIENT; classtype:trojan-activity; sid:2022125; rev:3; metadata:created_at 2015_11_20, updated_at 2015_11_20;)`
+	c_rule := C.CString(test_rule)
 	parsed_rule := Parser(c_rule)
 
 	fmt.Print("parsed rule:\n", C.GoString(parsed_rule))
