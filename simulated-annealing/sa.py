@@ -11,7 +11,6 @@ import csv
 import math
 import ast
 from functools import partial
-from snortparser import Parser
 from ctypes import *
 
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
@@ -84,6 +83,7 @@ print(len(pkts._packets))
 rule_protocol = str(pkts[0].highest_layer).lower()
 if rule_protocol in ["urlencoded-form"]:
     rule_protocol = "http"
+
 if args.attack == "teardrop":
     rule_protocol = "udp"
 
@@ -432,13 +432,13 @@ def getStats():
 
     return 1
 
-rules_per_size = getRulesPerSize()
+"""rules_per_size = getRulesPerSize()
 rules_per_contents = getRulesPerContents()
 contents_dict = getContentsDict()
 keywords_freq = getKeywordsFrequency()
 
 sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
-
+"""
 html_modifiers_freq = {}
 def getHtmlModifiersFreq(keywords_freq):
     global html_modifiers
@@ -462,6 +462,7 @@ def getLowerCaseContentsDict():
     
     return low_case_contents_dict
 
+"""
 if rule_protocol == "http":
     pkt_content_modifiers = getContentsPerModifiers()
     html_modifiers_freq = getHtmlModifiersFreq(keywords_freq)
@@ -479,6 +480,7 @@ if rule_protocol == "http":
     print()
 
 max_fitness = [0,0,0,0,0]
+"""
 
 def ruleSizeFitness(rule):
     global rules_per_size
@@ -703,13 +705,14 @@ class Rule:
         self.action = action
         self.protocol = protocol
         self.header = header
-        self.message = "msg: \"" + message + "\""
+        self.message = message
         self.sid = sid
         self.threshold = {}
         self.fitness = []
         self.options = {}
     
     def __str__(self):
+        self.message = "msg: \"" + self.message + "\""
         str_options = ""
         for option in self.options:
             if option == "content":
@@ -732,7 +735,10 @@ class Rule:
                 if option == "pcre":
                     self.options[option] = "\"" + self.options[option] + "\""
                 
-                str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
+                if str(self.options[option]) == "":
+                    str_options = str_options + ' ' + str(option) + ';'
+                else:
+                    str_options = str_options + ' ' + str(option) + ':' + str(self.options[option]) + ';'
 
         if self.threshold != {}:
             str_options = str_options + ' ' + "threshold:"
@@ -1304,11 +1310,6 @@ def updateyaml():
 
 updateyaml()
 
-class go_string(Structure):
-    _fields_ = [
-        ("p", c_char_p),
-        ("n", c_int)]
-
 def parseRules():
     lib = cdll.LoadLibrary("./parser.so")
     lib.Parser.argtypes = [c_char_p]
@@ -1360,7 +1361,49 @@ def parseRules():
             
         print("rules: ", r_count)
         
-parseRules()
+def parsePacket():
+    pcap_dir = "Tests/icmp-sample.pcap"
+    pkts = pyshark.FileCapture(pcap_dir)
+    pkts.load_packets()
+    pkt_proto = str(pkts[0].highest_layer).lower()
+
+    rule = Rule(default_rule_action, "proto", default_rule_header, default_rule_message, default_rule_sid)
+
+    for pkt_layer in pkts[0].layers:
+        if pkt_layer._layer_name == "ip":
+            ip_pkt = pkts[0].ip
+            rule.options["fragoffset"] = ip_pkt.frag_offset
+            rule.options["ip_proto"] = ip_pkt.proto
+            rule.options["ttl"] = ip_pkt.ttl
+            rule.options["id"] = int(ip_pkt.id, 0)
+            rule.options["tos"] = int(ip_pkt.dsfield, 0)
+
+    if pkt_proto == "icmp":
+        rule.protocol = "icmp"
+        rule.message = "ICMP Rule"
+
+        try:
+            del rule.options["ip_proto"]
+        except:
+            pass
+        
+        icmp_pkt = pkts[0].icmp
+        rule.options["itype"] = icmp_pkt.type
+        rule.options["icmp_seq"] = icmp_pkt.seq
+        rule.options["icode"] = icmp_pkt.code
+        rule.options["icmp_id"] = icmp_pkt.ident
+        rule.options["dsize"] = icmp_pkt.data_len
+        
+        if ip_pkt.src == ip_pkt.dst:
+            rule.options["sameip"] = ""
+        
+    else: 
+        print("unsupported protocol")
+
+    return rule
+
+parsed_rule = parsePacket()
+print(parsed_rule)
 exit()
 
 final_rule = init_rule
