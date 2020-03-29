@@ -91,9 +91,8 @@ print(rule_protocol)
 
 #exit()
 
-def getContentsPerModifiers():
-    global pcapAttack
-    cap = pyshark.FileCapture(pcapAttack)
+def getContentsPerModifiers(pcap_dir):
+    cap = pyshark.FileCapture(pcap_dir)
     cap.load_packets()
     pkt_content_modifiers = {}
     
@@ -154,9 +153,9 @@ def getTokens(pcap_dir):
         aux_list = []
         for t in range(0, len(tokens)):
             aux = tokens[t].split(';')
-            if len(aux) > 1:
-                for a in range(0, len(aux)-1):
-                    aux[a] = aux[a] + str(';')
+            #if len(aux) > 1:
+            #    for a in range(0, len(aux)-1):
+            #        aux[a] = aux[a] + str(';')
 
             for a in aux:
                 aux_list.append(a)
@@ -208,6 +207,9 @@ def getTokens(pcap_dir):
         aux = aux.replace("\\r\\n", '')
         if aux != '':
             tokens[aux] = []
+    
+    if "/" in tokens.keys():
+        del tokens["/"]
 
     return tokens
 
@@ -459,7 +461,7 @@ def getLowerCaseContentsDict():
 
 """
 if rule_protocol == "http":
-    pkt_content_modifiers = getContentsPerModifiers()
+    pkt_content_modifiers = getContentsPerModifiers(pcapAttack)
     html_modifiers_freq = getHtmlModifiersFreq(keywords_freq)
 
     #print("pkt_content_modifiers", pkt_content_modifiers)
@@ -1367,6 +1369,7 @@ def parsePacket():
     for pkt_layer in pkts[0].layers:
         if pkt_layer._layer_name == "ip":
             ip_pkt = pkts[0].ip
+            #rule.options["fragbits"] = 
             rule.options["fragoffset"] = ip_pkt.frag_offset
             rule.options["ip_proto"] = ip_pkt.proto
             rule.options["ttl"] = ip_pkt.ttl
@@ -1393,8 +1396,14 @@ def parsePacket():
             rule.options["sameip"] = ""
         
     elif pkt_proto == "http":
+        rule.protocol = "http"
+        rule.message = "HTTP Rule"
+
+        rule.options = {}
+
         tokens = getTokens(pcap_dir)
-        print(tokens)
+        rule.options["content"] = tokens
+        http_modifiers = getContentsPerModifiers(pcap_dir)
     else: 
         print("unsupported protocol")
 
