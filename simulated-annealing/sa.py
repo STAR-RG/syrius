@@ -115,17 +115,14 @@ def getContentsPerModifiers():
     
     return pkt_content_modifiers
 
-def getTokens():
-    global pcapAttack
-    cap_raw = pyshark.FileCapture(pcapAttack, include_raw=True, use_json=True)
-    cap = pyshark.FileCapture(pcapAttack)
+def getTokens(pcap_dir):
+    cap_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
+    cap = pyshark.FileCapture(pcap_dir)
     cap.load_packets()
     aux_list = []
 
     for pkt in cap_raw:
-        hex_data = str(binascii.b2a_hex(pkt.get_raw_packet()))[134:][:-1]
-        str_data = str(binascii.unhexlify(hex_data))[2:][:-1]
-
+        str_data = str(binascii.unhexlify(pkt.http_raw.value))[2:][:-1]
         tokens = str_data.split(' ')
         
         aux_list = []
@@ -187,7 +184,7 @@ def getTokens():
                 aux_list.append(a)
 
         tokens = copy.deepcopy(aux_list)
-        aux_list = []
+        """aux_list = []
         for t in range(0, len(tokens)):
             aux = tokens[t].split('=')
             if len(aux) > 1:
@@ -196,7 +193,7 @@ def getTokens():
 
             for a in aux:
                 aux_list.append(a)
-
+        """
         while '' in aux_list:
             aux_list.remove('')
         
@@ -212,13 +209,11 @@ def getTokens():
         if aux != '':
             tokens[aux] = []
 
-    print(tokens)
-
-    print(len(tokens))
-
     return tokens
 
-#getTokens()
+#tokens =getTokens(pcapAttack)
+#print(tokens)
+#print(len(tokens))
 
 #exit()
 
@@ -1362,7 +1357,7 @@ def parseRules():
         print("rules: ", r_count)
         
 def parsePacket():
-    pcap_dir = "Tests/icmp-sample.pcap"
+    pcap_dir = "tests/http-sample.pcap"
     pkts = pyshark.FileCapture(pcap_dir)
     pkts.load_packets()
     pkt_proto = str(pkts[0].highest_layer).lower()
@@ -1397,6 +1392,9 @@ def parsePacket():
         if ip_pkt.src == ip_pkt.dst:
             rule.options["sameip"] = ""
         
+    elif pkt_proto == "http":
+        tokens = getTokens(pcap_dir)
+        print(tokens)
     else: 
         print("unsupported protocol")
 
