@@ -1359,7 +1359,7 @@ def parseRules():
         print("rules: ", r_count)
         
 def parsePacket():
-    pcap_dir = "tests/http-sample.pcap"
+    pcap_dir = "tests/tcp2-sample.pcap"
     pkts = pyshark.FileCapture(pcap_dir)
     pkts.load_packets()
     pkt_proto = str(pkts[0].highest_layer).lower()
@@ -1404,6 +1404,55 @@ def parsePacket():
         tokens = getTokens(pcap_dir)
         rule.options["content"] = tokens
         http_modifiers = getContentsPerModifiers(pcap_dir)
+    elif pkt_proto == "tcp":
+        rule.protocol = "tcp"
+        rule.message = "TCP Rule"
+
+        print(dir(pkts[0].tcp))
+        
+        tcp_pkt = pkts[0].tcp
+
+        try:
+            del rule.options["ip_proto"]
+        except:
+            pass
+        
+        tcp_flags = ''
+
+        if int(tcp_pkt.flags, 0) == 0:
+            tcp_flags = 0
+        else:    
+            if int(tcp_pkt.flags, 0) & 1 :
+                tcp_flags += 'F'
+            if int(tcp_pkt.flags, 0) & 2:
+                tcp_flags += 'S'
+            if int(tcp_pkt.flags, 0) & 4:
+                tcp_flags += 'R'
+            if int(tcp_pkt.flags, 0) & 8:
+                tcp_flags += 'P'
+            if int(tcp_pkt.flags, 0) & 16:
+                tcp_flags += 'A'
+            if int(tcp_pkt.flags, 0) & 32:
+                tcp_flags += 'U'
+            if int(tcp_pkt.flags, 0) & 64:
+                tcp_flags += 'E'
+            if int(tcp_pkt.flags, 0) & 128:
+                tcp_flags += 'C'
+            #if int(tcp_pkt.flags, 0) & 256:
+            #    tcp_flags += 'N'
+
+        #rule.options["seq"] = tcp_pkt.seq
+        #rule.options["ack"] = tcp_pkt.ack
+        rule.options["window"] = tcp_pkt.window_size
+        rule.options["flags"] = tcp_flags
+
+        """try:
+            #suricata >5
+            rule.options["tcp.mss"] = tcp_pkt.options_mss_val
+        except:
+            pass
+        """
+    #elif pkt_proto == "udp":
     else: 
         print("unsupported protocol")
 
