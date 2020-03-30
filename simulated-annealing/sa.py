@@ -91,20 +91,18 @@ print(rule_protocol)
 
 #exit()
 
-def getContentsPerModifiers(pcap_dir):
-    cap = pyshark.FileCapture(pcap_dir)
-    cap.load_packets()
+def getContentsPerModifiers(pkt):
     pkt_content_modifiers = {}
     
-    if cap[0].http.request :
-        pkt_content_modifiers["http_method"] = cap[0].http.request_method
-        pkt_content_modifiers["http_uri"] = cap[0].http.request_uri
-        pkt_content_modifiers["http_user_agent"] = str(cap[0].http.request_line)
-        pkt_content_modifiers["http_protocol"] = cap[0].http.request_version
-        pkt_content_modifiers["http_host"] = "Host: " + str(cap[0].http.host)
-        pkt_content_modifiers["http_connection"] = "Connection: " + str(cap[0].http.connection)
+    if pkt.http.request :
+        pkt_content_modifiers["http_method"] = pkt.http.request_method
+        pkt_content_modifiers["http_uri"] = pkt.http.request_uri
+        pkt_content_modifiers["http_user_agent"] = str(pkt.http.request_line)
+        pkt_content_modifiers["http_protocol"] = pkt.http.request_version
+        pkt_content_modifiers["http_host"] = "Host: " + str(pkt.http.host)
+        pkt_content_modifiers["http_connection"] = "Connection: " + str(pkt.http.connection)
         pkt_content_modifiers["http_header"] = pkt_content_modifiers["http_host"] + ' ' + pkt_content_modifiers["http_user_agent"] + ' ' + pkt_content_modifiers["http_connection"]
-        pkt_content_modifiers["http_request_line"] = cap[0].http.chat
+        pkt_content_modifiers["http_request_line"] = pkt.http.chat
 
     for c in pkt_content_modifiers:
         if "\\xd\\xa" in pkt_content_modifiers[c]:
@@ -114,92 +112,88 @@ def getContentsPerModifiers(pcap_dir):
     
     return pkt_content_modifiers
 
-def getTokens(pcap_dir):
-    cap_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
-    cap = pyshark.FileCapture(pcap_dir)
-    cap.load_packets()
+def getTokens(pkt):
     aux_list = []
 
-    for pkt in cap_raw:
-        str_data = str(binascii.unhexlify(pkt.http_raw.value))[2:][:-1]
-        tokens = str_data.split(' ')
-        
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('/')
-            if len(aux) > 1:
-                for a in range(1, len(aux)):
-                    aux[a] = str('/') + aux[a]
-            for a in aux:
-                aux_list.append(a)
+    str_data = str(binascii.unhexlify(pkt.http_raw.value))[2:][:-1]
+    tokens = str_data.split(' ')
+    
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split('/')
+        if len(aux) > 1:
+            for a in range(1, len(aux)):
+                aux[a] = str('/') + aux[a]
+        for a in aux:
+            aux_list.append(a)
 
-        tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('?')
-                
-            for a in aux:
-                aux_list.append(a)
-        
-        tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('&')
-                
-            for a in aux:
-                aux_list.append(a)
-        
-        tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split(';')
-            #if len(aux) > 1:
-            #    for a in range(0, len(aux)-1):
-            #        aux[a] = aux[a] + str(';')
+    tokens = copy.deepcopy(aux_list)
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split('?')
+            
+        for a in aux:
+            aux_list.append(a)
+    
+    tokens = copy.deepcopy(aux_list)
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split('&')
+            
+        for a in aux:
+            aux_list.append(a)
+    
+    tokens = copy.deepcopy(aux_list)
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split(';')
+        #if len(aux) > 1:
+        #    for a in range(0, len(aux)-1):
+        #        aux[a] = aux[a] + str(';')
 
-            for a in aux:
-                aux_list.append(a)
-        
-        tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split(':')
-            if len(aux) > 1:
-                for a in range(0, len(aux)-1):
-                    aux[a] = aux[a] + str(':')
+        for a in aux:
+            aux_list.append(a)
+    
+    tokens = copy.deepcopy(aux_list)
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split(':')
+        if len(aux) > 1:
+            for a in range(0, len(aux)-1):
+                aux[a] = aux[a] + str(':')
 
-            for a in aux:
-                aux_list.append(a)
+        for a in aux:
+            aux_list.append(a)
 
-        tokens = copy.deepcopy(aux_list)
-        aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split("\\n")
-            if len(aux) > 1:
-                for a in range(0, len(aux)-1):
-                    aux[a] = aux[a] + str("\\n")
+    tokens = copy.deepcopy(aux_list)
+    aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split("\\n")
+        if len(aux) > 1:
+            for a in range(0, len(aux)-1):
+                aux[a] = aux[a] + str("\\n")
 
-            for a in aux:
-                aux_list.append(a)
+        for a in aux:
+            aux_list.append(a)
 
-        tokens = copy.deepcopy(aux_list)
-        """aux_list = []
-        for t in range(0, len(tokens)):
-            aux = tokens[t].split('=')
-            if len(aux) > 1:
-                for a in range(0, len(aux)-1):
-                    aux[a] = aux[a] + str('=')
+    tokens = copy.deepcopy(aux_list)
+    """aux_list = []
+    for t in range(0, len(tokens)):
+        aux = tokens[t].split('=')
+        if len(aux) > 1:
+            for a in range(0, len(aux)-1):
+                aux[a] = aux[a] + str('=')
 
-            for a in aux:
-                aux_list.append(a)
-        """
-        while '' in aux_list:
-            aux_list.remove('')
-        
-        while ' ' in aux_list:
-            aux_list.remove(' ')
-        
-        tokens = copy.deepcopy(aux_list)
+        for a in aux:
+            aux_list.append(a)
+    """
+    while '' in aux_list:
+        aux_list.remove('')
+    
+    while ' ' in aux_list:
+        aux_list.remove(' ')
+    
+    tokens = copy.deepcopy(aux_list)
 
     tokens = {}
 
@@ -1358,19 +1352,21 @@ def parseRules():
             
         print("rules: ", r_count)
         
-def parsePacket():
-    pcap_dir = "tests/tcp2-sample.pcap"
-    pkts = pyshark.FileCapture(pcap_dir)
-    pkts.load_packets()
-    pkt_proto = str(pkts[0].highest_layer).lower()
+def parsePacket(pkt):
+    pkt_proto = ""
+    for l in pkt.layers:
+        if "_raw" not in l._layer_name:
+            pkt_proto = l._layer_name
 
     rule = Rule(default_rule_action, "proto", default_rule_header, default_rule_message, default_rule_sid)
 
-    for pkt_layer in pkts[0].layers:
+    for pkt_layer in pkt.layers:
         if pkt_layer._layer_name == "ip":
-            ip_pkt = pkts[0].ip
+            rule.protocol = "IP"
+            rule.message = "IP Rule"
+            ip_pkt = pkt.ip
             #rule.options["fragbits"] = 
-            rule.options["fragoffset"] = ip_pkt.frag_offset
+            rule.options["fragoffset"] = ip_pkt.flags_tree.frag_offset
             rule.options["ip_proto"] = ip_pkt.proto
             rule.options["ttl"] = ip_pkt.ttl
             rule.options["id"] = int(ip_pkt.id, 0)
@@ -1385,7 +1381,7 @@ def parsePacket():
         except:
             pass
         
-        icmp_pkt = pkts[0].icmp
+        icmp_pkt = pkt.icmp
         rule.options["itype"] = icmp_pkt.type
         rule.options["icmp_seq"] = icmp_pkt.seq
         rule.options["icode"] = icmp_pkt.code
@@ -1401,16 +1397,14 @@ def parsePacket():
 
         rule.options = {}
 
-        tokens = getTokens(pcap_dir)
+        tokens = getTokens(pkt)
         rule.options["content"] = tokens
-        http_modifiers = getContentsPerModifiers(pcap_dir)
+        #http_modifiers = getContentsPerModifiers(pkt)
     elif pkt_proto == "tcp":
         rule.protocol = "tcp"
         rule.message = "TCP Rule"
 
-        print(dir(pkts[0].tcp))
-        
-        tcp_pkt = pkts[0].tcp
+        tcp_pkt = pkt.tcp
 
         try:
             del rule.options["ip_proto"]
@@ -1452,14 +1446,27 @@ def parsePacket():
         except:
             pass
         """
-    #elif pkt_proto == "udp":
     else: 
         print("unsupported protocol")
 
     return rule
 
-parsed_rule = parsePacket()
-print(parsed_rule)
+def allMalignRule(pcap_dir):
+    pkts_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
+    pkts_raw.load_packets()
+
+    rules = []
+
+    for pkt in pkts_raw:
+        rule = parsePacket(pkt)
+        rules.append(rule)
+    
+    for r in rules:
+        print(r)
+        
+
+pcap_dir = "tests/all-malign.pcap"
+allMalignRule(pcap_dir)
 exit()
 
 final_rule = init_rule
