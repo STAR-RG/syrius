@@ -1451,7 +1451,7 @@ def parsePacket(pkt):
 
     return rule
 
-def allMalignRule(pcap_dir):
+def allPktsRule(pcap_dir):
     pkts_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
     pkts_raw.load_packets()
 
@@ -1461,12 +1461,36 @@ def allMalignRule(pcap_dir):
         rule = parsePacket(pkt)
         rules.append(rule)
     
+    common_contents = {}
+    common_options = {}
+
     for r in rules:
-        print(r)
-        
+        for key in r.options:
+            if key == "content":
+                common_contents.update(r.options["content"])
+            else:
+                value = r.options[key]
+                if key in common_options:
+                    if common_options[key] != value:
+                        common_options[key] == "to remove"
+                else:
+                    common_options[key] = value
+    
+    for key in common_options:
+        if common_options[key] == "to remove":
+            del common_options[key]
+
+    #print(common_contents)
+    #print(len(common_contents))
+
+    rules[0].message = "All " + rules[0].message
+    rules[0].options = common_options
+    rules[0].options["content"] = common_contents
+    return rules[0]
 
 pcap_dir = "tests/all-malign.pcap"
-allMalignRule(pcap_dir)
+all_pkts_rule = allPktsRule(pcap_dir)
+print(all_pkts_rule)
 exit()
 
 final_rule = init_rule
