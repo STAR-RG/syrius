@@ -13,6 +13,8 @@ import ast
 from functools import partial
 from ctypes import *
 
+from copy import deepcopy
+
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
 http_attacks = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "jsp", "inc", "wordpress", "sanny"]
@@ -1488,9 +1490,31 @@ def allPktsRule(pcap_dir):
     rules[0].options["content"] = common_contents
     return rules[0]
 
-pcap_dir = "tests/all-malign.pcap"
-all_pkts_rule = allPktsRule(pcap_dir)
-print(all_pkts_rule)
+def onlyMalignRule(malign_pcap, fp_pcap):
+    #missing non-content options
+    fp_pkt = pyshark.FileCapture(fp_pcap, include_raw=True, use_json=True)
+    fp_pkt.load_packets()
+    fp_pkt = fp_pkt[0]
+
+    all_malign_rule = allPktsRule(malign_pcap)
+    fp_rule = parsePacket(fp_pkt)
+    
+    only_malign_contents = list(set(all_malign_rule.options["content"]) - set(fp_rule.options["content"])) 
+    only_malign_rule = deepcopy(all_malign_rule)
+    
+    aux_content = deepcopy(only_malign_rule.options["content"])
+    
+    for c in aux_content:
+        if c not in only_malign_contents:
+            del only_malign_rule.options["content"][c]
+
+    return only_malign_rule
+
+
+malign_pcap = "tests/all-malign.pcap"
+fp_pcap = "tests/false-positive.pcap"
+
+malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
 exit()
 
 final_rule = init_rule
