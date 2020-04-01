@@ -1876,13 +1876,13 @@ mpipe:
 ##
 
 #default-rule-path: /usr/local/etc/suricata/rules
-default-rule-path: ./
+default-rule-path: ./attacks/
 #default-rule-path: rules/emerging-threats/
 
 
 rule-files:
 #- nikto.rules
-- parsed.rules
+- htaccess.rules
 #- nocontent.rules
 # - test.rules
 # - botcc.rules
