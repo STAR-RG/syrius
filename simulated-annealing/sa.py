@@ -982,158 +982,103 @@ def sortMultipleAttacks():
 def optimizeRule(rule):
     all_rule_list = []
     new_rule = copy.deepcopy(rule)
+    #if "content" in rule.options:
+    #    rule.options.update(rule.options["content"])
+    #    del rule.options["content"]
     #print("len options:", len(rule.options))
-    if len(rule.options) > 1:
-        print("aqe")
+
+    if len(rule.options) > 0:
         new_rule = copy.deepcopy(rule)
         rule_list = [new_rule]
         aux = []
         aux2 = []
-        aux3 = []
         timeout = 6000
         start_time = time.time()   #inicia contador do timeout
-        while time.time() - start_time < timeout:
-            if not rule_list:
-                break
-
-            counter = 0
-            print("RULE LIST:", len(rule_list))
-
-            for rule in rule_list:
-                if len(rule.options) == 1:
-                    if len(rule_list) == 1:
-                        break
-                    else:
-                        continue
-
-                tam = 2
-
-                if len(rule.options) == 2:
-                    tam = 1
-
-                elem = random.sample(list(rule.options.keys()), tam)
-                print('RANDOM ELEM:', str(elem))
-                while 1:
-                    if "content" in elem:
-                        elem = random.sample(list(rule.options), tam)
-                    else:
-                        break
-
-                for i in range(tam):
-                    new_sid=0
-                    checker=False
-                    tmp = copy.deepcopy(rule)
-                    del tmp.options[elem[i]]
-
-                    for op in tmp.options:
-                        for c in op:
-                            new_sid += int(ord(c))
-
-                    tmp.message = "Testing rule {}".format(counter)
-
-                    if new_sid>0:
-                        tmp.sid=new_sid
-                    else:
-                        tmp.sid=counter+1
-
-                    if not aux:
-                        aux.append(tmp)
-                        counter+=1
-                    else:
-                        for z in aux:
-                            if z.sid==new_sid:
-                                checker=True
-                                break
-                            else:
-                                checker=False
-                        if not checker:
-                            aux.append(tmp)
-                            #print("REGRA UNICA")
-                            counter+=1
-
-                    #print(tmp)
-
-            for a in aux:
-                print(a)
-            print("len aux1:", len(aux))
-
-            fitness_list = evalContents(aux)
-            print(fitness_list)
-            #print("aqui auqi auiq")
-
-            #rule_list.clear()
-            for i, fitness in enumerate(fitness_list):
-                if fitness < 1.0:
-                    aux2.append(aux[i])
-                    #print("{} : {}".format(aux[i], fitness))
-                    all_rule_list.append(aux[i])
-
-            for a in aux2:
-                print(a)
-            print("len aux2:", len(aux2))
-
-            if not aux2:
-                #print(rule_list)
-                break
-            else:
-                rule_list.clear()
-                rule_list=aux2.copy()
-                fitness_list.clear()
-                aux2.clear()
-                aux.clear()
-
-    if "content" in rule.options:
-        new_rule = copy.deepcopy(rule)
-        rule_list = [new_rule]
-        aux = []
-        aux2 = []
-        aux3 = []
-        timeout = 6000
-        start_time = time.time()   #inicia contador do timeout
-
+        
         while time.time() - start_time < timeout:
 
             if not rule_list:
                 break
 
             counter=0
-            for rules in rule_list:
-                tam=2
 
-                if len(list(rules.options["content"].keys())) == 1:
+            for rules in rule_list:
+
+                tam=2
+                clen=0
+                olen=len(rules.options)
+                prob=0
+
+
+                if "content" in rule.options:
+                    clen=len(rules.options["content"])
+                    prob=(clen)/(clen+olen-1)
+                    if olen==1 and clen==1:
+                        tam=1
+                elif olen==1:
                     tam=1
-                try:
-                    elem = random.sample(list(rules.options["content"].keys()),tam)
-                except:
-                    print("len:", len(list(rules.options["content"].keys())))
-                    print("tam:", tam)
+                else:
+                    tam=2
+
+                #print("olen: " + str(olen))
+                #print("clen: " + str(len(rules.options["content"])))
+                #print("prob: " + str(prob))
 
                 for i in range(tam):
                     new_sid=0
                     checker=False
                     temp = copy.deepcopy(rules)
-                    del temp.options["content"][elem[i]]
+                    if random.random()>prob:
+                        elem=random.choice(list(rules.options.keys()))
+                        del temp.options[elem]
+                        #delete random option
+                    else:
+                        elem=random.choice(list(rules.options["content"].keys()))
+                        del temp.options["content"][elem]
+                        if len(rules.options["content"]) == 0:
+                            del temp.options["content"]
+                        ###
+                        #else:
+                        #    for z in temp.options["content"]:
+                        #        for g in z:
+                        #            new_sid+=int(ord(g))
 
-                    for z in temp.options["content"]:
-                        for g in z:
-                            new_sid+=int(ord(g))
+                    #for z in temp.options:
+                    #    for g in z:
+                    #        new_sid+=int(ord(g))
+                    #
+                    ######
 
                     temp.message = "Testing rule {}".format(counter)
-                    if new_sid>0:
-                        temp.sid=new_sid
-                    else:
-                        temp.sid=counter+1
+
+                    ###
+                    #if new_sid>0:
+                    #    temp.sid=new_sid
+                    #else:
+                    #    temp.sid=counter+1
+                    ###
+                    temp.sid=counter+1
+                    #temp.sid=new_sid
+
                     if not aux:
                         aux.append(temp)
-                        #print("AAAAAAAA:")
                         counter+=1
                     else:
-                        for z in aux:
-                            if z.sid==new_sid:
-                                checker=True
-                                break
-                            else:
-                                checker=False
+                        if "content" in temp.options:
+                            for z in aux:
+                                if (temp.options==z.options) and (temp.options['content']==z.options['content']):
+                                    checker=True
+                                    #print(temp)
+                                    break
+                                else:
+                                    checker=False
+                        else:
+                            for z in aux:
+                                if temp.options==z.options:
+                                    checker=True
+                                    break
+                                else:
+                                    checker=False
                         if not checker:
                             aux.append(temp)
                             #print("REGRA UNICA")
