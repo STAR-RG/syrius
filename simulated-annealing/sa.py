@@ -27,7 +27,7 @@ fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
 time_begin = time.time()
 
 contents_dict = {}
-contents_dict["cron"] = {'GET':[], '/cron.php?':["http_uri", "nocase"], 'include_path=':["http_uri", "nocase"], 'http:':[], '/cirt.net':[], '/rfiinc':[], '.txt??':[], 'HTTP':[], '/1.1':[], 'Connection:':[], 'Keep-Alive':[], 'User-Agent':[], 'Mozilla':[], '5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test':[], '004603)':[], 'Host:':[], '192.168.1.108': []}
+contents_dict["cron"] = {'GET': [], '/cron.php?': ["http_uri", "nocase"], 'include_path=': ["http_uri", "nocase"], 'http:': [], '/cirt.net': [], '/rfiinc': [], '.txt??': [], 'HTTP': [], '/1.1': [], 'Connection:': [], 'Keep-Alive': [], 'User-Agent': [], 'Mozilla': [], '5.00': [], '(Nikto': [], '/2.1.5)': [], '(Evasions:': [], 'None)': [], '(Test': [], '004603)': [], 'Host:': [], '192.168.1.108': []}
 
 contents_dict["htaccess"] = {'GET':[], '/Ud3uMSnb':[], '.htaccess':["http_uri", "nocase"], 'HTTP':[], '/1.1':[], 'User-Agent:':[], 'Mozilla':[], '/5.00':[], '(Nikto':[], '/2.1.5)':[], '(Evasions:':[], 'None)':[], '(Test:':[], 'map_codes)':[], 'Connection:':[], 'Keep-Alive':[], 'Host:':[]}
 
@@ -424,6 +424,7 @@ def getStats():
 
     return 1
 
+
 rules_per_size = getRulesPerSize()
 rules_per_contents = getRulesPerContents()
 contents_dict = getContentsDict()
@@ -456,7 +457,7 @@ def getLowerCaseContentsDict():
 
 
 if rule_protocol == "http":
-    #pkt_content_modifiers = getContentsPerModifiers(pcapAttack)
+    pkt_content_modifiers = getContentsPerModifiers(pkts[0])
     html_modifiers_freq = getHtmlModifiersFreq(keywords_freq)
 
     #print("pkt_content_modifiers", pkt_content_modifiers)
@@ -994,7 +995,7 @@ def optimizeRule(rule):
         aux2 = []
         timeout = 6000
         start_time = time.time()   #inicia contador do timeout
-        
+
         while time.time() - start_time < timeout:
 
             if not rule_list:
@@ -1269,7 +1270,6 @@ def parseRules():
 
                 rule = Rule(raw_rule["action"], raw_rule["protocol"], raw_rule["header"], raw_rule["msg"], raw_rule["sid"])
 
-
                 if "threshold" in raw_rule:
                     rule.threshold = raw_rule["threshold"]
 
@@ -1294,9 +1294,9 @@ def parseRules():
 
         print("rules: ", r_count)
 
-def parsePacket(pkt):
+def parsePacket(pkt_raw, pkt):
     pkt_proto = ""
-    for l in pkt.layers:
+    for l in pkt_raw.layers:
         if "_raw" not in l._layer_name:
             pkt_proto = l._layer_name
 
@@ -1308,7 +1308,7 @@ def parsePacket(pkt):
             rule.message = "IP Rule"
             ip_pkt = pkt.ip
             #rule.options["fragbits"] =
-            rule.options["fragoffset"] = ip_pkt.flags_tree.frag_offset
+            rule.options["fragoffset"] = ip_pkt.frag_offset
             rule.options["ip_proto"] = ip_pkt.proto
             rule.options["ttl"] = ip_pkt.ttl
             rule.options["id"] = int(ip_pkt.id, 0)
@@ -1323,7 +1323,7 @@ def parsePacket(pkt):
         except:
             pass
 
-        icmp_pkt = pkt.icmp
+        icmp_pkt = pkt_raw.icmp
         rule.options["itype"] = icmp_pkt.type
         rule.options["icmp_seq"] = icmp_pkt.seq
         rule.options["icode"] = icmp_pkt.code
@@ -1339,14 +1339,14 @@ def parsePacket(pkt):
 
         rule.options = {}
 
-        tokens = getTokens(pkt)
+        tokens = getTokens(pkt_raw)
         rule.options["content"] = tokens
         #http_modifiers = getContentsPerModifiers(pkt)
     elif pkt_proto == "tcp":
         rule.protocol = "tcp"
         rule.message = "TCP Rule"
 
-        tcp_pkt = pkt.tcp
+        tcp_pkt = pkt_raw.tcp
 
         try:
             del rule.options["ip_proto"]
@@ -1394,13 +1394,17 @@ def parsePacket(pkt):
     return rule
 
 def allPktsRule(pcap_dir):
+    pkts = pyshark.FileCapture(pcap_dir)
     pkts_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
+    pkts.load_packets()
     pkts_raw.load_packets()
 
     rules = []
 
-    for pkt in pkts_raw:
-        rule = parsePacket(pkt)
+    for i in range(len(pkts)):
+        pkt = pkts[i]
+        pkt_raw = pkts_raw[i]
+        rule = parsePacket(pkt_raw, pkt)
         rules.append(rule)
 
     common_contents = {}
@@ -1432,12 +1436,15 @@ def allPktsRule(pcap_dir):
 
 def onlyMalignRule(malign_pcap, fp_pcap):
     #missing non-content options
-    fp_pkt = pyshark.FileCapture(fp_pcap, include_raw=True, use_json=True)
+    fp_pkt = pyshark.FileCapture(fp_pcap)
+    fp_pkt_raw = pyshark.FileCapture(fp_pcap, include_raw=True, use_json=True)
     fp_pkt.load_packets()
+    fp_pkt_raw.load_packets()
     fp_pkt = fp_pkt[0]
+    fp_pkt_raw = fp_pkt_raw[0]
 
     all_malign_rule = allPktsRule(malign_pcap)
-    fp_rule = parsePacket(fp_pkt)
+    fp_rule = parsePacket(fp_pkt_raw, fp_pkt)
 
     only_malign_contents = list(set(all_malign_rule.options["content"]) - set(fp_rule.options["content"]))
     only_malign_rule = deepcopy(all_malign_rule)
@@ -1453,8 +1460,8 @@ def onlyMalignRule(malign_pcap, fp_pcap):
 
 """malign_pcap = "tests/all-malign.pcap"
 fp_pcap = "tests/false-positive.pcap"
-
 malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
+print(malign_rule)
 exit()
 """
 
