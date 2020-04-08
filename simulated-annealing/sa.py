@@ -22,7 +22,7 @@ parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
 ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
-fitnessFile_path = "./suricata-logs/" + str(args.attack) + ".log"
+fitness_file_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
 
@@ -590,31 +590,34 @@ def writeRuleOnFile(rules):
     for rule in rules:
         ruleFile.write(str(rule) + "\n")
     ruleFile.close()
-    #time.sleep(0.050)
 
 def sendGoodTraffic(attack):
     subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
-    #time.sleep(0.05)
 
 def sendAttackVariation(attack):
     subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
-    #time.sleep(0.5)
+
+def testPcap(pcap1):
+    subprocess.Popen(["sh", "testPcap.sh", pcap1], stdout=subprocess.DEVNULL).wait()
 
 def checkFalseNegative(rules):
-    global fitnessFile_path
+    global fitness_file_path
     global args
     variation_packets = 4
 
-    open(fitnessFile_path, 'w').close()
+    open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
-    sendAttackVariation(args.attack)
+    attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
+    print(attack_pcap)
+    exit()
+    testPcap(attack_pcap)
 
     output = []
 
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitnessFile_path, "r") as fitnessFile:
+    with open(fitness_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -635,11 +638,11 @@ def sendTest(attack):
     subprocess.Popen(["sh", "sendTest.sh", attack], stdout=subprocess.DEVNULL).wait()
 
 def checkPrecision(rules):
-    global fitnessFile_path
+    global fitness_file_path
     global args
     variation_packets = 4
 
-    open(fitnessFile_path, 'w').close()
+    open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
     sendTest(args.attack)
 
@@ -648,7 +651,7 @@ def checkPrecision(rules):
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitnessFile_path, "r") as fitnessFile:
+    with open(fitness_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -666,17 +669,19 @@ def checkPrecision(rules):
 
 
 def evalContents(rules):
-    global fitnessFile_path
+    global fitness_file_path
     global args
-    open(fitnessFile_path, 'w').close()
+    open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
-    sendGoodTraffic(args.attack)
+    attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
+    positive_pcap = "Datasets/positive-http.pcap"
+    testPcap(positive_pcap)
     output= []
 
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitnessFile_path, "r") as fitnessFile:
+    with open(fitness_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -1486,8 +1491,8 @@ def fixRule():
 
     print(fp_rule)
 
-fixRule()
-exit()
+#fixRule()
+#exit()
 
 final_rule = init_rule
 if len(pkts._packets) > 1:
