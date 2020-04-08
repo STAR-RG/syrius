@@ -697,7 +697,7 @@ class Rule:
         self.options = {}
 
     def __str__(self):
-        self.message = "msg: \"" + self.message + "\""
+        str_message = "msg: \"" + self.message + "\""
         str_options = ""
         for option in self.options:
             if option == "content":
@@ -734,7 +734,7 @@ class Rule:
 
         str_protocol = str(self.protocol)
 
-        return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(self.message) + ';' + str_options + ')')
+        return (str(self.action) + ' ' + str(str_protocol) + ' ' + str(self.header) + ' ' + '(' + str(str_message) + ';' + str_options + ')')
 
     def calculateFitness(self):
         global max_fitness
@@ -1079,7 +1079,7 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
-            
+           
             ec_pcap = "Datasets/positive-http.pcap"
             fitness_list = evalContents(aux, ec_pcap)
             for i, fitness in enumerate(fitness_list):
@@ -1479,11 +1479,9 @@ def fixRule():
         aux_rule = deepcopy(fp_rule)
         if c not in aux_rule.options["content"]:
             aux_rule.options["content"][c] = malign_rule.options["content"][c]
-
+        
         print(aux_rule)
         aux_rule_list = [aux_rule]
-        writeRuleOnFile(aux_rule_list)
-
     print(fp_rule)
 
 #fixRule()
