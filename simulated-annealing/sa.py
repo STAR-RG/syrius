@@ -22,7 +22,7 @@ parser.add_argument('attack', metavar='A')
 args = parser.parse_args()
 
 ruleFile_path = "./attacks/" + str(args.attack) + ".rules"
-fitness_file_path = "./suricata-logs/" + str(args.attack) + ".log"
+log_file_path = "./suricata-logs/" + str(args.attack) + ".log"
 
 time_begin = time.time()
 
@@ -595,11 +595,11 @@ def testPcap(pcap):
     subprocess.Popen(["sh", "testPcap.sh", pcap], stdout=subprocess.DEVNULL).wait()
 
 def checkFalseNegative(rules, pcap_dir):
-    global fitness_file_path
+    global log_file_path
     global args
     variation_packets = 4
 
-    open(fitness_file_path, 'w').close()
+    open(log_file_path, 'w').close()
     writeRuleOnFile(rules)
     testPcap(pcap_dir)
 
@@ -608,7 +608,7 @@ def checkFalseNegative(rules, pcap_dir):
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitness_file_path, "r") as fitnessFile:
+    with open(log_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -626,11 +626,11 @@ def checkFalseNegative(rules, pcap_dir):
 
 
 def checkPrecision(rules, pcap_dir):
-    global fitness_file_path
+    global log_file_path
     global args
     variation_packets = 4
 
-    open(fitness_file_path, 'w').close()
+    open(log_file_path, 'w').close()
     writeRuleOnFile(rules)
 
     testPcap(pcap_dir)
@@ -640,7 +640,7 @@ def checkPrecision(rules, pcap_dir):
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitness_file_path, "r") as fitnessFile:
+    with open(log_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -658,9 +658,9 @@ def checkPrecision(rules, pcap_dir):
 
 
 def evalContents(rules, pcap_dir):
-    global fitness_file_path
+    global log_file_path
     global args
-    open(fitness_file_path, 'w').close()
+    open(log_file_path, 'w').close()
     writeRuleOnFile(rules)
     attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
     positive_pcap = "Datasets/positive-http.pcap"
@@ -670,7 +670,7 @@ def evalContents(rules, pcap_dir):
     for i in range(len(rules)):
         output.append(0)
 
-    with open(fitness_file_path, "r") as fitnessFile:
+    with open(log_file_path, "r") as fitnessFile:
         line = fitnessFile.readline()
 
         if not line :
@@ -1241,13 +1241,13 @@ def updateyaml():
 
 updateyaml()
 
-def parseRules():
+def parseRules(rule_file):
     lib = cdll.LoadLibrary("./parser.so")
     lib.Parser.argtypes = [c_char_p]
     lib.Parser.restype = c_char_p
     rules = []
     #with open("Datasets/all_rules.txt", 'r') as rule_file:
-    with open("attacks/htaccess.rules", 'r') as rule_file:
+    with open(rule_file, 'r') as rule_file:
         r_count = 0
         for line in rule_file:
             if line != "\n":
@@ -1456,7 +1456,8 @@ def onlyMalignRule(malign_pcap, fp_pcap):
 
 
 def fixRule():
-    fp_rule = parseRules()
+    rule_file = "attacks/adaptor.rules"
+    fp_rule = parseRules(rule_file)
 
     if len(fp_rule) == 0:
         print("no rule parsed")
@@ -1470,22 +1471,39 @@ def fixRule():
         exit()
 
     fp_pcap = "tests/false-positive.pcap"
-    malign_pcap = "tests/all-malign.pcap"
+    malign_pcap = "tests/true-positives.pcap"
     malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
     print(malign_rule)
     print()
-    
+
+    count = 0
     for c in malign_rule.options["content"]:
         aux_rule = deepcopy(fp_rule)
+        aux_rule.message = "Testing rule {}".format(count)
         if c not in aux_rule.options["content"]:
             aux_rule.options["content"][c] = malign_rule.options["content"][c]
         
-        print(aux_rule)
-        aux_rule_list = [aux_rule]
+            print(c)
+            print(aux_rule)
+            print(len(aux_rule.options["content"]))
+            aux_rule_list = [aux_rule]
+            output = evalContents(aux_rule_list, "tests/false-positive.pcap")
+            output = output[0]
+
+            if output == 1:
+                continue
+            else:
+                output = checkFalseNegative(aux_rule_list, malign_pcap)
+                print("false negative chek output:", output)
+                output = output[0]
+        
+                if output >= 1:
+                    print("true positive")
+        count += 1
     print(fp_rule)
 
-#fixRule()
-#exit()
+fixRule()
+exit()
 
 final_rule = init_rule
 if len(pkts._packets) > 1:
