@@ -504,7 +504,7 @@ def ruleContentsFitness(rule):
 
     return fitness
 
-def rareContentsFitness(rule):
+def ruleContentsFitness(rule):
     global contents_dict
     global low_case_contents_dict
     fitness = 0
@@ -750,7 +750,7 @@ class Rule:
 
         if self.protocol == "http":
             self.fitness.append(ruleContentsFitness(self))
-            self.fitness.append(rareContentsFitness(self))
+            self.fitness.append(ruleContentsFitness(self))
             self.fitness.append(ruleContentsModifiersFitness(self))
 
 
@@ -1195,8 +1195,8 @@ def optimizeRule(rule):
                         raw_writer.write(str(x.getAllAttributesRaw())+'\n')
                         total="{} -> recall: {}%, precision: {}%\n".format(str(x), str(y), str(z))
                         writer.writerow([str(x), "{}%".format(str(y)), "{}%".format(str(z)), "{}%".format(str(f1))])
-                        #fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)])
-                        #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), rareContentsFitness(x),ruleContentsModifiersFitness(x)))
+                        #fitness_writer.writerow([str(x), ruleSizeFitness(x),ruleContentsFitness(x), ruleContentsFitness(x),ruleContentsModifiersFitness(x)])
+                        #regrafit.append((x, ruleSizeFitness(x),ruleContentsFitness(x), ruleContentsFitness(x), ruleContentsModifiersFitness(x)))
                         fitness_writer.writerow([str(x), ruleSizeFitness(x), ruleOptionsFitness(x)])
                         regrafit.append((x, ruleSizeFitness(x), ruleOptionsFitness(x)))
 
@@ -1248,10 +1248,9 @@ def parseRules():
     lib = cdll.LoadLibrary("./parser.so")
     lib.Parser.argtypes = [c_char_p]
     lib.Parser.restype = c_char_p
-
+    rules = []
     #with open("Datasets/all_rules.txt", 'r') as rule_file:
     with open("attacks/htaccess.rules", 'r') as rule_file:
-        rules = []
         r_count = 0
         for line in rule_file:
             if line != "\n":
@@ -1290,9 +1289,9 @@ def parseRules():
                         elif key == "threshold" :
                             rule.threshold = raw_rule[key]
 
-                print(rule)
+                rules.append(rule)
 
-        print("rules: ", r_count)
+    return rules
 
 def parsePacket(pkt_raw, pkt):
     pkt_proto = ""
@@ -1458,12 +1457,37 @@ def onlyMalignRule(malign_pcap, fp_pcap):
     return only_malign_rule
 
 
-"""malign_pcap = "tests/all-malign.pcap"
-fp_pcap = "tests/false-positive.pcap"
-malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
-print(malign_rule)
+
+def fixRule():
+    fp_rule = parseRules()
+
+    if len(fp_rule) == 0:
+        print("no rule parsed")
+        exit()
+    elif len(fp_rule) == 1:
+        fp_rule = fp_rule[0]
+        print(fp_rule)
+        print()
+    else:
+        print("multiple rules parsed")
+        exit()
+
+    fp_pcap = "tests/false-positive.pcap"
+    malign_pcap = "tests/all-malign.pcap"
+    malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
+    print(malign_rule)
+    print()
+    for c in malign_rule.options["content"]:
+        aux_rule = deepcopy(fp_rule)
+        if c not in aux_rule.options["content"]:
+            aux_rule.options["content"][c] = malign_rule.options["content"][c]
+
+        print(aux_rule)
+
+    print(fp_rule)
+
+fixRule()
 exit()
-"""
 
 final_rule = init_rule
 if len(pkts._packets) > 1:
