@@ -685,6 +685,22 @@ def evalContents(rules, pcap_dir):
     #print(output)
     return output
 
+def checkRuleAlert(rule, log_file_dir):
+    has_alerted = False
+    count = 0
+
+    with open(log_file_dir, 'r') as log_file:
+        while True:
+            line = log_file.readline()
+            if line:
+                if rule.message in line and ('[1:'+str(rule.sid)+':') in line:
+                    count += 1
+                    has_alerted = True
+            else:
+                break
+    
+    return has_alerted, count
+
 class Rule:
     def __init__(self, action, protocol, header, message, sid):
         self.action = action
@@ -1409,7 +1425,14 @@ def allPktsRule(pcap_dir):
     for r in rules:
         for key in r.options:
             if key == "content":
-                common_contents.update(r.options["content"])
+                if common_contents == {}:
+                    common_contents.update(r.options["content"])
+                else:
+                    intersection = set(common_contents) & set(r.options["content"])
+                    aux_contents_dict = deepcopy(common_contents)
+                    common_contents = {}
+                    for elem in intersection:
+                        common_contents[elem] = aux_contents_dict[elem]
             else:
                 value = r.options[key]
                 if key in common_options:
@@ -1424,6 +1447,7 @@ def allPktsRule(pcap_dir):
 
     #print(common_contents)
     #print(len(common_contents))
+    #exit()
 
     rules[0].message = "All " + rules[0].message
     rules[0].options = common_options
@@ -1456,7 +1480,7 @@ def onlyMalignRule(malign_pcap, fp_pcap):
 
 
 def fixRule():
-    rule_file = "attacks/adaptor.rules"
+    rule_file = "tests/tofix.rule"
     fp_rule = parseRules(rule_file)
 
     if len(fp_rule) == 0:
@@ -1481,27 +1505,26 @@ def fixRule():
         aux_rule = deepcopy(fp_rule)
         aux_rule.message = "Testing rule {}".format(count)
         if c not in aux_rule.options["content"]:
+            global log_file_path
             aux_rule.options["content"][c] = malign_rule.options["content"][c]
         
-            print(c)
-            print(aux_rule)
-            print(len(aux_rule.options["content"]))
             aux_rule_list = [aux_rule]
-            output = evalContents(aux_rule_list, "tests/false-positive.pcap")
-            output = output[0]
+            writeRuleOnFile(aux_rule_list)
+            testPcap("tests/false-positive.pcap")
+            output, _ = checkRuleAlert(aux_rule, log_file_path)
 
-            if output == 1:
+            if output == True:
                 continue
             else:
-                output = checkFalseNegative(aux_rule_list, malign_pcap)
-                print("false negative chek output:", output)
-                output = output[0]
+                writeRuleOnFile(aux_rule_list)
+                testPcap("tests/true-positives.pcap")
+                output, alerts_count = checkRuleAlert(aux_rule, log_file_path)
+                print("false negative check output:", output, alerts_count)
         
-                if output >= 1:
-                    print("true positive")
+                if alerts_count == 3:
+                    pass
         count += 1
     print(fp_rule)
-
 fixRule()
 exit()
 
