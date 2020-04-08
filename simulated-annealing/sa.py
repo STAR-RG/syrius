@@ -469,7 +469,7 @@ if rule_protocol == "http":
 
     low_case_contents_dict = getLowerCaseContentsDict()
 
-    #lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
+    lower_case_pkt_content_modifiers = dict((k, v.lower()) for k,v in pkt_content_modifiers.items())
     print()
 
 max_fitness = [0,0,0,0,0]
@@ -591,26 +591,17 @@ def writeRuleOnFile(rules):
         ruleFile.write(str(rule) + "\n")
     ruleFile.close()
 
-def sendGoodTraffic(attack):
-    subprocess.Popen(["sh", "sendGoodTraffic.sh", attack], stdout=subprocess.DEVNULL).wait()
+def testPcap(pcap):
+    subprocess.Popen(["sh", "testPcap.sh", pcap], stdout=subprocess.DEVNULL).wait()
 
-def sendAttackVariation(attack):
-    subprocess.Popen(["sh", "sendAttackVariation.sh", attack], stdout=subprocess.DEVNULL).wait()
-
-def testPcap(pcap1):
-    subprocess.Popen(["sh", "testPcap.sh", pcap1], stdout=subprocess.DEVNULL).wait()
-
-def checkFalseNegative(rules):
+def checkFalseNegative(rules, pcap_dir):
     global fitness_file_path
     global args
     variation_packets = 4
 
     open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
-    attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
-    print(attack_pcap)
-    exit()
-    testPcap(attack_pcap)
+    testPcap(pcap_dir)
 
     output = []
 
@@ -634,17 +625,15 @@ def checkFalseNegative(rules):
     return output
 
 
-def sendTest(attack):
-    subprocess.Popen(["sh", "sendTest.sh", attack], stdout=subprocess.DEVNULL).wait()
-
-def checkPrecision(rules):
+def checkPrecision(rules, pcap_dir):
     global fitness_file_path
     global args
     variation_packets = 4
 
     open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
-    sendTest(args.attack)
+
+    testPcap(pcap_dir)
 
     output = []
 
@@ -668,14 +657,14 @@ def checkPrecision(rules):
     return output
 
 
-def evalContents(rules):
+def evalContents(rules, pcap_dir):
     global fitness_file_path
     global args
     open(fitness_file_path, 'w').close()
     writeRuleOnFile(rules)
     attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
     positive_pcap = "Datasets/positive-http.pcap"
-    testPcap(positive_pcap)
+    testPcap(pcap_dir)
     output= []
 
     for i in range(len(rules)):
@@ -688,7 +677,7 @@ def evalContents(rules):
             return output
 
         while line:
-            rule_number = int(line.split("Testing rule ")[1].split(" ")[0])
+            rule_number = int(line.split("Testing rule ")[1].split(" ")[0][0])
             output[rule_number] = 1
 
             line = fitnessFile.readline()
@@ -1090,8 +1079,9 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
-
-            fitness_list = evalContents(aux)
+            
+            ec_pcap = "Datasets/positive-http.pcap"
+            fitness_list = evalContents(aux, ec_pcap)
             for i, fitness in enumerate(fitness_list):
                 if fitness < 1.0:
                     aux2.append(aux[i])
@@ -1168,9 +1158,11 @@ def optimizeRule(rule):
     print("normal pos:", current_pos)
 
     print("pegando precision")
-    normal_precision=checkPrecision(normal_rules_list)
+    cp_pcap = "Datasets/test.pcap"
+    normal_precision=checkPrecision(normal_rules_list, cp_pcap)
     print("pegando recall")
-    normal_recall=checkFalseNegative(normal_rules_list)
+    cfn_pcap = "Datasets/all-" + args.attack + ".pcap"
+    normal_recall=checkFalseNegative(normal_rules_list, cfn_pcap)
 
     print('recall golden rule:', normal_recall[golden_rule_pos])
 
@@ -1482,12 +1474,15 @@ def fixRule():
     malign_rule = onlyMalignRule(malign_pcap, fp_pcap)
     print(malign_rule)
     print()
+    
     for c in malign_rule.options["content"]:
         aux_rule = deepcopy(fp_rule)
         if c not in aux_rule.options["content"]:
             aux_rule.options["content"][c] = malign_rule.options["content"][c]
 
         print(aux_rule)
+        aux_rule_list = [aux_rule]
+        writeRuleOnFile(aux_rule_list)
 
     print(fp_rule)
 
