@@ -9,8 +9,8 @@ import argparse
 import csv
 import math
 import ast
+import ctypes
 from functools import partial
-from ctypes import *
 
 from copy import deepcopy
 
@@ -696,7 +696,7 @@ def checkRuleAlert(rule, log_file_dir):
                     count += 1
                     has_alerted = True
             line = log_file.readline()
- 
+
     return has_alerted, count
 
 class Rule:
@@ -1093,7 +1093,7 @@ def optimizeRule(rule):
                             #print("REGRA UNICA")
                             counter+=1
             print(len(aux))
-           
+
             ec_pcap = "Datasets/positive-http.pcap"
             fitness_list = evalContents(aux, ec_pcap)
             for i, fitness in enumerate(fitness_list):
@@ -1256,18 +1256,18 @@ def updateyaml():
 updateyaml()
 
 def parseRules(rule_file):
-    lib = cdll.LoadLibrary("./parser.so")
-    lib.Parser.argtypes = [c_char_p]
-    lib.Parser.restype = c_char_p
+    lib = ctypes.cdll.LoadLibrary("./parser.so")
+    lib.Parser.argtypes = [ctypes.c_char_p]
+    lib.Parser.restype = ctypes.c_char_p
     rules = []
-    #with open("Datasets/all_rules.txt", 'r') as rule_file:
+    # with open("Datasets/all_rules.txt", 'r') as rule_file:
     with open(rule_file, 'r') as rule_file:
         r_count = 0
         for line in rule_file:
             if line != "\n":
                 line = line.rstrip()
                 line_b = bytes(line, 'utf-8')
-                go_out = lib.Parser(c_char_p(line_b)).decode()
+                go_out = lib.Parser(ctypes.c_char_p(line_b)).decode()
                 raw_rule = {}
                 if go_out != "error":
                     try:
@@ -1505,7 +1505,7 @@ def fixRule():
         if c not in aux_rule.options["content"]:
             global log_file_path
             aux_rule.options["content"][c] = malign_rule.options["content"][c]
-        
+
             aux_rule_list = [aux_rule]
             writeRuleOnFile(aux_rule_list)
             testPcap("tests/false-positive.pcap")
@@ -1518,7 +1518,7 @@ def fixRule():
                 testPcap("tests/true-positives.pcap")
                 output, alerts_count = checkRuleAlert(aux_rule, log_file_path)
                 print("false negative check output:", output, alerts_count)
-        
+
                 if alerts_count == 3:
                     pass
         count += 1
