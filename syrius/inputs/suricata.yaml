@@ -76,7 +76,7 @@ outputs:
   # a line based alerts log similar to Snort's fast.log
   - fast:
       enabled: yes
-      filename: htaccess.log
+      filename: adaptor.log
       append: no
       #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
 
@@ -1882,7 +1882,7 @@ default-rule-path: ./attacks/
 
 rule-files:
 #- nikto.rules
-- htaccess.rules
+- adaptor.rules
 #- nocontent.rules
 # - test.rules
 # - botcc.rules
