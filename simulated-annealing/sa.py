@@ -690,15 +690,13 @@ def checkRuleAlert(rule, log_file_dir):
     count = 0
 
     with open(log_file_dir, 'r') as log_file:
-        while True:
-            line = log_file.readline()
-            if line:
-                if rule.message in line and ('[1:'+str(rule.sid)+':') in line:
+        line = log_file.readline()
+        while line:
+            if ('[1:'+str(rule.sid)+':') in line:
                     count += 1
                     has_alerted = True
-            else:
-                break
-    
+            line = log_file.readline()
+ 
     return has_alerted, count
 
 class Rule:
