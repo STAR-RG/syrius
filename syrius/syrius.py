@@ -520,7 +520,7 @@ def ruleContentsFitness(rule):
     return fitness
 
 
-def ruleContentsFitness(rule):
+def rareContentsFitness(rule):
     global contents_dict
     global low_case_contents_dict
     fitness = 0
@@ -650,27 +650,16 @@ def checkPrecision(rules, pcap_dir):
 
     open(log_file_path, 'w').close()
     writeRuleOnFile(rules)
-
     testPcap(pcap_dir)
 
-    output = []
-
-    for i in range(len(rules)):
-        output.append(0)
-
+    number_of_rules = len(rules)
+    output = [0] * number_of_rules
     with open(log_file_path, "r") as fitnessFile:
-        line = fitnessFile.readline()
-
-        if not line:
-            return output
-
-        while line:
-            for i in range(len(rules)):
+        for line in fitnessFile:
+            for i in range(number_of_rules):
                 if ('[1:'+str(rules[i].sid)+':') in line:
                     output[i] += 1
                     break
-
-            line = fitnessFile.readline()
 
     return output
 
@@ -683,24 +672,14 @@ def evalContents(rules, pcap_dir):
     attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
     positive_pcap = "Datasets/positive-http.pcap"
     testPcap(pcap_dir)
-    output = []
 
-    for i in range(len(rules)):
-        output.append(0)
+    output = [0] * len(rules)
 
     with open(log_file_path, "r") as fitnessFile:
-        line = fitnessFile.readline()
-
-        if not line:
-            return output
-
-        while line:
+        for line in fitnessFile:
             rule_number = int(line.split("Testing rule ")[1].split(" ")[0][0])
             output[rule_number] = 1
 
-            line = fitnessFile.readline()
-
-    # print(output)
     return output
 
 
@@ -778,7 +757,7 @@ class Rule:
 
         if self.protocol == "http":
             self.fitness.append(ruleContentsFitness(self))
-            self.fitness.append(ruleContentsFitness(self))
+            self.fitness.append(rareContentsFitness(self))
             self.fitness.append(ruleContentsModifiersFitness(self))
 
         for i in range(0, len(self.fitness)):
@@ -1033,7 +1012,6 @@ def optimizeRule(rule):
             counter = 0
 
             for rules in rule_list:
-
                 tam = 2
                 clen = 0
                 olen = len(rules.options)
