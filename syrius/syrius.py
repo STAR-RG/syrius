@@ -622,24 +622,15 @@ def checkFalseNegative(rules, pcap_dir):
     writeRuleOnFile(rules)
     testPcap(pcap_dir)
 
-    output = []
-
-    for i in range(len(rules)):
-        output.append(0)
+    number_of_rules = len(rules)
+    output = [0] * number_of_rules
 
     with open(log_file_path, "r") as fitnessFile:
-        line = fitnessFile.readline()
-
-        if not line:
-            return output
-
-        while line:
-            for i in range(len(rules)):
+        for line in fitnessFile:
+            for i in range(number_of_rules):
                 if ('[1:'+str(rules[i].sid)+':') in line:
                     output[i] += 1
                     break
-
-            line = fitnessFile.readline()
 
     return output
 
@@ -654,6 +645,7 @@ def checkPrecision(rules, pcap_dir):
 
     number_of_rules = len(rules)
     output = [0] * number_of_rules
+
     with open(log_file_path, "r") as fitnessFile:
         for line in fitnessFile:
             for i in range(number_of_rules):
@@ -677,25 +669,21 @@ def evalContents(rules, pcap_dir):
 
     with open(log_file_path, "r") as fitnessFile:
         for line in fitnessFile:
-            rule_number = int(line.split("Testing rule ")[1].split(" ")[0][0])
+            rule_number = int(line.split("Testing rule ")[1].split(" ")[0])
             output[rule_number] = 1
 
     return output
 
 
 def checkRuleAlert(rule, log_file_dir):
-    has_alerted = False
     count = 0
 
     with open(log_file_dir, 'r') as log_file:
-        line = log_file.readline()
-        while line:
+        for line in log_file:
             if ('[1:'+str(rule.sid)+':') in line:
                 count += 1
-                has_alerted = True
-            line = log_file.readline()
 
-    return has_alerted, count
+    return count
 
 
 class Rule:
@@ -1523,14 +1511,14 @@ def fixRule():
             aux_rule_list = [aux_rule]
             writeRuleOnFile(aux_rule_list)
             testPcap("tests/false-positive.pcap")
-            output, _ = checkRuleAlert(aux_rule, log_file_path)
+            alerts_count = checkRuleAlert(aux_rule, log_file_path)
 
-            if output is True:
+            if alerts_count > 0:
                 continue
             else:
                 writeRuleOnFile(aux_rule_list)
                 testPcap("tests/true-positives.pcap")
-                output, alerts_count = checkRuleAlert(aux_rule, log_file_path)
+                alerts_count = checkRuleAlert(aux_rule, log_file_path)
                 # print("false negative check output: ", output, alerts_count)
 
                 if alerts_count == 1:
