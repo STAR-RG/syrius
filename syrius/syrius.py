@@ -614,68 +614,25 @@ def testPcap(pcap):
     subprocess.Popen(["sh", "testPcap.sh", pcap], stdout=subprocess.DEVNULL).wait()
 
 
-def checkFalseNegative(rules, pcap_dir):
+def checkAlerts(rules, pcap_dir):
     global log_file_path
-    global args
 
     open(log_file_path, 'w').close()
     writeRuleOnFile(rules)
-    testPcap(pcap_dir)
-
-    number_of_rules = len(rules)
-    output = [0] * number_of_rules
-
-    with open(log_file_path, "r") as fitnessFile:
-        for line in fitnessFile:
-            for i in range(number_of_rules):
-                if ('[1:'+str(rules[i].sid)+':') in line:
-                    output[i] += 1
-                    break
-
-    return output
-
-
-def checkPrecision(rules, pcap_dir):
-    global log_file_path
-    global args
-
-    open(log_file_path, 'w').close()
-    writeRuleOnFile(rules)
-    testPcap(pcap_dir)
-
-    number_of_rules = len(rules)
-    output = [0] * number_of_rules
-
-    with open(log_file_path, "r") as fitnessFile:
-        for line in fitnessFile:
-            for i in range(number_of_rules):
-                if ('[1:'+str(rules[i].sid)+':') in line:
-                    output[i] += 1
-                    break
-
-    return output
-
-
-def evalContents(rules, pcap_dir):
-    global log_file_path
-    global args
-    open(log_file_path, 'w').close()
-    writeRuleOnFile(rules)
-    attack_pcap = "Datasets/nikto-" + args.attack + ".pcap"
-    positive_pcap = "Datasets/positive-http.pcap"
     testPcap(pcap_dir)
 
     output = [0] * len(rules)
 
-    with open(log_file_path, "r") as fitnessFile:
-        for line in fitnessFile:
-            rule_number = int(line.split("Testing rule ")[1].split(" ")[0])
-            output[rule_number] = 1
+    with open(log_file_path, "r") as logFile:
+        for line in logFile:
+            for idx, rule in enumerate(rules):
+                if ('[1:'+str(rule.sid)+':') in line:
+                    output[idx] += 1
+                    break
 
     return output
 
-
-def checkRuleAlert(rule, log_file_dir):
+def checkRuleAlerts(rule, log_file_dir):
     count = 0
 
     with open(log_file_dir, 'r') as log_file:
@@ -1076,7 +1033,7 @@ def optimizeRule(rule):
             print(len(aux))
 
             ec_pcap = "Datasets/positive-http.pcap"
-            fitness_list = evalContents(aux, ec_pcap)
+            fitness_list = checkAlerts(aux, ec_pcap)
             for i, fitness in enumerate(fitness_list):
                 if fitness < 1.0:
                     aux2.append(aux[i])
@@ -1154,11 +1111,10 @@ def optimizeRule(rule):
 
     print("pegando precision")
     cp_pcap = "Datasets/test.pcap"
-    normal_precision = checkPrecision(normal_rules_list, cp_pcap)
+    normal_precision = checkAlerts(normal_rules_list, cp_pcap)
     print("pegando recall")
     cfn_pcap = "Datasets/all-" + args.attack + ".pcap"
-    normal_recall = checkFalseNegative(normal_rules_list, cfn_pcap)
-
+    normal_recall = checkAlerts(normal_rules_list, cfn_pcap)
     print('recall golden rule:', normal_recall[golden_rule_pos])
 
     with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
@@ -1237,7 +1193,6 @@ def updateyaml():
 
 
 updateyaml()
-
 
 def parseRules(rule_file):
     lib = ctypes.cdll.LoadLibrary("./parser.so")
@@ -1511,14 +1466,14 @@ def fixRule():
             aux_rule_list = [aux_rule]
             writeRuleOnFile(aux_rule_list)
             testPcap("tests/false-positive.pcap")
-            alerts_count = checkRuleAlert(aux_rule, log_file_path)
+            alerts_count = checkRuleAlerts(aux_rule, log_file_path)
 
             if alerts_count > 0:
                 continue
             else:
                 writeRuleOnFile(aux_rule_list)
                 testPcap("tests/true-positives.pcap")
-                alerts_count = checkRuleAlert(aux_rule, log_file_path)
+                alerts_count = checkRuleAlerts(aux_rule, log_file_path)
                 # print("false negative check output: ", output, alerts_count)
 
                 if alerts_count == 1:
