@@ -328,22 +328,24 @@ signature-based \nids~(\eg{}, Snort~\cite{snort}).
 \subsection{Suricata Rules}
 \label{sec:example-suricata-rules}
 
+%% \footnote{IPS (Intrusion Prevention System) and IDS differ in
+%%   the action taken when an intrusion is observed. IPS systems block
+%%   malicious traffic whereas IDS systems only alert them. However, IDS
+%%   and IPS are similar in the approaches used to detect
+%%   intrusions~\cite{ids-ips}.}
+
 Figure~\ref{fig:pingscan-example} shows an example rule of
 Suricata~\cite{suricata}, a popular open-source \nids{} maintained by
 the Open Information Security Foundation (OISF)~\cite{oisf}.  A
 Suricata rule is divided in three parts---action, header, and rule
 options~\cite{suri-rule-format}. The \emph{action} appears as the
-first word in the rule description (an \CodeIn{alert}, in this
-case). An action denotes the task that needs to be executed if the
+first word in the rule description---an \CodeIn{alert}, in this
+case. An action denotes the task that needs to be executed if the
 rule pattern is satisfied.  In this example, an alert message will be
 sent to system administrators if the rule pattern is
-satisfied\footnote{IPS (Intrusion Prevention System) and IDS differ in
-  the action taken when an intrusion is observed. IPS systems block
-  malicious traffic whereas IDS systems only alert them. However, IDS
-  and IPS are similar in the approaches used to detect
-  intrusions~\cite{ids-ips}.}. The \emph{header} comes after the
+satisfied. The \emph{header} comes after the
 action in the rule description. It restricts the information flow
-covered by the rule. The header of this rule is \CodeIn{icmp any any
+monitored by the rule. The header of this rule is \CodeIn{icmp any any
   -> any any}. It instructs Suricata to inspect \CodeIn{icmp} traffic
 flowing from any machine and port to any machine and port.\MyComment{
   The variables \CodeIn{\$HOME\_NET} and \CodeIn{\$EXTERNAL\_NET} are
@@ -384,16 +386,16 @@ argument is present in the payload of a message.
 Table~\ref{table:rules} shows a sample of non-documentation options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
 the name of the option, and column ``Description'' summarizes
-purpose. The option \CodeIn{content} is common in rules to capture
-http attacks and http rules are the most common in the Emerging
-Threats Open Ruleset~\cite{emerging-threats-open}. The content option
-takes a sequence of bytes as argument and checks if that sequence is
-present in the payload of the message.  For example, the option
-\CodeIn{content:''SELECT''} checks if the string ``SELECT'' is present
-in the payload.  Detailed description of the Suricata rules can be
-found elsewhere~\cite{suri-rule-format}. It is worth noting that
-Suricata supports a total of \totoptions\ distinct options covering
-\numproto\ distinct network protocols.
+purpose. The option \CodeIn{content} deserves attention. It is common
+in rules to capture http attacks and http rules are the most common in
+the Emerging Threats Open Ruleset~\cite{emerging-threats-open}. The
+content option takes a sequence of bytes as argument and checks if
+that sequence is in the payload of the message.  For example, the
+option \CodeIn{content:''SELECT''} checks if the string ``SELECT'' is
+present in the payload.  Detailed description of the Suricata rules
+can be found elsewhere~\cite{suri-rule-format}. Suricata supports a
+total of \totoptions\ distinct options covering \numproto\ distinct
+network protocols.
 
 
 %% A total of 9 of these options
@@ -442,10 +444,12 @@ Suricata supports a total of \totoptions\ distinct options covering
 \subsection{Rules and Packets}
 \label{sec:rules-and-packets}
 
-We mentioned above that http rules often used content options, which
-associate with the message payload. For non-http rules, options are
-often associated with packet fields. Let us consider a rule for an
-icmp attack as example.
+%% We mentioned above that http rules often used content options, which
+%% associate with the message payload.
+
+We observed that the options used in non-http rules typically
+associate with packet fields. Let us consider a rule for an icmp
+attack as example.
 
 \begin{figure}[h!]
   \centering
@@ -460,16 +464,16 @@ icmp attack as example.
 Figure~\ref{fig:icmp-packet-layout} shows the
 layout of an icmp packet. The packet fields ``Flags'' and ``Time to
 Live'', declared in the ip header, are mapped to the \suri\ options
-\CodeIn{flagbits} and \CodeIn{ttl}, respectively. Likewise, the fields
+\CodeIn{fragbits} and \CodeIn{ttl}, respectively. Likewise, the fields
 ``Type'' and ``Code'', declared in the icmp header, are mapped to the
 options \CodeIn{itype} and \CodeIn{icode}, respectively. The values of
 the options ``ttl'', ``itype'', and ``icode'' are the same as the
 value of the corresponding fields in the icmp packet. For the field
 ``Flags'' the value of the corresponding option is encoded in a
-bitvector. For example, if the ``Flags'' field stores the value 1010,
-the corresponding rule option will be \CodeIn{flagbits:RM}, as each
+bitvector. For example, if the ``Flags'' field stores the value 101,
+the corresponding rule option will be \CodeIn{fragbits:RM}, as each
 position of the vector encodes a different character in the
-\CodeIn{flagbits} rule option. In summary, the value of several
+\CodeIn{fragbits} rule option. In summary, the value of several
 options can be determined through transformation functions, as those
 informally described above. One exception to this is the option
 \CodeIn{threshold}, which is typically used in denial-of-service
