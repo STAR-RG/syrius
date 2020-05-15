@@ -56,7 +56,26 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Learning to Synthesize Rules for Rule-based Intrusion Detectors}
+
+%
+% Add comments in the text
+%
+\newboolean{showcomments}
+\setboolean{showcomments}{true}
+%\setboolean{showcomments}{false}
+
+\ifthenelse{\boolean{showcomments}}
+  {\newcommand{\nb}[3]{
+  {\color{#2}\small\fbox{\bfseries\sffamily\scriptsize#1}}
+  {\color{#2}\sffamily\small$\triangleright~$\textit{\small #3}$~\triangleleft$}
+  }
+  }
+  {\newcommand{\nb}[3]{}
+  }
+
+\newcommand\rui[1]{\nb{Rui}{blue}{#1}}
+
+\title{Rule Synthesis for Rule-based Intrusion Detectors}
 
 %% \title{Conference Paper Title*\\
 %% {\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
@@ -111,12 +130,15 @@ traffic and flag suspicious network behavior. Rule-based \nids\ do
 that by checking the network traffic against a set of rules, which
 become obsolete as attackers learn new strategies to circumvent
 existing defenses. This paper proposes \tname{}, a novel approach to
-synthesize rules for Rule-based \nids. \tname\ leverages positive and
-negative traffic and examples of trusted rules to create
-rules. \tname{} is organized as a pipeline of three components that
+synthesize rules for \textit{rule-based} \nids. \tname\ leverages positive and
+negative traffic 
+\rui{positive and negative traffic are first introduced here, withuot being explaiend.} 
+and examples of trusted rules to create
+rules not previously captured. \tname{} is organized as a pipeline of three components that
 1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. Experimental results provide
-early evidence showing that \tname\ is promising. For example, it was
+evidence that \tname\ is promising. \rui{the example is interesting, but this gives the 
+feeling that the work is too preliminary} For example, it was
 able to synthesize the correct rule in all cases we analyzed and
 ranked the correct rule among the first five rules of the reported
 ranking in \percTopFiveRanking\ of the cases.
@@ -192,9 +214,9 @@ Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
 data set of \suri\ rules. A closer observation on the
 changelogs of this ruleset~\cite{emerging-threats-changelogs} shows that new rules are
 often created.  Rulesets need to be continuously revised because the
-community finds and advertises vulnerabilities and attackers can take
-advantage of them. Unfortunately, creating these rules is
-time-consuming and error-prone. The language for describing rules is
+community finds and advertises vulnerabilities, which eventually can be exploited by attackers. 
+Unfortunately, creating these rules is
+time-consuming and error-prone \rui{is there a citation we could add here?}. The language for describing rules is
 non-trivial (see Section~\ref{sec:example-suricata-rules}) and testing
 correctness of a rule requires data and careful inspection.
 
@@ -228,7 +250,7 @@ and structured data, which are prevalent in this domain.
 %public data sets of rules to differentiate rules by the similarity to
 %human-written rules.
 
-\tname{} takes on input one or more examples of an attack and produces
+\tname{} takes on input one or more examples \rui{We ought to explain how does one get hold on examples. How diffcult are they to obtain?} of an attack and produces
 on output a ranked list of rules for that attack. It uses public data
 sets of benign messages~\cite{tcpreplay,stratosphere-normal} and
 rulesets~\cite{emerging-threats-open} to create those rules. The
@@ -239,11 +261,13 @@ benign traffic to derive a set of plausible rules that isolate the
 benign traffic from the malicious traffic. Finally, it uses existing
 rules to learn heuristics to rank the plausible rules.
 
-We evaluated \tname\ against 14 attacks of various kinds (see
-Table~\ref{table:attacks}). Results are encouraging. For example, \tname\ ranked
-the correct rule among the top five rules in \percTopFiveRanking\ of
-the cases and ranked the correct rule among the top ten rules in 11 of
-the 14 cases.
+We evaluated \tname\ against 14 attacks of various kinds, such as 
+
+\rui{add few examples}. The observed results are encouraging. For 
+example, \tname\ ranked the correct rule among the top five rules in 
+\percTopFiveRanking\ of the cases and ranked the correct rule among 
+the top ten rules in 11 of the 14 cases. \rui{to discuss, I find 
+this a bit weak.}
 
 %% \Fix{
 %% denial-of-service
@@ -381,7 +405,7 @@ argument is present in the payload of a message.
   \vspace{-3ex}  
 \end{table}
 
-Table~\ref{table:rules} shows a sample of non-documentation options of
+Table~\ref{table:rules} shows a sample of non-documentation options \rui{what is the meaning of non-documentation in this context?} of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
 the name of the option, and column ``Description'' summarizes
 purpose. The option \CodeIn{content} is common in rules to capture
@@ -513,7 +537,7 @@ an attacker to discover which machines are active in the network.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
+Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} shows a Suricata rule that captures
 Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
@@ -1271,7 +1295,7 @@ following formula:
 \vspace{-0.5ex}
 }
 \noindent
-, where $\mathit{content_i}$ denotes the $i$th content in a given
+where $\mathit{content_i}$ denotes the $i$th content in a given
 rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
 denotes the frequency of the string used in the $i$th content, the
 term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
@@ -1327,7 +1351,7 @@ heuristic function for content modifiers with the following formula:
 \[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
 
 \noindent
-, where $g(i)$ is the contribution of content option $i$ to the score,
+where $g(i)$ is the contribution of content option $i$ to the score,
 $N$ is the number of contents options present in a rule,
 $\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
 of a modifier $j$ to content option $i$,
@@ -1435,7 +1459,7 @@ This section reports on the evaluation of \tname{}.
 
 \noindent
 \textbf{Rationale.}~The golden rule is a trusted human-written
-\nids\ rule that we obtained from credible sources. \tname\ generates
+\nids\ rule that we obtained from credible sources \rui{which are?}. \tname\ generates
 several rules that satisfy the invariant to only capture the malicious
 traffic, but the amount of data we used to evaluate that property,
 albeit large, is limited. Assessing the quality of each rule
@@ -1462,7 +1486,7 @@ the extent to which each function contributes to the overall
 performance of the technique.
 
 \newcommand{\textRQthree}{How sensitive \tname\ is to the amount of
-  positive examples?}
+  positive examples?} \rui{should we also investigate the impact of the negative ones?}
 %\vspace{0.2cm}
 \begin{itemize}[leftmargin=*,label={}]
 \item{\textbf{RQ3.}} \textRQthree\
@@ -2079,6 +2103,13 @@ rank the correct rule among the first five rules of the reported
 ranking in \percTopFiveRanking\ of the cases we analyzed. The data set
 containing our experimental artifacts is publicly accessible at
 \ourdataset.
+
+\rui{thinking out loud here: one of the motivations is that it is time-consuming
+and troublesome to generate new rules. Time-consuming is not being addressed in 
+the RQs and I think that, albeit it is difficult to conduct such a study, we 
+shuold discuss it. I would think that mentinoing the human-on-the-loop (not in-the-loop)
+should also be dscussed (this is more about the troublesomeness)}
+
 
 \balance
 %\bibliographystyle{ACM-Reference-Format}
