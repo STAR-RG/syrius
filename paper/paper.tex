@@ -410,9 +410,12 @@ argument is present in the payload of a message.
   \vspace{-3ex}  
 \end{table}
 
-Table~\ref{table:rules} shows a sample of non-documentation options \rui{what is the meaning of non-documentation in this context?} of
-Suricata. Column ``\#'' shows the option number, column ``Name'' shows
-the name of the option, and column ``Description'' summarizes
+Table~\ref{table:rules} shows a sample of non-documentation options \rui{what 
+is the meaning of non-documentation in this context?} \Luc{documentation options
+are options that gives information about the rule itself and are not used for 
+matching on packet data. So, non-documentation options are the ones that really
+matters for detection.} of Suricata. Column ``\#'' shows the option number, column 
+``Name'' shows the name of the option, and column ``Description'' summarizes
 purpose. The option \CodeIn{content} deserves attention. It is common
 in rules to capture http attacks and http rules are the most common in
 the Emerging Threats Open Ruleset~\cite{emerging-threats-open}. The
