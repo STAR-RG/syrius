@@ -211,14 +211,15 @@ exploit systems through the
 network. Figure~\ref{fig:distribution-rules-per-month} shows the
 number of rules added per month in the year of 2019 to the ``Emerging
 Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
-data set of \suri\ rules. A closer observation on the
-changelogs of this ruleset~\cite{emerging-threats-changelogs} shows that new rules are
-often created.  Rulesets need to be continuously revised as the
-community finds and advertises vulnerabilities, which eventually can be exploited by hackers. 
-Unfortunately, creating these rules is
-time-consuming and error-prone \rui{is there a citation we could add here?}. The language for describing rules is
-non-trivial (see Section~\ref{sec:example-suricata-rules}) and testing
-correctness of a rule requires data and careful inspection.
+data set of \suri\ rules. A closer observation on the changelogs of
+this ruleset~\cite{emerging-threats-changelogs} shows that new rules
+are often created.  Rulesets need to be continuously revised as the
+community finds and advertises vulnerabilities, which eventually can
+be exploited by hackers.  Unfortunately, creating these rules is
+time-consuming and error-prone~\cite{Ring_2019}. The language for
+describing rules is non-trivial (see
+Section~\ref{sec:example-suricata-rules}) and testing correctness of a
+rule requires data and careful inspection.
 
 %% IT-security companies capitalize on this phenomena and
 %% offer rulesets on the
@@ -237,15 +238,14 @@ trusted rules. The positive and negative examples constrain the search
 space of rules that can be used to capture the attack. Intuitively,
 positive examples indicate what should be captured whereas negative
 examples indicate what should not be captured. It is worth noting that
-vast amounts of negative data
-exist~\cite{tcpreplay,stratosphere-normal}, but positive data is
-scarce as it is not common (and considered unethical~\Mar{look for
-  citation for ethics code on this}) to publish attacks on the
-web\Mar{is there a term for non-deep web?}. Classical machine learning techniques \emph{are not directly
-  applicable in this context} for two main reasons: 1)~they require a
-large amount of training data to build models (recall that positive
-data is scarce) and 2)~they typically have limited support to string
-and structured data, which are prevalent in this domain.
+classical machine learning techniques \emph{are not directly
+  applicable in this context} as they typically have limited support
+to string and structured data, which are prevalent in this domain.
+
+%% vast amounts of negative data
+%% exist~\cite{tcpreplay,stratosphere-normal}, but positive data is
+%% scarce~\cite{} as it is not common (and considered unethical) to publish
+%% attacks on the web\Mar{is there a term for non-deep web?}.
 
 %Furthermore, \tname\ uses
 %public data sets of rules to differentiate rules by the similarity to
@@ -268,7 +268,7 @@ We evaluated \tname\ against \Mar{@Lucas, please look for constant
 example, \tname\ ranked the correct rule among the top five rules in 
 \percTopFiveRanking\ of the cases and ranked the correct rule among 
 the top ten rules in 11 of the 14 cases. \rui{to discuss, I find 
-this a bit weak.}
+this a bit weak.}\Mar{agree. let us try to add more examples and data.}
 
 %% \Fix{
 %% denial-of-service
@@ -2037,6 +2037,8 @@ of the ranking.
 
 
 \section{Related Work}
+
+\Mar{mention something on ethical hacking.. ethical-hacking}
 
 This section elaborates on the most similar work.
 
