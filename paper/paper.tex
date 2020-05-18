@@ -388,7 +388,7 @@ argument is present in the payload of a message.
 %\vspace{-1ex}
 \begin{table}[t!]
   \footnotesize
-  \caption{\label{table:rules}Example of non-documentation options of Suricata.}
+  \caption{\label{table:rules}Example of capture-relevant options of Suricata.}
   \vspace{-2ex}
   \centering
   \begin{tabular}{clp{6cm}}
@@ -410,19 +410,20 @@ argument is present in the payload of a message.
   \vspace{-3ex}  
 \end{table}
 
-Table~\ref{table:rules} shows a sample of non-documentation options \rui{what is the meaning of non-documentation in this context?} of
+Table~\ref{table:rules} shows a sample of capture-relevant options of
 Suricata. Column ``\#'' shows the option number, column ``Name'' shows
 the name of the option, and column ``Description'' summarizes
-purpose. The option \CodeIn{content} deserves attention. It is common
-in rules to capture http attacks and http rules are the most common in
-the Emerging Threats Open Ruleset~\cite{emerging-threats-open}. The
-content option takes a sequence of bytes as argument and checks if
-that sequence is in the payload of the message.  For example, the
-option \CodeIn{content:''SELECT''} checks if the string ``SELECT'' is
-present in the payload.  Detailed description of the Suricata rules
-can be found elsewhere~\cite{suri-rule-format}. Suricata supports a
-total of \totoptions\ distinct options covering \numproto\ distinct
-network protocols.
+purpose. The option \CodeIn{content} deserves special attention. It is
+common in rules to capture http attacks and http rules are the most
+common in the Emerging Threats Open
+Ruleset~\cite{emerging-threats-open}. The content option takes a
+sequence of bytes as argument and checks if that sequence appears in
+the payload of the message.  For example, the option
+\CodeIn{content:''SELECT''} checks if the string ``SELECT'' is present
+in the payload.  Detailed description of the Suricata rules can be
+found elsewhere~\cite{suri-rule-format}. Suricata supports a total of
+\totoptions\ distinct options covering \numproto\ distinct network
+protocols.
 
 
 %% A total of 9 of these options
@@ -468,15 +469,14 @@ network protocols.
 %% \end{figure}
   
 
-\subsection{Rules and Packets}
+\subsection{Non-http Rules and Packets}
 \label{sec:rules-and-packets}
 
 %% We mentioned above that http rules often used content options, which
 %% associate with the message payload.
 
-We observed that the options used in non-http rules typically
-associate with packet fields. Let us consider a rule for an icmp
-attack as example.
+Options of non-http rules typically associate with packet fields. Let
+us consider a rule for an icmp attack as example.
 
 \begin{figure}[h!]
   \centering
@@ -500,9 +500,11 @@ value of the corresponding fields in the icmp packet. For the field
 bitvector. For example, if the ``Flags'' field stores the value 101,
 the corresponding rule option will be \CodeIn{fragbits:RM}, as each
 position of the vector encodes a different character in the
-\CodeIn{fragbits} rule option. In summary, the value of several
-options can be determined through transformation functions, as those
-informally described above. One exception to this is the option
+\CodeIn{fragbits} option.
+
+In summary, the value of several options \emph{of non-http rules} can
+be determined through transformation functions, as those informally
+described above. One exception to this is the option
 \CodeIn{threshold}, which is typically used in denial-of-service
 attacks. That option operates over sequence of messages as opposed to
 single messages.
