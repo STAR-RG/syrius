@@ -1,7 +1,6 @@
 import subprocess
 import time
 import copy
-import pyshark
 import random
 import re
 import binascii
@@ -11,8 +10,8 @@ import math
 import ast
 import ctypes
 from functools import partial
-
 from copy import deepcopy
+import pyshark
 
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
@@ -58,7 +57,7 @@ if args.attack in contents_dict:
 else:
     print("ataque sem content")
 
-keyword_list = ("app-layer-protocol", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
+keyword_list = ("app-layer-protocol", "fragoffset", "uricontent", "ack", "seq", "window", "ipopts", "flags", "fragbits", "fragoffset", "ttl", "tos", "itype", "icode", "icmp_id", "icmp_seq", "dsize", "flow", "threshold", "tag", "content", "pcre", "replace", "rawbytes", "byte_test", "byte_jump", "sameip", "geoip", "ip_proto", "ftpbounce", "id", "rpc", "flowvar", "flowint", "pktvar", "flowbits", "hostbits", "ipv4-csum", "tcpv4-csum", "tcpv6-csum", "udpv4-csum", "udpv6-csum", "icmpv4-csum", "icmpv6-csum", "stream_size", "detection_filter", "decode-event", "nfq_set_mark", "bsize", "tls.version", "tls.subject", "tls.issuerdn", "tls_cert_notbefore", "tls_cert_notafter", "tls_cert_expired", "tls_cert_valid", "tls.fingerprint", "tls_store", "http_protocol", "http_start", "urilen", "http_header_names", "http_accept", "http_accept_lang", "http_accept_enc", "http_connection", "http_content_len", "http_content_type", "http_referer", "http_request_line", "http_response_line", "nfs_procedure", "nfs_version", "ssh_proto", "ssh.protoversion", "ssh_software", "ssh.softwareversion", "ssl_version", "ssl_state", "byte_extract", "file_data", "pkt_data", "app-layer-event", "dce_iface", "dce_opnum", "dce_stub_data", "smb_named_pipe", "smb_share", "asn1", "engine-event", "stream-event", "filename", "fileext", "filestore", "filemagic", "filemd5", "filesha1", "filesha256", "filesize", "l3_proto", "lua", "iprep", "dns_query", "tls_sni", "tls_cert_issuer", "tls_cert_subject", "tls_cert_serial", "tls_cert_fingerprint", "ja3_hash", "ja3_string", "modbus", "cip_service", "enip_command", "dnp3_data", "dnp3_func", "dnp3_ind", "dnp3_obj", "xbits", "base64_decode", "base64_data", "krb5_err_code", "krb5_msg_type", "krb5_cname", "krb5_sname", "template2", "ftpdata_command", "bypass", "prefilter", "compress_whitespace", "strip_whitespace", "to_sha256", "depth", "distance", "within", "offset", "nocase", "fast_pattern", "startswith", "endswith", "distance", "noalert", "http_cookie", "http_method", "http_uri", "http_raw_uri", "http_header", "http_raw_header", "http_user_agent", "http_client_body", "http_stat_code", "http_stat_msg", "http_server_body", "http_host", "http_raw_host")
 
 content_modifiers = ("http_uri", "http_raw_uri", "http_method", "http_request_line", "http_client_body", "http_header", "http_raw_header", "http_cookie", "http_user_agent", "http_host", "http_raw_host", "http_accept", "http_accept_lang", "http_accept_enc", "http_referer", "http_connection", "http_content_type", "http_content_len", "http_start", "http_protocol", "http_header_names", "http_stat_msg", "http_stat_code", "http_response_line", "http_server_body", "file_data", "nocase")
 
@@ -591,7 +590,8 @@ def ruleOptionsFitness(rule):
 
     for option in rule.options:
         count += 1
-        fitness += keywords_freq[option]/max(list(keywords_freq.values()))
+        if option in keywords_freq:
+            fitness += keywords_freq[option]/max(list(keywords_freq.values()))
 
     if count > 0:
         fitness = fitness/count
@@ -1116,7 +1116,7 @@ def optimizeRule(rule):
     cfn_pcap = "Datasets/all-" + args.attack + ".pcap"
     normal_recall = checkAlerts(normal_rules_list, cfn_pcap)
     print('recall golden rule:', normal_recall[golden_rule_pos])
-
+    print("all pkts len:", len(allpkts))
     with open("result_"+str(args.attack)+".csv", "w+", newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Rule", "Recall", "Precision", "F1 Score"])
@@ -1272,14 +1272,23 @@ def parsePacket(pkt_raw, pkt):
             del rule.options["ip_proto"]
         except:
             pass
-
         icmp_pkt = pkt_raw.icmp
         rule.options["itype"] = icmp_pkt.type
-        rule.options["icmp_seq"] = icmp_pkt.seq
+        try: 
+            rule.options["icmp_seq"] = icmp_pkt.seq
+        except:
+            pass
         rule.options["icode"] = icmp_pkt.code
-        rule.options["icmp_id"] = icmp_pkt.ident
-        rule.options["dsize"] = icmp_pkt.data_len
-
+        try:
+            rule.options["icmp_id"] = icmp_pkt.ident
+            if type(icmp_pkt.ident) is list:
+                rule.options["icmp_id"] = icmp_pkt.ident[0]
+        except:
+            pass
+        try:
+            rule.options["dsize"] = icmp_pkt.data_len
+        except:
+            pass
         if ip_pkt.src == ip_pkt.dst:
             rule.options["sameip"] = ""
 
@@ -1486,8 +1495,14 @@ def fixRule():
 
 # fixRule()
 # exit()
+pcap_dir = "Datasets/" + args.attack + ".pcap"
+pkts = pyshark.FileCapture(pcap_dir)
+pkts_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
+pkts.load_packets()
+pkts_raw.load_packets()
 
-final_rule = init_rule
+final_rule = parsePacket(pkts_raw[0], pkts[0])
+# final_rule = init_rule
 if len(pkts._packets) > 1:
     if args.attack == "synflood":
         synflood_options = {'window': 512, 'flags': 'S'}
@@ -1511,6 +1526,7 @@ else:
         final_rule.options = teardrop_options
 
     print("initial rule: \n", final_rule)
+    print("rule size:", len(final_rule.options))
 
     final_rule = optimizeRule(final_rule)
 
