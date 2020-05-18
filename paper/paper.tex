@@ -545,7 +545,9 @@ an attacker to discover which machines are active in the network.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} shows a Suricata rule that captures
+Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} \Luc{these are
+the options that are important for detection, the other ones are documentation
+options} shows a Suricata rule that captures
 Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
