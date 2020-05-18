@@ -544,9 +544,7 @@ an attacker to discover which machines are active in the network.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} \Luc{these are
-the options that are important for detection, the other ones are documentation
-options} shows a Suricata rule that captures
+Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
 Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
@@ -558,8 +556,17 @@ the packet to be captured are ICMP Echo requests.
 %, indicating that the rule applies to \CodeIn{icmp}messages
 
 In the following, we show how \tname{} synthesizes rules for this
-attack. \tname{} takes on input benign and malicious traffic and
-produces on output rules to capture only the malicious
+attack. The main challenge in synthesizing rules is to discover the
+set of rule options (see Table~\ref{table:rules}) that captures the
+malicious traffic, but allows the benign traffic to pass. \tname{}
+proceeds as follows to synthesize rule options.
+
+%% \tname{} takes on input benign and malicious traffic and
+%% produces on output rules to capture only the malicious
+%% traffic. 
+
+First, it analyzes the malicious traffic to extract rule's action,
+header, and \emph{initial} options expressed in the
 traffic. Considering the Ping Scan attack, \tname{} replays the
 attack---with NMAP, in this case---and monitors the traffic.  It
 infers the header by checking the protocol of the input messages. In
@@ -569,16 +576,7 @@ this case, \tname{} sets the header to \CodeIn{icmp any any -> any
 port.  The rationale is that the choice of these parameters are
 domain-specific and subject to change by the sys admins. Likewise,
 \tname{} leaves the action of the corresponding rule constant, as
-\CodeIn{alert}.
-
-\Mar{--------------------- I am here...}
-
-
-The main challenge in synthesizing rules is to discover the set of
-rule options (see Table~\ref{table:rules}) that captures the malicious
-traffic, but allows the benign traffic to pass. \tname{} proceeds as
-follows to synthesize rule options. First, it analyzes the malicious
-traffic to extract options expressed in that traffic. Recall from
+\CodeIn{alert}. Furthermore, recall from
 Section~\ref{sec:rules-and-packets} that some options can be inferred
 from packet contents. \tname{} finds the following five options at
 this stage: {\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
@@ -591,6 +589,7 @@ potentially result in false negatives. In this case, although the
 options \CodeIn{dsize:0} and \CodeIn{itype:8} are present in the set
 of inferred options---as the golden rule from
 Figure~\ref{fig:pingscan-example} shows---the others are not.
+
 
 %% \vspace{-2.5ex}
 %% \begin{figure}[h]
@@ -614,24 +613,25 @@ option combinations, where $n$ is the number of options contained in
 the seed rule ($n=5$, in this case). \tname{} is able to prune the
 search space and discard many implausible rules. It is worth noting
 that the number of plausible rules that \tname\ produces at this step
-can be very high for other example attacks (see column ``\#~Plausible
-Rules'' on Table~\ref{table:results}).
+can be very high for other example attacks. For illustration, see
+column ``\#~Plausible Rules'' on Table~\ref{table:results}.
+
 
 Finally, \tname{} ranks plausible rules according to heuristics
 obtained by analyzing a database of existing rules. The general
 intuition is that new rules should share characteristics with existing
 human-written rules. For example, one heuristic function used by
-\tname{} leverages the popularity of options for ranking.  The score
-of a rule $r$, according to that heuristic alone, is proportional to
-the popularity of the options declared in
+\tname{} leverages the popularity of options for ranking. According to
+that heuristic alone, the score of a rule $r$ is proportional to the
+popularity of the options declared in
 $r$. Figure~\ref{fig:distribution-options} shows the distribution of
 options associated with rules from a public
 ruleset~\cite{emerging-threats-open} containing
 \numrulessuri\ rules. Note that rules with options \CodeIn{content}
 and \CodeIn{flow} are the most common. The options \CodeIn{dsize} and
 \CodeIn{itype}, the ones associated with the golden rule, appear as
-the 6th and 7th most popular, respectively. But, among the options
-inferred by \tname{} at the first step, \CodeIn{dsize} and
+the 6th and 7th most popular, respectively. Restricted to the set of
+five options obtained at the first step, \CodeIn{dsize} and
 \CodeIn{itype} are the most popular. At the end of this step, \tname{}
 ranks the golden rule second in the list including
 \pingscanplausible{} rules. It is worth noting that
@@ -647,6 +647,8 @@ existing rules to learn heuristics to rank plausible rules.
 
 \section{Technique}
 \label{sec:technique}
+
+\Mar{--------------------- I am here...}
 
 \tname{} is a technique to synthesize rules for rule-based
 \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
