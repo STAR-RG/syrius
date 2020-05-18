@@ -546,26 +546,33 @@ an attacker to discover which machines are active in the network.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} shows a Suricata rule that captures
+Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
 Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
 bytes in the payload and the option \CodeIn{itype: 8} indicates that
 the packet to be captured are ICMP Echo requests.
 
-In the following, we briefly show how \tname{} synthesizes rules for
-this attack. In short, \tname{} takes one or more examples of an
-attack---in the form of network messages---and produces rules to
-capture that attack. Considering the rule for the Ping Scan attack,
-whose example was reproduced with NMAP, \tname{} leaves the action of
-the corresponding rule constant (as \CodeIn{alert}) and infers the
-header by checking the protocol of the input messages. For example, in
+%---in the form of network messages---
+% one or more examples of an attack
+%, indicating that the rule applies to \CodeIn{icmp}messages
+
+In the following, we show how \tname{} synthesizes rules for this
+attack. \tname{} takes on input benign and malicious traffic and
+produces on output rules to capture only the malicious
+traffic. Considering the Ping Scan attack, \tname{} replays the
+attack---with NMAP, in this case---and monitors the traffic.  It
+infers the header by checking the protocol of the input messages. In
 this case, \tname{} sets the header to \CodeIn{icmp any any -> any
-  any}, indicating that the rule applies to \CodeIn{icmp} messages and
-the most general flow description, \ie{}, it instructs the \nids\ to
-analyze the icmp traffic flowing from/to any address and port.  The
-rationale for this decision is that the choice of these parameters are
-domain-specific and subject to change by the system administrator.
+  any}. It uses the most general flow description instructing the
+\nids\ to analyze the icmp traffic flowing from/to any address and
+port.  The rationale is that the choice of these parameters are
+domain-specific and subject to change by the sys admins. Likewise,
+\tname{} leaves the action of the corresponding rule constant, as
+\CodeIn{alert}.
+
+\Mar{--------------------- I am here...}
+
 
 The main challenge in synthesizing rules is to discover the set of
 rule options (see Table~\ref{table:rules}) that captures the malicious
