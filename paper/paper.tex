@@ -130,15 +130,17 @@ traffic and flag suspicious network behavior. Rule-based \nids\ do
 that by checking the network traffic against a set of rules, which
 become obsolete as attackers learn new strategies to circumvent
 existing defenses. This paper proposes \tname{}, a novel approach to
-synthesize rules for \textit{rule-based} \nids. \tname\ leverages positive and
-negative traffic 
-\rui{positive and negative traffic are first introduced here, withuot being explaiend.} 
+synthesize rules for \textit{rule-based} \nids. \tname\ leverages
+malicious (positive) and benign (negative) traffic 
+%\rui{positive and negative traffic are first introduced here, withuot being explaiend.} 
 and examples of trusted rules to create
-rules not previously captured. \tname{} is organized as a pipeline of three components that
+rules for new attacks. \tname{} is organized as a pipeline of three components that
 1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. Experimental results provide
-evidence that \tname\ is promising. \rui{the example is interesting, but this gives the 
-feeling that the work is too preliminary} For example, it was
+evidence that \tname\ is promising.
+ \rui{the example is interesting, but this gives the 
+feeling that the work is too preliminary} 
+For example, it was
 able to synthesize the correct rule in all cases we analyzed and
 ranked the correct rule among the first five rules of the reported
 ranking in \percTopFiveRanking\ of the cases.
@@ -171,7 +173,7 @@ set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
 of Suricata~\cite{suricata}, a popular open-source \nids{}. A rule
 describes a pattern in the traffic. The observation of that pattern in
 the traffic indicates an attempt of a malicious individual
-to attack a local network. The example rule prescribes a method to
+to attack a local network. This particular rule prescribes a method to
 capture an Active Reconnaissance attack for discovering accessible
 hosts in a network (see Section~\ref{sec:active-recon}).
 
@@ -213,8 +215,8 @@ number of rules added per month in the year of 2019 to the ``Emerging
 Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
 data set of \suri\ rules. A closer observation on the
 changelogs of this ruleset~\cite{emerging-threats-changelogs} shows that new rules are
-often created.  Rulesets need to be continuously revised because the
-community finds and advertises vulnerabilities, which eventually can be exploited by attackers. 
+often created.  Rulesets need to be continuously revised as the
+community finds and advertises vulnerabilities, which eventually can be exploited by hackers. 
 Unfortunately, creating these rules is
 time-consuming and error-prone \rui{is there a citation we could add here?}. The language for describing rules is
 non-trivial (see Section~\ref{sec:example-suricata-rules}) and testing
@@ -224,7 +226,7 @@ correctness of a rule requires data and careful inspection.
 %% offer rulesets on the
 %% market.
 
-This paper proposes \tname{} (for \textbf{Sy}nthesis of
+\sloppy This paper proposes \tname{} (for \textbf{Sy}nthesis of
 Su\textbf{ri}cata R\textbf{u}le\textbf{s}), a technique to
 automatically synthesize rules for rule-based \nids. Our goal is to
 facilitate the creation of rules and, consequently, help system
@@ -239,8 +241,9 @@ positive examples indicate what should be captured whereas negative
 examples indicate what should not be captured. It is worth noting that
 vast amounts of negative data
 exist~\cite{tcpreplay,stratosphere-normal}, but positive data is
-scarce as it is not common to publish attacks openly on the
-web. Classical machine learning techniques \emph{are not directly
+scarce as it is not common (and considered unethical~\Mar{look for
+  citation for ethics code on this}) to publish attacks on the
+web\Mar{is there a term for non-deep web?}. Classical machine learning techniques \emph{are not directly
   applicable in this context} for two main reasons: 1)~they require a
 large amount of training data to build models (recall that positive
 data is scarce) and 2)~they typically have limited support to string
@@ -261,9 +264,9 @@ benign traffic to derive a set of plausible rules that isolate the
 benign traffic from the malicious traffic. Finally, it uses existing
 rules to learn heuristics to rank the plausible rules.
 
-We evaluated \tname\ against 14 attacks of various kinds, such as 
-
-\rui{add few examples}. The observed results are encouraging. For 
+We evaluated \tname\ against \Mar{@Lucas, please look for constant
+  numbers as this *in text* and use macros instead. We do not want to
+  leave inconsistent data in the paper!}14 attacks of various kinds, such as \Fix{...}\rui{add few examples}. The observed results are encouraging. For 
 example, \tname\ ranked the correct rule among the top five rules in 
 \percTopFiveRanking\ of the cases and ranked the correct rule among 
 the top ten rules in 11 of the 14 cases. \rui{to discuss, I find 
