@@ -73,8 +73,6 @@
   {\newcommand{\nb}[3]{}
   }
 
-\newcommand\rui[1]{\nb{Rui}{blue}{#1}}
-
 \title{Rule Synthesis for Rule-based Intrusion Detectors}
 
 %% \title{Conference Paper Title*\\
@@ -546,7 +544,9 @@ an attacker to discover which machines are active in the network.
   \label{fig:pingscan-example}
 \end{figure}
 
-Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
+Figure~\ref{fig:pingscan-example} \rui{any reason for the bolds?} \Luc{these are
+the options that are important for detection, the other ones are documentation
+options} shows a Suricata rule that captures
 Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
@@ -1443,6 +1443,13 @@ weights.
     SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
     UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
+      2100384 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
+      2100399 & - & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
+      2100401 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
+      2100402 & - & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
+      2100408 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
+      2100485 & - & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
+      2100486 & - & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
     %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
     \midrule
     %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
@@ -1475,7 +1482,7 @@ This section reports on the evaluation of \tname{}.
 
 \noindent
 \textbf{Rationale.}~The golden rule is a trusted human-written
-\nids\ rule that we obtained from credible sources \rui{which are?}. \tname\ generates
+\nids\ rule that we obtained from credible sources \rui{which are?}\Luc{\cite{emerging-threats-open}}. \tname\ generates
 several rules that satisfy the invariant to only capture the malicious
 traffic, but the amount of data we used to evaluate that property,
 albeit large, is limited. Assessing the quality of each rule
@@ -1667,6 +1674,13 @@ proxy of human performance in analyzing the list of plausible rules.
     Ping Scan & 6 & 5 & 9 & 2 \\
     SYN Flood & 4 & 2 & 2 & 1 \\
     UDP Teardrop & 1 & 4 & 8 & 4 \\
+    2100384 & 13 & 8 & 18 & 2 \\
+    2100399 & 132 & 6 & 3 & 1 \\
+    2100401 & 12 & 6 & 25 & 1 \\
+    2100402 & 3 & 6 & 12 & 1 \\
+    2100408 & 15 & 8 & 9 & 2 \\
+    2100485 & 4 & 6 & 3 & 1 \\
+    2100486 & 195 & 6 & 2 & 1 \\
     %%UDP Flood & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & 2 & 65 & - & - \\
