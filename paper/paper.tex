@@ -817,8 +817,6 @@ the malicious traffic.
 %% }
 
 
-\Mar{--------------------------------------------- I am here}
-
 \subsection{Step 2: Rules Creation}
 \label{sec:minimization}
 
@@ -847,10 +845,7 @@ option results in the capture of negative (\ie{}, benign) traffic.
 The procedure we propose in this step builds on the observation that
 all options from the rule produced in the previous step are satisifed
 by the traffic produced by the attack. Consequently, any subset of
-these options also captures the attack. The rule creation procedure
-iteratively discards options from visited rules---derived from the
-seed rule---using the negative traffic to guide the search for minimal
-rules.
+these options also captures the attack. 
 
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 \algnewcommand\algorithmicforeach{\textbf{for each}}
@@ -889,10 +884,13 @@ rules.
 \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{algo1} shows the pseudocode for deriving rules from the
-seed rule produced at the Reverse Engineering step. The algorithm
-takes as input an over-constrained rule $sr$ and pcap files~\cite{pcap}
-to reconstruct the benign ($\mathit{bTr}$) and malicious traffic
+The rule creation procedure \tname{} uses iteratively discards options
+from rules, derived from the seed rule, using the negative traffic to
+guide the search for minimal rules.  Algorithm~\ref{algo1} shows the
+pseudocode for deriving these rules. The algorithm takes as input an
+over-constrained rule $sr$, denoting the seed rule produced at the
+Reverse Engineering step, and pcap files~\cite{pcap} to reconstruct
+the benign traffic ($\mathit{bTr}$) and the malicious traffic
 ($\mathit{mTr}$). The algorithm produces on output a set of
 alternative rules to $sr$ that captures every instance of the attack
 (as per $\mathit{mTr}$), but does not capture any message from the
@@ -909,23 +907,24 @@ $\mathcal R'$. Line~\ref{init-rprime} initializes the population of
 individuals for the next generation. The inner loop
 (lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. The algorithm mutates each of these
-rules for $N$ times, discarding one option of the rule each
-time. Line~\ref{copy} assigns a copy of the bitvector, encoding
-$\mathit{ro}$, to variable $r$. Function $\mathit{len}$ returns the
-length of a vector and function $\mathit{rand}$ randomly chooses one
-integer value in the range defined by its parameters. So, the
-expression $\mathit{rand(0, len(r))}$, appearing at
-line~\ref{choose-index}, returns an index of the option in $r$ to
-delete at line~\ref{delete-option}. The call to $\mathit{isNew}$
-checks if $r$ has not been previously generated in another iteration
-whereas the call to $\mathit{isPlausible}$ checks if the rule only
-captures positive traffic, \ie{}, it checks that no message present in
-$\mathit{bTr}$ is captured by $r$. If $r$ satisfies both criteria, it
-is added to $\mathcal R'$, which denotes the next generation of
-individuals in the search. After processing every candidate rule in
-$\mathcal R$, the next generation of individuals is defined
-(line~\ref{define-next-gen}) and the set of discovered rules is
-updated (at line~\ref{output-accum}).
+rules for $N$ times, discarding one rule option each
+time. Line~\ref{copy} assigns a copy of the bitvector encoding
+$\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
+length of a vector and function $\mathit{rand(lo, hi)}$ randomly
+chooses one integer value in the range $[lo, hi]$ defined by its
+parameters. So, the expression $\mathit{rand(0, len(r))}$, appearing
+at line~\ref{choose-index}, returns an index of the option in $r$ and
+the statement at line~\ref{delete-option} deletes that option. The
+call to $\mathit{isNew}$ checks if $r$ has not been previously
+generated in another iteration whereas the call to
+$\mathit{isPlausible}$ checks if the rule only captures positive
+traffic, \ie{}, it checks that no message present in $\mathit{bTr}$ is
+captured by $r$. If $r$ satisfies both criteria, it is added to
+$\mathcal R'$, which denotes the next generation of individuals in the
+search. After processing every candidate rule in $\mathcal R$, the
+next generation of individuals is defined (line~\ref{define-next-gen})
+and the set of discovered rules is updated (at
+line~\ref{output-accum}).
 
 The do-while loop terminates when no rule in the current generation of
 individuals can be further reduced without violating the invariant
@@ -941,22 +940,25 @@ provided on input (line~\ref{filtering}).
 
 Note that the algorithm produces no rules in the last iteration. Rules
 with a single option are produced in the second-to-last iteration. In
-other iterations, rules with more than one option are
-produced. Conceptually, the search induces a search tree with the seed
-rule $sr$ as root, single-option rules as child nodes, and rules with
-more options as internal nodes. The edges of the tree denote the
-ancestor relation between a pair of rules. It is also worth noting
-that the algorithm reports every rule in the tree instead of only
-those with one option. The reason is that the traffic used to check
-plausibility is limited by definition---reporting only minimal rules
-with respect to that traffic could discard the correct rule.
+other iterations, rules with more than one option are produced. The
+search induces a search tree with the seed rule $sr$ as root,
+single-option rules as child nodes, and rules with more options as
+internal nodes. The edges of the tree denote the ancestor relation
+between a pair of rules. It is also worth noting that the algorithm
+reports every rule in the tree instead of only those with one
+option. The reason is that the traffic used to check plausibility is
+limited by definition---reporting only minimal rules with respect to
+that traffic could discard the correct rule.
 
 In summary, the algorithm reports many rules that are plausible by
 using the benign traffic to reduce the over-constrained rule produced
 at the \reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
-\tname{} ranks the rules this algorithm reports by their similarity to
-trusted rules. Intuitively, rules dissimilar to those trusted rules
-rank low.
+\tname{} ranks the rules.
+
+%Intuitively, rules dissimilar to (a very
+%large set of) trusted rules rank low.
+
+% this algorithm reports by their similarity to trusted rules
 
 \textbf{Correctness argument.}~The algorithm reports rules that
 capture only the positive traffic. Every rule created during the
@@ -995,7 +997,7 @@ on output.
 
 \textbf{Implementation details.} We implemented function
 \emph{isPlausible} by 1)~spawning Suricata to monitor a specified
-rule, 2)~replaying the negative benign traffic (see
+rule, 2)~replaying the benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
 check if any benign message was captured by the rule. The function
 \emph{filter} is implemented similarly. It returns a projection of the
@@ -1018,6 +1020,9 @@ multiple times for creating rules.
 
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
+
+\Mar{-------------------------- I am here}
+
 
 \tname{} uses a composition of heuristic functions to sort the rules
 produced in the previous step. Each of these functions uses a
