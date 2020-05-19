@@ -262,9 +262,14 @@ benign traffic to derive a set of plausible rules that isolate the
 benign traffic from the malicious traffic. Finally, it uses existing
 rules to learn heuristics to rank the plausible rules.
 
-We evaluated \tname\ against \Mar{@Lucas, please look for constant
-  numbers as this *in text* and use macros instead. We do not want to
-  leave inconsistent data in the paper!}\totalAttacks attacks of various kinds, such as \Fix{...}\rui{add few examples}. The observed results are encouraging. For 
+%\Mar{@Lucas, please look for constant
+  %numbers as this *in text* and use macros instead. We do not want to
+  %leave inconsistent data in the paper!}
+We evaluated \tname\ against \totalAttacks attacks of various kinds, such as 
+\Luc{This is already on section V, should it also be here?} Denial-of-Service (DoS)~\cite{denial-of-service},
+Active Reconnaissance (AREC)~\cite{active-reconnaissance} and Privilege
+escalation (PESC)~\cite{privilege-escalation}. %\Fix{...}\rui{add few examples}. 
+The observed results are encouraging. For 
 example, \tname\ ranked the correct rule among the top five rules in 
 \percTopFiveRanking\ of the cases and ranked the correct rule among 
 the top ten rules in \topTenAttacks of the \totalAttacks cases. \rui{to discuss, I find 
