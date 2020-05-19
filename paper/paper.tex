@@ -1942,6 +1942,92 @@ best results.
 %%   \end{axis}
 %% \end{tikzpicture}
 
+\subsection{Discussion}
+\label{sec:rce}
+\label{sec:jboss}
+\label{sec:content-example}
+\label{sec:dos}
+
+
+\subsubsection{Comparison with other tools}\Mar{Lucas and Guilherme,
+  please summarize results here!}
+
+
+\subsubsection{Running time}\Mar{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Add this in a journal submission in section to discuss
+%% limitations...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \begin{figure}[t!]
+%%   \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
+%%   \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code
+%%     Execution.}
+%% \end{figure}
+
+%% \Mar{We may want to comment part of this to make room for the 
+%%   experiments that Lucas and Guilherme are currently running.
+%%   Side-comparison with prior work based on paper (not actual tool) results.}
+%% This section elaborates how \tname\ performs on two other attacks.
+%% \textbf{Remote Code Execution (RCE).}~RCE refers to the family of
+%% attacks where hackers exploit a network vulnerability to run arbitrary
+%% code on a remote machine. The code to be executed could damage the
+%% system or steal sensitive information. JBoss~\cite{jboss} is a popular
+%% open source Java application server. This attack enables remote
+%% execution of code on the JBoss application server.
+%% Figure~\ref{fig:rule-jboss} shows a Suricata rule that captures a
+%% JBoss RCE attack.  The option \CodeIn{flow: established, to\_server;}
+%% indicates that a rule match will only occur on packets that (1) flow
+%% on an already-established connection and that (2) flow to the server
+%% as opposed to the client. For the content options the modifiers
+%% \CodeIn{nocase} and \CodeIn{http\_uri} indicate, respectively, that
+%% the matching is not case sensitive and that the string should be
+%% located at the packet field ``Request URI''. We reproduced the
+%% malicious JBoss attack using the traffic from a Nikto
+%% script~\cite{nikto}. Similar attacks are also available on the
+%% Metasploit database~\cite{metasploit}. This is a case where
+%% \tname\ performed poorly. Of the 228 plausible rules it generated for
+%% this attack, the ground truth was located at position 45 in the ranked
+%% list.
+
+
+%% \textbf{Denial-of-Service.}~
+%% The SYN Flood attack is a denial-of-service attack that exploits a
+%% vulnerability in the tcp/ip handshake
+%% to establish a tcp connection~\cite{cloudfare-synflood}. The handshake
+%% works as follows in normal circumstances. First, a client sends a SYN
+%% packet to the server, requesting a connection. Second, the server
+%% responds with a SYN-ACK packet to the client. Third, the client
+%% responds with an ACK message and the connection is established. Aware
+%% of the protocol, an attacker sends multiple SYN packets to different
+%% ports of a server, often using fake IP addresses. Then, after the
+%% server responds with a SYN-ACK packet, the client keeps sending other
+%% SYN packets to avoid the connection to time out. Without proper
+%% protection, the server accepts these malicious requests and eventually
+%% legitimate requests cannot be satisfied due to resource exhaustion.
+
+%% %\vspace{-1ex}
+%% \begin{figure}[h!]
+%%   \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
+%% %  \vspace{-2ex}
+%%   \caption{\suri\ rule for SYN Flood attack.}
+%%   \label{fig:synflood-example}
+%% \end{figure}
+%% %\vspace{-2ex}
+
+%% Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
+%% this attack. This rule was obtained from the Emerging Threats Open
+%% Ruleset~\cite{emerging-threats-open}. The relevant options in the
+%% rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
+%% SYN packet in a tcp packet and the option \CodeIn{threshold: type
+%%   both, track by\_dst, count 5000, seconds 5} indicates that a high
+%% volume of such packets should be requested in a short period of
+%% time. The other options are for documentation purposes. This is a case
+%% where \tname\ works very well, reporting the golden rule at the top
+%% of the ranking.
+
 
 \subsection{Threats to Validity}
 \label{sec:threats}
@@ -1949,107 +2035,16 @@ best results.
 Our experiments is affected by the usual threats. Considering external
 validity. Our results cannot be generalized beyond the subjects we
 selected. To mitigate that threat we selected a variety of attacks
-with different characteristics. Considering internal validity, the
-implementation of \tname\ could contain errors. We mitigated that
-threat by carefully inspecting code and results. Considering construct
-validity, the choice of metric used to evaluate the approach may not
-be applicable in practice. We considering the use of ranking of the
-golden rule a reasonable choice as the approach places the golden rule
-close to the top in most cases.
-
-\section{Discussion of other attacks}
-\label{sec:rce}
-\label{sec:jboss}
-\label{sec:content-example}
-\label{sec:dos}
-
-%\Mar{@Lucas, por
-%  favor, observe o padrao usado nos exemplos anteriores. eh preciso
-%  explicar em alto nivel o ataque antes de explicar a regra!}
-
-%% In an RCE attack, hackers
-%% intentionally exploit a vulnerability in the system to run malware
-%% By prompting the targeted device to perform code execution, a hacker
-%% can run arbritrary code to
-%% their own programming in its
-%% place. This programming can then enable them to gain full access,
-%% steal data, carry out a full distributed denial of service (DDoS)
-%% attack, destroy files and infrastructure, or engage in illegal
-%% activity. And as the term remote execution suggests, an RCE
-%% cyberattack can take place from any geophysical location."\\
-
-
-%A opção  define que o match só será feito em pacotes que fazem parte
-%de uma conexão já estabelecida entre um cliente e um servidor. Além
-%disso, define também que os pacotes devem estar direcionados ao servidor, não ao cliente.
-
-\begin{figure}[t!]
-%  \vspace{-1ex}    
-  \lstinputlisting[language=C,numbers=none,keywords={content,flow}]{adaptor-golden-rule.suricata}
-%  \vspace{-2ex}  
-  \caption{\label{fig:rule-jboss}Suricata rule for JBoss Remote Code
-    Execution.}
-%  \vspace{-1ex}
-\end{figure}
-
-\Mar{We may want to comment part of this to make room for the 
-  experiments that Lucas and Guilherme are currently running.
-  Side-comparison with prior work based on paper (not actual tool) results.}
-This section elaborates how \tname\ performs on two other attacks.
-\textbf{Remote Code Execution (RCE).}~RCE refers to the family of
-attacks where hackers exploit a network vulnerability to run arbitrary
-code on a remote machine. The code to be executed could damage the
-system or steal sensitive information. JBoss~\cite{jboss} is a popular
-open source Java application server. This attack enables remote
-execution of code on the JBoss application server.
-Figure~\ref{fig:rule-jboss} shows a Suricata rule that captures a
-JBoss RCE attack.  The option \CodeIn{flow: established, to\_server;}
-indicates that a rule match will only occur on packets that (1) flow
-on an already-established connection and that (2) flow to the server
-as opposed to the client. For the content options the modifiers
-\CodeIn{nocase} and \CodeIn{http\_uri} indicate, respectively, that
-the matching is not case sensitive and that the string should be
-located at the packet field ``Request URI''. We reproduced the
-malicious JBoss attack using the traffic from a Nikto
-script~\cite{nikto}. Similar attacks are also available on the
-Metasploit database~\cite{metasploit}. This is a case where
-\tname\ performed poorly. Of the 228 plausible rules it generated for
-this attack, the ground truth was located at position 45 in the ranked
-list. \textbf{Denial-of-Service.}~
-The SYN Flood attack is a denial-of-service attack that exploits a
-vulnerability in the tcp/ip handshake
-to establish a tcp connection~\cite{cloudfare-synflood}. The handshake
-works as follows in normal circumstances. First, a client sends a SYN
-packet to the server, requesting a connection. Second, the server
-responds with a SYN-ACK packet to the client. Third, the client
-responds with an ACK message and the connection is established. Aware
-of the protocol, an attacker sends multiple SYN packets to different
-ports of a server, often using fake IP addresses. Then, after the
-server responds with a SYN-ACK packet, the client keeps sending other
-SYN packets to avoid the connection to time out. Without proper
-protection, the server accepts these malicious requests and eventually
-legitimate requests cannot be satisfied due to resource exhaustion.
-
-%\vspace{-1ex}
-\begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={flags,threshold}]{synflood.suricata}
-%  \vspace{-2ex}
-  \caption{\suri\ rule for SYN Flood attack.}
-  \label{fig:synflood-example}
-\end{figure}
-%\vspace{-2ex}
-
-Figure~\ref{fig:synflood-example} shows a Suricata rule that captures
-this attack. This rule was obtained from the Emerging Threats Open
-Ruleset~\cite{emerging-threats-open}. The relevant options in the
-rule appear in bold---the option \CodeIn{flags: S,12}, identifies a
-SYN packet in a tcp packet and the option \CodeIn{threshold: type
-  both, track by\_dst, count 5000, seconds 5} indicates that a high
-volume of such packets should be requested in a short period of
-time. The other options are for documentation purposes. This is a case
-where \tname\ works very well, reporting the golden rule at the top
-of the ranking.
-
+with different characteristics. Unfortunately, we could not access
+tools for related techniques. For that reason, we made a
+side-comparison based on the common examples and results reported in
+the original paper. Considering internal validity, the implementation
+of \tname\ could contain errors. We mitigated that threat by carefully
+inspecting code and results. Considering construct validity, the
+choice of ranking to evaluate the approach may not be useful in
+practice. We considered the use of ranking of the golden rule a
+reasonable choice as the approach places the golden rule close to the
+top in most cases.
 
 \section{Related Work}
 
@@ -2137,6 +2132,9 @@ Section~\ref{sec:background}.
 %% \Gui{\textbf{Automated Repair By Example for Firewalls -} Ruzica repara e modifica regras de firewall a partir de uma entrada contendo exemplos ou behaviour. Embora firewalls e NIDS nao sejam exatamente a mesma coisa, a estrutura de regras contem muitas semelhancas, e a utilizacao de exemplos para modificar a regra pode ser comparado com nosso metodo de criacao de regras a partir de um pacote maligno (para ser sincero, nao vi muitas semelhancas com nosso paper, nao sei descrever mais)}
 
 %% \Gui{\textbf{Search-based test and improvement of machine-learning-based anomaly detection systems -} o autor desenvolve uma ferramenta search-based que ira testar e explorar automaticamente vulnerabilidades em Anomaly-Based NIDS, e entao apresentando medidas preventivas contra o ataque recem criado atravez de attack schemes, que detectam apenas o ataque e com o minimo de falsos positivos possivel. Semelhante a nos, eles tambem utilizam trafego benigno para simular uma rede normal. (Os metodos preventivos sao para Anomaly-Based NIDS, nao sei como se encaixa no nosso paper tambem)}
+
+
+
 
 \section{Conclusions}
 
