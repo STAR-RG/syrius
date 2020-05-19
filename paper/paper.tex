@@ -264,7 +264,7 @@ rules to learn heuristics to rank the plausible rules.
 
 We evaluated \tname\ against \Mar{@Lucas, please look for constant
   numbers as this *in text* and use macros instead. We do not want to
-  leave inconsistent data in the paper!}14 attacks of various kinds, such as \Fix{...}\rui{add few examples}. The observed results are encouraging. For 
+  leave inconsistent data in the paper!}\totalAttacks attacks of various kinds, such as \Fix{...}\rui{add few examples}. The observed results are encouraging. For 
 example, \tname\ ranked the correct rule among the top five rules in 
 \percTopFiveRanking\ of the cases and ranked the correct rule among 
 the top ten rules in \topTenAttacks of the \totalAttacks cases. \rui{to discuss, I find 
@@ -1449,13 +1449,13 @@ weights.
     SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
     UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
-      2100384 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
-      2100399 & - & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
-      2100401 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
-      2100402 & - & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
-      2100408 & - & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
-      2100485 & - & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
-      2100486 & - & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
+      2100384 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
+      2100399 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
+      2100401 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
+      2100402 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
+      2100408 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
+      2100485 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
+      2100486 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
     %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
     \midrule
     %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
