@@ -1950,19 +1950,25 @@ best results.
 
 
 \subsubsection{Comparison with other tools}
- \Luc{Vollmer \cite{vollmer-etal-cics2011} used an evolutionary approach to 
-autonomously generate rules to detect ICMP packets using the Snort IDS. They built their own dataset 
-using packet creation tools. Ten different packets were 
-created to match ten existing rules, and then these packets were used as input 
-to the rule generation. As a result, they were able to produce rules with 
-100\% detection rate and that produced 3 false positives out of 33k packets.
-On our experiments with Syrius, we used 381 \Fix{use macros}packets that matches nine existing 
-rules and it was able to generate rules that detected all the packets with 
-no false positives.  
- } 
+ \Luc{Vollmer \cite{vollmer-etal-cics2011} and Guruprasad \cite{guruprasad} used 
+ evolutionaries approaches to 
+autonomously generate rules using the Snort IDS. They built 
+their own ICMP datasets by using packet creation tools or by capturing network traffic. 
+Guruprasad also used DARPA 1999 and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks.
 
- \Luc{Guruprasad \cite{guruprasad}}
+Vollmer created ten different packets to match ten existing rules, and then used 
+these packets as input to the rule generation process. As a result, the produced 
+rules achieved a 100\% detection rate and produced 3 false positives out of 33k packets.
 
+Guruprasad manually created a set of rules by analyzing the network patterns and 
+the datasets, this set of rules was used as the initial population of the algorithm. 
+The produced rules achieved a detection rate up to 96\%, the false positive rate 
+was not evaluated. 
+
+On our experiments with Syrius, we used a total of \totalPackets packets that 
+matches \totalAttacks different existing rules and it was able to generate rules that detected 
+all the packets with no false positives.  
+ }  
 \subsubsection{Running time}\Mar{}
 
 
