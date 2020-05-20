@@ -1949,9 +1949,19 @@ best results.
 \label{sec:dos}
 
 
-\subsubsection{Comparison with other tools}\Mar{Lucas and Guilherme,
-  please summarize results here!}
+\subsubsection{Comparison with other tools}
+ \Luc{Vollmer \cite{vollmer-etal-cics2011} used and evolutionary approach to 
+autonomously generate rules to detect ICMP packets using the Snort IDS. They built their own dataset 
+using packet creation tools. Ten different packets were 
+created to match ten existing rules, and then these packets were used as input 
+to the rule generation. As a result, they were able to produce rules with 
+100\% detection rate and that produced 3 false positives out of 33k packets.
+On our experiments with Syrius, we used 381 \Fix{use macros}packets that matches nine existing 
+rules and it was able to generate rules that detected all the packets with 
+no false positives.  
+ } 
 
+ \Luc{Guruprasad \cite{guruprasad}}
 
 \subsubsection{Running time}\Mar{}
 
