@@ -1949,7 +1949,7 @@ best results.
 \label{sec:dos}
 
 
-\subsubsection{Comparison with other tools}
+\subsubsection{\Fix{Lack of }Comparison with other tools}
  \Gui{There are a few reasons that makes the comparison between Syrius and other tools \Fix{impossible} 
 
 \textbf{Tools availability.} We tried contact with authors of 5 different papers \Fix{[10][34][37][iran][bayesian]}, but got no response from them. Since their tools are not available online or at least not publicly, we could not run them.
@@ -1957,26 +1957,26 @@ best results.
 \textbf{Different output and specific rules.} We considered using the results they provides with results that Syrius provide, but concluded it wouldn't be possible as the results are essentially different. Commonly the  other results focus on showing the ratio of false negatives and false positives as a way to show the efficiency of the learning algorithm \Fix{citation needed}, but never comparing the generated rules to a Ground Truth, and most of times not showing individually the attacks used. Syrius' results, on the other hand, shows the generated rules that produce no false positives and negatives to the given packets, and always compares the results with a Ground Truth to verify its efficiency.
 
 \textbf{'content' option support.} Another limitation is the support of 'content' option. Most papers do not support rule generation with the 'content' option, using only classic DDoS attacks in the rule generation, like ICMP and SYN flood, which only use numerical and categorical options. Some papers do support 'content', but don't explain well how they handle those rules with exclusive 'content'.\Fix{citation needed}}
- \Luc{Vollmer \cite{vollmer-etal-cics2011} and Guruprasad \cite{guruprasad} used 
- evolutionaries approaches to 
-autonomously generate rules using the Snort IDS. They built 
-their own ICMP datasets by using packet creation tools or by capturing network traffic. 
-Guruprasad also used DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets 
-for non-ICMP attacks.
-
-Vollmer created ten different packets to match ten existing rules, and then used 
-these packets as input to the rule generation process. As a result, the produced 
-rules achieved a 100\% detection rate and produced 3 false positives out of 33k packets.
-
-Guruprasad manually created a set of rules by analyzing the network patterns and 
-the datasets, this set of rules was used as the initial population of the algorithm. 
-The produced rules achieved a detection rate up to 96\%, the false positive rate 
-was not evaluated. 
-
-On our experiments with Syrius, we used a total of \totalPackets packets that 
-matches \totalAttacks different existing rules and it was able to generate rules that detected 
-all the packets with no false positives.  
- }  
+%%  \Luc{Vollmer \cite{vollmer-etal-cics2011} and Guruprasad \cite{guruprasad} used 
+%%  evolutionaries approaches to 
+%% autonomously generate rules using the Snort IDS. They built 
+%% their own ICMP datasets by using packet creation tools or by capturing network traffic. 
+%% Guruprasad also used DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets 
+%% for non-ICMP attacks.
+%% 
+%% Vollmer created ten different packets to match ten existing rules, and then used 
+%% these packets as input to the rule generation process. As a result, the produced 
+%% rules achieved a 100\% detection rate and produced 3 false positives out of 33k packets.
+%% 
+%% Guruprasad manually created a set of rules by analyzing the network patterns and 
+%% the datasets, this set of rules was used as the initial population of the algorithm. 
+%% The produced rules achieved a detection rate up to 96\%, the false positive rate 
+%% was not evaluated. 
+%% 
+%% On our experiments with Syrius, we used a total of \totalPackets packets that 
+%% matches \totalAttacks different existing rules and it was able to generate rules that detected 
+%% all the packets with no false positives.  
+%%  }  
 \subsubsection{Running time}\Mar{}
 
 
@@ -2084,7 +2084,7 @@ comparison. Nevertheless, we found that there are important
 differences between our work and related work. Vollmer
 \etal{}~\cite{vollmer-etal-cics2011} propose the use of search to
 derive rules for Snort, which are very similar to \suri's.  Their
-approach focuses on icmp attacks. It models every field of the icmp
+approach focuses on icmp attacks \Gui{, creating their own packets manually}. It models every field of the icmp
 packet in the chromosome of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
 that randomly combine options, modelling the packet fields. They show
@@ -2100,7 +2100,7 @@ refer to message fields (see Section~\ref{sec:rules-and-packets}).
 diz q \textbf{geralmente} as regras nao-http possuem apenas field options}. }
 As for 2, our solution additionally ranks plausible options, which
 contain \emph{no} false positives or negatives with respect to the
-benign and mallicious traffic considered. Muthuregunathan
+benign and mallicious traffic considered.\Gui{Guruprasad \cite{guruprasad} also proposes an evolutionary framework, creating their own ICMP dataset as Vollmer, but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks. The produced rules reported a detection rate up to 96\%. Although Guruprasad supports more protocols than Vollmer, our approach still supports more options and protocols, making both key differences considered when comparing with Vollmer also relevant with Guruprasad.} Muthuregunathan
 \etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
 create rules. They characterize candidate solutions as a set of field
 values and use a clustering algorithm---hybrid k-means partitioned
