@@ -251,7 +251,7 @@ to string and structured data, which are prevalent in this domain.
 %public data sets of rules to differentiate rules by the similarity to
 %human-written rules.
 
-\tname{} takes on input one or more examples \rui{We ought to explain how does one get hold on examples. How diffcult are they to obtain?} of an attack and produces
+\tname{} takes on input one or more examples \rui{We ought to explain how does one get hold on examples. How diffcult are they to obtain?} \Gui{Given a captured network traffic, an expert must identify which packets can be used to generate the rule. These packets are separated and given as input to Syrius.}of an attack and produces
 on output a ranked list of rules for that attack. It uses public data
 sets of benign messages~\cite{tcpreplay,stratosphere-normal} and
 rulesets~\cite{emerging-threats-open} to create those rules. The
@@ -2083,8 +2083,8 @@ not access the tools implementing the techniques for side
 comparison. Nevertheless, we found that there are important
 differences between our work and related work. Vollmer
 \etal{}~\cite{vollmer-etal-cics2011} propose the use of search to
-derive rules for Snort, which are very similar to \suri's.  Their
-approach focuses on icmp attacks \Gui{, creating their own packets manually}. It models every field of the icmp
+derive rules for Snort, which are very similar to \suri's.  \Fix{Their
+approach focuses on icmp attacks.} \Gui{The dataset used by them consists of manually produced ICMP packets using packet creation tools.}. It models every field of the icmp
 packet in the chromosome of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
 that randomly combine options, modelling the packet fields. They show
