@@ -1701,17 +1701,17 @@ proxy of human performance in analyzing the list of plausible rules.
     %%UDP Flood & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & 2 & 65 & - & - \\
-    ColdFusion & 7 & 19 & 34 & 3\\
-    iisadmin access & 3 & 17 & 408 & 1 \\        
-    JBoss JMX & 5 & 23 & 228 & 45 \\
-    scripttag & 23 & 22 & 786 & 1 \\
-    WeBid LFI & 1 & 23 & 11,100 & 10\\    
+    ColdFusion & 7 & 19 & 41 & 4\\
+    iisadmin access & 3 & 17 & 606 & 1 \\        
+    JBoss JMX & 5 & 23 & 925 & 88 \\
+    scripttag & 23 & 22 & 2,222 & 1 \\
+    WeBid LFI & 1 & 23 & 35,445 & 18\\    
     %%Wordpress Login & 8 & 59 & - & - \\
-    .htaccess access & 5 & 17 & 984 & 2\\
-    .idq access & 14 & 19 & 511 & 2 \\
-    /system32/ in URI & 4 & 20 & 1,913 & 4 \\
-    Basebuilder LFI & 1 & 22 & 18,133 & 34 \\
-    Tomcat Snoop Access & 1 & 24 & 29,830 & 32 \\
+    .htaccess access & 5 & 17 & 853 & 1\\
+    .idq access & 14 & 19 & 807 & 1 \\
+    /system32/ in URI & 4 & 20 & 1882 & 2 \\
+    Basebuilder LFI & 1 & 22 & 60223 & 49 \\
+    Tomcat Snoop Access & 1 & 24 & 58,123 & 39 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1810,21 +1810,27 @@ the table, indicates the contrary.
     Black Nurse & 2 & 7$\uparrow$ & 2 & 2 & 2 \\    
     Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
     SYN Flood & 1 & 1 & 1 & 1 & 1 \\
-    UDP Teardrop & 4 & 4 & 4 & 4 & 4 \\
+    2100384 & 2 & \Fix{} & 2 & 2 & 2 \\
+    2100399 & 1 & \Fix{} & 1 & 1 & 1 \\
+    2100401 & 1 & \Fix{} & 1 & 1 & 1 \\
+    2100402 & 1 & \Fix{} & 1 & 1 & 1 \\
+    2100408 & 2 & \Fix{} & 2 & 2 & 2 \\
+    2100485 & 1 & \Fix{} & 1 & 1 & 1 \\
+    2100486 & 1 & \Fix{} & 1 & 1 & 1 \\
     %%UDP Flood & - & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & - & - & - & - & - & -\\
-    ColdFusion & 3 & 3 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ \\
+    ColdFusion & 4 & 4 & 2\cellcolor{lightgray}$\downarrow$ & 12$\uparrow$ & 5$\uparrow$ \\
     iisadmin access & 1  & 1 & 1 & 1 & 8$\uparrow$\\        
-    JBoss JMX & 45 & 45 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ \\
+    JBoss JMX & 88 & 88 & 5\cellcolor{lightgray}$\downarrow$ & 45 & 111$\uparrow$ \\
     scripttag & 1 & 1 & 4$\uparrow$ & 1 & 8$\uparrow$ \\
-    WeBid LFI & 10 & 10 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ \\    
+    WeBid LFI & 18 & 18 & 77$\uparrow$ & 28$\uparrow$ & 32$\uparrow$ \\    
     %%Wordpress Login & 8 & - & - & - & - \\
-    .htaccess access & 2  & 2 & 2 & 2 & 17$\uparrow$\\
-    .idq access & 2  & 2 & 2 & 2 & 12$\uparrow$ \\
-    /system32/ in URI & 4  & 4 & 20$\uparrow$ & 1\cellcolor{lightgray}$\downarrow$ & 58$\uparrow$\\
-    Basebuilder LFI & 34  & 34 & 117$\uparrow$ & 57$\uparrow$ & 183$\uparrow$\\
-    Tomcat Snoop Access & 32  & 32 & 828$\uparrow$ & 2\cellcolor{lightgray}$\downarrow$ & 2564$\uparrow$\\
+    .htaccess access & 1  & 1 & 1 & 1 & 17$\uparrow$\\
+    .idq access & 1  & 1 & 1 & 1 & 12$\uparrow$ \\
+    /system32/ in URI & 2  & 2 & 20$\uparrow$ & 1\cellcolor{lightgray}$\downarrow$ & 58$\uparrow$\\
+    Basebuilder LFI & 49  & 49 & 117$\uparrow$ & 57$\uparrow$ & 183$\uparrow$\\
+    Tomcat Snoop Access & 39  & 39 & 828$\uparrow$ & 2\cellcolor{lightgray}$\downarrow$ & 2564$\uparrow$\\
     \bottomrule
   \end{tabular}
 \end{table}
