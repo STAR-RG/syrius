@@ -1021,19 +1021,17 @@ multiple times for creating rules.
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
 
-\Mar{-------------------------- I am here}
-
-
-\tname{} uses a composition of heuristic functions to sort the rules
+\tname{} uses a composition of heuristic functions to rank the rules
 produced in the previous step. Each of these functions uses a
-different criterion to estimate how similar a created rule is to those
-from public rulesets~\cite{emerging-threats-open}. The intuition is
-that rules that look more similar to existing trusted rules are more
-likely to be useful. The aggregated score of a rule is the weighted
-average across the values produced by each heuristic function. The
-co-domain of each function ranges on the 0-1 interval. Hence, the score
-of a rule also ranges on the 0-1 interval. We describe in the
-following each of these heuristic functions.
+different criterion to estimate how similar a new rule is to the rules
+from public rulesets (\eg{},~\cite{emerging-threats-open}). The
+intuition is that rules that look more similar to existing trusted
+rules are more likely to reflect user's intention and be more
+useful. The aggregated score of a rule is the weighted average across
+the values produced by each heuristic function. The co-domain of each
+function ranges on the 0-1 interval. Hence, the score of a rule also
+ranges on the 0-1 interval. We describe in the following each of these
+heuristic functions.
 
 %% \Luc{atualmente eh uma
 %%   média simples e não ponderada ja q as funções tem o mesmo
@@ -1046,40 +1044,44 @@ following each of these heuristic functions.
 %% malicious. Also note that most rules have 2 to 6 options. 
 
 \subsubsection{\label{sec:popularity-options}Popularity of options.}
-One heuristic function that \tname{} uses to measure similarity
-between a synthesized rule and a human-created rule is the popularity
-of the options used in those rules. According to this heuristic, rules
-containing popular options score higher compared to those containing
-unpopular rules. Figure~\ref{fig:distribution-options} shows the
-histogram of rule options for the ruleset we
-used~\cite{emerging-threats-open}. The x-axis shows the options used
-in rules (the 10 most common) and the y-axis shows the number of rules
-using the corresponding option. Note that the options
-\CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce} are very
-popular. \tname\ uses the following formula to compute the
-contribution of option popularity to the score of a rule $r$:
 
-{\small
-\vspace{-2ex}
-\[\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N\]
-\vspace{-2ex}
-}
+\tname{} use the popularity of the options used in trusted rules as a
+heuristic function---rules containing popular options score higher
+compared to those containing unpopular
+rules. Figure~\ref{fig:distribution-options} shows the histogram of
+rule options for the ruleset we used~\cite{emerging-threats-open}. The
+x-axis shows the options used in rules (the 10 most common) and the
+y-axis shows the number of rules using the corresponding option. Note
+that the options \CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce}
+are very popular. \tname\ uses the following formula to compute the
+contribution of option popularity to the score of a rule $r$:
+\indent
+$\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N$.
+
+%% {\small
+%% \vspace{-2ex}
+%% \[
+
+
+%% \]
+%% \vspace{-2ex}
+%% }
 
 \noindent
 The term $\mathit{option_i}$ denotes the $i$th option in the bitvector
 encoding $r$. The term $\mathit{option\_frequency}$ encodes the
-distribution of option popularity as a dictionary mapping
-numbers---indicating popularity---to corresponding
-options. Consequently, the term $\mathit{option\_frequency[option_i]}$
-denotes the number of rules, from our dataset, containing
-$\mathit{option\_i}$. The term $\mathit{max(option\_frequency)}$
-refers to the maximum number of rules for any dictionary entry (to
-normalize the measurement in the 0-1 range), and $N$ is the number of
-options in $r$. To illustrate, the contribution of this function to
-the score of a rule would be $0.26$ ($=(10181+3049)/(2*25699)$) for a
-rule with options \CodeIn{prce} and \CodeIn{flowbits} and $0.01$
-($=(155+108)/(2*25699)$) for a rule with options \CodeIn{itype} and
-\CodeIn{icode}.
+distribution of option popularity as a dictionary mapping numbers,
+indicating popularity, to corresponding options. The expression
+$\mathit{option\_frequency[option_i]}$ denotes the number of rules,
+from our dataset, containing $\mathit{option\_i}$. The expression
+$\mathit{max(option\_frequency)}$ refers to the maximum number of
+rules for any dictionary entry (to normalize the measurement in the
+0-1 range), and $N$ is the number of options in $r$. To illustrate,
+the contribution of this function to the score of a rule would be
+$0.26=$($10181$+$3049)/(2$*$25699)$ for a rule with options
+\CodeIn{prce} and \CodeIn{flowbits} and
+$0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
+\CodeIn{itype} and \CodeIn{icode}.
 
 %% \Gui{A quinta heuristica que utilizamos
 %%   considera a popularidade das opcoes. Primeiro pegamos a quantidade
@@ -1284,25 +1286,22 @@ bar width=4pt,
 that \percContentOptions\ of the rules from the ruleset we analyzed
 contain content options, but the distribution of those contents per
 rule is not uniform. Figure~\ref{fig:distribution-contents} shows the
-distribution of number of contents in a rule. Results indicate nearly
-73\% of the rules from our ruleset contain one to three content
+distribution of number of contents in a rule. Results indicate that
+nearly 73\% of the rules from our ruleset contain one to three content
 options. Hence, we found that that information could help
 \tname\ discriminate useful rules. \tname{} computes the contribution
 of the number of content options to the score of a rule $r$ with the
 fraction
 $\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}$,
 where $\mathit{len(r)}$ denotes the number of content options in $r$
-and $\mathit{rules\_per\_number\_of\_contents}$ denotes the
-distribution of number of contents (encoded with a dictionary as in
-the function described on
-Section~\ref{sec:popularity-options}). Consequently the term
-$\mathit{rules\_per\_number\_of\_contents[len(r)]}$ corresponds to the
-number of rules in the ruleset with the same number of contents as
-$r$. The denominator of the fraction normalizes the contribution in
-the 0-1 range. To illustrate, the contribution of this heuristic
-function to the score a rule would be $.64$ $(=5841/9164)$ to a rule
-with 3 content options and $.18$ $(=1622/9164)$ to a rule with 5
-content options.
+and $\mathit{rules\_per\_number\_of\_contents}$ is the distribution of
+number of contents. The expression in the numerator
+%$\mathit{rules\_per\_number\_of\_contents[len(r)]}$
+calculates the number of rules in the ruleset with the same number of
+contents as $r$ whereas the denominator normalizes the value in the
+0-1 range. To illustrate, the contribution of this function would be
+$.64$~($=5841/9164$) and $.18$~($=1622/9164$) to the score of rules
+with 3 and 5 options, respectively.
 
 %% \noindent
 %% The only difference of this formula compared to the one defined on
@@ -1312,53 +1311,36 @@ content options.
 %% number of content options to number of rules that contain that number
 %% of content options.
 
+%% {\small
+%% \vspace{-1.5ex}
+%% \[
+%% \]
+%% \vspace{-0.5ex}
+%% }
 
 \subsubsection{Popularity of content strings.} 
-This heuristic leverages content rarity to discriminate rules---it
+This heuristic leverages content rarity to discriminate rules. It
 weighs higher (respectively, lower) rules that use popular
 (respectively, unpopular) strings in content options. The score of a
-rule $r$ on this function is given by the arithmetic mean of the
-popularity scores of each string used in contents in $r$. More
-precisely, the contribution of content rarity is given by the
-following formula:
+rule $r$ on this function is the arithmetic mean of the popularity
+scores of each string used in contents in $r$. More precisely, content
+rarity is obtained with the following formula:
+\indent
+$\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N$
 
-{\small
-\vspace{-1.5ex}
-\[\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N\]
-\vspace{-0.5ex}
-}
 \noindent
-where $\mathit{content_i}$ denotes the $i$th content in a given
+, where $\mathit{content_i}$ denotes the $i$th content in a given
 rule, the term $\mathit{content\_frequency[\mathit{content_i}]}$
 denotes the frequency of the string used in the $i$th content, the
 term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
 observed across all strings appearing as content parameters, and $N$
 is the number of content options in a given
 rule. Figure~\ref{fig:distribution-strings} shows the distribution of
-the ten most popular strings in our ruleset. To illustrate, let us
-consider a rule with whose content options use the strings ``GET'' and
-``ID'', respectively. The contribution of that rule for the
-computation of similarity score would be 0.601 (=(1+.203)/2). The
-relatively high weight reflects the fact that ``GET'' and ``ID'' are
-popular content strings.
-
-\subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers.} As previously
-mentioned, \percRulesWithContent\ of \suri\ rules involve content
-options. Furthermore, nearly half of the rules that use content
-options use content modifiers to qualify the search. Http modifiers
-typically serve to specify parts of the message payloads that the
-input string should be matched against. For example, the modifier
-\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
-  http\_header} indicates that the string ``keep-alive'' should be
-present in the header of the http message\footnote{A keep-alive
-  connection attribute indicates that a single tcp connection should
-  remain open for multiple http requests/responses.}. Note that, in
-this case, the content modifier refers to a field of an http message,
-which appears in the payload of a tcp message, which is the target of
-the option \CodeIn{content}. Figure~\ref{fig:http-header-example}
-illustrates possible content options used to match against certain
-strings that appear in an http message. A check mark (respectively,
-cross) indicates a match (respectively, no match).
+the ten most popular strings in our ruleset. To illustrate, consider a
+rule whose content options use the strings ``GET'' and ``ID''. The
+contribution of that rule for the computation of similarity score
+would be $0.601$ $(=(1$+$.203)$/$2)$. The relatively high weight
+reflects the fact that ``GET'' and ``ID'' are popular content strings.
 
 \begin{figure}[t!]
 \centering
@@ -1368,6 +1350,23 @@ cross) indicates a match (respectively, no match).
 \label{fig:http-header-example}
 \end{figure}
 
+\subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers.} As previously
+mentioned, \percRulesWithContent\ of \suri\ rules involve content
+options. Furthermore, nearly half of the rules that use content
+options use content modifiers to qualify the search. Http modifiers
+typically serve to specify parts of the message payloads that the
+input string should be matched against. For example, the modifier
+\CodeIn{http\_header} in the option \CodeIn{content: ``keep-alive'';
+  http\_header} indicates that the string ``keep-alive'' should be
+present in the header of the http message. (A keep-alive connection
+attribute indicates that a single tcp connection should remain open
+for multiple http requests/responses.) In this case, the content
+modifier refers to an http field that appears in the payload of a tcp
+message, which is the target of the option
+\CodeIn{content}. Figure~\ref{fig:http-header-example} illustrates
+possible content options used to match against certain strings that
+appear in an http message. A check mark (respectively, cross)
+indicates a match (respectively, no match).
 \tname\ builds on the observation that the strings commonly accessed
 at positions associated with content modifiers (\eg{}, host,
 connection) are more common. For example, historical data indicates
@@ -1381,10 +1380,12 @@ currently, \tname\ only supports this features for tcp and http; these
 rules comprise $\sim$80\% of the rules of our data set. We compute the
 heuristic function for content modifiers with the following formula:
 
-\[\frac{\sum_{i=1}^{N}g(i)}{N},~g(i)=\frac{\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}}{M_i}\]
+\indent
+$\sum_{i=1}^{N}g(i)/N,~g(i)$=$\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}/M_i$
+
 
 \noindent
-where $g(i)$ is the contribution of content option $i$ to the score,
+, where $g(i)$ is the contribution of content option $i$ to the score,
 $N$ is the number of contents options present in a rule,
 $\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
 of a modifier $j$ to content option $i$,
@@ -1392,10 +1393,9 @@ $\mathit{max(modifier\_frequency)}$ refers to the modifier with
 maximum popularity (for normalization), and $M_i$ is the number of
 content modifiers that could access the string associated with content
 $i$.
-    
 To illustrate, consider a rule containing the option
 \CodeIn{content:``/HtmlAdaptor''} (see Section~\ref{sec:jboss}). The
-contribution of this option---\ie{}, the value of $\mathit{g(i)}$---to
+contribution of this option (\ie{}, the value of $\mathit{g(i)}$) to
 the score of the rule is $0.5$ (=$\frac{10,111+11}{10,111*2}$). The
 value of $M_i$, in this case, is 2 as the string ``/HtmlAdaptor''
 could be accessed through the modifiers \CodeIn{uri} and
@@ -1404,16 +1404,23 @@ that string appears in the field \CodeIn{Request URI} (of an http
 message from the malicious traffic) and that field is accessible
 through these two modifiers. The relatively high heuristic value
 reflects the fact that the string could be accessed by two popular
-content modifiers.  As another example, consider the option
-\CodeIn{content: ``keep-alive''}. In this case, either the modifier
-\CodeIn{header} or the modifier \CodeIn{connection} could be used to
-locate the string ``keep-alive'', stored in the field
-\CodeIn{Connection} from an http message (see
-Figure~\ref{fig:http-header-example}). Consequently the contribution
-of this heuristic function to the corresponding rule would be $0.2$
-(=$\frac{4089+29}{10111*2}$), in this case. Assuming that a rule uses
-the two content options mentioned above, the aggregated contribution
-of this heuristic function to the rule would be 0.35 (=(0.2+0.5)/2).
+content modifiers.
+
+%%%%%%%%%%%%%%
+%% Removed for space
+%%%%%%%%%%%%%%
+
+
+%% As another example, consider the option
+%% \CodeIn{content: ``keep-alive''}. In this case, either the modifier
+%% \CodeIn{header} or the modifier \CodeIn{connection} could be used to
+%% locate the string ``keep-alive'', stored in the field
+%% \CodeIn{Connection} from an http message (see
+%% Figure~\ref{fig:http-header-example}). Consequently the contribution
+%% of this heuristic function to the corresponding rule would be $0.2$
+%% (=$\frac{4089+29}{10111*2}$), in this case. Assuming that a rule uses
+%% the two content options mentioned above, the aggregated contribution
+%% of this heuristic function to the rule would be 0.35 (=(0.2+0.5)/2).
 
 \subsubsection{Weight Optimization}
 \label{sec:weight-optimization}
@@ -1422,12 +1429,11 @@ ran \tname{} using different combinations of weights on a sample of
 attacks and chose the combination that offered the best overall
 performance, which we computed with the sum of the rankings of the
 golden rule on each attack. The weight combination that led to the
-smaller sum of positions (of the golden rule) in the rankings was
-considered the best choice. We considered \emph{all} combinations of
-the following weights 0, 0.25, 0.5, 0.75, and 1. Given that we have
-four different functions and five possible weight values, we needed to
-run \tname{} on the sample of attacks for 625 (=$5^4$) times. In the
-end of the process, the weight combination
+smaller sum of rankings was considered the best choice. We considered
+\emph{all} combinations of the following weights 0, 0.25, 0.5, 0.75,
+and 1. Given that there are four different functions and five possible
+weight values, we needed to run \tname{} on the sample of attacks for
+625 (=$5^4$) times. In the end of the process, the weight combination
 $\langle{}1,0.25,0.25,1\rangle$ was the best choice we found. Although
 results showed that this strategy results in good performance, we
 remain to evaluate other optimization strategies to find better
