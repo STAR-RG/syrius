@@ -2112,8 +2112,11 @@ refer to message fields (see Section~\ref{sec:rules-and-packets}).
 diz q \textbf{geralmente} as regras nao-http possuem apenas field options}. }
 As for 2, our solution additionally ranks plausible options, which
 contain \emph{no} false positives or negatives with respect to the
-benign and mallicious traffic considered.\Gui{Guruprasad \cite{guruprasad} also proposes an evolutionary framework, creating their own ICMP dataset as Vollmer, but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks. The produced rules reported a detection rate up to 96\%. Although Guruprasad supports more protocols than Vollmer, our approach still supports more options and protocols, making both key differences considered when comparing with Vollmer also relevant with Guruprasad.} Muthuregunathan
-\etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
+benign and mallicious traffic considered.
+
+\Gui{Guruprasad \etal{}\cite{guruprasad} also proposes an evolutionary framework, creating their own ICMP dataset as Vollmer, but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks. The produced rules reported a detection rate up to 96\%. Although Guruprasad supports more protocols than Vollmer, our approach still supports more options and protocols, making both key differences considered when comparing with Vollmer also relevant with Guruprasad.} 
+
+Muthuregunathan \etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
 create rules. They characterize candidate solutions as a set of field
 values and use a clustering algorithm---hybrid k-means partitioned
 around menoids---to isolate malicious from benign
@@ -2126,7 +2129,9 @@ looks for a common pattern across the different inputs to define
 rules. It does not take existing rules as input or benign
 traffic. Consequently, false positive can be produced and need to be
 handled manually by users. Our approach, in contrast, does not
-generate false positives w.r.t. the input traffic. \Gui{Fallahi and colleagues proposes a flow-based solution for automated rule generation. Instead of analyzing the packets individually, their algorithm investigates and creates the rules for flows in the network. The algorithm was tested using the ISCX 2012 dataset and showed good results in terms of precision, but it is limited to the type of attack. As it won't analyse individual details of each packet, it wouldn't be able to identify and generate rules for attacks that require detailed options, such as the HTTP PESC, RCE and LFI. https://ieeexplore.ieee.org/abstract/document/7585840}
+generate false positives w.r.t. the input traffic. 
+
+\Gui{Fallahi \etal{}\cite{fallahi} proposes a flow-based solution for automated rule generation. Instead of analyzing the packets individually, their algorithm investigates and creates the rules for flows in the network. The algorithm was tested using the ISCX 2012 dataset and showed good results in terms of precision, but it is limited to the type of attack. As it won't analyse individual details of each packet, it wouldn't be able to identify and generate rules for attacks that require detailed options, such as the HTTP PESC, RCE and LFI.}
 
 %% \Luc{\textbf{Autonomous Rule Creation for Intrusion Detection} -
 %% Usam o Snort e geram regras apenas para pacotes ICMP. O pacote
@@ -2153,7 +2158,9 @@ repair firewall rules based on false positive detected by the
 rules. Although firewall and \nids\ rules have differences and the
 problem addressed is different---repair not synthesis---the work is
 similar in spirit and inspiring. We remain to evaluate how \tname\ can
-be used for repair. \Gui{Ganesan and colleagues introduces an idea of generating new sets of rules based on modifications of existing rules. They used the community edition of snort rules from 2012 for the modifications and tested with the the pcap file from the MACCDC 2012 dataset. It was reported an increase in the number of alerts, but it wasn't analysed the false alarmrates for abduced rules. Their technique is parallel to the rule creation strategies, as the objective of the modified rules is to capture variations and evolutions of attacks. https://arxiv.org/abs/1903.12101 \Fix{I'm not sure if we can consider it 'rule repair', but I don't know where to put it.}}
+be used for repair. 
+
+\Gui{Ganesan \etal{} introduces an idea of generating new sets of rules based on modifications of existing rules. They used the community edition of snort rules from 2012 for the modifications and tested with the the pcap file from the MACCDC 2012 dataset. It was reported an increase in the number of alerts, but it wasn't analysed the false alarmrates for abduced rules. Their technique is parallel to the rule creation strategies, as the objective of the modified rules is to capture variations and evolutions of attacks.}
 
 \noindent
 \textbf{Anomaly-based intrusion detection.}
