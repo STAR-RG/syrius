@@ -661,13 +661,13 @@ interest.
 \vspace{1ex}
 \noindent\textbf{Overview.}~\tname\ takes on input one or more
 examples of an attack and produces on output a ranked list of
-\emph{plausible rules}, \ie{}, rules that captures only the malicious
-traffic produced by the attacks. Figure~\ref{fig:overview} shows the workflow of \tname{} as a
-pipeline of three components, appearing numbered in the figure.
-Public data sets of benign
+\emph{plausible rules}, \ie{}, rules capturing only the malicious
+traffic produced by the attacks. Figure~\ref{fig:overview} shows 
+the workflow of \tname{} as a pipeline of three components, appearing 
+numbered in the figure. As public data sets of benign
 traffic~\cite{tcpreplay,stratosphere-normal} and rules
-exist~\cite{emerging-threats-open}. Consequently, a user of \tname{}
-only needs to provide examples of attacks on input.
+exist~\cite{emerging-threats-open}, a user of \tname{}
+only needs to provide examples of attacks.
 
 %% To create rules, \tname\ leverages (1)
 %% benign and malicious network traffic and (2) rules from public
@@ -750,14 +750,14 @@ to any protocol whereas the payload strategy applies only to http.
 The decision of which strategy to use is based on the protocol
 associated with input traffic--\tname{} uses the payload strategy if
 http is detected; otherwise, it uses the field strategy. We elaborate
-these strategies in the following.
+on these strategies in the following.
 
 For the field strategy, \tname{} parses the input messages looking for
 options associated with the data in the fields of
 messages. Section~\ref{sec:rules-and-packets} shows the correspondence
 between packet fields and some of the rule options from \suri\ and
 Section~\ref{sec:active-recon} shows a concrete example where \tname{}
-uses this strategy. ALthough we built the option-field mapping
+uses this strategy. Although we built the option-field mapping
 manually, from the \suri\ documentation, this is a one-time activity.
 Unfortunately, for http attacks, the relevant data for the options is
 likely at the message payload; not the fields. By analyzing our data
@@ -788,8 +788,7 @@ splits the payload in tokens using these delimiters.
 
 It is worth noting that we found that deciding which reverse
 engineering strategy to use based on the protocol of the input
-(malicious) messages showed to be effective. We used the payload
-strategy for http and the field strategy for the other protocols. For
+(malicious) messages showed to be effective. For
 flooding attacks, \tname\ runs the same approach for each message and
 identifies common options across all messages. For that case,
 \tname\ reports, in addition, a \CodeIn{threshold} option, as
@@ -907,7 +906,7 @@ $\mathcal R'$. Line~\ref{init-rprime} initializes the population of
 individuals for the next generation. The inner loop
 (lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. The algorithm mutates each of these
-rules for $N$ times, discarding one rule option each
+rules $N$ times \rui{is N an input? How does one determine it in practice?}, discarding one rule option each
 time. Line~\ref{copy} assigns a copy of the bitvector encoding
 $\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand(lo, hi)}$ randomly
@@ -1017,6 +1016,9 @@ multiple times for creating rules.
 %% the negative traffic. However, in this case, \tname{} can use a large
 %% variety of public data sets available online (see
 %% Section~\ref{sec:objectanalysis-benign}).
+
+\rui{paragraph on complexity? I wonder whether that is a good ideia because
+this is already a long section.}
 
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
@@ -1505,8 +1507,8 @@ This section reports on the evaluation of \tname{}.
 
 \noindent
 \textbf{Rationale.}~The golden rule is a trusted human-written
-\nids\ rule that we obtained from credible sources \rui{which are?}\Luc{\cite{emerging-threats-open}}. \tname\ generates
-several rules that satisfy the invariant to only capture the malicious
+\nids\ rule that we obtained from credible sources~\cite{emerging-threats-open}. 
+\tname\ generates several rules that satisfy the invariant to only capture the malicious
 traffic, but the amount of data we used to evaluate that property,
 albeit large, is limited. Assessing the quality of each rule
 \tname\ produces (\ie{}, fitness to the attack) requires domain
