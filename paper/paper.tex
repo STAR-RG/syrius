@@ -1843,6 +1843,35 @@ the table, indicates the contrary.
   \end{tabular}
 \end{table}
 
+\renewcommand{\arraystretch}{0.9}
+\begin{table*}[t!]
+  \footnotesize
+  \caption{\label{table:attacks}-}
+  \vspace{-2ex}
+  \centering
+    \begin{tabular}{lp{2cm}p{2.1cm}ccp{2cm}c}
+    \toprule
+    \multicolumn{1}{c}{Paper} &
+    \multicolumn{1}{c}{Input} &
+    \multicolumn{1}{c}{Dataset} &
+    \multicolumn{1}{c}{Protocol} &
+    \multicolumn{1}{c}{Output} &
+    \multicolumn{1}{c}{Evaluation} &
+    \multicolumn{1}{c}{Availability} \\
+    \midrule
+    \cite{vollmer-etal-cics2011} & Malign Traffic & Manually crafted & ICMP & Rule List & TP, FP & No\\
+    \midrule
+    \cite{fallahi} & Mixed Traffic & \cite{iscx} & HTTP, SSH, TCP & Single Rule & TP, FP, Precision, Recall, F1 & No\\    
+    \midrule
+    \cite{Kao2015AutomaticNR} & Malign Traffic, Benign Traffic, Rule Dataset & Manually crafted, \cite{emerging-threats-open} & HTTP & Single Rule & Generating time, FP & No \\
+    \midrule
+    \cite{guruprasad}& Malign Traffic & \cite{iscx} \cite{darpa1999} & ICMP, TCP & Rule List & FP & No\\
+    \midrule
+    Syrius & Malign Traffic, Benign Traffic, Rule Dataset & Manually crafted, \cite{emerging-threats-open}, \cite{iscx} & HTTP, TCP, ICMP & Rule List & Rule Ranking & Yes \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
 Note that the number of up arrows is relatively high and the magnitude
 of the degradation can be very high in some cases. Basebuilder and
 Tomcat are two cases where results get much worse when suppressing one
