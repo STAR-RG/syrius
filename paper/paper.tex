@@ -1169,7 +1169,7 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
           scaled ticks=true,
           ymajorticks=false,
           ybar stacked,
-          ymax=28000,
+          ymax=27000,
           enlargelimits=0.12,
 %          enlargelimits=false,
 %          axis equal,
@@ -1181,9 +1181,10 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
           every node near coord/.append style={font=\scriptsize},
           xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
-          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
+          %symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype},          
         ]
-        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode, 108) (flags, 97) (tls.fingerprint, 61)};
+        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155)};
       \end{axis}
     \end{tikzpicture}
   }
@@ -1213,9 +1214,10 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
           every node near coord/.append style={font=\scriptsize},
           xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
-          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          %symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7},
           ]
-          \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535) (8, 340) (9,154) (10, 53)};
+          \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535)};
         \end{axis}
       \end{tikzpicture}
     }
@@ -1244,9 +1246,10 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
           every node near coord/.append style={font=\scriptsize},
           xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
-          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},          
+          %symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},          
+          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE},          
         ]
-        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387) (INSERT, 386) (200, 352) (/index.php?, 273)};
+        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387)};
       \end{axis}
     \end{tikzpicture}
   }
