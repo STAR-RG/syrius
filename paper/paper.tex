@@ -186,10 +186,11 @@ attacks. Unfortunately, attackers actively look for new mechanisms to
         \begin{axis}[
             width = 0.3\textwidth,
             height = 0.2\textwidth,            
-            bar width=4pt,
+            bar width=3pt,
             scaled ticks=false,
             ymajorticks=false,
             ybar stacked,
+            ymax=250,
             enlargelimits=0.09,
             clip=true,
             legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
@@ -1161,20 +1162,21 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
   \centering
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.8}{  
+  \scalebox{0.9}{  
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
           scaled ticks=true,
           ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.08,
+          ymax=28000,
+          enlargelimits=0.12,
 %          enlargelimits=false,
 %          axis equal,
           clip=false,
           legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
           xtick=data,
-          xticklabel style={rotate=30},
+          xticklabel style={rotate=35},
           nodes near coords,
           every node near coord/.append style={font=\scriptsize},
           xticklabel style={font=\footnotesize},          
@@ -1192,14 +1194,15 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{subfigure}%  
   \begin{subfigure}{.25\textwidth}
     \centering
-    \scalebox{0.8}{  
+    \scalebox{0.9}{  
       \begin{tikzpicture}
         \begin{axis}[
-bar width=4pt,
+          bar width=4pt,
           scaled ticks=true,
           ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.08,
+          ymax=10000,
+          enlargelimits=0.1,
 %          enlargelimits=false,
 %          axis equal,
           clip=false,
@@ -1222,14 +1225,15 @@ bar width=4pt,
   \\
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.8}{  
+  \scalebox{0.9}{  
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
           scaled ticks=true,
           ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.08,
+          ymax=2200,
+          enlargelimits=0.1,
 %          enlargelimits=false,
 %          axis equal,
           clip=false,
@@ -1251,14 +1255,15 @@ bar width=4pt,
 \end{subfigure}%
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.8}{
+  \scalebox{0.9}{
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
           scaled ticks=true,
           ymajorticks=false,
           ybar stacked,
-          enlargelimits=0.08,
+          ymax=11000,
+          enlargelimits=0.12,
 %          enlargelimits=false,
 %          axis equal,
           clip=false,
