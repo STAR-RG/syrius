@@ -2027,17 +2027,20 @@ small number of positive examples suffices to achieve good results.
 %%   \end{axis}
 %% \end{tikzpicture}
 
+%\subsection{Threats to Validity}
+
 \subsection{Discussion}
 \label{sec:rce}
 \label{sec:jboss}
 \label{sec:content-example}
 \label{sec:dos}
+\label{sec:threats}
 
-
-\subsubsection{Lack of comparison with other tools}
+%\subsubsection{Lack of comparison with other tools}
+\noindent\textbf{Lack of comparison with other tools}
 Table~\ref{table:comparison} summarizes the characteristics of
 alternative techniques and provides details about the evaluation used
-in their original paper. Unfortunately, side comparison was not
+in corresponding papers. Unfortunately, side comparison was not
 possible for three key reasons. First, we did not have access to the
 tools. We tried, unsuccssefully, making contact with authors to obtain
 the tools. Second, the tools output different objects. For that
@@ -2051,7 +2054,27 @@ only domain experts can identify that. Third, we are the only
 technique to support content options, which are prevalent and
 challenging to handle. A side comparison would be unfair if we
 consider rules with those options.
+\noindent\textbf{Running times.}~We ran all our tests using an
+Intel(R) Xeon(R) CPU E3-1240 v6 and 8GB RAM. For attacks with only
+categorical and numerical options, the average running time was 6
+seconds per attack. For attacks with the content option, the average
+running time was 1,445 seconds (=24.1 minutes).  \textbf{Threats to
+  Validity.}~Considering external validity. Our results cannot be
+generalized beyond the subjects we selected. To mitigate that threat
+we selected a variety of attacks with different
+characteristics. Unfortunately, we could not access tools for related
+techniques, but there is strong evidence that \tname\ performs very
+well and is the only technique to support content options, which are
+very important in this domain. Considering internal validity, in
+principle, the implementation of \tname\ could contain errors. We
+mitigated that threat by carefully inspecting code and
+results. Considering construct validity, the choice of ranking to
+evaluate the approach may not be useful in practice. We considered the
+use of ranking of the golden rule a reasonable choice as the approach
+places the golden rule close to the top in most cases.
 
+% For that reason, we made a side-comparison based on the common
+% examples and results reported in the original paper. 
 
 %%  \Gui{There are a few reasons that makes the comparison between Syrius and other tools impossible 
 
@@ -2080,7 +2103,7 @@ consider rules with those options.
 %% matches \totalAttacks different existing rules and it was able to generate rules that detected 
 %% all the packets with no false positives.  
 %%  }  
-\subsubsection{Running time}\Mar{}\Gui{We ran all our tests using an Intel(R) Xeon(R) CPU E3-1240 v6 and 8GB RAM. For attacks with only categorical and numerical options, the average running time was 6 seconds per attack. For attacks with the content option, the average running time was 1445 seconds.}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2155,23 +2178,6 @@ consider rules with those options.
 %% where \tname\ works very well, reporting the golden rule at the top
 %% of the ranking.
 
-
-\subsection{Threats to Validity}
-\label{sec:threats}
-
-Our experiments is affected by the usual threats. Considering external
-validity. Our results cannot be generalized beyond the subjects we
-selected. To mitigate that threat we selected a variety of attacks
-with different characteristics. Unfortunately, we could not access
-tools for related techniques. For that reason, we made a
-side-comparison based on the common examples and results reported in
-the original paper. Considering internal validity, the implementation
-of \tname\ could contain errors. We mitigated that threat by carefully
-inspecting code and results. Considering construct validity, the
-choice of ranking to evaluate the approach may not be useful in
-practice. We considered the use of ranking of the golden rule a
-reasonable choice as the approach places the golden rule close to the
-top in most cases.
 
 \section{Related Work}
 
