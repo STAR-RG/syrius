@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-pdf("jsp.pdf", width = 5, height = 5)
+pdf("jsp.pdf", width = 6.5, height = 3)
 
 
 df1 <- read.table("data0.txt", header = FALSE)
@@ -15,7 +15,7 @@ par(mar = c(5, 4, 4, 0),
     mai = c(0.4, 0.6, 0.1, 0),
     mfrow = c(1,2))
 
-bp <- boxplot(df1$V1,df2$V1,df3$V1,df4$V1,df5$V1,names=c("0","","100","","100k"), boxwex=0.2, cex.axis=1, las=1)
+bp <- boxplot(df1$V1,df2$V1,df3$V1,df4$V1,df5$V1,names=c("0","1","100","10k","100k"), boxwex=0.2, cex.axis=1, las=1)
 
 dev.off()
 
