@@ -754,6 +754,15 @@ associated with input traffic--\tname{} uses the payload strategy if
 http is detected; otherwise, it uses the field strategy. We elaborate
 on these strategies in the following.
 
+\begin{figure}[h!]
+  \lstinputlisting[language=C,numbers=none,keywords={content}]{adaptor-golden-rule.suricata}
+  \vspace{-1ex}  
+  \caption{Suricata rule for JBoss JMX attack.}
+  \vspace{-2ex}  
+  \label{fig:adaptor-golden-rule.suricata}
+\end{figure}
+
+
 For the field strategy, \tname{} parses the input messages looking for
 options associated with the data in the fields of
 messages. Section~\ref{sec:rules-and-packets} shows the correspondence
@@ -768,7 +777,7 @@ which are prevalent. For example, \percHttp\ of the \numrulessuri{}
 rules from the ruleset we analyzed~\cite{emerging-threats-open}
 prescribe defenses against http attacks. In addition,
 \percRulesWithContent{} of these rules contain at least one content
-option. Figure~\ref{fig:rule-jboss} shows an example of a rule that
+option. Figure~\ref{fig:adaptor-golden-rule.suricata} shows an example of a rule that
 captures traffic containing the string \CodeIn{"/HtmlAdaptor"} in the
 payload.  Figure~\ref{fig:distribution-contents} shows the
 distribution of number of content options per rule for the data set
