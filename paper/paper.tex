@@ -1158,11 +1158,11 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 %%     \caption{\label{fig:distribution-rule-size}Rule sizes.}
 %%   \end{subfigure}%
 
-\begin{figure}[t!]
+\begin{figure*}[t!]
   \centering
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.9}{  
+  \scalebox{0.8}{  
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
@@ -1195,7 +1195,7 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{subfigure}%  
   \begin{subfigure}{.25\textwidth}
     \centering
-    \scalebox{0.9}{  
+    \scalebox{0.85}{  
       \begin{tikzpicture}
         \begin{axis}[
           bar width=4pt,
@@ -1224,10 +1224,10 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
     \vspace{-1ex}
     \caption{\label{fig:distribution-contents}Number of content options.}
   \end{subfigure}% <---- don't forget this %
-  \\
+%  \\
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.9}{  
+  \scalebox{0.8}{  
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
@@ -1258,7 +1258,7 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{subfigure}%
 \begin{subfigure}{.25\textwidth}
   \centering
-  \scalebox{0.9}{
+  \scalebox{0.8}{
     \begin{tikzpicture}
       \begin{axis}[
           bar width=4pt,
@@ -1288,8 +1288,7 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{subfigure}%
 \vspace{-1ex}
 \caption{Distributions.}
-\end{figure}
-
+\end{figure*}
 
 
 \subsubsection{Number of content options} We observed
@@ -1456,14 +1455,16 @@ weights.
 
 
 %\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{0.9}
+%renewcommand{\arraystretch}{0.9}
 \begin{table*}[t!]
   \footnotesize
   \caption{\label{table:attacks}List of attacks. Non-http attacks
     appear at the top; http attacks appear at the bottom.}
   \vspace{-2ex}
   \centering
-  \begin{tabular}{lcccp{10cm}}
+  \setlength{\tabcolsep}{4.5pt}
+  \renewcommand{\arraystretch}{0.35}
+  \begin{tabular}{lcccp{11cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Source} &
@@ -1499,6 +1500,7 @@ weights.
     Tomcat Snoop Access & \cite{nikto} & AREC & http & \textbf{content}:"/jsp/snp/"; http\_uri; \textbf{content}:".snp"; http\_uri;\\  
     \bottomrule
   \end{tabular}
+  \vspace{-2ex}
 \end{table*}
 
 
@@ -1681,10 +1683,12 @@ position of the golden rule at the ranked list of plausible rules
 reported by \tname\ (see Figure~\ref{fig:overview}). This metric is a
 proxy of human performance in analyzing the list of plausible rules.
 
-\renewcommand{\arraystretch}{0.7}
-\setlength{\tabcolsep}{2pt}
+%\renewcommand{\arraystretch}{0.7}
+%\setlength{\tabcolsep}{2pt}
 \begin{table}[t!]
   \footnotesize
+  \setlength{\tabcolsep}{2pt}
+  \renewcommand{\arraystretch}{0.5}
   \caption{\label{table:results}Results.}
   \vspace{-2ex}
   \centering
@@ -1768,13 +1772,17 @@ reported that rule within the top five rules of the ranking in
 %% ground truth rule contains only one content options the number of
 %% option candidates and plausible rules produced is high. 
 
-\begin{center}
-\begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
-\tname\ successfully synthesizes the golden rules in all cases and
-that rule is ranked among the top five rules in
-\percTopFiveRanking\ of the cases.
-\end{tcolorbox}
-\end{center}
+%% \begin{center}
+%% \begin{tcolorbox}[enhanced,width=3.3in,center upper,drop shadow southwest,sharp corners]
+%% \tname\ successfully synthesizes the golden rules in all cases and
+%% that rule is ranked among the top five rules in
+%% \percTopFiveRanking\ of the cases.
+%% \end{tcolorbox}
+%% \end{center}
+
+\emph{ \textbf{Summary of results:}~\tname\ successfully synthesizes
+  the golden rules in all cases and that rule is ranked among the top
+  five rules in \percTopFiveRanking\ of the cases.  }
 
 
 \subsection{Answering RQ2: \textRQtwo}
@@ -1811,7 +1819,9 @@ the table, indicates the contrary.
 
 \begin{table}[h!]
   \footnotesize
-  \setlength{\tabcolsep}{8pt}  
+  \setlength{\tabcolsep}{8pt}
+  %\setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{-0.01}
   \caption{\label{table:weights}Contribution of heuristic functions.}
   \vspace{-2ex}
   \centering
@@ -1897,14 +1907,17 @@ contributed in more cases whereas function ``Popularity of options''
 performance of attacks involving non-http protocols.
 
 
-\begin{center}
-\begin{tcolorbox}[enhanced,width=3.4in,center upper,drop shadow southwest,sharp corners]
-Every function showed impact on the performance of \tname. The function that builds on popularity of content
-modifiers showed highest impact.
-%The function that builds on  was the one that affected positively the higher number of
-%cases we analyzed.
-\end{tcolorbox}
-\end{center}
+%% \begin{center}
+%% \begin{tcolorbox}[enhanced,width=3.4in,center upper,drop shadow southwest,sharp corners]
+%% %The function that builds on  was the one that affected positively the higher number of
+%% %cases we analyzed.
+%% \end{tcolorbox}
+%% \end{center}
+
+\emph{\textbf{Summary of results:}~Every function showed impact on the
+  performance of \tname. The function that builds on popularity of
+  content modifiers showed highest impact.}
+
 
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
@@ -1914,9 +1927,18 @@ examples provided on input. Recall that \tname\ uses one example
 attack to generate the seed rule (at the Reverse Engineering step) and
 the remaining attacks to evaluate soundness of the rule (at the Rules
 Creations step). It is expected that the number and variety of attacks
-play a role in the performance of the technique.
+play a role in the performance of the technique.  We answered this
+question in two parts. First, we analyzed the impact of the amount of
+positive examples in results. For that, we selected two cases with the
+highest number of examples---idqaccess and scripttag---and measured
+the position of the golden rule at the rank for an increasing number
+of examples provided to \tname. For each number of variants, we
+sampled five sets of that size to provide as input to the technique.
+
+% (see column ``\#~Vars'' on Table~\ref{table:results})
 
 \begin{figure}[h]
+  \vspace{-2ex}
   \centering
   \begin{subfigure}{.2\textwidth}
     \centering
@@ -1927,27 +1949,18 @@ play a role in the performance of the technique.
     \centering
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}       \caption{scripttag}    
   \end{subfigure}%
-%\vspace{1ex}  
-\caption{Impact of number of positive examples.}
-\label{fig:impact-number-attacks}
-%\vspace{1ex}
+  \caption{\label{fig:impact-number-attacks}Impact of number of positive examples.}
+  \vspace{-2ex}
 \end{figure}
 
-We answer this question in two parts. Firts, we analyzed the impact of
-the amount of positive examples in results. For that, we selected two
-cases with the highest number of examples (see column ``\#~Vars'' on
-Table~\ref{table:results})---idqaccess and scripttag and measured the
-position of the golden rule at the rank for an increasing number of
-examples provided to \tname. For each number of variants, we sampled
-five sets of that size to provide as input to the
-technique. Figure~\ref{fig:impact-number-attacks} shows the results
-for each attack we selected. The y-axis of each plot denotes the rank
-of the golden rule and x-axis denotes the number of attack examples
-used to synthesize rules. Each point in the x-axis is associated with
-the boxplot of the distribution of results for the corresponding
-number of variants. Results indicate that 1) the number of examples is
-important, 2) the choice of examples is important, and 3) a small
-number of examples suffices to reach the best results.
+Figure~\ref{fig:impact-number-attacks} shows the results for each
+attack we selected. The y-axis of each plot denotes the rank of the
+golden rule and x-axis denotes the number of attack examples used to
+synthesize rules. Each point in the x-axis is associated with the
+boxplot of the distribution for the corresponding number of
+variants. Results indicate that the number of examples is important,
+the choice of examples is important, and a small number of examples
+suffices to reach the best results.
 
 \begin{figure}[h!]
  \centering
@@ -1981,12 +1994,15 @@ Figure~\ref{fig:impact-number-attacks}, the rank of the golden rule
 improves at a much slower pace. Fortunately, negative traffic is much
 easier to access.
 
-\begin{center}
-\begin{tcolorbox}[enhanced,width=3.5in,center upper,drop shadow southwest,sharp corners]
-\tname\ is sensitive to the number and choice of examples. However, a
-small number of positive examples suffices to achieve good results.
-\end{tcolorbox}
-\end{center}
+%% \begin{center}
+%% \begin{tcolorbox}[enhanced,width=3.5in,center upper,drop shadow southwest,sharp corners]
+
+%% \end{tcolorbox}
+%% \end{center}
+
+\emph{ \textbf{Summary of results:}~\tname\ is sensitive to the number
+  and choice of examples. However, a small number of positive examples
+  suffices to achieve good results.}
 
 %% \pgfplotsset{
 %%   box plot width/.initial=0.5em
