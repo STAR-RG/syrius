@@ -140,7 +140,7 @@ evidence that \tname\ is promising.
 feeling that the work is too preliminary} 
 For example, it was
 able to synthesize the correct rule in all cases we analyzed and
-ranked the correct rule among the first five rules of the reported
+ranked the correct rule among the first ten rules of the reported
 ranking in \percTopFiveRanking\ of the cases.
 \end{abstract}
 
@@ -272,9 +272,9 @@ We evaluated \tname\ against \totalAttacks attacks of various kinds, such as
 Active Reconnaissance (AREC)~\cite{active-reconnaissance} and Privilege
 escalation (PESC)~\cite{privilege-escalation}. %\Fix{...}\rui{add few examples}. 
 The observed results are encouraging. For 
-example, \tname\ ranked the correct rule among the top five rules in \Fix{fix values}
-\percTopFiveRanking\ of the cases and ranked the correct rule among 
-the top ten rules in \topTenAttacks of the \totalAttacks cases. \rui{to discuss, I find 
+example, \tname\ ranked the correct rule among the top ten rules in \Fix{fix values}
+\percTopFiveRanking\ of the cases \Fix{and ranked the correct rule among 
+the top ten rules in \topTenAttacks of the \totalAttacks cases.} \rui{to discuss, I find 
 this a bit weak.}\Mar{agree. let us try to add more examples and data.}
 
 %% \Fix{
@@ -761,7 +761,6 @@ on these strategies in the following.
   \vspace{-2ex}  
   \label{fig:adaptor-golden-rule.suricata}
 \end{figure}
-
 
 For the field strategy, \tname{} parses the input messages looking for
 options associated with the data in the fields of
@@ -1771,7 +1770,7 @@ attacks compared to content attacks.
 
 Overall, results show that \tname\ performed very well in most of the
 cases. It reported the ground truth rule in \emph{all} cases and
-reported that rule within the top five rules of the ranking in
+reported that rule within the top ten rules of the ranking in
 \percTopFiveRanking\ of the cases. 
 
 %% It is important to note that the
@@ -1791,7 +1790,7 @@ reported that rule within the top five rules of the ranking in
 
 \emph{ \textbf{Summary of results:}~\tname\ successfully synthesizes
   the golden rules in all cases and that rule is ranked among the top
-  five rules in \percTopFiveRanking\ of the cases.  }
+  ten rules in \percTopFiveRanking\ of the cases.  }
 
 
 \subsection{Answering RQ2: \textRQtwo}
@@ -2342,7 +2341,7 @@ components that 1)~create an over-specified seed rule, 2)~derive
 plausible rules from the seed, and 3)~rank plausible
 rules. Experimental results provide early evidence showing that
 \tname\ is promising. It was able to rank the correct rule among the
-first five rules of the reported ranking in \percTopFiveRanking\ of
+first ten rules of the reported ranking in \percTopFiveRanking\ of
 the cases we analyzed, for example. The data set containing our
 experimental artifacts is publicly accessible at \ourdataset.
 
