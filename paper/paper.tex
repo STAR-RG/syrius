@@ -406,8 +406,8 @@ argument is present in the payload of a message.
     5 & icmp\_id & matches on specific ICMP id-values\\
     6 & window & checks the size of the TCP window\\
     7 & flags & matches on TCP flags\\
-    8 & fragbits & checks if the frag. or reserved bits are set in the IP header\\
-    9 & threshold & minimum threshold for a rule before it generates alerts\\
+    8 & fragbits & checks if the frag. bits are set in the IP header\\ % or reserved bits
+    9 & threshold & min \# messages for a rule before it generates alerts\\
     10 & content & checks if argument is present on the payload\\
     \bottomrule
   \end{tabular}
@@ -1808,9 +1808,10 @@ configuration is worse when compared to \tname's default
 configuration. A down arrow ($\downarrow$), appearing highlighted in
 the table, indicates the contrary.
 
-\setlength{\tabcolsep}{8pt}
+
 \begin{table}[h!]
   \footnotesize
+  \setlength{\tabcolsep}{8pt}  
   \caption{\label{table:weights}Contribution of heuristic functions.}
   \vspace{-2ex}
   \centering
@@ -1851,31 +1852,34 @@ the table, indicates the contrary.
   \end{tabular}
 \end{table}
 
-\renewcommand{\arraystretch}{0.9}
 \begin{table*}[t!]
   \footnotesize
-  \caption{\label{table:attacks}-}
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{-0.01}
+  \caption{\label{table:comparison}Alternative techniques.}
   \vspace{-2ex}
   \centering
-    \begin{tabular}{lp{2cm}p{2.1cm}ccp{2cm}c}
+    \begin{tabular}{lcccccc}
     \toprule
     \multicolumn{1}{c}{Paper} &
     \multicolumn{1}{c}{Input} &
+    \multicolumn{1}{c}{Output} &    
     \multicolumn{1}{c}{Dataset} &
-    \multicolumn{1}{c}{Protocol} &
-    \multicolumn{1}{c}{Output} &
+    \multicolumn{1}{c}{Protocols} &
     \multicolumn{1}{c}{Evaluation} &
-    \multicolumn{1}{c}{Availability} \\
+    \multicolumn{1}{c}{Avail.?} \\
     \midrule
-    \cite{vollmer-etal-cics2011} & Malign Traffic & Manually crafted & ICMP & Rule List & TP, FP & No\\
-    \midrule
-    \cite{fallahi} & Mixed Traffic & \cite{iscx} & HTTP, SSH, TCP & Single Rule & TP, FP, Precision, Recall, F1 & No\\    
-    \midrule
-    \cite{Kao2015AutomaticNR} & Malign Traffic, Benign Traffic, Rule Dataset & Manually crafted, \cite{emerging-threats-open} & HTTP & Single Rule & Generating time, FP & No \\
-    \midrule
-    \cite{guruprasad}& Malign Traffic & \cite{iscx} \cite{darpa1999} & ICMP, TCP & Rule List & FP & No\\
-    \midrule
-    Syrius & Malign Traffic, Benign Traffic, Rule Dataset & Manually crafted, \cite{emerging-threats-open}, \cite{iscx} & HTTP, TCP, ICMP & Rule List & Rule Ranking & Yes \\
+    \cite{vollmer-etal-cics2011} & Malign Traffic & List  & Manually crafted & ICMP & TP, FP & No\\
+%    \midrule
+    \cite{fallahi} & Mixed Traffic & One Rule  & \cite{iscx} & HTTP, SSH, TCP & TP, FP, Precision, Recall, F1 & No\\    
+%    \midrule
+    \cite{Kao2015AutomaticNR} & Malign/Benign Traffic, Rule Dataset &
+    One Rule & Manually crafted, \cite{emerging-threats-open} & HTTP & Generating time, FP & No \\
+%    \midrule
+    \cite{guruprasad}& Malign Traffic & List  & \cite{iscx} \cite{darpa1999} &
+    ICMP, TCP & FP & No\\
+%    \midrule
+    Syrius & Malign/Benign Traffic, Rule Dataset & Ranking & Manually crafted, \cite{emerging-threats-open}, \cite{iscx} & HTTP, TCP, ICMP & Rule List & Yes \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -1905,14 +1909,33 @@ modifiers showed highest impact.
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
 
-This section evaluates sensitivity of \tname{} to the number of
-attacks provided on input. Recall that \tname\ uses one example attack
-to generate the seed rule (at the Reverse Engineering step) and the
-remaining attacks to evaluate soundness of the rule (at the Rules
-Creations step). It is expected that the number and variety of
-attacks---of the same kind---plays an important role in the
-performance of the technique. To answer this research question, we selected two cases with the
-highest number of examples (see column ``\#~Vars'' on
+This section evaluates sensitivity of \tname{} to the amount of
+examples provided on input. Recall that \tname\ uses one example
+attack to generate the seed rule (at the Reverse Engineering step) and
+the remaining attacks to evaluate soundness of the rule (at the Rules
+Creations step). It is expected that the number and variety of attacks
+play a role in the performance of the technique.
+
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}{.2\textwidth}
+    \centering
+    \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/idqaccess/idqaccess.pdf}
+    \caption{idqaccess}
+  \end{subfigure}%
+  \begin{subfigure}{.2\textwidth}
+    \centering
+    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}       \caption{scripttag}    
+  \end{subfigure}%
+%\vspace{1ex}  
+\caption{Impact of number of positive examples.}
+\label{fig:impact-number-attacks}
+%\vspace{1ex}
+\end{figure}
+
+We answer this question in two parts. Firts, we analyzed the impact of
+the amount of positive examples in results. For that, we selected two
+cases with the highest number of examples (see column ``\#~Vars'' on
 Table~\ref{table:results})---idqaccess and scripttag and measured the
 position of the golden rule at the rank for an increasing number of
 examples provided to \tname. For each number of variants, we sampled
@@ -1926,25 +1949,7 @@ number of variants. Results indicate that 1) the number of examples is
 important, 2) the choice of examples is important, and 3) a small
 number of examples suffices to reach the best results.
 
- 
-\begin{figure}[t!]
-  \centering
-  \begin{subfigure}{.2\textwidth}
-    \centering
-    \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/idqaccess/idqaccess.pdf}
-    \caption{idqaccess}
-  \end{subfigure}%
-  \begin{subfigure}{.2\textwidth}
-    \centering
-    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
-    \caption{scripttag}    
-  \end{subfigure}%
-\vspace{2ex}  
-\caption{Impact of number of positive examples.}
-\label{fig:impact-number-attacks}
-%\vspace{1ex}
-\end{figure}
-\begin{figure}[t!]
+\begin{figure}[h!]
  \centering
  \begin{subfigure}{.2\textwidth}
     \centering
@@ -1963,20 +1968,23 @@ number of examples suffices to reach the best results.
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
     \caption{jsp}    
   \end{subfigure}%
-
 %\vspace{-2.5ex}  
 \caption{Impact of number of negative examples.}
-\label{fig:impact-number-attacks}
-%\vspace{1ex}
+\label{fig:impact-negative}
+\vspace{1ex}
 \end{figure}
 
-
+We conducted a similar experiment with negative examples on three
+different attacks. Figure~\ref{fig:impact-negative} shows
+results. Note that, compared with the plots of
+Figure~\ref{fig:impact-number-attacks}, the rank of the golden rule
+improves at a much slower pace. Fortunately, negative traffic is much
+easier to access.
 
 \begin{center}
-\begin{tcolorbox}[enhanced,width=3.4in,center upper,drop shadow southwest,sharp corners]
-As expected, \tname\ is sensitive to the number and choice of example
-input attacks. However, a small number of examples suffices to achieve
-best results.
+\begin{tcolorbox}[enhanced,width=3.5in,center upper,drop shadow southwest,sharp corners]
+\tname\ is sensitive to the number and choice of examples. However, a
+small number of positive examples suffices to achieve good results.
 \end{tcolorbox}
 \end{center}
 
@@ -2027,13 +2035,31 @@ best results.
 
 
 \subsubsection{Lack of comparison with other tools}
- \Gui{There are a few reasons that makes the comparison between Syrius and other tools impossible 
+Table~\ref{table:comparison} summarizes the characteristics of
+alternative techniques and provides details about the evaluation used
+in their original paper. Unfortunately, side comparison was not
+possible for three key reasons. First, we did not have access to the
+tools. We tried, unsuccssefully, making contact with authors to obtain
+the tools. Second, the tools output different objects. For that
+reason, a comparison based on published results did not make sense. It
+is important to recall that we did not report precision and recall as
+it is 100\% always. \tname captures, by construction, all positive
+traffic and does not capture any negative traffic. We used a stronger
+criteria instead---the position of the correct rule in the ranking. It
+is possible that other rules, higher in the ranking, are useful, but
+only domain experts can identify that. Third, we are the only
+technique to support content options, which are prevalent and
+challenging to handle. A side comparison would be unfair if we
+consider rules with those options.
 
-\textbf{Tools availability.} We tried contact with authors of 4 different papers \cite{vollmer-etal-cics2011}\cite{muthuregunathan-etal2009}\cite{fallahi}\cite{Kao2015AutomaticNR}, but got no response from them. Since their tools are not available online or at least not publicly, we could not run them.
 
-\textbf{Different output and specific rules.} We considered using the results they provides with results that Syrius provide, but concluded it wouldn't be possible as the results are essentially different. Commonly the  other results focus on showing the ratio of false negatives and false positives as a way to show the efficiency of the learning algorithm, but never comparing the generated rules to a Ground Truth, and most of times not showing individually the attacks used. Syrius' results, on the other hand, shows the generated rules that produce no false positives and negatives to the given packets, and always compares the results with a Ground Truth to verify its efficiency.
+%%  \Gui{There are a few reasons that makes the comparison between Syrius and other tools impossible 
 
-\textbf{'content' option support.} Another limitation is the support of 'content' option. Most papers do not support rule generation with the 'content' option, using only classic DDoS attacks in the rule generation, like ICMP and SYN flood, which only use numerical and categorical options. Some papers do support 'content', but don't explain well how they handle those rules with exclusive 'content'.}
+%% \textbf{Tools availability.} We tried contact with authors of 4 different papers \cite{vollmer-etal-cics2011}\cite{muthuregunathan-etal2009}\cite{fallahi}\cite{Kao2015AutomaticNR}, but got no response from them. Since their tools are not available online or at least not publicly, we could not run them.
+
+%% \textbf{Different output and specific rules.} We considered using the results they provides with results that Syrius provide, but concluded it wouldn't be possible as the results are essentially different. Commonly the  other results focus on showing the ratio of false negatives and false positives as a way to show the efficiency of the learning algorithm, but never comparing the generated rules to a Ground Truth, and most of times not showing individually the attacks used. Syrius' results, on the other hand, shows the generated rules that produce no false positives and negatives to the given packets, and always compares the results with a Ground Truth to verify its efficiency.
+
+%% \textbf{'content' option support.} Another limitation is the support of 'content' option. Most papers do not support rule generation with the 'content' option, using only classic DDoS attacks in the rule generation, like ICMP and SYN flood, which only use numerical and categorical options. Some papers do support 'content', but don't explain well how they handle those rules with exclusive 'content'.}
 %%  \Luc{Vollmer \cite{vollmer-etal-cics2011} and Guruprasad \cite{guruprasad} used 
 %%  evolutionaries approaches to 
 %% autonomously generate rules using the Snort IDS. They built 
