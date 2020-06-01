@@ -1288,6 +1288,7 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{subfigure}%
 \vspace{-1ex}
 \caption{Distributions.}
+\vspace{-4ex}
 \end{figure*}
 
 
@@ -1351,13 +1352,14 @@ contribution of that rule for the computation of similarity score
 would be $0.601$ $(=(1$+$.203)$/$2)$. The relatively high weight
 reflects the fact that ``GET'' and ``ID'' are popular content strings.
 
-\begin{figure}[t!]
+\begin{wrapfigure}[9]{r}{0.21\textwidth}
+  \vspace{-2ex}
 \centering
-\includegraphics[scale=0.5]{figs/http_header-example.png}
-\vspace{-2ex}
+\includegraphics[scale=0.6]{figs/http_header-example.png}
+\vspace{-1ex}
 \caption{Content modifiers.}
 \label{fig:http-header-example}
-\end{figure}
+\end{wrapfigure}
 
 \subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers} As previously
 mentioned, \percRulesWithContent\ of \suri\ rules involve content
@@ -1817,7 +1819,7 @@ configuration. A down arrow ($\downarrow$), appearing highlighted in
 the table, indicates the contrary.
 
 
-\begin{table}[h!]
+\begin{table}[t!]
   \footnotesize
   \setlength{\tabcolsep}{8pt}
   %\setlength{\tabcolsep}{5pt}
@@ -1963,28 +1965,28 @@ the choice of examples is important, and a small number of examples
 suffices to reach the best results.
 
 \begin{figure}[h!]
- \centering
- \begin{subfigure}{.2\textwidth}
+  \vspace{-1.5ex}
+  \centering
+  \begin{subfigure}{.2\textwidth}
     \centering
     \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/coldfusion/coldfusion.pdf}
     \caption{coldfusion}
   \end{subfigure}%
-    \hspace{-8ex}
+  \hspace{-8ex}
   \begin{subfigure}{.2\textwidth}
     \centering
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/inc/inc.pdf}
     \caption{inc}    
   \end{subfigure}%
-    \hspace{-8ex}
+  \hspace{-8ex}
   \begin{subfigure}{.2\textwidth}
     \centering
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
     \caption{jsp}    
   \end{subfigure}%
-%\vspace{-2.5ex}  
-\caption{Impact of number of negative examples.}
-\label{fig:impact-negative}
-\vspace{1ex}
+  \caption{Impact of number of negative examples.}
+  \label{fig:impact-negative}
+  \vspace{-2ex}
 \end{figure}
 
 We conducted a similar experiment with negative examples on three
