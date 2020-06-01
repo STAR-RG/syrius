@@ -2199,39 +2199,44 @@ places the golden rule close to the top in most cases.
 
 \section{Related Work}
 
-\Mar{mention something on ethical hacking.. ethical-hacking}
+%\Mar{mention something on ethical hacking.. ethical-hacking}
 
 This section elaborates on the most similar work.
 
+%We discuss in the following techniques similar in goal to ours. Unfortunately
+
 \noindent
-\textbf{Alternative methods for rule synthesis.} We discuss in the
-following techniques similar in goal to ours. Unfortunately, we could
-not access the tools implementing the techniques for side
+\textbf{Alternative methods for rule synthesis.} As detailed before,
+we could not access the tools implementing the techniques for
 comparison. Nevertheless, we found that there are important
-differences between our work and related work. Vollmer
-\etal{}~\cite{vollmer-etal-cics2011} propose the use of search to
-derive rules for Snort, which are very similar to \suri's.  \Fix{Their
-approach focuses on icmp attacks.} \Gui{The dataset used by them consists of manually produced ICMP packets using packet creation tools.}. It models every field of the icmp
-packet in the chromosome of candidate solutions (\ie{}, a rule) of a
+differences between our work and prior work. Vollmer
+\etal{}~\cite{vollmer-etal-cics2011} proposed the use of search to
+derive rules for Snort, which are very similar to \suri's.  Their
+solution focused on icmp attacks for which plausible attacks can be
+created directly from packets (see
+Section~\ref{sec:rules-and-packets}). They modeled every field of the
+icmp packet in chromosomes of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
-that randomly combine options, modelling the packet fields. They show
-that they were able to generate rules without false negatives and only
-3 false positives across 33K benign packets. The key differences
-between our work and Vollmer~\etal{}'s are 1) the support of different
-protocols and 2) the use of ranking to discriminate alternative
-plausible rules. As for 1, our approach supports a variety of
-protocols and options that refer to message payloads which
-significantly increase the search space. The icmp rules they generate only
-refer to message fields (see Section~\ref{sec:rules-and-packets}).
-\MyComment{\Luc{eh possivel incluir contents em regras icmp tb. o q a secao 2.3 
-diz q \textbf{geralmente} as regras nao-http possuem apenas field options}. }
-As for 2, our solution additionally ranks plausible options, which
-contain \emph{no} false positives or negatives with respect to the
-benign and mallicious traffic considered.
-
-\Gui{Guruprasad \etal{}\cite{guruprasad} also proposes an evolutionary framework, creating their own ICMP dataset as Vollmer, but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks. The produced rules reported a detection rate up to 96\%. Although Guruprasad supports more protocols than Vollmer, our approach still supports more options and protocols, making both key differences considered when comparing with Vollmer also relevant with Guruprasad.} 
-
-Muthuregunathan \etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
+that randomly combine options, modelling the packet fields. They
+showed that they were able to generate rules without false negatives
+and only 3 false positives across 33K benign packets. The key
+differences between our work and Vollmer~\etal{}'s are 1) the support
+of different protocols and 2) the use of ranking to discriminate
+alternative plausible rules. As for 1, our approach supports a variety
+of protocols and options (\eg{}, options that refer to message
+payloads). The icmp rules they generate only refer to message fields.
+\MyComment{\Luc{eh possivel incluir contents em regras icmp tb. o q a
+    secao 2.3 diz q \textbf{geralmente} as regras nao-http possuem
+    apenas field options}. } As for 2, our solution additionally ranks
+plausible options, which contain \emph{no} false positives or
+negatives with respect to the benign and mallicious traffic
+considered. Guruprasad \etal{}\cite{guruprasad} also proposes an
+evolutionary framework, creating their own ICMP dataset as Vollmer,
+but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx}
+datasets for non-ICMP attacks. Although Guruprasad supports more
+protocols than Vollmer, our approach still supports a larger set of
+protocols and the ability to ranks rules. Muthuregunathan
+\etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
 create rules. They characterize candidate solutions as a set of field
 values and use a clustering algorithm---hybrid k-means partitioned
 around menoids---to isolate malicious from benign
@@ -2244,7 +2249,10 @@ looks for a common pattern across the different inputs to define
 rules. It does not take existing rules as input or benign
 traffic. Consequently, false positive can be produced and need to be
 handled manually by users. Our approach, in contrast, does not
-generate false positives w.r.t. the input traffic. 
+generate false positives w.r.t. the input traffic.
+
+%% \Gui{Guruprasad \etal{}\cite{guruprasad} also proposes an evolutionary framework, creating their own ICMP dataset as Vollmer, but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx} datasets for non-ICMP attacks. The produced rules reported a detection rate up to 96\%. Although Guruprasad supports more protocols than Vollmer, our approach still supports more options and protocols, making both key differences considered when comparing with Vollmer also relevant with Guruprasad.} 
+
 
 \Gui{Fallahi \etal{}\cite{fallahi} proposes a flow-based solution for automated rule generation. Instead of analyzing the packets individually, their algorithm investigates and creates the rules for flows in the network. The algorithm was tested using the ISCX 2012 dataset and showed good results in terms of precision, but it is limited to the type of attack. As it won't analyse individual details of each packet, it wouldn't be able to identify and generate rules for attacks that require detailed options, such as the HTTP PESC, RCE and LFI.}
 
