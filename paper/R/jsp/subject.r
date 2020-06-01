@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-pdf("jsp.pdf", width = 5, height = 2.9)
+pdf("jsp.pdf", width = 5, height = 5)
 
 
 df1 <- read.table("data0.txt", header = FALSE)
