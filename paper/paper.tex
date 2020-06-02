@@ -1522,15 +1522,16 @@ This section reports on the evaluation of \tname{}.
 \end{itemize}
 
 \noindent
-\textbf{Rationale.}~The golden rule is a trusted human-written
-\nids\ rule that we obtained from credible sources~\cite{emerging-threats-open}. 
-\tname\ generates several rules that satisfy the invariant to only capture the malicious
-traffic, but the amount of data we used to evaluate that property,
-albeit large, is limited. Assessing the quality of each rule
+\textbf{Rationale.}~Assessing the quality of each rule
 \tname\ produces (\ie{}, fitness to the attack) requires domain
-knowledge and much effort. The position of the golden rule at the
-ranking produced by \tname\ is a proxy measure to the effort of a
-system administrator in finding the rule that fits the purpose.
+knowledge and effort. The ranking position of the golden rule is a
+proxy to measure the effort of a system administrator in finding the
+rule that fits the purpose.  The golden rule is a trusted
+human-written \nids\ rule that we obtained from credible
+sources~\cite{emerging-threats-open}.
+
+%\tname\ generates several rules that satisfy the invariant to only
+%capture the malicious traffic, but the amount of data we used to evaluate that property, albeit large, is limited.
 
 
 \newcommand{\textRQtwo}{How important are the heuristic functions
@@ -1543,9 +1544,9 @@ system administrator in finding the rule that fits the purpose.
 
 \noindent
 \textbf{Rationale.}~We proposed a variety of heuristic functions to
-rank the plausible rules that \tname\ created during minimization (as
-per step 2 in the workflow). Recall that these functions are based on
-the data from a public ruleset~\cite{emerging-threats-open} (see
+rank the plausible rules that \tname\ created during
+minimization. Recall that these functions are based on the data from a
+public ruleset~\cite{emerging-threats-open} (see
 Section~\ref{sec:ranking}). It is therefore important to understand
 the extent to which each function contributes to the overall
 performance of the technique.
@@ -1564,12 +1565,11 @@ technique is to the selection of these inputs.
 \noindent
 \vspace{1ex}
 
-The following sections describe the objects we used to evaluate the
-technique (Section~\ref{sec:dataset-benign}), answer the posed
-research questions (sections~\ref{sec:answer-rqone},
-and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), and
-discuss threats to the validity of the
-experiments~(Section~\ref{sec:threats}).
+The following sections describe the objects we used in the evaluation
+(Section~\ref{sec:dataset-benign}), answer the research questions
+(sections~\ref{sec:answer-rqone}, C, D), and discuss
+results~(Section~\ref{sec:threats}).
+%and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), 
 
 
 %%\begin{table}[h!]
@@ -1940,12 +1940,7 @@ question in two parts. First, we analyzed the impact of the amount of
 positive examples in results. For that, we selected two cases with the
 highest number of examples---idqaccess and scripttag---and measured
 the position of the golden rule at the rank for an increasing number
-of examples provided to \tname. For each number of variants, we
-sampled five sets of that size to provide as input to the technique.
-
-% (see column ``\#~Vars'' on Table~\ref{table:results})
-
-\begin{wrapfigure}[11]{r}{0.28\textwidth}  
+\begin{wrapfigure}[10]{r}{0.28\textwidth}  
   \vspace{-2ex}
   \centering
   \begin{subfigure}{.15\textwidth}
@@ -1957,13 +1952,15 @@ sampled five sets of that size to provide as input to the technique.
   \begin{subfigure}{.15\textwidth}
     \centering
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
-    \vspace{-3ex}        
+    \vspace{-2ex}        
     \caption{scripttag}
   \end{subfigure}%
-  \caption{\label{fig:impact-number-attacks}Impact of number of positive examples.}
-  \vspace{-2ex}
+    \vspace{-1ex}          
+  \caption{\label{fig:impact-number-attacks}Positive examples.}
+  \vspace{-1ex}
 \end{wrapfigure}
-
+of examples provided to \tname. For each number of variants, we
+sampled five sets of that size to provide as input to the technique.
 Figure~\ref{fig:impact-number-attacks} shows results for each
 attack we selected. The y-axis of each plot denotes the rank of the
 golden rule and x-axis denotes the number of attack examples used to
@@ -1973,33 +1970,32 @@ variants. Results indicate that the number of examples is important,
 the choice of examples is important, and a small number of examples
 suffices to reach the best results.
 
-\begin{figure}[h!]
+\begin{wrapfigure}[11]{r}{0.28\textwidth}  
   \vspace{-1.5ex}
   \centering
-  \begin{subfigure}{.2\textwidth}
+  %% \begin{subfigure}{.2\textwidth}
+  %%   \centering
+  %%   \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/coldfusion/coldfusion.pdf}
+  %%   \vspace{-1ex}        
+  %%   \caption{coldfusion}
+  %% \end{subfigure}%
+  %% \hspace{-8ex}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/coldfusion/coldfusion.pdf}
-    \vspace{-1ex}        
-    \caption{coldfusion}
-  \end{subfigure}%
-  \hspace{-8ex}
-  \begin{subfigure}{.2\textwidth}
-    \centering
-    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/inc/inc.pdf}
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/inc/inc.pdf}
     \vspace{-1ex}    
     \caption{inc}    
   \end{subfigure}%
-  \hspace{-8ex}
-  \begin{subfigure}{.2\textwidth}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
     \vspace{-1ex}    
     \caption{jsp}    
   \end{subfigure}%
-  \caption{Impact of number of negative examples.}
+  \caption{Negative examples.}
   \label{fig:impact-negative}
   \vspace{-2ex}
-\end{figure}
+\end{wrapfigure}
 
 We conducted a similar experiment with negative examples on three
 different attacks. Figure~\ref{fig:impact-negative} shows
