@@ -853,7 +853,7 @@ option results in the capture of negative (\ie{}, benign) traffic.
 The procedure we propose in this step builds on the observation that
 all options from the rule produced in the previous step are satisifed
 by the traffic produced by the attack. Consequently, any subset of
-these options also captures the attack. 
+these options also captures the attack.
 
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 \algnewcommand\algorithmicforeach{\textbf{for each}}
@@ -892,17 +892,16 @@ these options also captures the attack.
 \end{algorithmic}
 \end{algorithm}
 
-The rule creation procedure \tname{} uses iteratively discards options
-from rules, derived from the seed rule, using the negative traffic to
-guide the search for minimal rules.  Algorithm~\ref{algo1} shows the
-pseudocode for deriving these rules. The algorithm takes as input an
-over-constrained rule $sr$, denoting the seed rule produced at the
-Reverse Engineering step, and pcap files~\cite{pcap} to reconstruct
-the benign traffic ($\mathit{bTr}$) and the malicious traffic
-($\mathit{mTr}$). The algorithm produces on output a set of
-alternative rules to $sr$ that captures every instance of the attack
-(as per $\mathit{mTr}$), but does not capture any message from the
-benign traffic (as per $\mathit{bTr}$).
+\tname{} generates plausible rules while minimizing the seed
+rule. Algorithm~\ref{algo1} shows the pseudocode of that
+procedure. The algorithm takes as input an over-constrained rule $sr$,
+denoting the seed rule produced at the Reverse Engineering step, and
+pcap files~\cite{pcap} to reconstruct the benign traffic
+($\mathit{bTr}$) and the malicious traffic ($\mathit{mTr}$). The
+algorithm produces on output a set of plausible rules. Each of these
+rules should capture every instance of the attack (as per
+$\mathit{mTr}$) and not capture any message from the benign traffic
+(as per $\mathit{bTr}$).
 
 Line~\ref{line-init} initializes the current population of individuals
 (\ie{}, rules) $\mathcal{R}$ with the seed rule $sr$. We encode a rule
@@ -915,8 +914,10 @@ $\mathcal R'$. Line~\ref{init-rprime} initializes the population of
 individuals for the next generation. The inner loop
 (lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. The algorithm mutates each of these
-rules $N$ times \rui{is N an input? How does one determine it in practice?} \Gui{Yes. Higher N values increases the chances of creating every possible rule for the attack (decreasing the negative effects of the non-determinism), at the same time that increases the computational cost. So the value can be increased in case the desired rule is not being created, or it can be reduced if the code is creating too many rules. In our code, we chose manually N=2, as it was already enough for showing the desired results.}, discarding one rule option each
-time. Line~\ref{copy} assigns a copy of the bitvector encoding
+rules $N$ times, discarding one rule option each
+time. Higher (resp., lower) values of $N$ produces more (resp.,
+less) rules. We found empirically that a value of 2 was sufficient to
+generate rules in all cases. Line~\ref{copy} assigns a copy of the bitvector encoding
 $\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand(lo, hi)}$ randomly
 chooses one integer value in the range $[lo, hi]$ defined by its
@@ -933,6 +934,8 @@ search. After processing every candidate rule in $\mathcal R$, the
 next generation of individuals is defined (line~\ref{define-next-gen})
 and the set of discovered rules is updated (at
 line~\ref{output-accum}).
+
+%\rui{is N an input? How does one determine it in practice?} \Gui{Yes. Higher N values increases the chances of creating every possible rule for the attack (decreasing the negative effects of the non-determinism), at the same time that increases the computational cost. So the value can be increased in case the desired rule is not being created, or it can be reduced if the code is creating too many rules. In our code, we chose manually N=2, as it was already enough for showing the desired results.}
 
 The do-while loop terminates when no rule in the current generation of
 individuals can be further reduced without violating the invariant
@@ -970,8 +973,8 @@ at the \reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
 
 \textbf{Correctness argument.}~The algorithm reports rules that
 capture only the positive traffic. Every rule created during the
-search captures the attack associated with the input as every created
-rule contains a proper subset of the options from the original rule
+search captures the attack associated with the input as every rule
+created contains a proper subset of the options from the original rule
 and all those options are, by definition, satisfied by the traffic
 produced by the original attack. In addition, from the definition of
 $\mathit{isPlausible}$, reported rules capture \emph{only} the
@@ -979,9 +982,20 @@ positive traffic. If negative traffic is captured, a rule is not added
 to $\mathcal R'$. Consequently, it cannot be an element of $\mathcal
 O$ and reported on the output. Finally, from the definition of
 function $\mathit{filter}$, only the rules in $\mathcal O$ that
-capture all the instances of the attack (\ie{}, variants) are reported
-on output.
-
+capture all the instances of the attack are reported on output.
+\textbf{Implementation details.} We implemented function
+\emph{isPlausible} by 1)~spawning Suricata to monitor a specified
+rule, 2)~replaying the benign traffic (see
+Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
+check if any benign message was captured by the rule. The function
+\emph{filter} is implemented similarly. It returns a projection of the
+set $\mathcal O$ where every rule captures the attacks characterized
+by $\mathit{mTr}$. It is worth noting that Suricata can process
+\emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
+network messages directly. Instead of sending traffic to a machine
+with a deployed server (\eg{}, web server) that \suri\ would monitor,
+our setup calls \suri\ directly through an API. \suri\ is invoked
+multiple times for creating rules.
 
 
 %% \begin{proposition}
@@ -1003,19 +1017,7 @@ on output.
 %\subsection{Limitations}
 %\Fix{...}
 
-\textbf{Implementation details.} We implemented function
-\emph{isPlausible} by 1)~spawning Suricata to monitor a specified
-rule, 2)~replaying the benign traffic (see
-Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
-check if any benign message was captured by the rule. The function
-\emph{filter} is implemented similarly. It returns a projection of the
-set $\mathcal O$ where every rule captures the attacks characterized
-by $\mathit{mTr}$. It is worth noting that Suricata can process
-\emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
-network messages directly. Instead of sending traffic to a machine
-with a deployed server (\eg{}, web server) that \suri\ would monitor,
-our setup calls \suri\ directly through an API. \suri\ is invoked
-multiple times for creating rules.
+
 
 %% \textbf{Limitations.} It is worth
 %% noting that the performance of \tname{} depends on the quality of
@@ -1026,8 +1028,8 @@ multiple times for creating rules.
 %% variety of public data sets available online (see
 %% Section~\ref{sec:objectanalysis-benign}).
 
-\rui{paragraph on complexity? I wonder whether that is a good ideia because
-this is already a long section.}
+%\rui{paragraph on complexity? I wonder whether that is a good ideia because
+%this is already a long section.}
 
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
