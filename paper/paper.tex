@@ -172,12 +172,8 @@ to attack a local network. This particular rule prescribes a method to
 capture an Active Reconnaissance attack for discovering accessible
 hosts in a network (see Section~\ref{sec:active-recon}).
 
-Open-source \nids{}, like Snort~\cite{snort} and
-Suricata~\cite{suricata}, provide rulesets for many existing
-attacks. Unfortunately, attackers actively look for new mechanisms to
-
-\begin{wrapfigure}[8]{r}{0.21\textwidth}
-    \vspace{-2ex}  
+\begin{wrapfigure}[7]{r}{0.21\textwidth}
+    \vspace{-4ex}  
     \centering
     \scalebox{0.9}{  
       \begin{tikzpicture}
@@ -206,6 +202,9 @@ attacks. Unfortunately, attackers actively look for new mechanisms to
     \vspace{-5ex}
     \caption{\label{fig:distribution-rules-per-month}2019 new rules.}
 \end{wrapfigure}
+Open-source \nids{}, like Snort~\cite{snort} and
+Suricata~\cite{suricata}, provide rulesets for many existing
+attacks. Unfortunately, attackers actively look for new mechanisms to
 exploit systems through the
 network. Figure~\ref{fig:distribution-rules-per-month} shows the
 number of rules added per month in the year of 2019 to the ``Emerging
@@ -250,9 +249,16 @@ to string and structured data, which are prevalent in this domain.
 %public data sets of rules to differentiate rules by the similarity to
 %human-written rules.
 
-\tname{} takes on input one or more examples of an attack, identified by a domain expert, 
-and produces on output a ranked list of rules for that attack. It uses public data
-sets of benign messages~\cite{tcpreplay,stratosphere-normal} and
+%\rui{We ought to explain how does one get hold on examples. How diffcult are they to obtain?} \Gui{Given a captured network traffic, an expert must identify which packets can be used to generate the rule. These packets are separated and given as input to Syrius.}
+
+\tname{} takes on input one or more examples of an attack, identified by a domain expert, and produces
+on output a ranked list of rules for that attack. One assumption that
+we make is that system administrators are able to capture the traffic
+that perpetrated the attack. The capture can be obtained by other
+institutions, who shared that information, or the organization itself
+that suffered the attack and wants to avoid that
+repeated. \tname\ uses public data sets of benign
+messages~\cite{tcpreplay,stratosphere-normal} and
 rulesets~\cite{emerging-threats-open} to create those rules. The
 technique is organized as a pipeline of three components. First,
 \tname\ uses the messages that manifest an attack to create a
@@ -264,13 +270,17 @@ rules to learn heuristics to rank the plausible rules.
 %\Mar{@Lucas, please look for constant
   %numbers as this *in text* and use macros instead. We do not want to
   %leave inconsistent data in the paper!}
-We evaluated \tname\ against \totalAttacks attacks of various kinds, such as 
-Denial-of-Service (DoS)~\cite{denial-of-service},
-Active Reconnaissance (AREC)~\cite{active-reconnaissance} and Privilege
-escalation (PESC)~\cite{privilege-escalation}. %\Fix{...}\rui{add few examples}. 
-The observed results are encouraging. For 
-example, \tname\ ranked the correct rule among the top ten rules in 
-\percTopFiveRanking\ of the cases. \rui{should we quote the same numbers as in the abstract?}
+
+We evaluated \tname\ against \totalAttacks attacks of various kinds
+(\eg{} Denial-of-Service (DoS)~\cite{denial-of-service}, Active
+Reconnaissance (AREC)~\cite{active-reconnaissance} and Privilege
+escalation (PESC)~\cite{privilege-escalation}) and from various
+sources. Preliminary results provide early evidence that \tname\ is
+promising. It reported the ground truth rule in \emph{all} cases and
+reported that rule within the top-1, top-3, top-5, and top-10 rules of
+the ranking, respectively, in \percTopOneRanking\,
+\percTopThreeRanking, \percTopFiveRanking, and \percTopTenRanking\ of
+the cases.
 
 %% \Fix{
 %% denial-of-service
