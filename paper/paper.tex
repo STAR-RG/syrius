@@ -825,7 +825,7 @@ the malicious traffic.
 %% }
 
 
-\subsection{Step 2: Rules Creation}
+\subsection{Step 2: Rules Generation}
 \label{sec:minimization}
 
 The seed rule produced in the first step satisfies the criterion to
@@ -1795,19 +1795,17 @@ the cases.
 \subsection{Answering RQ2: \textRQtwo}
 \label{sec:answer-rqtwo}
 
-RQ2 evaluates the importance of each proposed heuristic function. To
-answer that question, we evaluated the use of \tname{} without each of
-these functions with the goal of checking how much each of them
-contributes to the overall performance of the technique. Recall that
-the score a rule $r$ is given by the weighted average of the values
-given by each heuristic function, \ie{} the score of $r$ is obtained
-with the function $f(r)=\sum_{i}^{N} w_i*f_i(r)/N$, where $w_i$ is the
-weight of heuristic $i$, $f_i(r)$ is the score of heuristic $i$ on
-$r$, and $N$ is the number of heuristics considered---four, in our
-case. To assess the value of each heuristic function, we assigned its
-weight to zero---effectively, disabling the function---and compared
-the result with \tname\ using default weights, obtained with the
-optimization procedure described on
+RQ2 assesses the importance of each heuristic function. To that end,
+we compared \tname{}, with all functions enabled, against
+\tname\ without each one of those functions. Recall that the score a
+rule $r$ is given by the weighted average of the values given by each
+heuristic function, \ie{}, the score of $r$ is obtained with the
+function $f(r)=\sum_{i}^{N} w_i*f_i(r)/N$, where $w_i$ is the weight
+of heuristic $i$, $f_i(r)$ is the score of heuristic $i$ on $r$, and
+$N$ is the number of heuristics considered. To assess the value of
+each heuristic function, we assigned its weight to zero---effectively,
+disabling the function---and compared the result with \tname\ using
+default weights, obtained with the optimization procedure described on
 Section~\ref{sec:weight-optimization}.
 
 Table~\ref{table:weights} shows results. Column ``Name'' shows the
@@ -1819,9 +1817,9 @@ Section~\ref{sec:answer-rqone}, but suppressing one heuristic
 function. The number corresponds to the order the heuristic function
 is introduced on Section~\ref{sec:ranking}. The symbol of an up arrow
 ($\uparrow$) indicates that the performance of \tname{} on that
-configuration is worse when compared to \tname's default
-configuration. A down arrow ($\downarrow$), appearing highlighted in
-the table, indicates the contrary.
+configuration is worse when compared to ``base'' (as the ranking
+increased). A down arrow ($\downarrow$), appearing highlighted in the
+table, indicates the contrary.
 
 
 \begin{table}[t!]
@@ -1864,14 +1862,14 @@ the table, indicates the contrary.
     .idq access & 2  & 2 & 2 & 1\cellcolor{lightgray}$\downarrow$ & 15$\uparrow$ \\
     /system32/ in URI & 1  & 1 & 4$\uparrow$ & 1 & 15$\uparrow$\\
     Basebuilder LFI & 55  & 55 & 320$\uparrow$ & 112$\uparrow$ & 58$\uparrow$\\
-      Tomcat Snoop Access & 6 & 6 & 3$\cellcolor{lightgray}\downarrow$ & 6 & 2665$\uparrow$\\
+      Tomcat Snoop Access & 6 & 6 & 3$\cellcolor{lightgray}\downarrow$ & 6 & 2,665$\uparrow$\\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \begin{table*}[t!]
   \footnotesize
-  \setlength{\tabcolsep}{5pt}
+  \setlength{\tabcolsep}{3pt}
   \renewcommand{\arraystretch}{-0.01}
   \caption{\label{table:comparison}Alternative techniques.}
   \vspace{-2ex}
@@ -1934,13 +1932,13 @@ This section evaluates sensitivity of \tname{} to the amount of
 examples provided on input. Recall that \tname\ uses one example
 attack to generate the seed rule (at the Reverse Engineering step) and
 the remaining attacks to evaluate soundness of the rule (at the Rules
-Creations step). It is expected that the number and variety of attacks
+Generation step). It is expected that the number and variety of attacks
 play a role in the performance of the technique.  We answered this
 question in two parts. First, we analyzed the impact of the amount of
 positive examples in results. For that, we selected two cases with the
 highest number of examples---idqaccess and scripttag---and measured
 the position of the golden rule at the rank for an increasing number
-\begin{wrapfigure}[10]{r}{0.28\textwidth}  
+\begin{wrapfigure}[9]{r}{0.28\textwidth}  
   \vspace{-2ex}
   \centering
   \begin{subfigure}{.15\textwidth}
@@ -1957,7 +1955,7 @@ the position of the golden rule at the rank for an increasing number
   \end{subfigure}%
     \vspace{-1ex}          
   \caption{\label{fig:impact-number-attacks}Positive examples.}
-  \vspace{-1ex}
+  \vspace{-2ex}
 \end{wrapfigure}
 of examples provided to \tname. For each number of variants, we
 sampled five sets of that size to provide as input to the technique.
@@ -1970,8 +1968,8 @@ variants. Results indicate that the number of examples is important,
 the choice of examples is important, and a small number of examples
 suffices to reach the best results.
 
-\begin{wrapfigure}[11]{r}{0.28\textwidth}  
-  \vspace{-2ex}
+\begin{wrapfigure}[8]{r}{0.28\textwidth}  
+  \vspace{-2.5ex}
   \centering
   %% \begin{subfigure}{.2\textwidth}
   %%   \centering
@@ -1994,7 +1992,7 @@ suffices to reach the best results.
   \end{subfigure}%
   \vspace{-1ex}
   \caption{Negative examples.}
-  \vspace{-1ex}
+  \vspace{-2ex}
   \label{fig:impact-negative}
 \end{wrapfigure}
 
