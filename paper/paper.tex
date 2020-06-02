@@ -121,27 +121,25 @@
 \pagestyle{plain}
 \maketitle
 
+% and examples of trusted rules
+
 \begin{abstract}
 Network Intrusion Detection Systems (\nids{}) are popular tools to
-defend against network attacks. These systems monitor the network
-traffic and flag suspicious network behavior. Rule-based \nids\ do
+defend local networks against attacks. These systems monitor the
+network traffic and flag suspicious behavior. Rule-based \nids\ do
 that by checking the network traffic against a set of rules, which
 become obsolete as attackers learn new strategies to circumvent
 existing defenses. This paper proposes \tname{}, a novel approach to
-synthesize rules for \textit{rule-based} \nids. \tname\ leverages
-malicious (positive) and benign (negative) traffic 
-%\rui{positive and negative traffic are first introduced here, withuot being explaiend.} 
-and examples of trusted rules to create
-rules for new attacks. \tname{} is organized as a pipeline of three components that
+synthesize rules for rule-based \nids. \tname\ leverages malicious
+(positive) and benign (negative) traffic to create rules for new
+attacks. \tname{} is organized as a pipeline of three components to
 1)~create an over-specified seed rule, 2)~derive plausible rules from
-the seed, and 3)~rank plausible rules. Experimental results provide
-evidence that \tname\ is promising.
- \rui{the example is interesting, but this gives the 
-feeling that the work is too preliminary} 
-For example, it was
-able to synthesize the correct rule in all cases we analyzed and
-ranked the correct rule among the first ten rules of the reported
-ranking in \percTopFiveRanking\ of the cases.
+the seed, and 3)~rank plausible rules. We evaluated \tname\ against a
+set of 21 network attacks with varios
+characteristics. \tname\ performed very well, being capable of
+generating the correct rule among the top-3 and top-1 rules of the
+ranking, respectively, in \percTopThreeRankingPrefix\ and
+\percTopOneRankingPrefix\ of the cases.
 \end{abstract}
 
 %% \begin{IEEEkeywords}
@@ -1486,7 +1484,7 @@ as follows $\langle{}0.280, 0.057, 0.043, 0.490\rangle$.
   \centering
   \setlength{\tabcolsep}{4.5pt}
   \renewcommand{\arraystretch}{0.35}
-  \begin{tabular}{lcccp{11cm}}
+  \begin{tabular}{lcccp{10.9cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
     \multicolumn{1}{c}{Source} &
@@ -1499,13 +1497,13 @@ as follows $\langle{}0.280, 0.057, 0.043, 0.490\rangle$.
     SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
     \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
     UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
-      2100384 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
-      2100399 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
-      2100401 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
-      2100402 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
-      2100408 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
-      2100485 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
-      2100486 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
+      ICMP Info: Ping & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
+      Dst/Host Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
+      Dst/Net Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
+      Dst/Port Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
+      ICMP Info: Echo Reply & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
+      ICMP Info: Code 13 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
+      ICMP Info: Code 10 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
     %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
     \midrule
     %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:"POST"; http\_method; \textbf{content}:"java.lang.ProcessBuilder"; nocase; http\_client\_body; fast\_pattern; \textbf{content}:"/struts2-rest-showcase/orders/3"; http\_uri; \\    
@@ -1728,13 +1726,13 @@ human performance in analyzing the list of plausible rules.
     Ping Scan & 6 & 5 & 9 & 2 \\
     SYN Flood & 4 & 2 & 2 & 1 \\
     UDP Teardrop & 1 & 4 & 8 & 4 \\
-    2100384 & 13 & 8 & 18 & 2 \\
-    2100399 & 132 & 6 & 3 & 1 \\
-    2100401 & 12 & 6 & 25 & 1 \\
-    2100402 & 3 & 6 & 12 & 1 \\
-    2100408 & 15 & 8 & 9 & 2 \\
-    2100485 & 4 & 6 & 3 & 1 \\
-    2100486 & 195 & 6 & 2 & 1 \\
+    ICMP Info: Ping & 13 & 8 & 18 & 2 \\
+    Dst/Host Unreachable & 132 & 6 & 3 & 1 \\
+    Dst/Net Unreachable & 12 & 6 & 25 & 1 \\
+    Dst/Port Unreachable & 3 & 6 & 12 & 1 \\
+    ICMP Info: Echo Reply & 15 & 8 & 9 & 2 \\
+    ICMP Info: Code 13 & 4 & 6 & 3 & 1 \\
+    ICMP Info: Code 10 & 195 & 6 & 2 & 1 \\
     %%UDP Flood & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & 2 & 65 & - & - \\
@@ -1855,13 +1853,13 @@ table, indicates the contrary.
     Black Nurse & 2 & 7$\uparrow$ & 2 & 2 & 2 \\    
     Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
     SYN Flood & 1 & 1 & 1 & 1 & 1 \\
-    2100384 & 2 & 18$\uparrow$& 2 & 2 & 2 \\
-    2100399 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
-    2100401 & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
-    2100402 & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
-    2100408 & 2 & 9$\uparrow$ & 2 & 2 & 2 \\
-    2100485 & 1 & 2$\uparrow$ & 1 & 1 & 1 \\
-    2100486 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
+    ICMP Info: Ping & 2 & 18$\uparrow$& 2 & 2 & 2 \\
+    Dst/Host Unreachable & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
+    Dst/Net Unreachable & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
+    Dst/Port Unreachable & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
+    ICMP Info: Echo Reply & 2 & 9$\uparrow$ & 2 & 2 & 2 \\
+    ICMP Info: Code 13 & 1 & 2$\uparrow$ & 1 & 1 & 1 \\
+    ICMP Info: Code 10 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
     %%UDP Flood & - & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & - & - & - & - & - & -\\
