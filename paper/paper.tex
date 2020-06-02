@@ -121,27 +121,25 @@
 \pagestyle{plain}
 \maketitle
 
+% and examples of trusted rules
+
 \begin{abstract}
 Network Intrusion Detection Systems (\nids{}) are popular tools to
-defend against network attacks. These systems monitor the network
-traffic and flag suspicious network behavior. Rule-based \nids\ do
+defend local networks against attacks. These systems monitor the
+network traffic and flag suspicious behavior. Rule-based \nids\ do
 that by checking the network traffic against a set of rules, which
 become obsolete as attackers learn new strategies to circumvent
 existing defenses. This paper proposes \tname{}, a novel approach to
-synthesize rules for \textit{rule-based} \nids. \tname\ leverages
-malicious (positive) and benign (negative) traffic 
-%\rui{positive and negative traffic are first introduced here, withuot being explaiend.} 
-and examples of trusted rules to create
-rules for new attacks. \tname{} is organized as a pipeline of three components that
+synthesize rules for rule-based \nids. \tname\ leverages malicious
+(positive) and benign (negative) traffic to create rules for new
+attacks. \tname{} is organized as a pipeline of three components to
 1)~create an over-specified seed rule, 2)~derive plausible rules from
-the seed, and 3)~rank plausible rules. Experimental results provide
-evidence that \tname\ is promising.
- \rui{the example is interesting, but this gives the 
-feeling that the work is too preliminary} 
-For example, it was
-able to synthesize the correct rule in all cases we analyzed and
-ranked the correct rule among the first ten rules of the reported
-ranking in \percTopFiveRanking\ of the cases.
+the seed, and 3)~rank plausible rules. We evaluated \tname\ against a
+set of 21 network attacks with varios
+characteristics. \tname\ performed very well, being capable of
+generating the correct rule among the top-3 and top-1 rules of the
+ranking, respectively, in \percTopThreeRankingPrefix\ and
+\percTopOneRankingPrefix\ of the cases.
 \end{abstract}
 
 %% \begin{IEEEkeywords}
