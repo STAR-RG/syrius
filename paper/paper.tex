@@ -1682,10 +1682,10 @@ discarded.
 \subsection{Answering RQ1: \textRQone}
 \label{sec:answer-rqone}
 
-RQ1 addresses the performance of \tname. The metric we use is the
-position of the golden rule at the ranked list of plausible rules
-reported by \tname\ (see Figure~\ref{fig:overview}). This metric is a
-proxy of human performance in analyzing the list of plausible rules.
+RQ1 assesses \tname's performance. The metric we use is the position
+of the golden rule at the ranked list of plausible rules reported by
+\tname\ (see Figure~\ref{fig:overview}). This metric is a proxy of
+human performance in analyzing the list of plausible rules.
 
 %\renewcommand{\arraystretch}{0.7}
 %\setlength{\tabcolsep}{2pt}
@@ -1742,17 +1742,15 @@ proxy of human performance in analyzing the list of plausible rules.
 
 Table~\ref{table:results} shows results. Column ``Name'' shows the
 name of the attack, column ``\#~Vars.'' shows the number of variants
-of the attack, column ``\#~Option Cand. (step 1)'' shows the number of
+of the attack, column ``\#~Option Cand. (step~1)'' shows the number of
 option candidates reported by \tname\ at step 1, column ``\#~Plausible
-Rules (step 2)'' shows the number of plausible rules reported by
-\tname\ at step 2, and column ``Rank (step 3)'' shows the position of the
-golden rule in the ranked list reported at step 3.
-It is important to indicate that column ``\#~Vars.'' shows the input of
-\tname\ that varies across different attacks. Although \tname\ also
-depends on the data sets of benign traffic and existing \suri\ rules,
-these inputs are constant across different executions of the tool. The
-rest of the columns show the progress of the tool at various stages
-and provide an indication of complexity of the synthesis problem.
+Rules (step~2)'' shows the number of rules reported by \tname\ at step
+2, and column ``Rank (step~3)'' shows the position of the golden rule
+in the reported ranking.  Column ``\#~Vars.''  shows the number of
+variants of a given attack. The other data that \tname\ depends upon
+are not mentioned as they are constant. The rest of the columns show
+the progress of the tool at various stages and provide an indication
+of complexity of the synthesis problem.
 
 Observe that the number of option candidates is considerably higher
 for attacks captured with content options compared to attacks not
@@ -1766,8 +1764,10 @@ attacks compared to content attacks.
 
 Overall, results show that \tname\ performed very well in most of the
 cases. It reported the ground truth rule in \emph{all} cases and
-reported that rule within the top ten rules of the ranking in
-\percTopFiveRanking\ of the cases. 
+reported that rule within the top-1, top-3, top-5, and top-10 rules of
+the ranking, respectively, in \percTopOneRanking\,
+\percTopThreeRanking, \percTopFiveRanking, and \percTopTenRanking\ of
+the cases.
 
 %% It is important to note that the
 %% number of options in the ground truth (Table~\ref{table:attacks},
@@ -1786,7 +1786,7 @@ reported that rule within the top ten rules of the ranking in
 
 \emph{ \textbf{Summary of results:}~\tname\ successfully synthesizes
   the golden rules in all cases and that rule is ranked among the top
-  ten rules in \percTopFiveRanking\ of the cases.  }
+  three rules of the ranking in \percTopThreeRanking\ of the cases.  }
 
 
 \subsection{Answering RQ2: \textRQtwo}
