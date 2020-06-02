@@ -1646,6 +1646,7 @@ Active Reconnaissance (AREC)~\cite{active-reconnaissance}, Privilege
 escalation (PESC)~\cite{privilege-escalation}, Remote Code Execution
 (RCE)~\cite{remote-code-execution}, Local File Inclusion
 (LFI)~\cite{local-file-inclusion} and ICMP Traffic Alerts \cite{icmp-types}.
+
 \noindent\textbf{Malicious traffic.}~Recall that \tname\ takes
 pcap files on input. As explained on Section~\ref{sec:minimization},
 these files abstract network messages~\cite{pcap} and can be used to
@@ -1673,6 +1674,7 @@ obtain pcap files using other security testing tools. For example, we
 used NMAP~\cite{netmap} to reproduce the Ping Scan attack (see
 Section~\ref{sec:active-recon}) and hping3~\cite{hping3} to reproduce
 the SYN Flood attack (see Section~\ref{sec:dos}).
+
 \noindent\textbf{Benign traffic.}~Public data sets of benign traffic
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
@@ -1681,6 +1683,7 @@ project. It includes real network traffic of a private network. We
 also used data sets from the Stratosphere IPS
 Project~\cite{stratosphere-normal} including, for example, the regular
 traffic of a university network.
+
 \noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s
 performance we compared the rules it generates with \emph{trusted
   rules}. We used the ``Emerging Threats Open
@@ -1827,15 +1830,15 @@ disabling the function---and compared the result with \tname\ using
 default weights, obtained with the optimization procedure described on
 Section~\ref{sec:weight-optimization}.
 
-Table~\ref{table:weights} shows the results, where ``Name'' is the
+The results are in Table~\ref{table:weights}, where ``Name'' is the
 name of the attack and ``base'' is the result of
 \tname\ with all heuristic functions enabled, as in ``Rank
 (step 3)'' in Table~\ref{table:results}. The remaining columns are the
 results when suppressing one heuristic
-function. The number corresponds to the order the heuristic function
-is introduced on Section~\ref{sec:ranking}. The symbol of an up arrow
-($\uparrow$) indicates that the performance of \tname{} on that
-configuration is worse when compared to ``base''. A down arrow ($\downarrow$), 
+function. The number corresponds to the order of hte heuristic function
+as introduced on Section~\ref{sec:ranking}. The up arrow
+($\uparrow$) indicates that the performance is worse when compared to ``base'',
+whereas, a down arrow ($\downarrow$), 
 highlighted in the table, indicates the contrary.
 
 
@@ -2096,6 +2099,7 @@ easier to access.
 
 
 %\subsubsection{Lack of comparison with other tools}
+
 \noindent\textbf{Lack of comparison with other tools}
 Table~\ref{table:comparison} summarizes the characteristics of
 alternative techniques and provides details about the evaluation used
@@ -2110,18 +2114,20 @@ traffic and does not capture any negative traffic. We used a stronger
 criteria instead---the position of the correct rule in the ranking. It
 is possible that other rules, higher in the ranking, are useful, but
 only domain experts can identify that.
+
 \noindent\textbf{Running times.}~We ran all our tests using an
 Intel(R) Xeon(R) CPU E3-1240 v6 and 8GB RAM. For attacks with only
 categorical and numerical options, the average running time was 6
-seconds per attack. For attacks with the content option, the average
-running time was 1,445 seconds (=24.1 minutes).  \textbf{Threats to
-  Validity.}~Considering external validity. Our results cannot be
-generalized beyond the subjects we selected. To mitigate that threat
-we selected a variety of attacks with different
-characteristics. Unfortunately, we could not access tools for related
-techniques, but there is strong evidence that \tname\ performs very
-well and is the only technique to support content options, which are
-very important in this domain. Considering internal validity, in
+seconds per attack. For attacks with the content option, it was 
+1,445 seconds (=24.1 minutes) on average.  
+
+\noindent\textbf{Threats to Validity.}~Considering external validity, 
+our results cannot be generalized beyond the subjects we selected. To 
+mitigate that threat we selected a variety of attacks with different
+characteristics. Unfortunately, related techniques are unavailable, 
+but there is strong evidence that \tname\ performs very
+well and is the only technique to support content options, an important 
+aspect this domain. Considering internal validity, in
 principle, the implementation of \tname\ could contain errors. We
 mitigated that threat by carefully inspecting code and
 results. Considering construct validity, the choice of ranking to
@@ -2297,6 +2303,8 @@ results in terms of precision, but it is limited to that type of
 attack. As it won't analyse individual details of each packet, it
 wouldn't be able to identify and generate rules for attacks that
 require detailed options, such as the HTTP PESC, RCE and LFI.
+
+\noindent
 \textbf{Rule repair.}~Hallahan~\etal{}~\cite{8102263} propose to
 repair firewall rules based on false positive detected by the
 rules. Although firewall and \nids\ rules have differences and the
@@ -2308,6 +2316,8 @@ rules with the goal of capturing variations of existing attacks. They
 used the community edition of snort rules from 2012 for the
 modifications and tested them with pcap file from the MACCDC 2012
 dataset. Their technique is complementary to \tname{}.
+
+\noindent
 \textbf{Anomaly-based intrusion detection.}
 Cordy~\etal{}\cite{cordy-etal-issta19} used genetic search to not only
 to generate attacks capable of penetrating the tested anomaly-based
