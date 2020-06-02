@@ -645,7 +645,7 @@ ruleset~\cite{emerging-threats-open} containing
 and \CodeIn{flow} are the most common. The options \CodeIn{dsize} and
 \CodeIn{itype}, used in the golden rule, appear as the 6th and 7th
 most popular, respectively. However, when restricted to the set of
-five options obtained at the first step, \CodeIn{dsize} and
+five options obtained in the first step, \CodeIn{dsize} and
 \CodeIn{itype} are the most popular. At the end of this step, \tname{}
 ranks the golden rule second in the list including
 \pingscanplausible{} rules. It is worth noting that
@@ -769,7 +769,7 @@ Section~\ref{sec:active-recon} shows a concrete example where \tname{}
 uses this strategy. Although we built the option-field mapping
 manually, from the \suri\ documentation, this is a one-time activity.
 Unfortunately, for http attacks, the relevant data for the options is
-likely at the message payload; not the fields. By analyzing our data
+likely in the message payload; not the fields. By analyzing our data
 set of rules, we found that this occurs frequently in http attacks,
 which are prevalent. For example, \percHttp\ of the \numrulessuri{}
 rules from the ruleset we analyzed~\cite{emerging-threats-open}
@@ -905,7 +905,7 @@ these options also captures the attack.
 \tname{} generates plausible rules while minimizing the seed
 rule. Algorithm~\ref{algo1} shows the pseudocode of that
 procedure. The algorithm takes as input an over-constrained rule $sr$,
-denoting the seed rule produced at the Reverse Engineering step, and
+denoting the seed rule produced in the Reverse Engineering step, and
 pcap files~\cite{pcap} to reconstruct the benign traffic
 ($\mathit{bTr}$) and the malicious traffic ($\mathit{mTr}$). The
 algorithm produces on output a set of plausible rules. Each of these
@@ -1956,7 +1956,7 @@ play a role in the performance of the technique.  We answered this
 question in two parts. First, we analyzed the impact of the amount of
 positive examples in results. For that, we selected two cases with the
 highest number of examples---idqaccess and scripttag---and measured
-the position of the golden rule at the rank for an increasing number
+the position of the golden rule in the ranking for an increasing number
 \begin{wrapfigure}[9]{r}{0.28\textwidth}  
   \vspace{-2ex}
   \centering
