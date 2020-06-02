@@ -1661,20 +1661,20 @@ the SYN Flood attack (see Section~\ref{sec:dos}).
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
-project. It includes real network traffic of a busy private network
-access point to the Internet. We also used data sets from the
-Stratosphere IPS Project~\cite{stratosphere-normal} including, for
-example, the regular traffic of a university network.
-\noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s performance we
-compared the rules it generates with \emph{trusted rules}. We used
-the ``Emerging Threats Open Ruleset''~\cite{emerging-threats-open} for
-that. After finding a matching pair of attack and corresponding rule
-using the procedure described in
-Section~\ref{subsec:malicious-traffic}, we reproduced the attack to
-confirm the rule captures the attack in isolation (and no noise was
-introduced in the process). Column ``Ground Truth'' from
-Table~\ref{table:attacks} only shows the essential
-options. Documentation options (\eg{}, ``msg'') are discarded.
+project. It includes real network traffic of a private network. We
+also used data sets from the Stratosphere IPS
+Project~\cite{stratosphere-normal} including, for example, the regular
+traffic of a university network.
+\noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s
+performance we compared the rules it generates with \emph{trusted
+  rules}. We used the ``Emerging Threats Open
+Ruleset''~\cite{emerging-threats-open} for that. After finding a
+matching pair of attack and corresponding rule using the procedure
+described in Section~\ref{subsec:malicious-traffic}, we reproduced the
+attack to confirm the rule captures the attack in isolation. Column
+``Ground Truth'' from Table~\ref{table:attacks} only shows the
+essential options. Documentation options (\eg{}, ``msg'') are
+discarded.
 
 %% In addition to the Bigflows.pcap data
 %% set, we also used data sets\Mar{more than one?}  made available by
