@@ -1740,26 +1740,27 @@ human performance in analyzing the list of plausible rules.
   \end{tabular}
 \end{table}
 
+%% The other data that \tname\ depends upon are
+%% not mentioned as they are constant. The rest of the columns show the
+%% progress of the tool at various stages and provide an indication of
+%% complexity of the synthesis problem.
+
+
 Table~\ref{table:results} shows results. Column ``Name'' shows the
 name of the attack, column ``\#~Vars.'' shows the number of variants
 of the attack, column ``\#~Option Cand. (step~1)'' shows the number of
 option candidates reported by \tname\ at step 1, column ``\#~Plausible
 Rules (step~2)'' shows the number of rules reported by \tname\ at step
 2, and column ``Rank (step~3)'' shows the position of the golden rule
-in the reported ranking.  Column ``\#~Vars.''  shows the number of
-variants of a given attack. The other data that \tname\ depends upon
-are not mentioned as they are constant. The rest of the columns show
-the progress of the tool at various stages and provide an indication
-of complexity of the synthesis problem.
-
-Observe that the number of option candidates is considerably higher
-for attacks captured with content options compared to attacks not
-involving content options. This happens because for content attacks
-the number of option candidates depend on the unbounded size of the
-http payload whereas for attacks of different protocols the number of
-option candidates depend on the layout of the messages. Also observe
-that the number of plausible rules is much smaller for non-content
-attacks compared to content attacks.
+in the reported ranking. Observe that the number of option candidates
+is considerably higher for attacks captured with content options
+compared to attacks not involving content options. This happens
+because for content attacks the number of option candidates depend on
+the unbounded size of the http payload whereas for attacks of
+different protocols the number of option candidates depend on the
+layout of the messages. Also observe that the number of plausible
+rules is much smaller for non-content attacks compared to content
+attacks.
 
 
 Overall, results show that \tname\ performed very well in most of the
@@ -1768,6 +1769,8 @@ reported that rule within the top-1, top-3, top-5, and top-10 rules of
 the ranking, respectively, in \percTopOneRanking\,
 \percTopThreeRanking, \percTopFiveRanking, and \percTopTenRanking\ of
 the cases.
+
+%Results suggest that \tname\ either performs extremely well (in most of the cases) or poorly.
 
 %% It is important to note that the
 %% number of options in the ground truth (Table~\ref{table:attacks},
@@ -2263,7 +2266,7 @@ around menoids---to isolate malicious from benign
 traffic. Subsequently, they optimize the formed clusters using genetic
 algorithms and hill-climbing search. Ou approach differs from theirs
 in the method used, results, and support for content
-options. Kao~\etal~\cite{Kao2015AutomaticNR} proposed ARGS, a system
+options. Kao~\etal~\cite{kao2015AutomaticNR} proposed ARGS, a system
 to synthesize http rules that take malicious traffic as input. ARGS
 looks for a common pattern across the different inputs to define
 rules. It does not take existing rules as input or benign
