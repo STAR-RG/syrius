@@ -542,8 +542,10 @@ and checks which ones respond to these requests. This method enables
 an attacker to discover which machines are active in the network.
 
 %\vspace{-1ex}
+
 \begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={dsize,itype}]{pingscan.suricata}
+  % part removed...rev:4; metadata:created_at 2010_09_23, updated_at 2010_09_23;  
+  \lstinputlisting[language=C,numbers=none,keywords={icmp,dsize,itype}]{pingscan.suricata}
   \vspace{-1ex}  
   \caption{Suricata rule for Ping Scan attack.}
   \vspace{-2ex}  
@@ -555,7 +557,7 @@ Ping Scan, as documented on NMAP~\cite{netmap}, a network security
 auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
 bytes in the payload and the option \CodeIn{itype: 8} indicates that
-the packet to be captured are ICMP Echo requests.
+the packets to be captured are ICMP Echo requests.
 
 %---in the form of network messages---
 % one or more examples of an attack
@@ -577,10 +579,10 @@ traffic. Considering the Ping Scan attack, \tname{} replays the
 attack---with NMAP, in this case---and monitors the traffic.  It
 infers the header by checking the protocol of the input messages. In
 this case, \tname{} sets the header to \CodeIn{icmp any any -> any
-  any}. It uses the most general flow description instructing the
-\nids\ to analyze the icmp traffic flowing from/to any address and
+  any}. It uses the most general flow description to command the
+\nids\ to monitor the icmp traffic flowing from/to any address and
 port.  The rationale is that the choice of these parameters are
-domain-specific and subject to change by the sys admins. Likewise,
+domain-specific and subject to change by sys admins. Likewise,
 \tname{} leaves the action of the corresponding rule constant, as
 \CodeIn{alert}. Furthermore, recall from
 Section~\ref{sec:rules-and-packets} that some options can be inferred
@@ -635,8 +637,8 @@ options associated with rules from a public
 ruleset~\cite{emerging-threats-open} containing
 \numrulessuri\ rules. Note that rules with options \CodeIn{content}
 and \CodeIn{flow} are the most common. The options \CodeIn{dsize} and
-\CodeIn{itype}, the ones associated with the golden rule, appear as
-the 6th and 7th most popular, respectively. Restricted to the set of
+\CodeIn{itype}, used in the golden rule, appear as the 6th and 7th
+most popular, respectively. However, when restricted to the set of
 five options obtained at the first step, \CodeIn{dsize} and
 \CodeIn{itype} are the most popular. At the end of this step, \tname{}
 ranks the golden rule second in the list including
