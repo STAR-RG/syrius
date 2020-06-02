@@ -1522,15 +1522,16 @@ This section reports on the evaluation of \tname{}.
 \end{itemize}
 
 \noindent
-\textbf{Rationale.}~The golden rule is a trusted human-written
-\nids\ rule that we obtained from credible sources~\cite{emerging-threats-open}. 
-\tname\ generates several rules that satisfy the invariant to only capture the malicious
-traffic, but the amount of data we used to evaluate that property,
-albeit large, is limited. Assessing the quality of each rule
+\textbf{Rationale.}~Assessing the quality of each rule
 \tname\ produces (\ie{}, fitness to the attack) requires domain
-knowledge and much effort. The position of the golden rule at the
-ranking produced by \tname\ is a proxy measure to the effort of a
-system administrator in finding the rule that fits the purpose.
+knowledge and effort. The ranking position of the golden rule is a
+proxy to measure the effort of a system administrator in finding the
+rule that fits the purpose.  The golden rule is a trusted
+human-written \nids\ rule that we obtained from credible
+sources~\cite{emerging-threats-open}.
+
+%\tname\ generates several rules that satisfy the invariant to only
+%capture the malicious traffic, but the amount of data we used to evaluate that property, albeit large, is limited.
 
 
 \newcommand{\textRQtwo}{How important are the heuristic functions
@@ -1543,9 +1544,9 @@ system administrator in finding the rule that fits the purpose.
 
 \noindent
 \textbf{Rationale.}~We proposed a variety of heuristic functions to
-rank the plausible rules that \tname\ created during minimization (as
-per step 2 in the workflow). Recall that these functions are based on
-the data from a public ruleset~\cite{emerging-threats-open} (see
+rank the plausible rules that \tname\ created during
+minimization. Recall that these functions are based on the data from a
+public ruleset~\cite{emerging-threats-open} (see
 Section~\ref{sec:ranking}). It is therefore important to understand
 the extent to which each function contributes to the overall
 performance of the technique.
@@ -1564,12 +1565,11 @@ technique is to the selection of these inputs.
 \noindent
 \vspace{1ex}
 
-The following sections describe the objects we used to evaluate the
-technique (Section~\ref{sec:dataset-benign}), answer the posed
-research questions (sections~\ref{sec:answer-rqone},
-and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), and
-discuss threats to the validity of the
-experiments~(Section~\ref{sec:threats}).
+The following sections describe the objects we used in the evaluation
+(Section~\ref{sec:dataset-benign}), answer the research questions
+(sections~\ref{sec:answer-rqone}, C, D), and discuss
+results~(Section~\ref{sec:threats}).
+%and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), 
 
 
 %%\begin{table}[h!]
@@ -1661,20 +1661,20 @@ the SYN Flood attack (see Section~\ref{sec:dos}).
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The Bigflows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
-project. It includes real network traffic of a busy private network
-access point to the Internet. We also used data sets from the
-Stratosphere IPS Project~\cite{stratosphere-normal} including, for
-example, the regular traffic of a university network.
-\noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s performance we
-compared the rules it generates with \emph{trusted rules}. We used
-the ``Emerging Threats Open Ruleset''~\cite{emerging-threats-open} for
-that. After finding a matching pair of attack and corresponding rule
-using the procedure described in
-Section~\ref{subsec:malicious-traffic}, we reproduced the attack to
-confirm the rule captures the attack in isolation (and no noise was
-introduced in the process). Column ``Ground Truth'' from
-Table~\ref{table:attacks} only shows the essential
-options. Documentation options (\eg{}, ``msg'') are discarded.
+project. It includes real network traffic of a private network. We
+also used data sets from the Stratosphere IPS
+Project~\cite{stratosphere-normal} including, for example, the regular
+traffic of a university network.
+\noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s
+performance we compared the rules it generates with \emph{trusted
+  rules}. We used the ``Emerging Threats Open
+Ruleset''~\cite{emerging-threats-open} for that. After finding a
+matching pair of attack and corresponding rule using the procedure
+described in Section~\ref{subsec:malicious-traffic}, we reproduced the
+attack to confirm the rule captures the attack in isolation. Column
+``Ground Truth'' from Table~\ref{table:attacks} only shows the
+essential options. Documentation options (\eg{}, ``msg'') are
+discarded.
 
 %% In addition to the Bigflows.pcap data
 %% set, we also used data sets\Mar{more than one?}  made available by
@@ -1940,12 +1940,7 @@ question in two parts. First, we analyzed the impact of the amount of
 positive examples in results. For that, we selected two cases with the
 highest number of examples---idqaccess and scripttag---and measured
 the position of the golden rule at the rank for an increasing number
-of examples provided to \tname. For each number of variants, we
-sampled five sets of that size to provide as input to the technique.
-
-% (see column ``\#~Vars'' on Table~\ref{table:results})
-
-\begin{wrapfigure}[11]{r}{0.28\textwidth}  
+\begin{wrapfigure}[10]{r}{0.28\textwidth}  
   \vspace{-2ex}
   \centering
   \begin{subfigure}{.15\textwidth}
@@ -1957,13 +1952,15 @@ sampled five sets of that size to provide as input to the technique.
   \begin{subfigure}{.15\textwidth}
     \centering
     \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
-    \vspace{-3ex}        
+    \vspace{-2ex}        
     \caption{scripttag}
   \end{subfigure}%
-  \caption{\label{fig:impact-number-attacks}Impact of number of positive examples.}
-  \vspace{-2ex}
+    \vspace{-1ex}          
+  \caption{\label{fig:impact-number-attacks}Positive examples.}
+  \vspace{-1ex}
 \end{wrapfigure}
-
+of examples provided to \tname. For each number of variants, we
+sampled five sets of that size to provide as input to the technique.
 Figure~\ref{fig:impact-number-attacks} shows results for each
 attack we selected. The y-axis of each plot denotes the rank of the
 golden rule and x-axis denotes the number of attack examples used to
@@ -1973,33 +1970,32 @@ variants. Results indicate that the number of examples is important,
 the choice of examples is important, and a small number of examples
 suffices to reach the best results.
 
-\begin{figure}[h!]
+\begin{wrapfigure}[11]{r}{0.28\textwidth}  
   \vspace{-1.5ex}
   \centering
-  \begin{subfigure}{.2\textwidth}
+  %% \begin{subfigure}{.2\textwidth}
+  %%   \centering
+  %%   \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/coldfusion/coldfusion.pdf}
+  %%   \vspace{-1ex}        
+  %%   \caption{coldfusion}
+  %% \end{subfigure}%
+  %% \hspace{-8ex}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.35,trim=10 0 130 0,clip]{R/coldfusion/coldfusion.pdf}
-    \vspace{-1ex}        
-    \caption{coldfusion}
-  \end{subfigure}%
-  \hspace{-8ex}
-  \begin{subfigure}{.2\textwidth}
-    \centering
-    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/inc/inc.pdf}
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/inc/inc.pdf}
     \vspace{-1ex}    
     \caption{inc}    
   \end{subfigure}%
-  \hspace{-8ex}
-  \begin{subfigure}{.2\textwidth}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.35,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
     \vspace{-1ex}    
     \caption{jsp}    
   \end{subfigure}%
-  \caption{Impact of number of negative examples.}
+  \caption{Negative examples.}
   \label{fig:impact-negative}
   \vspace{-2ex}
-\end{figure}
+\end{wrapfigure}
 
 We conducted a similar experiment with negative examples on three
 different attacks. Figure~\ref{fig:impact-negative} shows
@@ -2066,24 +2062,38 @@ easier to access.
 \label{sec:dos}
 \label{sec:threats}
 
+%% Third, we are the only
+%% technique to support content options, which are prevalent and
+%% challenging to handle. A side comparison would be unfair if we
+%% consider rules with those options.\Gui{I think that it's not good to
+%%   say we are the only techinique to support content options. The other
+%%   papers do not explain well how they support it, if they support for
+%%   http (which is the most relevant one) or even if they support it at
+%%   all. \cite{Kao2015AutomaticNR} manages contents in a similar way to
+%%   ours, but it requires a manual step and their provided email doesn't
+%%   even exist anymore. \cite{vollmer-etal-cics2011} and
+%%   \cite{guruprasad} do not support http and don't explain well how
+%%   they deal with ICMP contents. \cite{fallahi} technique deals with
+%%   flows and not individual packets, so it doesn't even mention
+%%   supporting contents.}
+
+
+
 %\subsubsection{Lack of comparison with other tools}
 \noindent\textbf{Lack of comparison with other tools}
 Table~\ref{table:comparison} summarizes the characteristics of
 alternative techniques and provides details about the evaluation used
 in corresponding papers. Unfortunately, side comparison was not
-possible for three key reasons. First, we did not have access to the
+possible for two central reasons. First, we did not have access to the
 tools. We tried, unsuccssefully, making contact with authors to obtain
 the tools. Second, the tools output different objects. For that
-reason, a comparison based on published results did not make sense. It
+reason, a comparison based on published results was not realistic. It
 is important to recall that we did not report precision and recall as
 it is 100\% always. \tname captures, by construction, all positive
 traffic and does not capture any negative traffic. We used a stronger
 criteria instead---the position of the correct rule in the ranking. It
 is possible that other rules, higher in the ranking, are useful, but
-only domain experts can identify that. Third, we are the only
-technique to support content options, which are prevalent and
-challenging to handle. A side comparison would be unfair if we
-consider rules with those options.\Gui{I think that it's not good to say we are the only techinique to support content options. The other papers do not explain well how they support it, if they support for http (which is the most relevant one) or even if they support it at all. \cite{Kao2015AutomaticNR} manages contents in a similar way to ours, but it requires a manual step and their provided email doesn't even exist anymore. \cite{vollmer-etal-cics2011} and \cite{guruprasad} do not support http and don't explain well how they deal with ICMP contents. \cite{fallahi} technique deals with flows and not individual packets, so it doesn't even mention supporting contents.}
+only domain experts can identify that.
 \noindent\textbf{Running times.}~We ran all our tests using an
 Intel(R) Xeon(R) CPU E3-1240 v6 and 8GB RAM. For attacks with only
 categorical and numerical options, the average running time was 6
