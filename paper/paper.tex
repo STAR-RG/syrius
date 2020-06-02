@@ -272,9 +272,8 @@ We evaluated \tname\ against \totalAttacks attacks of various kinds, such as
 Active Reconnaissance (AREC)~\cite{active-reconnaissance} and Privilege
 escalation (PESC)~\cite{privilege-escalation}. %\Fix{...}\rui{add few examples}. 
 The observed results are encouraging. For 
-example, \tname\ ranked the correct rule among the top ten rules in \Fix{fix values}
-\percTopFiveRanking\ of the cases \Fix{and ranked the correct rule among 
-the top ten rules in \topTenAttacks of the \totalAttacks cases.} \rui{to discuss, I find 
+example, \tname\ ranked the correct rule among the top ten rules in 
+\percTopFiveRanking\ of the cases. \rui{to discuss, I find 
 this a bit weak.}\Mar{agree. let us try to add more examples and data.}
 
 %% \Fix{
@@ -916,7 +915,7 @@ $\mathcal R'$. Line~\ref{init-rprime} initializes the population of
 individuals for the next generation. The inner loop
 (lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. The algorithm mutates each of these
-rules $N$ times \rui{is N an input? How does one determine it in practice?}, discarding one rule option each
+rules $N$ times \rui{is N an input? How does one determine it in practice?} \Gui{Yes. Higher N values increases the chances of creating every possible rule for the attack (decreasing the negative effects of the non-determinism), at the same time that increases the computational cost. So the value can be increased in case the desired rule is not being created, or it can be reduced if the code is creating too many rules. In our code, we chose manually N=2, as it was already enough for showing the desired results.}, discarding one rule option each
 time. Line~\ref{copy} assigns a copy of the bitvector encoding
 $\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand(lo, hi)}$ randomly
