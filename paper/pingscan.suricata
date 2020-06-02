@@ -1,3 +1,13 @@
+<<<<<<< HEAD
 alert icmp any any -> any any (msg:"GPL SCAN PING NMAP";
 dsize:0; itype:8; reference:arachnids,162;
 classtype:attempted-recon; sid:2100469; ...)
+=======
+<<<<<<< HEAD
+alert icmp any any -> any any (msg:"..."; dsize:0; itype:8; ...)
+=======
+alert icmp any any -> any any (msg:"GPL SCAN PING NMAP";
+dsize:0; itype:8; reference:arachnids,162;
+classtype:attempted-recon; sid:2100469; ...)
+>>>>>>> pass on section 2 (examples)
+>>>>>>> e779df6
