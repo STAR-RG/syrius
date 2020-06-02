@@ -2240,14 +2240,17 @@ places the golden rule close to the top in most cases.
 
 %\Mar{mention something on ethical hacking.. ethical-hacking}
 
-This section elaborates on the most similar work.
+This section elaborates on the most similar work to ours.
 
-%We discuss in the following techniques similar in goal to ours. Unfortunately
+%We discuss in the following techniques similar in goal to
+%ours. Unfortunately
+
+%% As detailed before,
+%% we could not access the tools implementing the techniques for
+%% comparison. Nevertheless, we found that t
 
 \noindent
-\textbf{Alternative methods for rule synthesis.} As detailed before,
-we could not access the tools implementing the techniques for
-comparison. Nevertheless, we found that there are important
+\textbf{Alternative methods for rule synthesis.} There are important
 differences between our work and prior work. Vollmer
 \etal{}~\cite{vollmer-etal-cics2011} proposed the use of search to
 derive rules for Snort, which are very similar to \suri's.  Their
@@ -2269,23 +2272,21 @@ payloads). The icmp rules they generate only refer to message fields.
     apenas field options}. } As for 2, our solution additionally ranks
 plausible options, which contain \emph{no} false positives or
 negatives with respect to the benign and mallicious traffic
-considered. Guruprasad \etal{}\cite{guruprasad} also proposes an
-evolutionary framework, creating their own ICMP dataset as Vollmer,
-but also using DARPA 1999 \cite{darpa1999} and ISCX 2012 \cite{iscx}
-datasets for non-ICMP attacks. Although Guruprasad supports more
-protocols than Vollmer, our approach still supports a larger set of
-protocols and the ability to ranks rules. Muthuregunathan
-\etal{}~\cite{muthuregunathan-etal2009} propose a clustering method to
-create rules. They characterize candidate solutions as a set of field
-values and use a clustering algorithm---hybrid k-means partitioned
-around menoids---to isolate malicious from benign
-traffic. Subsequently, they optimize the formed clusters using genetic
-algorithms and hill-climbing search. Ou approach differs from theirs
-in the method used, results, and support for content
-options. Kao~\etal~\cite{Kao2015AutomaticNR} proposed ARGS, a system
-to synthesize http rules that take malicious traffic as input. ARGS
-looks for a common pattern across the different inputs to define
-rules. It does not take existing rules as input or benign
+considered. Guruprasad~\etal{}~\cite{guruprasad} also used an
+evolutionary approach to solve the problem. Although the solution of
+Guruprasad~\etal{} supports more protocols than Vollmer~\etal{}', our
+approach still supports a larger set of protocols and the ability to
+ranks rules. Muthuregunathan~\etal{}~\cite{muthuregunathan-etal2009}
+propose a clustering method to create rules. They characterize
+candidate solutions as a set of field values and use a clustering
+algorithm---hybrid k-means partitioned around menoids---to isolate
+malicious from benign traffic. Subsequently, they optimize the formed
+clusters using a genetic algorithm and hill-climbing search. Ou
+approach differs from theirs in the method used, results, and support
+for content options. Kao~\etal~\cite{Kao2015AutomaticNR} proposed
+ARGS, a system to synthesize http rules that take malicious traffic as
+input. ARGS looks for a common pattern across the different inputs to
+define rules. It does not take existing rules as input or benign
 traffic. Consequently, false positive can be produced and need to be
 handled manually by users. Our approach, in contrast, does not
 generate false positives w.r.t. the input traffic. Fallahi
