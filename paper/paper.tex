@@ -1456,7 +1456,10 @@ weight values, we needed to run \tname{} on the sample of attacks for
 $\langle{}1,0.25,0.25,1\rangle$ was the best choice we found. Although
 results showed that this strategy results in good performance, we
 remain to evaluate other optimization strategies to find better
-weights.
+weights. \Gui{We used Differential Evolution algorithm from SciPy to find the best weights for our set of attacks. The optmization for our weights consists of minimizing the function that returns the sum of every attack's golden rule ranking in our set given a combination of weights. 
+\indent
+$\sum_{i=1}^{N}\mathit{R_i}$ ($\mathit{R_i}$, where $\mathit{R}$ is the ranking of a golden rule and $\mathit{N}$ is the number of attacks)
+The algorithm also receives as input the range which the weights can change (between 0 and 1) and the max number of generations, which we set to 10 (setting higher values could provide better results, but also would take more time). At the end, the optimization returned the weights [0.28058353, 0.05713404, 0.043285, 0.49022223]}
 
 %% , such as evolutionary alternatives as
 %% AVM~\cite{10.1109/32.57624}.
