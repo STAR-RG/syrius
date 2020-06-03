@@ -218,7 +218,7 @@ exploit systems through the
 network. Figure~\ref{fig:distribution-rules-per-month} shows the
 number of rules added per month in the year of 2019 to the ``Emerging
 Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
-data set of \suri\ rules. A closer observation on the changelogs of
+data set of Snort and \suri\ rules. A closer observation on the changelogs of
 this ruleset~\cite{emerging-threats-changelogs} shows that new rules
 are often created.  Rulesets need to be continuously revised as the
 community finds and advertises vulnerabilities, which eventually can
@@ -590,8 +590,7 @@ proceeds as follows to synthesize rule options.
 
 First, it analyzes the malicious traffic to extract rule's action,
 header, and \emph{initial} options expressed in the
-traffic. Considering the Ping Scan attack, \tname{} replays the
-attack---with NMAP, in this case---and monitors the traffic.  It
+traffic. Considering the Ping Scan attack, \tname{} 
 infers the header by checking the protocol of the input messages. In
 this case, \tname{} sets the header to \CodeIn{icmp any any -> any
   any}. It uses the most general flow description to command the
@@ -624,8 +623,8 @@ Figure~\ref{fig:pingscan-example} shows---the others are not.
 
 Second, \tname{} uses the benign traffic to mitigate the over-fitting
 problem. In this step, \tname{} searches for alternative rules that
-preserve the invariant to capture the positive (/malicious) traffic
-but not capture the negative benign traffic. It uses the rule obtained
+preserve the invariant to capture the positive (malicious) traffic
+but not capture the negative (benign) traffic. It uses the rule obtained
 in the previous step as seed to bootstrap the search for alternative
 plausible rules, \ie{}, rules that satisfy the aforementioned
 invariant. The search is designed to generate rules containing subsets
@@ -799,7 +798,7 @@ captures traffic containing the string \CodeIn{"/HtmlAdaptor"} in the
 payload.  Figure~\ref{fig:distribution-contents} shows the
 distribution of number of content options per rule for the data set
 mentioned above. We limited the number of content options per rule to
-10 in the histogram for space. \MyComment{Rules without
+8 in the histogram for space. \MyComment{Rules without
   \CodeIn{content} options are an exception and half of the rules
   contain at least two \CodeIn{content} options.}  To sum up, handling
 content options for http is very important.
@@ -934,9 +933,9 @@ individuals for the next generation. The inner loop
 (lines~\ref{start-foreach}--\ref{end-foreach}) iterates through each
 candidate rule in $\mathcal R$. The algorithm mutates each of these
 rules $N$ times, discarding one rule option each
-time. Higher (resp., lower) values of $N$ produces more (resp.,
+time. Higher (respectively, lower) values of $N$ produces more (respectively,
 less) rules. We found empirically that a value of 2 was sufficient to
-generate rules in all cases. Line~\ref{copy} assigns a copy of the bitvector encoding
+generate the golden rule in all cases. Line~\ref{copy} assigns a copy of the bitvector encoding
 $\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand(lo, hi)}$ randomly
 chooses one integer value in the range $[lo, hi]$ defined by its
@@ -1013,7 +1012,7 @@ by $\mathit{mTr}$. It is worth noting that Suricata can process
 \emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
 network messages directly. Instead of sending traffic to a machine
 with a deployed server (\eg{}, web server) that \suri\ would monitor,
-our setup calls \suri\ directly through an API. \suri\ is invoked
+our setup calls \suri\ offiline by providing a \emph{pcap} file as input. \suri\ is invoked
 multiple times for creating rules.
 
 
@@ -1080,9 +1079,9 @@ heuristic functions.
 \tname{} use the popularity of the options used in trusted rules as a
 heuristic function---rules containing popular options score higher
 compared to those containing unpopular
-rules. Figure~\ref{fig:distribution-options} shows the histogram of
+options. Figure~\ref{fig:distribution-options} shows the histogram of
 rule options for the ruleset we used~\cite{emerging-threats-open}. The
-x-axis shows the options used in rules (the 10 most common) and the
+x-axis shows the options used in rules (the 8 most common) and the
 y-axis shows the number of rules using the corresponding option. Note
 that the options \CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce}
 are very popular. \tname\ uses the following formula to compute the
@@ -1211,9 +1210,9 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
           xticklabel style={font=\footnotesize},          
           nodes near coords align={vertical},
           %symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
-          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype},          
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode},          
         ]
-        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155)};
+        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode,108)};
       \end{axis}
     \end{tikzpicture}
   }
@@ -1375,13 +1374,13 @@ term $\mathit{max(content\_frequency)}$ denotes the maximum frequency
 observed across all strings appearing as content parameters, and $N$
 is the number of content options in a given
 rule. Figure~\ref{fig:distribution-strings} shows the distribution of
-the ten most popular strings in our ruleset. To illustrate, consider a
-rule whose content options use the strings ``GET'' and ``ID''. The
+the seven most popular strings in our ruleset. To illustrate, consider a
+rule whose content options use the strings ``GET'' and ``id=''. The
 contribution of that rule for the computation of similarity score
 would be $0.601$ $(=(1$+$.203)$/$2)$. The relatively high weight
-reflects the fact that ``GET'' and ``ID'' are popular content strings.
+reflects the fact that ``GET'' and ``id='' are popular content strings.
 
-\begin{wrapfigure}[9]{r}{0.21\textwidth}
+\begin{wrapfigure}[10]{r}{0.21\textwidth}
   \vspace{-2ex}
 \centering
 \includegraphics[scale=0.6]{figs/http_header-example.png}
@@ -1443,8 +1442,8 @@ could be accessed through the modifiers \CodeIn{uri} and
 that string appears in the field \CodeIn{Request URI} (of an http
 message from the malicious traffic) and that field is accessible
 through these two modifiers. The relatively high heuristic value
-reflects the fact that the string could be accessed by two popular
-content modifiers.
+reflects the fact that the string could be accessed by a popular
+content modifier.
 
 %%%%%%%%%%%%%%
 %% Removed for space
