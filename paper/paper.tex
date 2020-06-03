@@ -56,6 +56,10 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
+%
+% Math stuff
+%
+\newcommand{\argmin}{\mathop{\mathrm{{arg\,min}}}}
 
 %
 % Add comments in the text
@@ -1068,7 +1072,7 @@ heuristic functions.
 %% options. These rules only use the header to signal a traffic as
 %% malicious. Also note that most rules have 2 to 6 options. 
 
-\subsubsection{\label{sec:popularity-options}Popularity of options}
+\subsubsection{\label{sec:popularity-options}Popularity of options ($popt$)}
 
 \tname{} use the popularity of the options used in trusted rules as a
 heuristic function---rules containing popular options score higher
@@ -1081,7 +1085,7 @@ that the options \CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce}
 are very popular. \tname\ uses the following formula to compute the
 contribution of option popularity to the score of a rule $r$:
 \indent
-$\sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N$.
+$popt = \sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N$.
 
 %% {\small
 %% \vspace{-2ex}
@@ -1314,7 +1318,8 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 \end{figure*}
 
 
-\subsubsection{Number of content options} We observed
+\subsubsection{Number of content options ($ncont$)} 
+We observed
 that \percContentOptions\ of the rules from the ruleset we analyzed
 contain content options, but the distribution of those contents per
 rule is not uniform. Figure~\ref{fig:distribution-contents} shows the
@@ -1350,7 +1355,7 @@ with 3 and 5 options, respectively.
 %% \vspace{-0.5ex}
 %% }
 
-\subsubsection{Popularity of content strings} 
+\subsubsection{Popularity of content strings ($pcont$)} 
 This heuristic leverages content rarity to discriminate rules. It
 weighs higher (respectively, lower) rules that use popular
 (respectively, unpopular) strings in content options. The score of a
@@ -1383,8 +1388,8 @@ reflects the fact that ``GET'' and ``id='' are popular content strings.
 \label{fig:http-header-example}
 \end{wrapfigure}
 
-\subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers} As previously
-mentioned, \percRulesWithContent\ of \suri\ rules involve content
+\subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers ($phttp$)} 
+As previously mentioned, \percRulesWithContent\ of \suri\ rules involve content
 options. Furthermore, nearly half of the rules that use content
 options use content modifiers to qualify the search. Http modifiers
 typically serve to specify parts of the message payloads that the
@@ -1458,33 +1463,20 @@ content modifier.
 \subsubsection{Weight Optimization}
 \label{sec:weight-optimization}
 A key strategy for obtaining the ideal ranking lie in finding optimal weights
-of these heuristic functions. 
-%We ran \tname{} using different combinations of weights on a sample of
-%attacks and chose the combination that offered the best overall
-%performance, which we computed with the sum of the rankings of the
-%golden rule on each attack. The weight combination that led to the
-%smaller sum of rankings was considered the best choice. We considered
-%\emph{all} combinations of the following weights 0, 0.25, 0.5, 0.75,
-%and 1. Given that there are four different functions and five possible
-%weight values, we needed to run \tname{} on the sample of attacks for
-%625 (=$5^4$) times. In the end of the process, the weight combination
-%$\langle{}1,0.25,0.25,1\rangle$ was the best choice we found. Although
-%results showed that this strategy results in good performance, we
-%remain to evaluate other optimization strategies to find better
-%weights.
+for the heuristic functions. The ranking of a golden rule, for a set of $N$ 
+attacks, is given by $R(W) = \sum_{i=1}^{N}\mathit{R_i}$, where 
+$R_i = (w_1 \cdot popt) \cdot (w_2 \cdot ncont) \cdot (w_3 \cdot pcont) \cdot (w_4 \cdot phttp)$
+and $W = \langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered for each heuristic.
 %
 In  order to compute the optimal weights, we used the Differential Evolution 
-algorithm from SciPy\cite{diff-evo-scipy} to find the optimal weights for our set of attacks.
-The optmization consists in minimizing the function that returns the sum of 
-every attack's golden rule ranking in our set given a combination of weights: 
-\indent
-$\sum_{i=1}^{N}\mathit{R_i}$ ($\mathit{R_i}$, where $\mathit{R}$ is the 
-ranking of a golden rule and $\mathit{N}$ is the number of attacks).
-
+algorithm from SciPy\cite{diff-evo-scipy}.
+The optmization consists in minimizing the function of every attack's golden rule 
+ranking in our set given a combination of weights. Formally, $W  = \displaystyle \argmin_W R$.
+%
 The algorithm also takes as input the range of the weights (between 0 and 1) 
 and the max number of generations, which we set to 10 (confirmation whether 
 this number suffices remains to future work). The weights are 
-as follows $\langle{}0.280, 0.057, 0.043, 0.490\rangle$.
+as follows $\langle{}0.280, 0.057, 0.043, 0.490\rangle{}$.
 
 \begin{table*}[t!]
   \footnotesize
