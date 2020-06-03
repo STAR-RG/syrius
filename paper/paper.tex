@@ -75,12 +75,6 @@
 
 \title{Rule Synthesis for Rule-based Intrusion Detectors}
 
-\providecommand{\keywords}[1]
-{
-  \small	
-  \textbf{\textit{Keywords---}} #1
-}
-
 %% \title{Conference Paper Title*\\
 %% {\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
 %% should not be used}
@@ -147,24 +141,21 @@ among the top-3 and top-1 rules of the ranking, respectively, in
 \percTopThreeRankingPrefix\ and \percTopOneRankingPrefix\ of the cases.
 \end{abstract}
 
-
-\keywords{Intrusion Detection, Suricata, Rule-based, Synthesis}
-
-% \begin{IEEEkeywords}
-%% component, formatting, style, styling, insert
-%% \end{IEEEkeywords}
+\begin{IEEEkeywords}
+Intrusion Detection, Suricata, Rule Synthesis.
+\end{IEEEkeywords}
 
 \section{Introduction}
 \label{sec:intro}
 
 Network Intrusion Detection Systems (\nids{}) are software systems
-that monitor the network traffic for malicious behavior and act
-accordingly by blocking messages or alerting humans about suspicious
+that monitor the network traffic for malicious behavior and block 
+messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
-not block. Various open-source (\eg{}, Snort~\cite{snort} and
+not block. Various open-source (\eg{}, Snort~\cite{snort},
 Suricata~\cite{suricata}) and commercial (\eg{},
-SolarWinds~\cite{solarwinds} and IBM QRadar~\cite{qradar})
+SolarWinds~\cite{solarwinds}, IBM QRadar~\cite{qradar})
 \nids\ implementations exist.
 
 % given the amount of potential malicious traffic that exist on the Internet
@@ -273,8 +264,8 @@ technique is organized as a pipeline of three components. First,
 \tname\ uses the messages that manifest an attack to create a
 potentially over-specified seed rule. Then, it uses that seed rule and
 benign traffic to derive a set of plausible rules that isolate the
-benign traffic from the malicious traffic. Finally, it uses existing
-rules to learn heuristics to rank the plausible rules.
+benign traffic from the malicious traffic. Finally, it uses a set of 
+heuristics to rank the plausible rules.
 
 %\Mar{@Lucas, please look for constant
   %numbers as this *in text* and use macros instead. We do not want to
@@ -664,8 +655,8 @@ rules (see Table~\ref{table:results}).
 To sum up, \tname{} uses the messages that manifest an attack in the
 first step to create a potentially over-specified seed rule. Then, it
 uses benign traffic in the second step to create a set of plausible
-rules from the seed rule. Finally, in the third step, \tname{} uses
-existing rules to learn heuristics to rank plausible rules.
+rules from the seed rule. Finally, in the third step, \tname{} uses a 
+set of heuristics to rank plausible rules.
 
 \section{Technique}
 \label{sec:technique}
