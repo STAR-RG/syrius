@@ -763,18 +763,18 @@ on these strategies in the following.
 For the field strategy, \tname{} parses the input messages looking for
 options associated with the data in the fields of
 messages. Section~\ref{sec:rules-and-packets} shows the correspondence
-between packet fields and some of the rule options from \suri\ and
+between packet fields and some of the rule options from \suri\ while
 Section~\ref{sec:active-recon} shows a concrete example where \tname{}
-uses this strategy. Although we built the option-field mapping
-manually, from the \suri\ documentation, this is a one-time activity.
-Unfortunately, for http attacks, the relevant data for the options is
-likely in the message payload; not the fields. By analyzing our data
-set of rules, we found that this occurs frequently in http attacks,
-which are prevalent. For example, \percHttp\ of the \numrulessuri{}
-rules from the ruleset we analyzed~\cite{emerging-threats-open}
-prescribe defenses against http attacks. In addition,
-\percRulesWithContent{} of these rules contain at least one content
-option.
+uses this strategy to create the seed rule. Important to note that,
+although we built the option-field mapping manually (from the
+\suri\ documentation), this is a one-time activity.  Unfortunately,
+this strategy is insufficient for http attacks, which are
+prevalent. For example, \percHttp\ of the \numrulessuri{} rules from
+the ruleset we analyzed~\cite{emerging-threats-open} prescribe
+defenses against http attacks. By analyzing our data set of rules, we
+found that the relevant data for the options appears in the message
+payload, not the fields. For example, \percRulesWithContent{} of the
+rules for http attacks contain at least one content option.
 
 \begin{figure}[h!]
   \lstinputlisting[language=C,numbers=none,keywords={http,content}]{adaptor-golden-rule.suricata}
@@ -784,15 +784,17 @@ option.
   \label{fig:adaptor-golden-rule.suricata}
 \end{figure}
 
-Figure~\ref{fig:adaptor-golden-rule.suricata} shows an example of a rule that
-captures traffic containing the string \CodeIn{"/HtmlAdaptor"} in the
-payload.  Figure~\ref{fig:distribution-contents} shows the
-distribution of number of content options per rule for the data set
-mentioned above. We limited the number of content options per rule to
-8 in the histogram for space. \MyComment{Rules without
-  \CodeIn{content} options are an exception and half of the rules
-  contain at least two \CodeIn{content} options.}  To sum up, handling
-content options for http is very important.
+Figure~\ref{fig:adaptor-golden-rule.suricata} shows an example of an
+http rule that captures traffic containing the string
+\CodeIn{"/HtmlAdaptor"} in the payload.
+Figure~\ref{fig:distribution-contents} shows the distribution of
+number of content options per rule for the data set mentioned
+above. We limited the number of content options per rule to 7 in the
+histogram for space. \MyComment{Rules without \CodeIn{content} options
+  are an exception and half of the rules contain at least two
+  \CodeIn{content} options.}  To sum up, content options appear
+frequently in http rules and rules may contain several of these
+options. Handling content options is therefore very important.
 
 The content strategy focuses on extracting content options from the
 message payload. By inspecting existing rules, we found that these
@@ -1003,8 +1005,9 @@ by $\mathit{mTr}$. It is worth noting that Suricata can process
 \emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
 network messages directly. Instead of sending traffic to a machine
 with a deployed server (\eg{}, web server) that \suri\ would monitor,
-our setup calls \suri\ offiline by providing a \emph{pcap} file as input. \suri\ is invoked
-multiple times for creating rules.
+we calls \suri\ directly, through a public API, by providing a
+\emph{pcap} files on input. \suri\ is invoked multiple times for
+creating rules.
 
 
 %% \begin{proposition}
@@ -1490,7 +1493,7 @@ as follows $\langle{}0.280, 0.057, 0.043, 0.490\rangle$.
   \vspace{-2ex}
   \centering
   \setlength{\tabcolsep}{4.5pt}
-  \renewcommand{\arraystretch}{0.35}
+  \renewcommand{\arraystretch}{0.4}
   \begin{tabular}{lcccp{10.9cm}}
     \toprule
     \multicolumn{1}{c}{Name} &
@@ -1711,7 +1714,7 @@ human performance in analyzing the list of plausible rules.
 \begin{table}[t!]
   \footnotesize
   \setlength{\tabcolsep}{2pt}
-  \renewcommand{\arraystretch}{0.5}
+  \renewcommand{\arraystretch}{0.7}
   \caption{\label{table:results}Results.}
   \vspace{-2ex}
   \centering
@@ -1843,7 +1846,7 @@ highlighted in the table, indicates the contrary.
   \footnotesize
   \setlength{\tabcolsep}{8pt}
   %\setlength{\tabcolsep}{5pt}
-  \renewcommand{\arraystretch}{-0.01}
+  \renewcommand{\arraystretch}{0.5}
   \caption{\label{table:weights}Contribution of heuristic functions.}
   \vspace{-2ex}
   \centering
@@ -1955,7 +1958,7 @@ question in two parts. First, we analyzed the impact of the amount of
 positive examples in results. For that, we selected two cases with the
 highest number of examples---idqaccess and scripttag---and measured
 the position of the golden rule in the ranking for an increasing number
-\begin{wrapfigure}[11]{r}{0.28\textwidth}  
+\begin{wrapfigure}[9]{r}{0.28\textwidth}  
   \vspace{-2ex}
   \centering
   \begin{subfigure}{.15\textwidth}
@@ -1972,7 +1975,7 @@ the position of the golden rule in the ranking for an increasing number
   \end{subfigure}%
     \vspace{-1ex}          
   \caption{\label{fig:impact-number-attacks}Positive examples.}
-  \vspace{-2ex}
+  \vspace{-4ex}
 \end{wrapfigure}
 of examples provided to \tname. For each number of variants, we
 sampled five sets of that size to provide as input to the technique.
@@ -1985,7 +1988,7 @@ variants. Results indicate that the number of examples is important,
 the choice of examples is important, and a small number of examples
 suffices to reach the best results.
 
-\begin{wrapfigure}[10]{r}{0.28\textwidth}  
+\begin{wrapfigure}[8]{r}{0.28\textwidth}  
   \vspace{-2.5ex}
   \centering
   %% \begin{subfigure}{.2\textwidth}
