@@ -1638,10 +1638,10 @@ of attacks considered in our analysis.  Non-http attacks are listed at
 the top of the table and http attacks are listed at the bottom. Recall from
 Section~\ref{sec:reverse-engineering} that (1) http attacks are
 prevalent, (2) most http attacks use only content options, and (3)
-most non-http attacks use field options only. We selected
-\numNonContentAttacks\ non-http attacks and \numContentAttacks\ http
-attacks. The higher number of http attacks reflects their
-popularity. ``Name'' is the name of the attack,
+most non-http attacks use field options only. % We selected
+%\numNonContentAttacks\ non-http attacks and \numContentAttacks\ http
+%attacks. The higher number of http attacks reflects their popularity.
+``Name'' is the name of the attack,
 ``Source'' is the source where we obtained data to reproduce the
 attack (see Section~\ref{subsec:malicious-traffic}), ``Type''
 is the kind of attack, ``Protocol'' is the
@@ -1685,7 +1685,7 @@ the SYN Flood attack (see Section~\ref{sec:dos}).
 
 \noindent\textbf{Benign traffic.}~Public data sets of benign traffic
 exist and can be used to evaluate the rate of false positives of
-security tools. We used two popular public sources. The Bigflows.pcap
+security tools. We used two popular public sources. The bigFlows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
 project. It includes real network traffic of a private network. We
 also used data sets from the Stratosphere IPS
@@ -1744,7 +1744,7 @@ human performance in analyzing the list of plausible rules.
     Black Nurse & 1 & 4 & 9 & 2 \\    
     Ping Scan & 6 & 5 & 9 & 2 \\
     SYN Flood & 4 & 2 & 2 & 1 \\
-    UDP Teardrop & 1 & 4 & 8 & 4 \\
+    UDP Teardrop & 1 & 4 & 8 & 3 \\
     ICMP Info: Ping & 13 & 8 & 18 & 2 \\
     Dst/Host Unreachable & 132 & 6 & 3 & 1 \\
     Dst/Net Unreachable & 12 & 6 & 25 & 1 \\
@@ -1870,6 +1870,7 @@ highlighted in the table, indicates the contrary.
     Black Nurse & 2 & 7$\uparrow$ & 2 & 2 & 2 \\    
     Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
     SYN Flood & 1 & 1 & 1 & 1 & 1 \\
+      UDP Teardrop & 3 & 5$\uparrow$ & 2 \cellcolor{lightgray}$\downarrow$ & 3 & 3 \\
     ICMP Info: Ping & 2 & 18$\uparrow$& 2 & 2 & 2 \\
     Dst/Host Unreachable & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
     Dst/Net Unreachable & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
@@ -1877,7 +1878,6 @@ highlighted in the table, indicates the contrary.
     ICMP Info: Echo Reply & 2 & 9$\uparrow$ & 2 & 2 & 2 \\
     ICMP Info: Code 13 & 1 & 2$\uparrow$ & 1 & 1 & 1 \\
     ICMP Info: Code 10 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
-    %%UDP Flood & - & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & - & - & - & - & - & -\\
     ColdFusion & 2 & 2 & 2 & 7$\uparrow$ & 5$\uparrow$ \\
