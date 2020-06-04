@@ -1467,7 +1467,7 @@ finding optimal weights for the heuristic functions. The sum of rankings
 of the golden rules, for a set of $N$ attacks, is given by 
 $R(W) = \sum_{i=1}^{N}\mathit{R_i}$, where $R_i$ is the ranking based on 
 the score provided by 
-$(w_1 + popt) \cdot (w_2 + ncont) \cdot (w_3 + pcont) \cdot (w_4 + phttp)$ 
+$[(w_1 \cdot popt) + (w_2 \cdot ncont) + (w_3 \cdot pcont) + (w_4 \cdot phttp)]/4$ 
 and $W = \langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered 
 for each heuristic.
 %
