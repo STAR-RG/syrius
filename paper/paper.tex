@@ -1462,14 +1462,19 @@ content modifier.
 
 \subsubsection{Weight Optimization}
 \label{sec:weight-optimization}
-A key strategy for obtaining the ideal ranking lie in finding optimal weights
-for the heuristic functions. The sum of rankings of the golden rules, for a set of $N$ 
-attacks, is given by $R(W) = \sum_{i=1}^{N}\mathit{R_i}$, where $R_i$ is the ranking based on the score provided by $(w_1 + popt) \cdot (w_2 + ncont) \cdot (w_3 + pcont) \cdot (w_4 + phttp)$ and $W = \langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered for each heuristic.
+Obtaining the best possible ranking for the golden rule boils down to 
+finding optimal weights for the heuristic functions. The sum of rankings 
+of the golden rules, for a set of $N$ attacks, is given by 
+$R(W) = \sum_{i=1}^{N}\mathit{R_i}$, where $R_i$ is the ranking based on 
+the score provided by 
+$(w_1 + popt) \cdot (w_2 + ncont) \cdot (w_3 + pcont) \cdot (w_4 + phttp)$ 
+and $W = \langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered 
+for each heuristic.
 %
-In  order to compute the optimal weights, we used the Differential Evolution 
-algorithm from SciPy\cite{diff-evo-scipy}.
-The optmization consists in minimizing the function of every attack's golden rule 
-ranking in our set given a combination of weights. Formally, $W  = \displaystyle \argmin_W R$.
+We resorted to the Differential Evolution algorithm from SciPy\cite{diff-evo-scipy}
+to compute the optimal weights. The optmization consists in minimizing the function 
+of every attack's golden rule ranking in our set given a combination of weights. 
+Formally, $W  = \displaystyle \argmin_W R(W)$.
 %
 The algorithm also takes as input the range of the weights (between 0 and 1) 
 and the max number of generations, which we set to 10 (confirmation whether 
