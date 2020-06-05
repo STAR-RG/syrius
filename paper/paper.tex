@@ -1467,14 +1467,15 @@ finding optimal weights for the heuristic functions. The sum of rankings
 of the golden rules, for a set of $N$ attacks, is given by 
 $R(W) = \sum_{i=1}^{N}\mathit{R_i}$, where $R_i$ is the ranking based on 
 the score provided by 
-$[(w_1 \cdot popt) + (w_2 \cdot ncont) + (w_3 \cdot pcont) + (w_4 \cdot phttp)]/4$ 
-and $W = \langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered 
+$[(w_1 \cdot popt)$+$(w_2 \cdot ncont)$+$(w_3 \cdot pcont)$+$(w_4 \cdot phttp)]/4$ 
+and $W$=$\langle{}w_1, w_2, w_3, w_4\rangle{}$ are the weights considered 
 for each heuristic.
 %
-We resorted to the Differential Evolution algorithm from SciPy\cite{diff-evo-scipy}
-to compute the optimal weights. The optmization consists in minimizing the function 
-of every attack's golden rule ranking in our set given a combination of weights. 
-Formally, $W  = \displaystyle \argmin_W R(W)$.
+We resorted to the Differential Evolution algorithm from
+SciPy\cite{diff-evo-scipy} to compute the optimal weights. The
+optimization consists in minimizing the function of every attack's
+golden rule ranking in our set given a combination of weights.
+Formally, $W$=$\displaystyle \argmin_W R(W)$.
 %
 The algorithm also takes as input the range of the weights (between 0 and 1) 
 and the max number of generations, which we set to the default value of 1000, but the algorithm stopped at the 45th generation as there was no further improvement. The weights are 
