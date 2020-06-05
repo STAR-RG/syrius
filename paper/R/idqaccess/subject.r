@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-pdf("idqaccess.pdf", width = 5, height = 2.9)
+pdf("idqaccess.pdf", width = 6.5, height = 2.9)
 
 df1 <- read.table("data1.txt", header = FALSE)
 df2 <- read.table("data2.txt", header = FALSE)
