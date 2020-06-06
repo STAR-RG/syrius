@@ -140,7 +140,7 @@ synthesize rules for rule-based \nids. \tname\ leverages malicious
 attacks. \tname{} is organized as a pipeline of three components to
 1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. We evaluated \tname\ against a
-set of 21 network attacks with varios
+set of 21 network attacks with various
 characteristics. \tname\ was capable of generating the correct rule 
 among the top-3 and top-1 rules of the ranking, respectively, in 
 \percTopThreeRankingPrefix\ and \percTopOneRankingPrefix\ of the cases.
@@ -867,7 +867,7 @@ preserving the invariant of \emph{only} capturing the positive
 malicious traffic. We say that a rule is minimal if discarding any
 option results in the capture of negative (\ie{}, benign) traffic.
 The procedure we propose in this step builds on the observation that
-all options from the rule produced in the previous step are satisifed
+all options from the rule produced in the previous step are satisfied
 by the traffic produced by the attack. Consequently, any subset of
 these options also captures the attack.
 
@@ -1010,7 +1010,7 @@ by $\mathit{mTr}$. It is worth noting that Suricata can process
 \emph{pcap} files~\cite{pcap} very efficiently compared to analyzing
 network messages directly. Instead of sending traffic to a machine
 with a deployed server (\eg{}, web server) that \suri\ would monitor,
-we calls \suri\ directly, through a public API, by providing a
+we call \suri\ directly, through a public API, by providing a
 \emph{pcap} files on input. \suri\ is invoked multiple times for
 creating rules.
 
@@ -1938,7 +1938,7 @@ performance of attacks involving non-http protocols.
 
 \emph{\textbf{Summary of results:}~Every function showed impact on the
   performance of \tname. The function that builds on popularity of
-  content modifiers showed highest impact.}
+  content modifiers showed the highest impact.}
 
 
 \subsection{Answering RQ3: \textRQthree}
@@ -2101,7 +2101,7 @@ Table~\ref{table:comparison} summarizes the characteristics of
 alternative techniques and provides details about the evaluation used
 in corresponding papers. Unfortunately, side comparison was not
 possible for two central reasons. First, we did not have access to the
-tools. We tried, unsuccssefully, making contact with authors to obtain
+tools. We tried, unsuccessfully, making contact with authors to obtain
 the tools. Second, the tools output different objects. For that
 reason, a comparison based on published results was not realistic. It
 is important to recall that we did not report precision and recall as
@@ -2249,7 +2249,7 @@ created directly from packets (see
 Section~\ref{sec:rules-and-packets}). They modeled every field of the
 icmp packet in chromosomes of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
-that randomly combine options, modelling the packet fields. They
+that randomly combine options, modeling the packet fields. They
 showed that they were able to generate rules without false negatives
 and only 3 false positives across 33K benign packets. The key
 differences between our work and Vollmer~\etal{}'s are 1) the support
@@ -2261,7 +2261,7 @@ payloads). The icmp rules they generate only refer to message fields.
     secao 2.3 diz q \textbf{geralmente} as regras nao-http possuem
     apenas field options}. } As for 2, our solution additionally ranks
 plausible options, which contain \emph{no} false positives or
-negatives with respect to the benign and mallicious traffic
+negatives with respect to the benign and malicious traffic
 considered. Guruprasad~\etal{}~\cite{guruprasad} also used an
 evolutionary approach to solve the problem. Although the solution of
 Guruprasad~\etal{} supports more protocols than Vollmer~\etal{}', our
