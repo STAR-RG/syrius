@@ -987,7 +987,7 @@ at the \reveng\ step. In the Raking step (Section~\ref{sec:ranking}),
 
 % this algorithm reports by their similarity to trusted rules
 
-\textbf{Correctness argument.}~The algorithm reports rules that
+\noindent\textbf{Correctness argument.}~The algorithm reports rules that
 capture only the positive traffic. Every rule created during the
 search captures the attack associated with the input as every rule
 created contains a proper subset of the options from the original rule
@@ -999,7 +999,8 @@ to $\mathcal R'$. Consequently, it cannot be an element of $\mathcal
 O$ and reported on the output. Finally, from the definition of
 function $\mathit{filter}$, only the rules in $\mathcal O$ that
 capture all the instances of the attack are reported on output.
-\textbf{Implementation details.} We implemented function
+
+\noindent\textbf{Implementation details.} We implemented function
 \emph{isPlausible} by 1)~spawning Suricata to monitor a specified
 rule, 2)~replaying the benign traffic (see
 Section~\ref{sec:dataset-benign}), and 3)~reading the Suricata logs to
@@ -2363,8 +2364,8 @@ plausible rules from the seed, and 3)~rank plausible
 rules. Experimental results provide early evidence showing that
 \tname\ is promising. It was able to rank the correct rule among the
 first ten rules of the reported ranking in \percTopTenRanking\ of
-the cases we analyzed, for example. The data set containing our
-experimental artifacts is publicly accessible at \ourdataset.
+the cases we analyzed, for example. %The data set containing our
+%experimental artifacts is publicly accessible at \ourdataset.
 
 %\rui{thinking out loud here: one of the motivations is that it is
 %time-consuming and troublesome to generate new rules. Time-consuming
