@@ -78,7 +78,8 @@
   }
 
 %\title{\tname{} for NIDS Rule Synthesis}
-\title{Rule Synthesis for Network Intrusion Detectors}  
+\title{\tname{}: Intrusion Detection Rule Synthesis}  
+%\title{Rule Synthesis for Network Intrusion Detectors}  
 
 %% \title{Conference Paper Title*\\
 %% {\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
@@ -2240,9 +2241,10 @@ places the golden rule close to the top in most cases.
 
 \section{Related Work}
 
+% There are important differences between our work and prior work. 
+
 \noindent
-\textbf{Alternative methods for rule synthesis.} There are important
-differences between our work and prior work. Vollmer
+\textbf{Alternative methods for rule synthesis.}~Vollmer
 \etal{}~\cite{vollmer-etal-cics2011} proposed the use of search to
 derive rules for Snort, which are very similar to \suri's.  Their
 solution focused on icmp attacks for which plausible attacks can be
@@ -2250,19 +2252,19 @@ created directly from packets (see
 Section~\ref{sec:rules-and-packets}). They modeled every field of the
 icmp packet in chromosomes of candidate solutions (\ie{}, a rule) of a
 genetic search. The initial population is a set of candidate solutions
-that randomly combine options, modeling the packet fields. They
-showed that they were able to generate rules without false negatives
-and only 3 false positives across 33K benign packets. The key
-differences between our work and Vollmer~\etal{}'s are 1) the support
-of different protocols and 2) the use of ranking to discriminate
-alternative plausible rules. As for 1, our approach supports a variety
-of protocols and options (\eg{}, options that refer to message
-payloads). The icmp rules they generate only refer to message fields.
-\MyComment{\Luc{eh possivel incluir contents em regras icmp tb. o q a
-    secao 2.3 diz q \textbf{geralmente} as regras nao-http possuem
-    apenas field options}. } As for 2, our solution additionally ranks
-plausible options, which contain \emph{no} false positives or
-negatives with respect to the benign and malicious traffic
+that randomly combine options, modelling the packet fields. They were
+able to generate rules without false negatives and only 3 false
+positives across 33K benign packets. The key differences between our
+work and Vollmer~\etal{}'s are 1) the support of different protocols
+and 2) the use of ranking to discriminate alternative plausible
+rules. As for 1, our approach supports a variety of protocols and
+options (\eg{}, options that refer to message payloads). The icmp
+rules they generate only refer to message fields.  \MyComment{\Luc{eh
+    possivel incluir contents em regras icmp tb. o q a secao 2.3 diz q
+    \textbf{geralmente} as regras nao-http possuem apenas field
+    options}. } As for 2, our solution additionally ranks plausible
+options, which contain \emph{no} false positives or negatives with
+respect to the benign and mallicious traffic
 considered. Guruprasad~\etal{}~\cite{guruprasad} also used an
 evolutionary approach to solve the problem. Although the solution of
 Guruprasad~\etal{} supports more protocols than Vollmer~\etal{}', our
@@ -2364,8 +2366,8 @@ plausible rules from the seed, and 3)~rank plausible
 rules. Experimental results provide early evidence showing that
 \tname\ is promising. It was able to rank the correct rule among the
 first ten rules of the reported ranking in \percTopTenRanking\ of
-the cases we analyzed, for example. %The data set containing our
-%experimental artifacts is publicly accessible at \ourdataset.
+the cases we analyzed, for example. The data set containing our
+experimental artifacts is publicly accessible at \ourdataset.
 
 %\rui{thinking out loud here: one of the motivations is that it is
 %time-consuming and troublesome to generate new rules. Time-consuming
