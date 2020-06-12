@@ -11,7 +11,11 @@ import ast
 import ctypes
 from functools import partial
 from copy import deepcopy
+
 import pyshark
+import numpy as np
+import matplotlib.pyplot as plt
+plt.style.use(['ggplot'])
 
 attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "synflood", "pingscan", "cron", "teardrop", "blacknurse", "inc", "jsp"]
 
@@ -435,7 +439,7 @@ def getStats():
     return 1
 
 
-rules_per_size = getRulesPerSize()
+"""rules_per_size = getRulesPerSize()
 rules_per_contents = getRulesPerContents()
 contents_dict = getContentsDict()
 keywords_freq = getKeywordsFrequency()
@@ -443,7 +447,7 @@ keywords_freq = getKeywordsFrequency()
 sd = [(k, contents_dict[k]) for k in sorted(contents_dict, key=contents_dict.get, reverse=True)]
 
 html_modifiers_freq = {}
-
+"""
 
 def getHtmlModifiersFreq(keywords_freq):
     global html_modifiers
@@ -795,7 +799,85 @@ def sortRules():
     return best_rule_list, best_weights, best_pos
 
 
-def sortMultipleAttacks():
+def readRawRule(file_name):
+    with open(file_name, 'r') as reader:
+        return reader.readlines()
+
+
+def readAllRawRules():
+    attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "inc", "jsp"]
+    all_rules = []
+    for atk in attacks_list:
+        file_name = "all_rules_raw_"+str(atk)+".out"
+        all_rules.append(readRawRule(file_name))
+
+    all_rules_list = []
+    tmp_str_rule = ""
+    tmp_rule = Rule("", "", "", "", "")
+    golden_rule_pos = []
+    current_pos = []
+    best_pos = []
+    best_rule_list = []
+    best_weights = []
+
+    for i in range(0, len(all_rules)):
+        all_rules_list.append([])
+        golden_rule_pos.append(0)
+        current_pos.append(0)
+        best_pos.append(math.inf)
+        best_rule_list.append([])
+        best_weights.append([])
+
+        for elem in all_rules[i]:
+            tmp_rule = Rule("", "", "", "", "")
+            tmp_str_rule = elem.split('#')
+            tmp_rule.protocol = tmp_str_rule[0]
+            tmp_rule.action = tmp_str_rule[1]
+            tmp_rule.header = tmp_str_rule[2]
+            tmp_rule.message = tmp_str_rule[3]
+            tmp_rule.sid = int(tmp_str_rule[4])
+            tmp_rule.fitness = eval(tmp_str_rule[5])
+            tmp_rule.threshold = eval(tmp_str_rule[6])
+            tmp_rule.options = eval(tmp_str_rule[7])
+
+            all_rules_list[i].append(tmp_rule)
+
+    print("all rules list len: ", len(all_rules_list))
+                             
+    return all_rules_list
+ 
+
+def sortMultiplesAttacks(w, *args):
+    all_rules_list = args[0]
+    attacks_list = ["adaptor", "coldfusion", "htaccess", "idq", "issadmin", "system", "script", "cron", "inc", "jsp"]
+    current_pos = [0] * len(all_rules_list)
+    golden_rule_pos = [0] * len(all_rules_list)
+    all_rules_len = []
+    all_pos_sum = 0
+    for i in range(len(all_rules_list)):
+        all_rules_len.append(len(all_rules_list[i]))
+        all_rules_list[i] = sorted(all_rules_list[i], key=partial(callGetFitness, weights=w))
+
+        for x, rule in enumerate(all_rules_list[i]):
+            if rule.sid == 1099019:
+                golden_rule_pos[i] = all_rules_list[i].index(rule)
+            else:
+                rule.sid = x+1
+
+        current_pos[i] = all_rules_len[i]-golden_rule_pos[i]
+        all_pos_sum += current_pos[i]
+        # print("current pos", i, ": ", current_pos[i])
+        # print("best pos: ", best_pos[i])
+
+        
+    for i in range(len(current_pos)):
+        print(attacks_list[i]+':'+str(current_pos[i])+' ', end=' ')
+    print()
+    print(sum(current_pos))
+    return sum(current_pos)
+
+
+def sortMultipleWeights():
     all_rules = []
     for atk in attacks_list:
         file_name = "all_rules_raw_"+str(atk)+".out"
@@ -1168,8 +1250,6 @@ def optimizeRule(rule):
 
     return rule_list[0]
 
-# sortMultipleAttacks()
-# exit()
 
 
 init_rule = Rule(default_rule_action, rule_protocol, default_rule_header, default_rule_message, default_rule_sid)
@@ -1495,14 +1575,15 @@ def fixRule():
 
 # fixRule()
 # exit()
-pcap_dir = "Datasets/" + args.attack + ".pcap"
+"""pcap_dir = "Datasets/" + args.attack + ".pcap"
 pkts = pyshark.FileCapture(pcap_dir)
 pkts_raw = pyshark.FileCapture(pcap_dir, include_raw=True, use_json=True)
 pkts.load_packets()
 pkts_raw.load_packets()
 
 final_rule = parsePacket(pkts_raw[0], pkts[0])
-# final_rule = init_rule
+"""
+final_rule = init_rule
 if len(pkts._packets) > 1:
     if args.attack == "synflood":
         synflood_options = {'window': 512, 'flags': 'S'}
