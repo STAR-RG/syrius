@@ -4,7 +4,7 @@ Syrius is a a novel approach to synthesize rules for rule-based NIDS
 
   - Image
 
-### Requirements
+# Requirements
 
 Syrius uses a number of open source projects to work properly:
 
@@ -12,38 +12,49 @@ Syrius uses a number of open source projects to work properly:
 * [pyshark] - Python wrapper for tshark
 * [PyYAML] -  PyYAML is a YAML parser and emitter for Python.
 
-### Installation
+# Installation
 
-We recommend running the installSuricata.sh as it automatically installs Suricata's dependencies, Suricata itself and Syrius dependencies.
+We recommend running installSuricata.sh as it automatically installs Suricata's dependencies, Suricata itself and Syrius dependencies.
 
-After that, just clone this repository and run syrius/syrius.py.
+# Usage
 
-### Usage
+Syrius requires two .pcap files to run correctly, and must be stored in specific folders:
 
-Syrius requires two .pcap files to run correctly, one containing the isolated malicious packet and another containing benign packets. They must be stored in specific folders:
+- syrius/Datasets/[ATTACK].pcap -> contains the isolated malicious packet(s)
+- syrius/benign.pcap            -> contains benign packets
 
-- syrius/Datasets/[ATTACK].pcap
-- syrius/[BENIGN].pcap
-
-Where [ATTACK] must be the same name used as parameter later, and [BENIGN] must be named benign.pcap. This repository includes a few examples of attacks from multiple sources, and a benign one from [tcpreplay].
+Where [ATTACK] must be the same name used as parameter. 
 
 - add image showing the .pcap
 
-After that you only need to run Syrius and wait for the results:
+After that you only need to run Syrius:
 
 ```sh
 Usage:
 $ python3 syrius.py [ATTACK]
 ```
 
-It will initially show the seed rule, and other information such as protocol.
+As Syrius runs, it will show the seed rule, and total plausible rules created up to that iteration.
 
-After each iteration of the rule synthesis, Syrius will show the number of rules generated up to that point. When all iterations are done, it will print the best ranked rule, as well as generate a results_[ATTACK].csv with all plausible rules ordered by fitness.
+ At the end, it will generate a results_[ATTACK].csv with all plausible rules ordered by fitness.
 
 
 TIP: If you already know the protocol of the attack, we recommend using a filtered benign.pcap with only packets of that protocol. This will make the testing faster.
 
-### WIP
+# Tests
+
+This repository includes a few examples of attacks from multiple sources, and a benign one from [tcpreplay].
+
+We also provide the results obtained by running them, as well as other experiments.
+
+As the attack examples are already in the required folder and format, you can run it yourself, for example:
+
+```sh
+Usage:
+$ python3 syrius.py adaptor
+```
+
+# WIP
 
 - WIP
 
