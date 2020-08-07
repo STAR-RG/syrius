@@ -14,8 +14,6 @@ Syrius depends on the following tools:
 * [pyshark] - Python wrapper for tshark
 * [PyYAML] -  PyYAML is a YAML parser and emitter for Python.
 
-# Installation
-
 We recommend running installSuricata.sh as it automatically installs Suricata's dependencies, Suricata itself and Syrius dependencies.
 
 # Inputs
@@ -29,8 +27,7 @@ Syrius requires two .pcap files and one .rules file to run correctly:
 
 # Usage
 
-```sh
-Usage:
+```console
 $ python3 syrius.py [OPTIONS]
 
   Synthesis of Rules for Intrusion Detectors
@@ -58,7 +55,7 @@ We also provide the results obtained by running them, as well as other experimen
 
 As the attack examples are already in the required folder and format, you can run it yourself, for example:
 
-```sh
+```console
 $ python3 syrius.py -a "Datasets/adaptor.pcap"
 ```
 
