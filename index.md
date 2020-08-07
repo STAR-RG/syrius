@@ -1,37 +1,85 @@
-## Welcome to GitHub Pages
+<p style="text-align: center;">
+  
+               
+```                                                                              
+   d888888o.  `8.`8888.      ,8' 8 888888888o.    8 8888 8 8888      88    d888888o.   
+ .`8888:' `88. `8.`8888.    ,8'  8 8888    `88.   8 8888 8 8888      88  .`8888:' `88. 
+ 8.`8888.   Y8  `8.`8888.  ,8'   8 8888     `88   8 8888 8 8888      88  8.`8888.   Y8 
+ `8.`8888.       `8.`8888.,8'    8 8888     ,88   8 8888 8 8888      88  `8.`8888.     
+  `8.`8888.       `8.`88888'     8 8888.   ,88'   8 8888 8 8888      88   `8.`8888.    
+   `8.`8888.       `8. 8888      8 888888888P'    8 8888 8 8888      88    `8.`8888.   
+    `8.`8888.       `8 8888      8 8888`8b        8 8888 8 8888      88     `8.`8888.  
+8b   `8.`8888.       8 8888      8 8888 `8b.      8 8888 ` 8888     ,8P 8b   `8.`8888. 
+`8b.  ;8.`8888       8 8888      8 8888   `8b.    8 8888   8888   ,d8P  `8b.  ;8.`8888 
+ `Y8888P ,88P'       8 8888      8 8888     `88.  8 8888    `Y88888P'    `Y8888P ,88P' 
+ ```
 
-You can use the [editor on GitHub](https://github.com/damorimRG/syrius/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+ Syrius is a a novel approach to synthesize rules for rule-based NIDS
+ 
+ </p>
+                                                                                     
+# Requirements
 
-### Markdown
+Syrius uses a number of open source projects to work properly:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* [Suricata] (and all its dependencies) - A free and open source network threat detection engine.
+* [pyshark] - Python wrapper for tshark
+* [PyYAML] -  PyYAML is a YAML parser and emitter for Python.
 
-```markdown
-Syntax highlighted code block
+## Installation
 
-# Header 1
-## Header 2
-### Header 3
+We recommend running installSuricata.sh as it automatically installs Suricata's dependencies, Suricata itself and Syrius dependencies.
 
-- Bulleted
-- List
+## Inputs
 
-1. Numbered
-2. List
+Syrius requires two .pcap files and one .rules file to run correctly:
 
-**Bold** and _Italic_ and `Code` text
+- attack.pcap -> contains the isolated malicious packet(s)
+- benign.pcap -> contains benign packets
+- rules.rules -> contains the rule set used in the ranking step
+- add image showing the inputs
 
-[Link](url) and ![Image](src)
+# Usage
+
+```sh
+Usage:
+$ python3 syrius.py [OPTIONS]
+
+  Synthesis of Rules for Intrusion Detectors
+  
+Options:
+  -attack, -a  Filename of the attack .pcap. Default: attack.pcap
+  -benign, -b  Filename of the benign .pcap. Default: benign.pcap
+  -rules, -r   Filename of the ruleset .rules. Default: rules.rules
+  -output, -o  Filename of the output .out. Default: output.out
+  -help, -h    Show this message and exit.
+
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+As Syrius runs, it will show the seed rule, and total plausible rules created up to that iteration.
 
-### Jekyll Themes
+At the end, it will generate the output with all plausible rules ordered by fitness.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/damorimRG/syrius/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+TIP: If you already know the protocol of the attack, we recommend using a filtered benign.pcap with only packets of that protocol. This will make the testing faster.
 
-### Support or Contact
+## Tests
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+This repository includes a few examples of attacks from multiple sources, and a benign one from [tcpreplay].
+
+We also provide the results obtained by running them, as well as other experiments.
+
+As the attack examples are already in the required folder and format, you can run it yourself, for example:
+
+```sh
+$ python3 syrius.py -a "Datasets/adaptor.pcap"
+```
+
+# WIP
+
+- WIP
+
+   [pyshark]: <https://github.com/KimiNewt/pyshark>
+   [Suricata]: <https://suricata-ids.org/>
+   [PyYAML]: <https://pypi.org/project/PyYAML/>
+   [tcpreplay]: <https://tcpreplay.appneta.com/wiki/captures.html>
