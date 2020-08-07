@@ -1,25 +1,10 @@
-<p style="text-align: center;">
-  
-               
-```                                                                              
-   d888888o.  `8.`8888.      ,8' 8 888888888o.    8 8888 8 8888      88    d888888o.   
- .`8888:' `88. `8.`8888.    ,8'  8 8888    `88.   8 8888 8 8888      88  .`8888:' `88. 
- 8.`8888.   Y8  `8.`8888.  ,8'   8 8888     `88   8 8888 8 8888      88  8.`8888.   Y8 
- `8.`8888.       `8.`8888.,8'    8 8888     ,88   8 8888 8 8888      88  `8.`8888.     
-  `8.`8888.       `8.`88888'     8 8888.   ,88'   8 8888 8 8888      88   `8.`8888.    
-   `8.`8888.       `8. 8888      8 888888888P'    8 8888 8 8888      88    `8.`8888.   
-    `8.`8888.       `8 8888      8 8888`8b        8 8888 8 8888      88     `8.`8888.  
-8b   `8.`8888.       8 8888      8 8888 `8b.      8 8888 ` 8888     ,8P 8b   `8.`8888. 
-`8b.  ;8.`8888       8 8888      8 8888   `8b.    8 8888   8888   ,d8P  `8b.  ;8.`8888 
- `Y8888P ,88P'       8 8888      8 8888     `88.  8 8888    `Y88888P'    `Y8888P ,88P' 
- ```
-
+# Syrius
 
  Syrius is a a novel approach to synthesize rules for rule-based NIDS
  
  </p>
                                                                                      
-# Requirements
+## Requirements
 
 Syrius uses a number of open source projects to work properly:
 
@@ -27,11 +12,11 @@ Syrius uses a number of open source projects to work properly:
 * [pyshark] - Python wrapper for tshark
 * [PyYAML] -  PyYAML is a YAML parser and emitter for Python.
 
-## Installation
+### Installation
 
 We recommend running installSuricata.sh as it automatically installs Suricata's dependencies, Suricata itself and Syrius dependencies.
 
-## Inputs
+### Inputs
 
 Syrius requires two .pcap files and one .rules file to run correctly:
 
@@ -40,7 +25,7 @@ Syrius requires two .pcap files and one .rules file to run correctly:
 - rules.rules -> contains the rule set used in the ranking step
 - add image showing the inputs
 
-# Usage
+## Usage
 
 ```sh
 Usage:
@@ -63,7 +48,7 @@ At the end, it will generate the output with all plausible rules ordered by fitn
 
 TIP: If you already know the protocol of the attack, we recommend using a filtered benign.pcap with only packets of that protocol. This will make the testing faster.
 
-## Tests
+### Tests
 
 This repository includes a few examples of attacks from multiple sources, and a benign one from [tcpreplay].
 
@@ -75,7 +60,7 @@ As the attack examples are already in the required folder and format, you can ru
 $ python3 syrius.py -a "Datasets/adaptor.pcap"
 ```
 
-# WIP
+## WIP
 
 - WIP
 
