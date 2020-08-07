@@ -8,7 +8,7 @@
                                                                                      
 # Requirements
 
-Syrius uses a number of open source projects to work properly:
+Syrius depends on the following tools:
 
 * [Suricata] (and all its dependencies) - A free and open source network threat detection engine.
 * [pyshark] - Python wrapper for tshark
