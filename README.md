@@ -70,17 +70,13 @@ After finishing the instalation steps above, do the following:
 
 ```console
 $ cd syrius
-$ python3 syrius.py -a "/Datasets/synflood.pcap" -b "/Datasets/benign.pcap" -r "/Datasets/rules.rules"
+$ python3 syrius.py -a "./Datasets/synflood.pcap" -b "./Datasets/benign.pcap" -r "./Datasets/rules.rules"
 ```
 This will run Syrius using with the synflood attack pcap, the bigflows benign pcap from tcpreplay and the Emerging Threats rules from Suricata.
 
 The program will show you the seed rule created, as well as the total number of rules created in each iteration.
 
 After all iterations, the most well ranked rule will be shown to the user, and an output file "output.out" with all plausible rules ordered by ranking will be created on the default path. You can read it with any csv reader.
-
-# WIP
-
-- WIP
 
    [pyshark]: <https://github.com/KimiNewt/pyshark>
    [Suricata]: <https://suricata-ids.org/>
