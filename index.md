@@ -77,10 +77,6 @@ The program will show you the seed rule created, as well as the total number of 
 
 After all iterations, the most well ranked rule will be shown to the user, and an output file "output.out" with all plausible rules ordered by ranking will be created on the default path. You can read it with any csv reader.
 
-# WIP
-
-- WIP
-
    [pyshark]: <https://github.com/KimiNewt/pyshark>
    [Suricata]: <https://suricata-ids.org/>
    [PyYAML]: <https://pypi.org/project/PyYAML/>
