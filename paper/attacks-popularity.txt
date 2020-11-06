@@ -1,0 +1,20 @@
+Attack-Type:
+    'search string': X results
+
+Denial-of-Service:
+    '"denial of service" "attack"': 17.9M results
+
+ICMP Traffic Alerts:
+    '"icmp" "attack"': 1.27M results 
+
+Remote Code Execution:
+    '"remote code execution" "attack"': 1.1M results
+
+Privilege Escalation:
+    '"privilege escalation" "attack"': 551K results
+
+Local File Inclusion:
+    '"local file inclusion" "attack"': 98.9K results
+
+Active Reconnaissance:
+    '"active reconnaissance" "attack"': 13.4K results
