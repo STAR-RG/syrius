@@ -6,7 +6,7 @@
  
  </p>
                                                                                      
-# Instalation
+# Installation
 
 Git clone this repository and run installSuricata.sh:
 
