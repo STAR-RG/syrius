@@ -1,10 +1,6 @@
-<p style="text-align: center;">
-  
 ![logo](https://github.com/damorimRG/syrius/blob/gh-pages/logo.png?raw=true "Syrius")
 
- Syrius is a a novel approach to synthesize rules for rule-based NIDS
- 
- </p>
+Syrius is a a novel approach to synthesize rules for rule-based NIDS
                                                                                      
 # Installation
 
