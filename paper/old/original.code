@@ -1,6 +1,0 @@
-ICodeMatch(...){
-    switch (mode) {
-        case DETECT_ICODE_EQ:
-            return (pcode == dcode1) ? 1 : 0;
-    ...
-}

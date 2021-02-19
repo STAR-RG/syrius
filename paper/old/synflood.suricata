@@ -1,3 +1,0 @@
-alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"LOCAL 
-DOS Unusually fast SYN packets outbound, Potential DOS";
-flags: S,12; threshold: type both, track by_dst, count 5000, seconds 5; classtype: misc-activity; sid:6;)
