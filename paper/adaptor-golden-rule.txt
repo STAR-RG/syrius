@@ -1,0 +1,6 @@
+alert http $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (
+msg: "..."; flow: established,to_server; 
+content: "/HtmlAdaptor";nocase;http_uri; 
+content: "action=inspect";nocase;http_uri; 
+content: "bean";nocase;http_uri; 
+content: "name=";http_uri;)

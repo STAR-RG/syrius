@@ -1,0 +1,5 @@
+... (msg:"Testing rule 1077";  content: "GET"; content: "Catalina%3Atype%3DServer"; content: "/5.00"; sid:2653;)
+... (msg:"Testing rule 1024";  content: "GET"; content: "Catalina%3Atype%3DServer"; content: "(Evasions:"; sid:3349;)
+... (msg:"Testing rule 287";  content: "GET"; content: "Catalina%3Atype%3DServer"; content: "/2.1.5)"; sid:2743;)
+... (msg:"Testing rule 76";  content: "GET"; content: "Catalina%3Atype%3DServer"; content: "None)"; sid:2852;)
+... (msg:"Testing rule 1090";  content: "GET"; content: "/5.00"; content: "003846)"; sid:816;)

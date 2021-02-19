@@ -1,29 +1,16 @@
-\documentclass[journal]{IEEEtran}
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first
+% footnote. If that is unneeded, please comment it out.
 
-\usepackage[svgnames]{xcolor}
-%% hyperlinks
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    anchorcolor=blue,
-    filecolor=blue,      
-    citecolor=blue,
-    urlcolor=blue
-}
-
-\usepackage{lineno}
 \usepackage{subcaption}
-%\usepackage[type1]{libertine}
+\usepackage{libertine}
 \usepackage{lipsum}% http://ctan.org/pkg/lipsum
 \usepackage{algorithm}% http://ctan.org/pkg/algorithm
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{graphicx}
 \usepackage[compatibility=false]{caption}% http://ctan.org/pkg/caption
 \usepackage{booktabs}
-%% Apparently, there is a conflict with this package and acmart. -Marcelo
 \usepackage{cite}
 \usepackage{url}
 \usepackage{multirow}
@@ -47,45 +34,101 @@
   %numbersep=5pt,              % Abstand der Nummern zum Text
   %tabsize=2,                  % Groesse von Tabs
   %extendedchars=true,         %
-  keywords=[2]{tcp, flag, threshold, track, count, seconds, classtype, sid, msg, flow}
+  keywords=[2]{tcp, flag, threshold, track, count, seconds, classtype, sid}
 }
 \usepackage{balance}
 \usepackage{wrapfig}
 \usepackage{enumitem}
 \usepackage{color, colortbl}
 \definecolor{Gray}{gray}{0.9}
-\usepackage{amsmath,amssymb,amsfonts}
-%% as per https://tex.stackexchange.com/questions/5223/command-for-argmin-or-argmax
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
 \usepackage[skins]{tcolorbox}
 
 \input{macros}
 
-\hyphenation{op-tical net-works semi-conduc-tor}
+%\usepackage{theorem}
+\usepackage{amsmath,amssymb,amsfonts}
+%\usepackage{algorithmic}
+%% \usepackage{graphicx}
+%% \usepackage{textcomp}
+%% \usepackage{xcolor}
 
-
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Syrius: Synthesis of Rules for Intrusion Detectors}
+%
+% Math stuff
+%
+\newcommand{\argmin}{\mathop{\mathrm{{arg\,min}}}}
 
-\author{Lucas Alcantara,~%~\IEEEmembership{Member,~IEEE,}
-        Guilherme Padilha,~%~\IEEEmembership{Fellow,~OSA,}
-        Rui Abreu,
-        and~Marcelo d'Amorim%~\IEEEmembership{Life~Fellow,~IEEE}% <-this % stops a space
-\thanks{L. Alcantara, G. Padilha, and M. d'Amorim are with Universidade Federal de Pernambuco, Brazil.}
-\thanks{R. Abreu is with INESC-ID \& Faculty of Engineering of University of Porto, Portugal.}
-}
+%
+% Add comments in the text
+%
+\newboolean{showcomments}
+\setboolean{showcomments}{true}
+%\setboolean{showcomments}{false}
 
-% The paper headers
-%\markboth{}%
-%{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for IEEE Journals}
+\ifthenelse{\boolean{showcomments}}
+  {\newcommand{\nb}[3]{
+  {\color{#2}\small\fbox{\bfseries\sffamily\scriptsize#1}}
+  {\color{#2}\sffamily\small$\triangleright~$\textit{\small #3}$~\triangleleft$}
+  }
+  }
+  {\newcommand{\nb}[3]{}
+  }
 
-% make the title area
+%\title{\tname{} for NIDS Rule Synthesis}
+\title{\tname{}: Synthesis of Rules for Intrusion Detectors}  
+%\title{Rule Synthesis for Network Intrusion Detectors}  
+
+%% \title{Conference Paper Title*\\
+%% {\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
+%% should not be used}
+%% \thanks{Identify applicable funding agency here. If none, delete this.}
+%% }
+
+%% \author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% \and
+%% \IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% \and
+%% \IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% \and
+%% \IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% \and
+%% \IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% \and
+%% \IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
+%% \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%% \textit{name of organization (of Aff.)}\\
+%% City, Country \\
+%% email address or ORCID}
+%% }
+
+\pagestyle{plain}
 \maketitle
 
-% As a general rule, do not put math, special symbols or citations
-% in the abstract or keywords.
+% and examples of trusted rules
+
 \begin{abstract}
 Network Intrusion Detection Systems (\nids{}) are popular tools to
 defend local networks against attacks. These systems monitor the
@@ -99,80 +142,56 @@ attacks. \tname{} is organized as a pipeline of three components to
 1)~create an over-specified seed rule, 2)~derive plausible rules from
 the seed, and 3)~rank plausible rules. We evaluated \tname\ against a
 set of 21 network attacks with various
-characteristics. \tname\ was capable of generating the correct rule
-among the top-3 and top-1 rules of the ranking, respectively, in
+characteristics. \tname\ was capable of generating the correct rule 
+among the top-3 and top-1 rules of the ranking, respectively, in 
 \percTopThreeRankingPrefix\ and \percTopOneRankingPrefix\ of the cases.
 \end{abstract}
 
-% Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
 Intrusion Detection, Suricata, Rule Synthesis.
 \end{IEEEkeywords}
-
-\IEEEpeerreviewmaketitle
 
 \section{Introduction}
 \label{sec:intro}
 
 Network Intrusion Detection Systems (\nids{}) are software systems
-that monitor traffic of a network for malicious behavior and block 
-messages or alert humans about suspicious
+that monitor the network traffic for malicious behavior and block 
+messages or alerting humans about suspicious
 events~\cite{Mitchell:2014:SID:2597757.2542049}. \nids{} are typically
 placed behind a firewall, vetting the traffic that the firewall did
 not block. Various open-source (\eg{}, Snort~\cite{snort},
 Suricata~\cite{suricata}) and commercial (\eg{},
 SolarWinds~\cite{solarwinds}, IBM QRadar~\cite{qradar})
-\nids\ implementations exist. \emph{Rule-based} \nids{}~\cite{ids-comparison} check if the network traffic matches a fixed set of rules. 
+\nids\ implementations exist.
 
 % given the amount of potential malicious traffic that exist on the Internet
-% This paper focuses on rule-based \nids{}, which are very popular in
-% industry. 
 
-\begin{figure}[h!]
-\lstinputlisting[language=C,numbers=none,keywords={icmp,dsize,itype}]{pingscan.suricata.txt}
-  \caption{Suricata rule for Ping Scan attack.}
-  \label{fig:pingscan-example}
-\end{figure}
-
-Figure~\ref{fig:pingscan-example} shows an example rule of Suricata~\cite{suricata}, a popular rule-based \nids{}. A rule describes a pattern in the traffic. The observation of that pattern in the traffic indicates an attempt of a malicious individual
-to attack a local network.\footnote{Likewise, a rule can be used to describe a malicious access pattern of individual that have access to the network.} This particular rule prescribes a method to capture an Active Reconnaissance attack for discovering accessible
+This paper focuses on rule-based \nids{}, which are very popular in
+industry~\cite{proofpoint-etpro,snort-rule-subscriptions}. A
+\emph{rule-based intrusion detector}\MyComment{\footnote{\aka\ signature-based
+  intrusion detector.}} checks if the network traffic matches a fixed
+set of rules. Figure~\ref{fig:pingscan-example} shows an example rule
+of Suricata~\cite{suricata}, a popular open-source \nids{}. A rule
+describes a pattern in the traffic. The observation of that pattern in
+the traffic indicates an attempt of a malicious individual
+to attack a local network. This particular rule prescribes a method to
+capture an Active Reconnaissance attack for discovering accessible
 hosts in a network (see Section~\ref{sec:active-recon}).
-Open-source \nids{}, like Snort~\cite{snort} and
-Suricata~\cite{suricata}, provide rulesets for many existing
-attacks. Unfortunately, attackers actively look for new mechanisms to
-exploit systems through the
-network. Figure~\ref{fig:distribution-rules-per-month} shows the
-number of rules added per month in the year of 2019 to the ``Emerging
-Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
-data set of Snort and \suri\ rules. The changelogs of
-this ruleset~\cite{emerging-threats-changelogs} indicate that new rules
-are often created.  Rulesets need to be continuously revised as the
-community finds and advertises vulnerabilities, which eventually can
-be exploited by hackers.  Unfortunately, creating these rules is
-time-consuming and error-prone~\cite{vollmer-etal-cics2011,alparslan-blog-suri}. The language for
-describing rules is non-trivial (see
-Section~\ref{sec:example-suricata-rules}) and testing correctness of a
-rule requires data and careful inspection.
 
-%% IT-security companies capitalize on this phenomena and
-%% offer rulesets on the
-%% market.
-
-%\begin{wrapfigure}[7]{r}{0.35\textwidth}
-\begin{figure}[t!]
-    %\vspace{-4ex}  
+\begin{wrapfigure}[7]{r}{0.21\textwidth}
+    \vspace{-4ex}  
     \centering
-    \scalebox{1}{  
+    \scalebox{0.9}{  
       \begin{tikzpicture}
         \begin{axis}[
-            width = 0.47\textwidth,
-            height = 0.25\textwidth,            
+            width = 0.3\textwidth,
+            height = 0.2\textwidth,            
             bar width=3pt,
             scaled ticks=false,
             ymajorticks=false,
             ybar stacked,
             ymax=250,
-            enlargelimits=0.08,
+            enlargelimits=0.09,
             clip=true,
             legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
             xtick=data,
@@ -186,19 +205,57 @@ rule requires data and careful inspection.
         \end{axis}
       \end{tikzpicture}
     }
-    \vspace{-2ex}
-    \caption{\label{fig:distribution-rules-per-month}Number of rules added to the ``Emerging Threats Open Ruleset''~\cite{emerging-threats-open} each month in 2019.}
-%\end{wrapfigure}
-\end{figure}
+    \vspace{-5ex}
+    \caption{\label{fig:distribution-rules-per-month}2019 new rules.}
+\end{wrapfigure}
+Open-source \nids{}, like Snort~\cite{snort} and
+Suricata~\cite{suricata}, provide rulesets for many existing
+attacks. Unfortunately, attackers actively look for new mechanisms to
+exploit systems through the
+network. Figure~\ref{fig:distribution-rules-per-month} shows the
+number of rules added per month in the year of 2019 to the ``Emerging
+Threats Open Ruleset''~\cite{emerging-threats-open}, a popular public
+data set of Snort and \suri\ rules. A closer observation on the changelogs of
+this ruleset~\cite{emerging-threats-changelogs} shows that new rules
+are often created.  Rulesets need to be continuously revised as the
+community finds and advertises vulnerabilities, which eventually can
+be exploited by hackers.  Unfortunately, creating these rules is
+time-consuming and error-prone~\cite{vollmer-etal-cics2011,alparslan-blog-suri}. The language for
+describing rules is non-trivial (see
+Section~\ref{sec:example-suricata-rules}) and testing correctness of a
+rule requires data and careful inspection.
 
-\sloppy This paper proposes \textbf{\tname{}} (for \textbf{Sy}nthesis of
+%% IT-security companies capitalize on this phenomena and
+%% offer rulesets on the
+%% market.
+
+\sloppy This paper proposes \tname{} (for \textbf{Sy}nthesis of
 Su\textbf{ri}cata R\textbf{u}le\textbf{s}), a technique to
-automatically synthesize rules for rule-based \nids.\footnote{Despite the reference to ``\suri'' in the name, the technique is applicable to any rule-based \nids{}.} The goal of \tname\ is to facilitate the creation of rules and, consequently, help system
+automatically synthesize rules for rule-based \nids. Our goal is to
+facilitate the creation of rules and, consequently, help system
 administrators to harden the protection against network attacks.
 \tname{} leverages different sources of information to synthesize
-rules for a given attack. To create rules, \tname\ uses 1) positive examples (\ie{}, traffic to reproduce the attack), 2) negative examples (\ie{}, benign traffic), and 3) a data set of human-written
-trusted rules. The examples constrain the search
-space of rules that can be used to capture the attack. Intuitively, positive examples indicate what should be captured whereas negative examples indicate what should not be captured. It is worth noting that the sets of positive and negative examples are very unbalanced for this synthesis problem, making classical machine learning solutions not directly applicable~\cite{branco2016survey,ribeiro2020imbalanced}. The rationale for such imbalance is that system administrators may not have access to many positive examples right after realizing a new attack took place.
+rules for a given attack. It uses 1) positive examples, \ie{},
+scenarios that reproduce the attack, 2) negative examples in the form
+of a data set of benign messages, and 3) a data set of human-written
+trusted rules. The positive and negative examples constrain the search
+space of rules that can be used to capture the attack. Intuitively,
+positive examples indicate what should be captured whereas negative
+examples indicate what should not be captured. It is worth noting that
+classical machine learning techniques \emph{are not directly
+  applicable in this context} as they typically have limited support
+to string and structured data, which are prevalent in this domain.
+
+%% vast amounts of negative data
+%% exist~\cite{tcpreplay,stratosphere-normal}, but positive data is
+%% scarce~\cite{} as it is not common (and considered unethical) to publish
+%% attacks on the web\Mar{is there a term for non-deep web?}.
+
+%Furthermore, \tname\ uses
+%public data sets of rules to differentiate rules by the similarity to
+%human-written rules.
+
+%\rui{We ought to explain how does one get hold on examples. How diffcult are they to obtain?} \Gui{Given a captured network traffic, an expert must identify which packets can be used to generate the rule. These packets are separated and given as input to Syrius.}
 
 \tname{} takes on input one or more examples of an attack, identified by a domain expert, and produces
 on output a ranked list of rules for that attack. One assumption that
@@ -253,9 +310,7 @@ the cases.
 %% ways to circumvent existing protections and 2) manual creation of
 %% rules is tedious and time-consuming.  
 
-This paper makes the following contributions. 
-
-% \Fix{Q2.1 The authors should compare the proposed algorithm with the related ones} \Fix{Q3.3 While the proposed approach and its evaluation can be considered as the contribution, the implementation and data should not.}
+This paper makes the following contributions.
 
 \newcommand{\Contrib}[1]{$\star$#1}
 \begin{itemize}[topsep=.2ex,itemsep=.2ex,leftmargin=0.8em]
@@ -269,15 +324,15 @@ This paper makes the following contributions.
   correct rule among those generated.
 
 \item[\Contrib{}]\textbf{Implementation.} A public implementation of
-  \tname. 
+  \tname. (Available on request to preserve double-blindness.)
 
+\item[\Contrib{}]\textbf{Data.} A data set of artifacts involved in
+  the evaluation of \tname\ (\eg{}, pcap files of example attacks, list
+  of plausible rules generated, etc.). The data set is available at
+  the following URL~\ourdataset.
+  
 \end{itemize}
 
-The data set we used to evaluate \tname{} (\eg{}, pcap files of example attacks, list of plausible rules generated, etc.) and the tool itself are available at the following URL:
-
-\begin{center}
-\ourdataset
-\end{center}
 
 \section{\nids}
 \label{sec:background}
@@ -350,7 +405,7 @@ argument is present in the payload of a message.
 \begin{table}[t!]
   \footnotesize
   \caption{\label{table:rules}Example of capture-relevant options of Suricata.}
-  %\vspace{-2ex}
+  \vspace{-2ex}
   \centering
   \begin{tabular}{clp{6cm}}
     \toprule
@@ -368,7 +423,7 @@ argument is present in the payload of a message.
     10 & content & checks if argument is present on the payload\\
     \bottomrule
   \end{tabular}
-  %\vspace{-3ex}  
+  \vspace{-3ex}  
 \end{table}
 
 Table~\ref{table:rules} shows a sample of capture-relevant options of
@@ -398,7 +453,7 @@ protocols.
 
 
 %% %\begin{wrapfigure}[14]{r}{0.5\textwidth}
-%% \begin{figure}[t!]               
+%% \begin{figure}[t!]
 %%   \centering
 %% %  \vspace{-7ex}
 %%   \scalebox{0.85}{
@@ -441,11 +496,11 @@ us consider a rule for an icmp attack as example.
 
 \begin{figure}[h!]
   \centering
-  %\vspace{-2ex}  
+  \vspace{-2ex}  
   \includegraphics[scale=0.27]{figs/ICMP-packet-structure.png}
-  %\vspace{-1ex}
+  \vspace{-1ex}
   \caption{Layout of an icmp packet.}
-  %\vspace{-1ex}
+  \vspace{-1ex}
   \label{fig:icmp-packet-layout}
 \end{figure}
 
@@ -470,11 +525,29 @@ described above. One exception to this is the option
 attacks. That option operates over sequence of messages as opposed to
 single messages.
 
+%Consequently, it is not possible to determine its
+%values from a single message.
+
+
+%% More precisely, to trigger an action on a rule
+%% containing that option a \nids\ tool needs to monitor several
+%% messages.
+
+%% \Luc{
+%%   Os campos Flags e Time to live no header IP são mapeados para as opções fragbits e ttl, respectivamente. Os campos Type e Code no header ICMP são mapeados para as opções itype e icode. \\
+%% Os campos, Time to Live, Type e Code recebem diretamente o valor que está no pacote. Por exemplo, se o campo Type no pacote possuir valor 8, na regra ele vai aparecer como itype:8.\\
+%% O campo Flags é intepretado como um vetor de bits, onde cada posição representa uma flag. Na regra, o valor do campo Flags é traduzido em caracteres que representam cada flag presente no pacote. Por exemplo: se o campo Flags possuir o valor 1010, na regra aparecerá fragbits:RM, pois os caracteres R e M indicam a presença do quarto e segundo bits.}
+
+
 \section{Illustrative Example}
 \label{sec:suri-metas-coverage}
 \label{sec:active-recon}
-This section briefly shows how \tname{} synthesizes rules for 
-Active Reconnaissance~\cite{active-recon,active-reconnaissance}, an intrusion method that is typically used as a preliminary step towards an actual attack. Active Reconnaissance is a method to collect information about a computing system to determine its potential vulnerabilities. For example, the Ping Scan attack~\cite{ping-scan}
+
+This section briefly shows how \tname{} synthesizes rules for one
+example attack. Active Reconnaissance is typically used as a
+preliminary step towards an actual attack. It is a method to collect
+information about a computing system to determine potential
+vulnerabilities. For example, the Ping Scan attack~\cite{ping-scan}
 scans the network for IPs of accessible hosts. An attacker sends
 several ICMP Echo requests to a range of IP addresses in the network
 and checks which ones respond to these requests. This method enables
@@ -482,8 +555,18 @@ an attacker to discover which machines are active in the network.
 
 %\vspace{-1ex}
 
+\begin{figure}[h!]
+  % part removed...rev:4; metadata:created_at 2010_09_23, updated_at 2010_09_23;  
+  \lstinputlisting[language=C,numbers=none,keywords={icmp,dsize,itype}]{pingscan.suricata}
+  \vspace{-1ex}  
+  \caption{Suricata rule for Ping Scan attack.}
+  \vspace{-2ex}  
+  \label{fig:pingscan-example}
+\end{figure}
+
 Figure~\ref{fig:pingscan-example} shows a Suricata rule that captures
-Ping Scan, as documented by the network security auditing tool NMAP~\cite{netmap}. The essential options to capture the attack are in
+Ping Scan, as documented on NMAP~\cite{netmap}, a network security
+auditing tool. The essential options to capture the attack are in
 bold---the option \CodeIn{dsize: 0} indicates that the packet has no
 bytes in the payload and the option \CodeIn{itype: 8} indicates that
 the packets to be captured are ICMP Echo requests.
@@ -507,19 +590,24 @@ header, and \emph{initial} options expressed in the
 traffic. Considering the Ping Scan attack, \tname{} 
 infers the header by checking the protocol of the input messages. In
 this case, \tname{} sets the header to \CodeIn{icmp any any -> any
-  any}. It uses the most general flow description to indicate that the 
-\nids\ should monitor icmp traffic flowing from/to any address and
-port.  The rationale for using this flow description is that the choice of these parameters are domain-specific and subject to change by sys admins. Likewise, \tname{} leaves the action of the corresponding rule constant, as
+  any}. It uses the most general flow description to command the
+\nids\ to monitor the icmp traffic flowing from/to any address and
+port.  The rationale is that the choice of these parameters are
+domain-specific and subject to change by sys admins. Likewise,
+\tname{} leaves the action of the corresponding rule constant, as
 \CodeIn{alert}. Furthermore, recall from
 Section~\ref{sec:rules-and-packets} that some options can be inferred
 from packet contents. \tname{} finds the following five options at
 this stage: {\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
       \textbf{icode:}0; \textbf{icmp\_id:}23570;
       \textbf{icmp\_seq:}3439;}}}.  By construction, a rule that uses
-this set of options captures the malicious traffic. Unfortunately, a
-rule with the options above will be over-specified and could result in false negatives. More precisely, in this case, although the options \CodeIn{dsize:0} and \CodeIn{itype:8} are present in the set of inferred options---as the golden rule from Figure~\ref{fig:pingscan-example} shows---the others are irrelevant. They appeared in the positive example but do not contribute to the definition of the pattern describing the attack.
-
-% \Fix{Q3.4 Some of the statements in the manuscript is not rigorous and need more justification}
+this set of options captures the malicious traffic. Unfortunately, the
+rule above is over-specified. Informally, the rule includes ``too
+specific'' characteristics of the malicious traffic and could
+potentially result in false negatives. In this case, although the
+options \CodeIn{dsize:0} and \CodeIn{itype:8} are present in the set
+of inferred options---as the golden rule from
+Figure~\ref{fig:pingscan-example} shows---the others are not.
 
 
 %% \vspace{-2.5ex}
@@ -579,20 +667,21 @@ plausible rules.
 \section{Technique}
 \label{sec:technique}
 
-% \tname{} is a technique to synthesize rules for rule-based
-% \nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
-% goal is to automatically create rules that capture an attack of
-% interest. \Fix{Q1.1 some redundancy in the text where authors repeat the same description a few times}
+\tname{} is a technique to synthesize rules for rule-based
+\nids~(\eg{}, Snort~\cite{snort} and Suricata~\cite{suricata}). The
+goal is to automatically create rules that capture an attack of
+interest.
 
-\tname\ takes on input one or more
+\vspace{1ex}
+\noindent\textbf{Overview.}~\tname\ takes on input one or more
 examples of an attack and produces on output a ranked list of
 \emph{plausible rules}, \ie{}, rules capturing only the malicious
 traffic produced by the attacks. Figure~\ref{fig:overview} shows the
 workflow of \tname{} as a pipeline of three components, numbered in
 the figure. As public data sets of benign
 traffic~\cite{tcpreplay,stratosphere-normal} and rules
-exist~\cite{emerging-threats-open}, \tname{}'s users only need to
-provide example(s) of attacks.
+exist~\cite{emerging-threats-open}, \tname{}'s users only needs to
+provide examples of attacks.
 
 %% To create rules, \tname\ leverages (1)
 %% benign and malicious network traffic and (2) rules from public
@@ -600,11 +689,11 @@ provide example(s) of attacks.
 
 \begin{figure}[t!]
   \centering
-  \includegraphics[trim=0 340 50 0,clip,width=0.47\textwidth]{figs/nids-workflow}
+  \includegraphics[trim=0 340 50 0,clip,width=0.48\textwidth]{figs/nids-workflow}
 %  \vspace{-2ex}  
   \caption{The \tname\ workflow.}
   \label{fig:overview}
-  %\vspace{-4ex}
+  \vspace{-4ex}
 \end{figure}
 
 % (see Section~\ref{sec:rules-and-packets})
@@ -616,7 +705,7 @@ provide example(s) of attacks.
 %% the previous step. 
 
 \tname\ works as follows. First, it creates a rule that captures the
-malicious traffic associated with at least one example attack provided on
+malicious traffic associated with example attacks provided on
 input. In this step, \tname\ detects options directly from the input
 messages. More precisely, it creates a rule containing options that
 are guaranteed to be satisfied by the malicious traffic. We refer to
@@ -666,9 +755,9 @@ component of \tname.
 \label{sec:reverse-engineering}
 
 The goal of the Reverse Engineering step is to infer a \emph{seed
-  rule} that captures the attack. To that end, \tname{} extracts options
-from the traffic produced by the input example attack(s). % and  related messages.
-A rule that contains these options captures the
+  rule} that captures the attack. To that end, \tname{} monitors the
+traffic produced by the input example attack(s) and extracts options
+from related messages. A rule that contains these options captures the
 malicious traffic by construction. \tname\ uses two strategies to
 extract options: 1)~field and 2)~payload. The field strategy applies
 to any protocol whereas the payload strategy applies only to http.
@@ -694,8 +783,10 @@ payload, not the fields. For example, \percRulesWithContent{} of the
 rules for http attacks contain at least one content option.
 
 \begin{figure}[h!]
-  \lstinputlisting[language=C,numbers=none,keywords={http,content}]{adaptor-golden-rule.txt}
-  \caption{Suricata rule for the JBoss JMX attack.}
+  \lstinputlisting[language=C,numbers=none,keywords={http,content}]{adaptor-golden-rule.suricata}
+  \vspace{-1ex}  
+  \caption{Suricata rule for JBoss JMX attack.}
+  \vspace{-2ex}  
   \label{fig:adaptor-golden-rule.suricata}
 \end{figure}
 
@@ -751,11 +842,17 @@ the malicious traffic.
 %% }
 
 
-\subsection{Step 2: Rules Creation}
+\subsection{Step 2: Rules Generation}
 \label{sec:minimization}
 
 The seed rule produced in the first step satisfies the criterion to
-capture the traffic produced by the example attacks. However, it is over-constrained.  The seed rule may include options irrelevant to capture the attack and lead to false negatives---the \nids\ may be unable to capture manifestations of the same attack whose messages do not exhibit the data satisfying irrelevant options. For example, the seed rule produced after the Reverse Engineering step on the Ping Scan example (Section~\ref{sec:active-recon}) contains options
+capture the traffic produced by the example attacks. However, that
+rule is over-constrained.  It may include options irrelevant to
+capture the attack and lead to false negatives---the \nids\ may be
+unable to capture manifestations of the same attack whose messages do
+not exhibit the data satisfying irrelevant options. For example, the
+seed rule produced after the Reverse Engineering step on the Ping Scan
+example (Section~\ref{sec:active-recon}) contains options
 \CodeIn{icode:0}, \CodeIn{icmp\_id:23570}, and
 \CodeIn{icmp\_seq:3439}, which are irrelevant to capture that attack.
 
@@ -763,9 +860,17 @@ capture the traffic produced by the example attacks. However, it is over-constra
 %% during the first step are irrelevant for determining the attack and
 %% should be removed to obtain more general rules. 
 
-To address the overfitting issue, \tname{} \emph{minimizes} the rules produced in the previous step, preserving the invariant of \emph{only} capturing the positive malicious traffic. \tname{} leverages public data sets of benign traffic~\cite{tcpreplay} and \emph{all} available examples of the attack to guide the search for general rules. We say that a rule is minimal if discarding any option results in the capture of negative (\ie{}, benign) traffic. The procedure we propose in this step builds on the observation that all options from the rule produced in the previous step are satisfied by the traffic produced by the attack. Consequently, any subset of these options also captures the attack.
-
-
+To address the overfiting issue, \tname{} leverages public data sets
+of benign traffic~\cite{tcpreplay} and additional examples of the
+attack to guide the search for more general rules. To that end,
+\tname{} \emph{minimizes} the rules produced in the previous step,
+preserving the invariant of \emph{only} capturing the positive
+malicious traffic. We say that a rule is minimal if discarding any
+option results in the capture of negative (\ie{}, benign) traffic.
+The procedure we propose in this step builds on the observation that
+all options from the rule produced in the previous step are satisfied
+by the traffic produced by the attack. Consequently, any subset of
+these options also captures the attack.
 
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
 \algnewcommand\algorithmicforeach{\textbf{for each}}
@@ -773,10 +878,13 @@ To address the overfitting issue, \tname{} \emph{minimizes} the rules produced i
 \algnewcommand\And{\textbf{and} }%
 \setlength{\textfloatsep}{3pt}% Remove \textfloatsep
 \begin{algorithm}[t!]
+  %\noindent\hspace{-2ex}
   \flushleft{}\textbf{INPUT:} (over-constrained) seed rule $sr$, pcap
-  files for benign traffic
+  files for benign traffic\\
   ($\mathit{bTr}$), pcap files for malicious traffic ($\mathit{mTr}$)\\
+  %\noindent\hspace{-27.5ex} 
   \textbf{OUTPUT:} Set of minimized rules $\mathcal O$\\
+%\vspace{-3ex}
 \captionof{algorithm}{Rule creation algorithm}\label{algo1}
 \begin{algorithmic}[1]
   \State $\mathcal R \gets \{\mathit{sr}\}$\Comment{initial population of candidate solutions.}\label{line-init}
@@ -801,11 +909,9 @@ To address the overfitting issue, \tname{} \emph{minimizes} the rules produced i
 \end{algorithmic}
 \end{algorithm}
 
-% \tname{} generates plausible rules while minimizing the seed
-% rule. 
-
-Algorithm~\ref{algo1} shows the pseudocode of the
-procedure that \tname\ uses to minimize rules. The algorithm takes as input an over-constrained rule $sr$,
+\tname{} generates plausible rules while minimizing the seed
+rule. Algorithm~\ref{algo1} shows the pseudocode of that
+procedure. The algorithm takes as input an over-constrained rule $sr$,
 denoting the seed rule produced in the Reverse Engineering step, and
 pcap files~\cite{pcap} to reconstruct the benign traffic
 ($\mathit{bTr}$) and the malicious traffic ($\mathit{mTr}$). The
@@ -827,7 +933,8 @@ individuals for the next generation. The inner loop
 candidate rule in $\mathcal R$. The algorithm mutates each of these
 rules $N$ times, discarding one rule option each
 time. Higher (respectively, lower) values of $N$ produces more (respectively,
-less) rules. We empirically found that a value of 2 for $N$ was sufficient to generate the golden rule for all the cases we have analyzed. Line~\ref{copy} assigns a copy of the bitvector encoding
+less) rules. We found empirically that a value of 2 was sufficient to
+generate the golden rule in all cases. Line~\ref{copy} assigns a copy of the bitvector encoding
 $\mathit{ro}$ to variable $r$. Function $\mathit{len}$ returns the
 length of a vector and function $\mathit{rand(lo, hi)}$ randomly
 chooses one integer value in the range $[lo, hi]$ defined by its
@@ -943,147 +1050,6 @@ creating rules.
 %\rui{paragraph on complexity? I wonder whether that is a good ideia because
 %this is already a long section.}
 
-\pgfplotsset{width=6cm,compat=1.8}
-\pgfplotsset{every tick label/.append style={font=\tiny}}
-\begin{figure}[ht!]
-  \centering
-\begin{subfigure}{.20\textwidth}
-  %\centering
-  \scalebox{0.90}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=4pt,
-          scaled ticks=true,
-          ymajorticks=false,
-          ybar stacked,
-          ymax=28000,
-          enlargelimits=0.12,
-%          enlargelimits=false,
-%          axis equal,
-          clip=false,
-          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-          xtick=data,
-          xticklabel style={rotate=90},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          xticklabel style={font=\footnotesize},          
-          nodes near coords align={vertical},       
-          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode},          
-        ]
-        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode,108)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-4.5ex}
-  \caption{\label{fig:distribution-options}Options.}
-\end{subfigure}%
-\hspace{4ex}\begin{subfigure}{.25\textwidth}
-    \centering
-    \vspace{-.5ex}
-    \scalebox{0.90}{  
-      \begin{tikzpicture}
-        \begin{axis}[
-          bar width=4pt,
-          scaled ticks=true,
-          ymajorticks=false,
-          ybar stacked,
-          ymax=10000,
-          enlargelimits=0.1,
-%          enlargelimits=false,
-%          axis equal,
-          clip=false,
-          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-          xtick=data,
-%          xticklabel style={rotate=45},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          xticklabel style={font=\footnotesize},          
-          nodes near coords align={vertical},
-          %symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-          symbolic x coords={1, 3, 2, 0, 4, 5, 6, 7},
-          ]
-          \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535)};
-        \end{axis}
-      \end{tikzpicture}
-    }
-    \vspace{3ex}
-    \caption{\label{fig:distribution-contents}Number of content options.}
-  \end{subfigure}
-
-\vspace{3ex}  
-\begin{subfigure}{.25\textwidth}
-  \centering
-  \vspace{-1ex}
-  \scalebox{0.87}{  
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=4pt,
-          scaled ticks=true,
-          ymajorticks=false,
-          ybar stacked,
-          ymax=2100,
-          enlargelimits=0.1,
-%          enlargelimits=false,
-%          axis equal,
-          clip=false,
-          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-          xtick=data,
-          xticklabel style={rotate=90},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          xticklabel style={font=\footnotesize},
-          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE},
-        ]
-        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  \vspace{-2.5ex}
- \hspace{3ex}
-  %\vspace{-4ex}  
-  \caption{\label{fig:distribution-strings}Strings in content options.}
-\end{subfigure}%\hspace{4em}%
-\begin{subfigure}{.25\textwidth}
-  %\vspace{1.5ex}
-  \centering
-  \vspace{0ex}
-  \scalebox{0.90}{
-    \begin{tikzpicture}
-      \begin{axis}[
-          bar width=4pt,
-          scaled ticks=true,
-          ymajorticks=false,
-          ybar stacked,
-          ymax=10500,
-          enlargelimits=0.12,
-%          enlargelimits=false,
-%          axis equal,
-          clip=false,
-          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
-          xtick=data,
-          xticklabel style={rotate=90},          
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          xticklabel style={font=\footnotesize},          
-          nodes near coords align={vertical},
-          symbolic x coords={uri, header, method, user\_agent, host, connection, request\_line},          
-        ]
-        \addplot coordinates {(uri,10111) (method,3821) (user\_agent,1022) (header,4089) (host,224) (connection,29) (request\_line,11)};
-      \end{axis}
-    \end{tikzpicture}
-  }
-  %\hspace{-8ex}
-  \vspace{-2.5ex}
-  \caption{\label{fig:distribution-content_modifiers}Http content modifiers.}
-\end{subfigure}%
-%\vspace{-1ex}
-\caption{\label{fig:freq-features}Frequency of features.
-% \Mar{@Lucas, os x-ticks da figura (c) sumiram. vc. pode tentar coloca-los?}
-}
-\end{figure}
-
-%\Mar{@Lucas/Guilherme, podem tentar deixar isto na mesma linha? diminuindo espaços? Mas facam de forma que fique legivel.}}
-
 \subsection{Step 3: Ranking}
 \label{sec:ranking}
 
@@ -1099,20 +1065,39 @@ function ranges on the 0-1 interval. Hence, the score of a rule also
 ranges on the 0-1 interval. We describe in the following each of these
 heuristic functions.
 
+%% \Luc{atualmente eh uma
+%%   média simples e não ponderada ja q as funções tem o mesmo
+%%   peso. conversamos na ultima reuniao sobre testar diferentes pesos
+%%   para cada função, mas n sei quão prioritário eh isso comparado as
+%%   outras atividades que definimos.} $\sum{f_i}/|f_i|$.
+
+%% Note that there are 11 rules with no
+%% options. These rules only use the header to signal a traffic as
+%% malicious. Also note that most rules have 2 to 6 options. 
+
 \subsubsection{\label{sec:popularity-options}Popularity of options ($popt$)}
 
-\tname{} uses the popularity of the options used in trusted rules as a
+\tname{} use the popularity of the options used in trusted rules as a
 heuristic function---rules containing popular options score higher
 compared to those containing unpopular
-options. Figure~\ref{fig:freq-features} shows the frequency of various features used by \tname\ for ranking the rules it creates. Figure~\ref{fig:distribution-options} shows the histogram of rule options for the ruleset we used~\cite{emerging-threats-open}. For space, the x-axis shows only the 8 most common options used in rules and the y-axis shows the number of rules using the corresponding option. Note that the options \CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce}
-are very popular. \tname\ uses the following equation to compute the
+options. Figure~\ref{fig:distribution-options} shows the histogram of
+rule options for the ruleset we used~\cite{emerging-threats-open}. The
+x-axis shows the options used in rules (the 8 most common) and the
+y-axis shows the number of rules using the corresponding option. Note
+that the options \CodeIn{content}, \CodeIn{flow}, and \CodeIn{prce}
+are very popular. \tname\ uses the following formula to compute the
 contribution of option popularity to the score of a rule $r$:
+\indent
+$popt = \sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N$.
 
-\vspace{-1ex}
-\begin{equation}
-popt = \sum_{i=1}^{N}\frac{\mathit{option\_frequency[option_i]}}{\mathit{max(option\_frequency)}}/N
-\end{equation}
-\vspace{-1ex}
+%% {\small
+%% \vspace{-2ex}
+%% \[
+
+
+%% \]
+%% \vspace{-2ex}
+%% }
 
 \noindent
 The term $\mathit{option_i}$ denotes the $i$th option in the bitvector
@@ -1169,7 +1154,8 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 %%   data set}\Mar{sim, isto ajuda, porem mais importante eh saber quantas
 %%   (\%) das 28K regras tem contents.} \Luc{92\%}
 
-
+\pgfplotsset{width=6cm,compat=1.8}
+\pgfplotsset{every tick label/.append style={font=\tiny}}
 
 %%   \begin{subfigure}{.25\textwidth}
 %%     \centering
@@ -1201,6 +1187,138 @@ $0.01$=$(155$+$108)/(2$*$25699)$ for a rule with options
 %%     \caption{\label{fig:distribution-rule-size}Rule sizes.}
 %%   \end{subfigure}%
 
+\begin{figure*}[t!]
+  \centering
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \scalebox{0.8}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          ymax=27000,
+          enlargelimits=0.12,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+          xticklabel style={rotate=35},
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
+          nodes near coords align={vertical},
+          %symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode, flags, tls.fingerprint},          
+          symbolic x coords={content, flow, pcre, flowbits, threshold, dsize, itype, icode},          
+        ]
+        \addplot coordinates {(content,25699) (flow,23159) (pcre,10181) (flowbits,3049) (threshold,2300) (dsize,882) (itype,155) (icode,108)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-5ex}
+  \hspace{4ex}
+  \caption{\label{fig:distribution-options}Option popularity.}
+%  \vspace{-1ex}    
+\end{subfigure}%  
+  \begin{subfigure}{.25\textwidth}
+    \centering
+    \scalebox{0.85}{  
+      \begin{tikzpicture}
+        \begin{axis}[
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          ymax=10000,
+          enlargelimits=0.1,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+%          xticklabel style={rotate=45},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
+          nodes near coords align={vertical},
+          %symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+          symbolic x coords={0, 1, 2, 3, 4, 5, 6, 7},
+          ]
+          \addplot coordinates {(0,2134) (1,9164) (2,5103) (3,5841) (4,1987) (5,1622) (6,805) (7, 535)};
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \vspace{-1ex}
+    \caption{\label{fig:distribution-contents}Number of content options.}
+  \end{subfigure}% <---- don't forget this %
+%  \\
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \scalebox{0.8}{  
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          ymax=2200,
+          enlargelimits=0.1,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+          xticklabel style={rotate=35},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
+          nodes near coords align={vertical},
+          %symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE, INSERT, 200, /index.php?},          
+          symbolic x coords={GET, POST, SELECT, UNION, id=, DELETE, UPDATE},          
+        ]
+        \addplot coordinates {(GET,2007) (POST,1570) (SELECT,747) (UNION,461) (id=,408) (DELETE,390) (UPDATE,387)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-2ex}  
+  \caption{\label{fig:distribution-strings}Strings used in content options.}
+\end{subfigure}%
+\begin{subfigure}{.25\textwidth}
+  \centering
+  \scalebox{0.8}{
+    \begin{tikzpicture}
+      \begin{axis}[
+          bar width=4pt,
+          scaled ticks=true,
+          ymajorticks=false,
+          ybar stacked,
+          ymax=11000,
+          enlargelimits=0.12,
+%          enlargelimits=false,
+%          axis equal,
+          clip=false,
+          legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1},          
+          xtick=data,
+          xticklabel style={rotate=35},          
+          nodes near coords,
+          every node near coord/.append style={font=\scriptsize},
+          xticklabel style={font=\footnotesize},          
+          nodes near coords align={vertical},
+          symbolic x coords={uri, header, method, user\_agent, host, connection, request\_line},          
+        ]
+        \addplot coordinates {(uri,10111) (method,3821) (user\_agent,1022) (header,4089) (host,224) (connection,29) (request\_line,11)};
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \vspace{-2ex}
+  \caption{\label{fig:distribution-content_modifiers}Http content modifiers.}
+\end{subfigure}%
+\vspace{-1ex}
+\caption{Distributions.}
+\vspace{-2ex}
+\end{figure*}
 
 
 \subsubsection{Number of content options ($ncont$)} 
@@ -1212,15 +1330,9 @@ distribution of number of contents in a rule. Results indicate that
 nearly 73\% of the rules from our ruleset contain one to three content
 options. Hence, we found that that information could help
 \tname\ discriminate useful rules. \tname{} computes the contribution
-of the number of content options to the score of a rule $r$ as follows
-
-\vspace{-1ex}
-\begin{equation}
-\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}
-\end{equation}
-\vspace{-1ex}
-
-\noindent
+of the number of content options to the score of a rule $r$ with the
+fraction
+$\frac{\mathit{rules\_per\_number\_of\_contents[len(r)]}}{\mathit{max(rules\_per\_number\_of\_contents)}}$,
 where $\mathit{len(r)}$ denotes the number of content options in $r$
 and $\mathit{rules\_per\_number\_of\_contents}$ is the distribution of
 number of contents. The expression in the numerator
@@ -1252,13 +1364,9 @@ weighs higher (respectively, lower) rules that use popular
 (respectively, unpopular) strings in content options. The score of a
 rule $r$ on this function is the arithmetic mean of the popularity
 scores of each string used in contents in $r$. More precisely, content
-rarity is defined as follows:
-
-\vspace{-1ex}
-\begin{equation}
-\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N
-\end{equation}
-\vspace{-1ex}
+rarity is obtained with the following formula:
+\indent
+$\sum_{i=1}^{N}\frac{\mathit{content\_frequency[content_i]}}{\mathit{max(content\_frequency)}}/N$
 
 \noindent
 where $\mathit{content_i}$ denotes the $i$th content in a given
@@ -1274,6 +1382,14 @@ contribution of that rule for the computation of similarity score
 would be $0.601$ $(=(1$+$.203)$/$2)$. The relatively high weight
 reflects the fact that ``GET'' and ``id='' are popular content strings.
 
+\begin{wrapfigure}[9]{r}{0.21\textwidth}
+  \vspace{-2ex}
+\centering
+\includegraphics[scale=0.6]{figs/http_header-example.png}
+\vspace{-1ex}
+\caption{Content modifiers.}
+\label{fig:http-header-example}
+\end{wrapfigure}
 
 \subsubsection{\label{sec:popularity-content-modifiers}Popularity of http content modifiers ($phttp$)} 
 As previously mentioned, \percRulesWithContent\ of \suri\ rules involve content
@@ -1288,16 +1404,7 @@ attribute indicates that a single tcp connection should remain open
 for multiple http requests/responses.) In this case, the content
 modifier refers to an http field that appears in the payload of a tcp
 message, which is the target of the option
-\CodeIn{content}. 
-
-% \begin{wrapfigure}[11]{r}{0.25\textwidth}
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.2\textwidth]{figs/http_header-example.png}
-    \caption{\label{fig:http-header-example}Content Modifiers.}
-\end{figure}
-
-Figure~\ref{fig:http-header-example} illustrates
+\CodeIn{content}. Figure~\ref{fig:http-header-example} illustrates
 possible content options used to match against certain strings that
 appear in an http message. A check mark (respectively, cross)
 indicates a match (respectively, no match).
@@ -1307,20 +1414,19 @@ connection) are more common. For example, historical data indicates
 that content options that use the modifier \CodeIn{connection} are
 much less likely than content options that use the modifier
 \CodeIn{uri}. Figure~\ref{fig:distribution-content_modifiers} shows
-the histogram of content modifiers for http. We removed the prefix
-\CodeIn{http} on the modifier for space. Although content modifiers
+the histogram of content modifiers for http. (We removed the prefix
+\CodeIn{http} on the modifier for space.) Although content modifiers
 are applicable to rules of any protocol supported by Suricata,
-currently, \tname\ only supports this features for tcp and http, which are highly common. For example, $\sim$80\% of the rules from our data set are associated with these protocols. We compute the heuristic function for content modifiers as:
+currently, \tname\ only supports this features for tcp and http; these
+rules comprise $\sim$80\% of the rules of our data set. We compute the
+heuristic function for content modifiers with the following formula:
 
-\vspace{-1.5ex}
-\begin{equation}
-\small
-\sum_{i=1}^{N}g(i)/N,~g(i)=\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}/M_i
-\end{equation}
-\vspace{-1.5ex}
+\indent
+$\sum_{i=1}^{N}g(i)/N,~g(i)$=$\sum_{j=1}^{M_i}\frac{\mathit{modifier\_frequency[modifier_{ij}}]}{\mathit{max(modifier\_frequency)}}/M_i$
+
 
 \noindent
-The term $g(i)$ denotes the contribution of content option $i$ to the score,
+where $g(i)$ is the contribution of content option $i$ to the score,
 $N$ is the number of contents options present in a rule,
 $\mathit{modifier\_frequency[modifier_{ij}}]$ denotes the popularity
 of a modifier $j$ to content option $i$,
@@ -1378,92 +1484,54 @@ The algorithm also takes as input the range of the weights (between 0 and 1)
 and the max number of generations, which we set to the default value of 1000, but the algorithm stopped at the 45th generation as there was no further improvement. The weights are 
 as follows $\langle{}0.449, 0.103, 0.053, 0.796\rangle{}$.
 
-\vspace{1ex}\noindent\textbf{Artifacts.} \tname\ is publicly available at the following link: 
-\ourdataset. 
-
-
-% \section{Using \tname{}}
-% The goal of this section is to illustrate a use case scenario of \tname. The following steps show how to reproduce the example attack described on Section~\ref{sec:suri-metas-coverage}.
-% %\begin{figure}[h!]
-% %  \centering
-%   %\vspace{-2ex}  
-% %  \includegraphics[scale=0.1]{figs/syriushome.png}
-%   %\vspace{-1ex}
-% %  \caption{Syrius homepage.}
-%   %\vspace{-1ex}
-% %  \label{fig:syriushome}
-% %\end{figure}
-% \Fix{Q1.1 or are too verbose on the explanations (such as on using Syrius that is well detailed on github)}
-% \tname\ is publicly available at the following link: 
-% \url{htps://damorimrg.github.io/syrius/}. The goal of this section is to illustrate a use case scenario of \tname. The following steps show how to reproduce the example attack described on Section~\ref{sec:suri-metas-coverage}:
-
-% \begin{enumerate}
-%     \item Install \tname{}
-    
-%     Run the following commands on your terminal:
-    
-%     {\scriptsize
-%     \CodeIn{\# clones GitHub project}
-    
-%     \CodeIn{\$ git clone https://github.com/damorimRG/syrius}
-    
-%     \CodeIn{\# changes directory}
-    
-%     \CodeIn{\$ cd syrius}
-    
-%     \CodeIn{\# adds executable permission to script}
-    
-%     \CodeIn{\$ chmod +x installSyrius.sh}
-    
-%     \CodeIn{\# installs dependencies (e.g., Suricata)}
-    
-%     \CodeIn{\# and the tool}
-    
-%     \CodeIn{\$ ./installSyrius.sh}
-%     }
-    
-%     \item Prepare inputs
-    
-%     \tname\ requires 3 different inputs for working properly:
-%     \begin{enumerate}
-%         \item Attack Packet(s): a .pcap file containing the isolated attack. 
-%         \item Benign Packets: a .pcap file containing the benign traffic of a network.
-%         \item Ruleset: A set of pre-existing rules for the ranking step.
-%     \end{enumerate}
-    
-%     %\Mar{confirmem}
-%     The inputs for this example are located within the folder \CodeIn{./syrius/Datasets/}. In this case, the attack packet is \CodeIn{pingscan.pcap} the benign packets are encapsulated in the file \CodeIn{benign.pcap} and the data set of rules is encapsulated within file \CodeIn{rules.rules}.
-    
-%     %\Mar{Vcs. podem indicar onde estão estas coisas no nosso diretorio? Não há conexão entre o passo e o nosso projeto e nao da para esperar que o cara vai saber fazer isto sozinho!}
-    
-    
-%     %\Mar{pode ser mais especifico? (sobre que folders)?} \Gui{mais especifico como? Benign traffic is stored following the benign-\[protocol\].pcap pattern, the other .pcaps are attacks, and the rules have the .rules format. (?)}\Mar{isto é tudo salvo em um mesmo diretorio?} \Gui{Sim, nao esta dos mais organizados de fato...}\Mar{tudo bem.}
-    
-%     \item Run \tname{}
-    
-%     %\CodeIn{\$ python3 syrius.py [OPTIONS]}
-        
-%     %As an illustrative example, using the Ping Scan example from Section 3, one could run \tname\ with the following command:
-    
-%     \CodeIn{
-% \$ python3 syrius.py -a ``./Datasets/pingscan.pcap'' -b ``./Datasets/benign.pcap'' -r ``./Datasets/rules.rules''}
-
-%     %\Mar{confirme se esta OK.}
-%     The output log shows seed rule data---observed from the attack packet---and the number of plausible rules produced. For example, the log will show that the attack packet in this case uses the ICMP protocol and the options {\scriptsize{\texttt{\textbf{dsize}:0; \textbf{itype:}8;
-%       \textbf{icode:}0; \textbf{icmp\_id:}23570;
-%       \textbf{icmp\_seq:}3439;}}}. The log will also show the number of plausible rules generated on each iteration of Algorithm~\ref{algo1}. Upon termination, the path of a file with the ranking of plausible rules is reported on output. The running time depends heavily on the complexity of the attack.
-    
-%     \item Analyze results
-    
-%     The output contains all generated rules with 100\% Precision and Recall, ordered by ranking. %\Mar{confirmem}
-%     A developer needs to decide which one should be used to protect the network against a given attack. Section~\ref{sec:eval} shows that the golden rule is always listed and it is very often highly ranked.
-% \end{enumerate}
-
-
-
+\begin{table*}[t!]
+  \footnotesize
+  \caption{\label{table:attacks}List of attacks. Non-http attacks
+    appear at the top; http attacks appear at the bottom.}
+  \vspace{-2ex}
+  \centering
+  \setlength{\tabcolsep}{4.5pt}
+  \renewcommand{\arraystretch}{0.4}
+  \begin{tabular}{lcccp{10.9cm}}
+    \toprule
+    \multicolumn{1}{c}{Name} &
+    \multicolumn{1}{c}{Source} &
+    \multicolumn{1}{c}{Type} &
+    \multicolumn{1}{c}{Protocol} &
+    \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
+    \midrule
+    Black Nurse & \cite{pcap-attacks} & DoS & icmp & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
+    Ping Scan & \cite{netmap} & AREC & icmp & \textbf{dsize}:0; \textbf{itype}:8; \\
+    SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
+    \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
+    UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
+      ICMP Info: Ping & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
+      Dst/Host Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
+      Dst/Net Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
+      Dst/Port Unreachable & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
+      ICMP Info: Echo Reply & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
+      ICMP Info: Code 13 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
+      ICMP Info: Code 10 & \cite{iscx} & ICMP Info & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
+    %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
+    \midrule
+    %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:``POST''; http\_method; \textbf{content}:``java.lang.ProcessBuilder''; nocase; http\_client\_body; fast\_pattern; \textbf{content}:``/struts2-rest-showcase/orders/3''; http\_uri; \\    
+    ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & http \MyComment{& Privilege Escalation} & \textbf{content}:``GET''; http\_method; nocase; \textbf{content}:``/CFIDE/administrator''; http\_uri; nocase; \\
+    iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``/iisadmin''; nocase; http\_uri; \\
+    JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & http \MyComment{& Remote Code Execution} & \textbf{content}:``/HtmlAdaptor''; nocase; http\_uri; \textbf{content}:``action=inspect''; nocase; http\_uri; \textbf{content}:``bean''; nocase; http\_uri; \textbf{content}:``name=''; http\_uri; \\
+    scripttag\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``</script>''; nocase; http\_uri; \\
+    WeBid LFI \MyComment{Local File Inclusion} & \cite{nikto} & LFI & http & \textbf{content}:``GET''; depth:4; \textbf{content}:``/cron.php?''; http\_uri; nocase; \textbf{content}:``include\_path=''; http\_uri; nocase; \textbf{content}:``''../''; \\
+    %%WordPress Login & \cite{wrccdc} & PVE & http & \textbf{content}:``log=''; http\_client\_body; \textbf{content}:``''\&pwd=''; http\_client\_body; \textbf{content}:``''\&wp-submit=''; http\_client\_body; \\
+    .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:``.htaccess''; nocase; http\_uri; \\
+    .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``.idq''; nocase; http\_uri; \\
+    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:``/system32/''; nocase; http\_uri; \\
+    Basebuilder LFI & \cite{nikto} & LFI & http & \textbf{content}:``GET''; http\_method; \textbf{content}:``/main.inc.php?''; nocase; http\_uri; \textbf{content}:``mj\_config[src\_path]=''; nocase; http\_uri; \\
+    Tomcat Snoop Access & \cite{nikto} & AREC & http & \textbf{content}:``/jsp/snp/''; http\_uri; \textbf{content}:``.snp''; http\_uri;\\  
+    \bottomrule
+  \end{tabular}
+  \vspace{-2ex}
+\end{table*}
 
 \section{Evaluation}
-\label{sec:eval}
 
 This section reports on the evaluation of \tname{}.
 
@@ -1516,7 +1584,6 @@ technique is to the selection of these inputs.
 \noindent
 \vspace{1ex}
 
-\sloppy
 The following sections describe the objects we used in the evaluation
 (Section~\ref{sec:dataset-benign}), answer the research questions
 (sections~\ref{sec:answer-rqone}, C, D), and discuss
@@ -1524,6 +1591,30 @@ results~(Section~\ref{sec:threats}).
 %and~\ref{sec:answer-rqtwo}, and~\ref{sec:answer-rqthree}), 
 
 
+%%\begin{table}[h!]
+%%  \small
+%%  \caption{\label{table:weight}Weight Combinations.}
+%%  \centering
+%%  \begin{tabular}{lrrp{15cm}}
+%%    \toprule
+%%    \multicolumn{1}{c}{Name} &
+%%    \multicolumn{1}{c}{Weights} &
+%%    \multicolumn{1}{c}{Rank} \\
+%%    \midrule
+%%    Ping Scan & - & - \\
+%%    SYN Flood & - & - \\
+%%    JBoss JMX & 1,0,1,1 & 107 \\
+%%    WetedhhtedBid & - & - \\    
+%%    ColdFusion & 0,1,1,1 & 7 \\
+%%    .htaccess access & 0,1,1,1 & 11 \\
+%%    .idq access & 0,1,1,1 & 7 \\
+%%    iisadmin access & 0,1,1,1 & 2 \\
+%%    /system32/ in URI & 0,1,1,1 & 11 \\
+%%    scripttag & 0,1,1,1 & 9 \\
+%%    \bottomrule
+%%  \end{tabular}
+%%\end{table}
+%%
 
 \subsection{Objects of Analysis}
 \label{sec:dataset-benign}
@@ -1531,8 +1622,13 @@ results~(Section~\ref{sec:threats}).
 \label{subsec:malicious-traffic}
 \label{sec:objectanalysis-benign}
 
-\subsubsection{Attacks}Table~\ref{table:popularity} shows the types of attacks we used and its corresponding popularity. %The table shows non-http attack types at the top and http attack types at the bottom. 
-We used number of links returned in a Google search as proxy of popularity. (The search string we used can be found elsewhere\cite{gsearch}). Table~\ref{table:attacks} provides a characterization of the attacks we used, with non-http attacks at the top and http attacks are at the bottom. Recall from Section~\ref{sec:reverse-engineering} that (1) http attacks are
+%This section describes the objects used in the evaluation.
+
+%\vspace{0.5ex}
+\noindent\textbf{Attacks.}~Table~\ref{table:attacks} outlines the
+attacks considered in our analysis, where non-http attacks are at 
+the top and http attacks are at the bottom. Recall from
+Section~\ref{sec:reverse-engineering} that (1) http attacks are
 prevalent, (2) most http attacks use content options only, and (3)
 most non-http attacks use field options only. 
 ``Name'' is the name of the attack,
@@ -1544,38 +1640,12 @@ rule options to capture the attack. The rationale for the selection
 are attack and protocol diversity. Considering (1), 
 the selection includes attacks of
 the following types: Denial-of-Service (DoS)~\cite{denial-of-service},
-ICMP Traffic Alerts (ITA)~\cite{icmp-types}, Remote Code Execution
-(RCE)~\cite{remote-code-execution}, Privilege
-escalation (PESC)~\cite{privilege-escalation}, Local File Inclusion
-(LFI)~\cite{local-file-inclusion}, Active Reconnaissance (AREC)~\cite{active-reconnaissance}.
+Active Reconnaissance (AREC)~\cite{active-reconnaissance}, Privilege
+escalation (PESC)~\cite{privilege-escalation}, Remote Code Execution
+(RCE)~\cite{remote-code-execution}, Local File Inclusion
+(LFI)~\cite{local-file-inclusion} and ICMP Traffic Alerts \cite{icmp-types}.
 
-% \begin{wraptable}[8]{r}{4.8cm}
-%  \vspace{-6ex}
-\begin{table}[t!]
- \footnotesize
- \caption{\label{table:popularity}Popularity of attacks.}
- \centering
-%  \setlength{\tabcolsep}{1pt}
-% \renewcommand{\arraystretch}{1.5}
- \begin{tabular}{lr}
-    \toprule
-    \multicolumn{1}{c}{Type} &
-    \multicolumn{1}{c}{\# Links}\\
-    \midrule
-    Denial of Service (DoS) & 17.9M \\
-    %\Fix{xx} (ARES) & - \\
-    ICMP Traffic Alerts (ITA) & 1.27M \\
-    %\midrule
-    Remote Code Execution (RCE) & 1.1M \\    
-    Privilege Escalation (PESC) & 551K \\
-    Local File Inclusion (LFI) & 98.9K  \\
-    Active Reconnaissance (AREC) & 13.4K \\
-    \bottomrule
- \end{tabular}
-\vspace{2ex} 
-\end{table}
-
-\subsubsection{Malicious traffic.}~Recall that \tname\ takes
+\noindent\textbf{Malicious traffic.}~Recall that \tname\ takes
 pcap files on input. As explained on Section~\ref{sec:minimization},
 these files abstract network messages~\cite{pcap} and can be used to
 avoid network traffic during rule synthesis. For some of the attacks
@@ -1585,7 +1655,7 @@ NetReseC~\cite{pcap-attacks}). In addition to these sources, we used
 the Nikto2~\cite{nikto} open source security tool as follows to obtain
 pcap files for some of the http attacks. We configured an http server
 (Apache2) and ran Nikto2 to attack that server. Simultaneously, we ran
-WireShark~\cite{wsharknetmonitor} to record the network traffic
+WireShark~\cite{wireshark-net-monitor} to record the network traffic
 and Suricata to analyze the traffic. We configured \suri\ with all
 rules from the ``Emerging Threats Open
 Ruleset''~\cite{emerging-threats-open} and configured Nikto2 with
@@ -1603,7 +1673,7 @@ used NMAP~\cite{netmap} to reproduce the Ping Scan attack (see
 Section~\ref{sec:active-recon}) and hping3~\cite{hping3} to reproduce
 the SYN Flood attack (see Section~\ref{sec:dos}).
 
-\subsubsection{Benign traffic.}~Public data sets of benign traffic
+\noindent\textbf{Benign traffic.}~Public data sets of benign traffic
 exist and can be used to evaluate the rate of false positives of
 security tools. We used two popular public sources. The bigFlows.pcap
 data set is part of the TcpReplay~\cite{tcpreplay} open source
@@ -1612,7 +1682,7 @@ also used data sets from the Stratosphere IPS
 Project~\cite{stratosphere-normal} including, e.g., the regular
 traffic of a university network.
 
-\subsubsection{Ground Truth.}~To objectively evaluate \tname{}'s
+\noindent\textbf{Ground Truth.}~To objectively evaluate \tname{}'s
 performance, we compared the rules it generates with \emph{trusted
   rules} using the ``Emerging Threats Open
 Ruleset''~\cite{emerging-threats-open}. After finding a
@@ -1629,69 +1699,22 @@ discarded.
 %%   of the traffic? as the description for
 %%   Bigflows.pcap?}. \Luc{@Guilherme ...} \Gui{The Stratosphere IPS Project has a sister project called the Malware Capture Facility Project that is responsible for making the long-term captures. This project is continually obtaining malware and normal data to feed the Stratosphere IPS (copy paste do site). No site tem uma lista de datasets, e embaixo dele descricao da origem desses datasets, como de uma rede universitaria, um usuario normal, etc. https://www.stratosphereips.org/datasets-normal}
 
-
-\begin{table*}[t]
-  \footnotesize
-  \caption{\label{table:attacks}List of attacks. Non-http attacks
-    appear at the top; http attacks appear at the bottom.}
-  %\vspace{-2ex}
-  \centering
-%   \setlength{\tabcolsep}{4pt}
-%   \renewcommand{\arraystretch}{0.4}
-  \begin{tabular}{lcccp{10.5cm}}
-    \toprule
-    \multicolumn{1}{c}{Name} &
-    \multicolumn{1}{c}{Source} &
-    \multicolumn{1}{c}{Type} &
-    \multicolumn{1}{c}{Protocol} &
-    \multicolumn{1}{c}{Groud Truth (relevant/checked options)} \\
-    \midrule
-    Black Nurse & \cite{pcap-attacks} & DoS & icmp & \textbf{icode}:3; \textbf{itype}:3; \textbf{threshold}: type both, track by\_dst, count 250, seconds 1;\\    
-    Ping Scan & \cite{netmap} & AREC & icmp & \textbf{dsize}:0; \textbf{itype}:8; \\
-    SYN Flood & \cite{hping3} & DoS & tcp & \textbf{flags}: S,12;
-    \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5;\\
-    UDP Teardrop & \cite{udp-teardrop-source} & DoS & udp & \textbf{fragbits}:M; \textbf{id}:124; \\
-      ICMP: Ping & \cite{iscx} & ITA & icmp & \textbf{icode}:0; \textbf{itype}:8; \\
-      Dst/Host Unreachable & \cite{iscx} & ITA & icmp & \textbf{icode}:1; \textbf{itype}:3; \\
-      Dst/Net Unreachable & \cite{iscx} & ITA & icmp & \textbf{icode}:0; \textbf{itype}:3; \\
-      Dst/Port Unreachable & \cite{iscx} & ITA & icmp & \textbf{icode}:3; \textbf{itype}:3; \\
-      ICMP: Echo Reply & \cite{iscx} & ITA & icmp & \textbf{icode}:0; \textbf{itype}:0; \\
-      ICMP: Code 13 & \cite{iscx} & ITA & icmp & \textbf{icode}:13; \textbf{itype}:3; \\
-      ICMP: Code 10 & \cite{iscx} & ITA & icmp & \textbf{icode}:10; \textbf{itype}:3; \\
-    %%UDP Flood & MazeBolt & DoS & UDP & \textbf{fragbits}:M; \textbf{threshold}: type both, track by\_dst, count 5000, seconds 5; \\
-    \midrule
-    %%Apache Struts 2 & \cite{wrccdc} & RCE & http & \textbf{content}:``POST''; http\_method; \textbf{content}:``java.lang.ProcessBuilder''; nocase; http\_client\_body; fast\_pattern; \textbf{content}:``/struts2-rest-showcase/orders/3''; http\_uri; \\    
-    ColdFusion \MyComment{PESC} & \cite{nikto} & PESC & http \MyComment{& Privilege Escalation} & \textbf{content}:``GET''; http\_method; nocase; \textbf{content}:``/CFIDE/administrator''; http\_uri; nocase; \\
-    iisadmin access\MyComment{web-application-attack} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``/iisadmin''; nocase; http\_uri; \\
-    JBoss JMX\MyComment{ Console Beanshell Exploit} & \cite{nikto} & RCE & http \MyComment{& Remote Code Execution} & \textbf{content}:``/HtmlAdaptor''; nocase; http\_uri; \textbf{content}:``action=inspect''; nocase; http\_uri; \textbf{content}:``bean''; nocase; http\_uri; \textbf{content}:``name=''; http\_uri; \\
-    scripttag\MyComment{Possible Cross Site Scripting Attempt} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``$<$/script$>$''; nocase; http\_uri; \\
-    WeBid LFI \MyComment{Local File Inclusion} & \cite{nikto} & LFI & http & \textbf{content}:``GET''; depth:4; \textbf{content}:``/cron.php?''; http\_uri; nocase; \textbf{content}:``include\_path=''; http\_uri; nocase; \textbf{content}:``../``; \\
-    %%WordPress Login & \cite{wrccdc} & PVE & http & \textbf{content}:``log=''; http\_client\_body; \textbf{content}:``''\&pwd=''; http\_client\_body; \textbf{content}:``''\&wp-submit=''; http\_client\_body; \\
-    .htaccess access\MyComment{attempted-recon} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:``.htaccess''; nocase; http\_uri; \\
-    .idq access\MyComment{EXPLOIT ISAPI} & \cite{nikto} & RCE & http \MyComment{& Adicionar} & \textbf{content}:``.idq''; nocase; http\_uri; \\
-    /system32/ in URI\MyComment{Possible Protected Directory Access Attempt} & \cite{nikto} & AREC & http \MyComment{& Adicionar} & \textbf{content}:``/system32/''; nocase; http\_uri; \\
-    Basebuilder LFI & \cite{nikto} & LFI & http & \textbf{content}:``GET''; http\_method; \textbf{content}:``/main.inc.php?''; nocase; http\_uri; \textbf{content}:``mj\_config[src\_path]=''; nocase; http\_uri; \\
-    Tomcat Snoop Access & \cite{nikto} & AREC & http & \textbf{content}:``/jsp/snp/''; http\_uri; \textbf{content}:``.snp''; http\_uri;\\  
-    \bottomrule
-  \end{tabular}
-  \vspace{2ex}
-\end{table*}
-
 \subsection{Answering RQ1: \textRQone}
 \label{sec:answer-rqone}
 
-RQ1 evaluates the performance of \tname. The metric we used for that is the position of the golden rule in the ranked list of plausible rules reported by \tname\ (see Figure~\ref{fig:overview}). This metric is a proxy of
+RQ1 assesses \tname's performance. The metric we use is the position
+of the golden rule in the ranked list of plausible rules reported by
+\tname\ (see Figure~\ref{fig:overview}). This metric is a proxy of
 human performance in analyzing the list of plausible rules.
 
 %\renewcommand{\arraystretch}{0.7}
 %\setlength{\tabcolsep}{2pt}
-%\Fix{Q1.3 Table III on page 3, appears on page 9}
 \begin{table}[t!]
   \footnotesize
   \setlength{\tabcolsep}{2pt}
   \renewcommand{\arraystretch}{0.7}
   \caption{\label{table:results}Results.}
-  %\vspace{-2ex}
+  \vspace{-2ex}
   \centering
   \begin{tabular}{lrrrr}
     \toprule
@@ -1712,13 +1735,13 @@ human performance in analyzing the list of plausible rules.
     Ping Scan & 6 & 5 & 9 & 2 \\
     SYN Flood & 4 & 2 & 2 & 1 \\
     UDP Teardrop & 1 & 4 & 8 & 3 \\
-    ICMP: Ping & 13 & 8 & 18 & 2 \\
+    ICMP Info: Ping & 13 & 8 & 18 & 2 \\
     Dst/Host Unreachable & 132 & 6 & 3 & 1 \\
     Dst/Net Unreachable & 12 & 6 & 25 & 1 \\
     Dst/Port Unreachable & 3 & 6 & 12 & 1 \\
-    ICMP: Echo Reply & 15 & 8 & 9 & 2 \\
-    ICMP: Code 13 & 4 & 6 & 3 & 1 \\
-    ICMP: Code 10 & 195 & 6 & 2 & 1 \\
+    ICMP Info: Echo Reply & 15 & 8 & 9 & 2 \\
+    ICMP Info: Code 13 & 4 & 6 & 3 & 1 \\
+    ICMP Info: Code 10 & 195 & 6 & 2 & 1 \\
     %%UDP Flood & - & - & - & - \\
     \midrule
     %%Apache Struts 2 & 2 & 65 & - & - \\
@@ -1813,16 +1836,17 @@ results when suppressing one heuristic
 function. The number corresponds to the order of the heuristic function
 as introduced on Section~\ref{sec:ranking}. The up arrow
 ($\uparrow$) indicates that the performance is worse when compared to ``base'',
-whereas a down arrow ($\downarrow$), 
-highlighted in gray color on the table, indicates the contrary. Conceptually, an up arrow indicates that the function had a positive impact since results are worse when suppressing the function. Likewise, a down arrow indicates that the function had a negative impact on results.
+whereas, a down arrow ($\downarrow$), 
+highlighted in the table, indicates the contrary.
 
 
 \begin{table}[t!]
   \footnotesize
-  \setlength{\tabcolsep}{8.5pt}
+  \setlength{\tabcolsep}{8pt}
+  %\setlength{\tabcolsep}{5pt}
   \renewcommand{\arraystretch}{0.5}
   \caption{\label{table:weights}Contribution of heuristic functions.}
-  %\vspace{-2ex}
+  \vspace{-2ex}
   \centering
   \begin{tabular}{lrrrrrr}
     \toprule
@@ -1837,13 +1861,13 @@ highlighted in gray color on the table, indicates the contrary. Conceptually, an
     Ping Scan & 2 &  8$\uparrow$& 2 & 2 & 2 \\
     SYN Flood & 1 & 1 & 1 & 1 & 1 \\
       UDP Teardrop & 3 & 5$\uparrow$ & 2 \cellcolor{lightgray}$\downarrow$ & 3 & 3 \\
-    ICMP: Ping & 2 & 18$\uparrow$& 2 & 2 & 2 \\
+    ICMP Info: Ping & 2 & 18$\uparrow$& 2 & 2 & 2 \\
     Dst/Host Unreachable & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
     Dst/Net Unreachable & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
     Dst/Port Unreachable & 1 & 12$\uparrow$ & 1 & 1 & 1 \\
-    ICMP: Echo Reply & 2 & 9$\uparrow$ & 2 & 2 & 2 \\
-    ICMP: Code 13 & 1 & 2$\uparrow$ & 1 & 1 & 1 \\
-    ICMP: Code 10 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
+    ICMP Info: Echo Reply & 2 & 9$\uparrow$ & 2 & 2 & 2 \\
+    ICMP Info: Code 13 & 1 & 2$\uparrow$ & 1 & 1 & 1 \\
+    ICMP Info: Code 10 & 1 & 3$\uparrow$ & 1 & 1 & 1 \\
     \midrule
     %%Apache Struts 2 & - & - & - & - & - & -\\
     ColdFusion & 2 & 2 & 2 & 7$\uparrow$ & 6$\uparrow$ \\
@@ -1861,20 +1885,50 @@ highlighted in gray color on the table, indicates the contrary. Conceptually, an
   \end{tabular}
 \end{table}
 
+\begin{table*}[t!]
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{-0.01}
+  \caption{\label{table:comparison}Alternative techniques.}
+  \vspace{-2ex}
+  \centering
+    \begin{tabular}{lcccccc}
+    \toprule
+    \multicolumn{1}{c}{Paper} &
+    \multicolumn{1}{c}{Input} &
+    \multicolumn{1}{c}{Output} &    
+    \multicolumn{1}{c}{Dataset} &
+    \multicolumn{1}{c}{Evaluated Protocols} &
+    \multicolumn{1}{c}{Evaluation} &
+    \multicolumn{1}{c}{Avail.?} \\
+    \midrule
+    Vollmer\cite{vollmer-etal-cics2011} & Malign Traffic & List  & Manually crafted & ICMP & TP, FP & No\\
+%    \midrule
+    Fallahi\cite{fallahi} & Mixed Traffic & One Rule  & \cite{iscx} & HTTP, SSH, TCP & TP, FP, Precision, Recall, F1 & No\\    
+%    \midrule
+    Kao\cite{Kao2015AutomaticNR} & Malign/Benign Traffic, Rule Dataset &
+    One Rule & Manually crafted, \cite{emerging-threats-open} & HTTP & Generating time, FP & No \\
+%    \midrule
+    Guruprasad\cite{guruprasad}& Malign Traffic & List  & \cite{iscx} \cite{darpa1999} &
+    ICMP, TCP & FP & No\\
+%    \midrule
+    Syrius & Malign/Benign Traffic, Rule Dataset & Ranking & Manually crafted, \cite{emerging-threats-open}, \cite{iscx} & HTTP, TCP, ICMP & Rule List & Yes \\
+    \bottomrule
+    \end{tabular}
+    \vspace{-3ex}
+\end{table*}
 
 Note that the number of up arrows is relatively high and the magnitude
 of the degradation can be very high in some cases. Basebuilder and
-Tomcat are two cases where results get considerably worse when suppressing one
+Tomcat are two cases where results get much worse when suppressing one
 of the functions. Also note that the number of down arrows is
 relatively small. Recall that the optimization of weights looks for
-global optimum and cannot avoid those cases. Note that every
-function contributed.%\Mar{@Lucas, por favor, olhe...}
-However, ``Popularity of options'' (\CodeIn{-f1}) (see Section~\ref{sec:popularity-options}) only contributed to the
-performance of \tname{} on non-http attacks whereas the other functions only contributed positively to http attacks. Considering the attacks in the http group, function ``Popularity of content modifiers'' (\CodeIn{-f4}) (Section~\ref{sec:popularity-content-modifiers}) had the highest positive impact on ranking improvement.% and it was the function that contributed in all cases. 
-
-%  \Luc{Aqui afirmamos que f4 eh a função que contribui em mais casos, mas ela contribui com a mesma quantidade de casos que f1, ver tabela IV. Talvez devemos afirmar que f4 eh a função que mais melhora o ranking da golden rule? Algo como "f4 was able to increase/improve the ranking of the golden rule in up to 641 positions (Tomcat Snoop Access, ultima linha da tabela)".} 
- 
- 
+global optimum and cannot avoid those cases. Finally, note that every
+function contributed. Function ``Popularity of content modifiers''
+(Section~\ref{sec:popularity-content-modifiers}) was the function that
+contributed in more cases whereas function ``Popularity of options''
+(see Section~{sec:popularity-options}) only contributed to the
+performance of attacks involving non-http protocols.
 
 
 %% \begin{center}
@@ -1884,43 +1938,56 @@ performance of \tname{} on non-http attacks whereas the other functions only con
 %% \end{tcolorbox}
 %% \end{center}
 
-\emph{\textbf{Summary of results:}~Every heuristic function had an impact on the
-  performance of \tname. The contributions of these functions were disjoint. One of the functions (\CodeIn{-f1}) only contributed to non-http attack and the remaining functions only contributed to http attacks. Considering http-attacks, which are prevalent, the function that builds on popularity of content modifiers (\CodeIn{-f4}) showed the highest impact overall.}
+\emph{\textbf{Summary of results:}~Every function showed impact on the
+  performance of \tname. The function that builds on popularity of
+  content modifiers showed the highest impact.}
 
 
 \subsection{Answering RQ3: \textRQthree}
 \label{sec:answer-rqthree}
 
 This section evaluates sensitivity of \tname{} to the amount of
-examples provided on input. Recall that 1)~\tname\ uses example
-attacks to generate the seed rule (at the Reverse Engineering step) and the remaining attacks to evaluate soundness of the rule (at the Rules Generation step) and 2)~the number of example attacks is typically very. The rationale is that those are new attacks that malicious agents have designed to fool existing defenses that the attacker often have access. It is expected that the number of positive and negative examples play a role in the performance of \tname.  We answered this question in two parts. First, we analyzed the impact of the amount of positive examples in results. For that, we selected two cases with the highest number of examples---idqaccess and scripttag---and measured the position of the golden rule in the ranking for an increasing number of examples provided to \tname. For each number of variants, we sampled five sets of that size to provide as input to the technique.
-
-\begin{figure}[h!]
+examples provided on input. Recall that \tname\ uses one example
+attack to generate the seed rule (at the Reverse Engineering step) and
+the remaining attacks to evaluate soundness of the rule (at the Rules
+Generation step). It is expected that the number and variety of attacks
+play a role in the performance of the technique.  We answered this
+question in two parts. First, we analyzed the impact of the amount of
+positive examples in results. For that, we selected two cases with the
+highest number of examples---idqaccess and scripttag---and measured
+the position of the golden rule in the ranking for an increasing number
+\begin{wrapfigure}[8]{r}{0.28\textwidth}  
+  \vspace{-2ex}
   \centering
-  \begin{subfigure}{.25\textwidth}
+  \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[scale=0.45,trim=10 0 130 0,clip]{R/idqaccess/idqaccess.pdf}
-    %\vspace{-3ex}
-    \caption{\label{idq-positive-sens}.idq access}
+    \includegraphics[scale=0.30,trim=10 0 130 0,clip]{R/idqaccess/idqaccess.pdf}
+    \vspace{-3ex}
+    \caption{.idq access}
   \end{subfigure}%
-  \begin{subfigure}{.25\textwidth}
+  \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[scale=0.45,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
-    %\vspace{-3ex}        
-    \caption{\label{scripttag-positive-sens}scripttag}
+    \includegraphics[scale=0.30,trim=15 0 130 0,clip]{R/scripttag/scripttag.pdf}
+    \vspace{-3ex}        
+    \caption{scripttag}
   \end{subfigure}%
-    %\vspace{-1ex}          
+    \vspace{-1ex}          
   \caption{\label{fig:impact-number-attacks}Positive examples.}
-\end{figure}
-
-
-
+  \vspace{-4ex}
+\end{wrapfigure}
+of examples provided to \tname. For each number of variants, we
+sampled five sets of that size to provide as input to the technique.
 Figure~\ref{fig:impact-number-attacks} shows results for each
-attack we selected. The y-axis denotes the rank of the
-golden rule and x-axis denotes the number of positive examples (\ie{}, attack variants) used to synthesize rules. Each point in the x-axis is associated with the boxplot of the distribution for the corresponding number of variants. Results indicate that the number of examples is important, the choice of examples is important, and a small number of examples suffices to reach the best results. For example, only two positive examples were enough to make the golden rule for the idq access attack improve its ranking from 4 to 2, on average, see Figure~\ref{idq-positive-sens}. 
+attack we selected. The y-axis of each plot denotes the rank of the
+golden rule and x-axis denotes the number of attack examples used to
+synthesize rules. Each point in the x-axis is associated with the
+boxplot of the distribution for the corresponding number of
+variants. Results indicate that the number of examples is important,
+the choice of examples is important, and a small number of examples
+suffices to reach the best results.
 
-\begin{figure}[h]
-%  \vspace{-2.5ex}
+\begin{wrapfigure}[8]{r}{0.28\textwidth}  
+  \vspace{-2.5ex}
   \centering
   %% \begin{subfigure}{.2\textwidth}
   %%   \centering
@@ -1929,30 +1996,30 @@ golden rule and x-axis denotes the number of positive examples (\ie{}, attack va
   %%   \caption{coldfusion}
   %% \end{subfigure}%
   %% \hspace{-8ex}
-  \begin{subfigure}{.25\textwidth}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.45,trim=15 0 130 0,clip]{R/inc/inc.pdf}
-    %\vspace{-3ex}    
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/inc/inc.pdf}
+    \vspace{-3ex}    
     \caption{Basebuilder LFI}    
   \end{subfigure}%
-  \begin{subfigure}{.25\textwidth}
+  \begin{subfigure}{.14\textwidth}
     \centering
-    \includegraphics[scale=0.45,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
-   % \vspace{-3ex}    
+    \includegraphics[scale=0.3,trim=15 0 130 0,clip]{R/jsp/jsp.pdf}
+    \vspace{-3ex}    
     \caption{Tomcat S. A.}    
   \end{subfigure}%
-  %\vspace{-1ex}
+  \vspace{-1ex}
   \caption{Negative examples.}
-  %\vspace{-2ex}
+  \vspace{-2ex}
   \label{fig:impact-negative}
-\end{figure}
+\end{wrapfigure}
 
-%\begin{wrapfigure}[8]{r}{0.28\textwidth}
-
-We conducted a similar experiment with negative examples. It is worth noting that negative traffic is much easier to obtain. We report the results for two different attacks:~Basebuilder LFI and Tomcat S. A.. As Table~\ref{table:results} shows, the Basebuilder LFI is the attack where \tname\ performs the worst. Figure~\ref{fig:impact-negative} shows results. Note that, when compared with the plots of Figure~\ref{fig:impact-number-attacks}, the rank of the golden rule improves at a much slower pace with the addition of more negative examples. Considering Basebuilder LFI results and 100k negative samples, \tname{} reports the golden rule at position 50 of the ranked list in most cases. In two of the  runs, results are slightly better. For Tomcat S.A., the progress of ranking improvement is more noticeable.  Considering the runs with 100k samples, we noticed that the ranking reported by \tname{} was better compared to the one we reported on Table~\ref{table:results}. This occurs because of the inherent non-determinism of the Algorithm~\ref{algo1}.
-
-% \Mar{Lucas escreveu...}
-% Also, 10k negative examples were able to improve the ranking of Basebuilder LFI's golden rule from 57 to 54, on average, see Figure~\ref{scripttag-positive-sens}.
+We conducted a similar experiment with negative examples on three
+different attacks. Figure~\ref{fig:impact-negative} shows
+results. Note that, compared with the plots of
+Figure~\ref{fig:impact-number-attacks}, the rank of the golden rule
+improves at a much slower pace. Fortunately, negative traffic is much
+easier to access.
 
 %% \begin{center}
 %% \begin{tcolorbox}[enhanced,width=3.5in,center upper,drop shadow southwest,sharp corners]
@@ -1961,9 +2028,8 @@ We conducted a similar experiment with negative examples. It is worth noting tha
 %% \end{center}
 
 \emph{ \textbf{Summary of results:}~\tname\ is sensitive to the number
-  and choice of examples. Results indicate that a very small number of positive examples ($\sim$2) suffice to achieve good results. A large number of negative examples is necessary to achieve good results. However, public datasets of benign traffic exist and can be used to improve performance of \tname.}
-  
-%   \Luc{as only 2 examples were able to include the golden rule ranking for one of the attacks into the top 3.} \Fix{Q2.2 It is not easy to ensure the solid contributions of this work}
+  and choice of examples. However, a small number of positive examples
+  suffices to achieve good results.}
 
 %% \pgfplotsset{
 %%   box plot width/.initial=0.5em
@@ -2032,71 +2098,34 @@ We conducted a similar experiment with negative examples. It is worth noting tha
 
 %\subsubsection{Lack of comparison with other tools}
 
-
-% \begin{table*}[t!]
-%   \scriptsize
-%   \centering
-%     \begin{tabular}{ccccccc}
-%     \toprule
-%     & Vollmer\cite{vollmer-etal-cics2011} & Fallahi\cite{fallahi} & Kao\cite{Kao2015AutomaticNR} & Guruprasad\cite{guruprasad} & Syrius\\
-%     \midrule
-%     Input & Malign Traffic & Mixed Traffic & Malign/Benign Traffic, Rules & Malign Traffic & Malign/Benign Traffic, Rules\\
-%     \bottomrule
-%     \end{tabular}  
-% \end{table*}
-
-\begin{table*}[h!]
-  \footnotesize
-  \setlength{\tabcolsep}{6pt}
-  \renewcommand{\arraystretch}{.05}
-  \caption{\label{table:comparison}Alternative techniques.}
-  \centering
-    \begin{tabular}{lcccccc}
-    \toprule
-    \multicolumn{1}{c}{Paper} &
-    \multicolumn{1}{c}{Input} &
-    \multicolumn{1}{c}{Output} &    
-    \multicolumn{1}{c}{Dataset} &
-    \multicolumn{1}{c}{Evaluated Protocols} &
-    \multicolumn{1}{c}{Metrics} &
-    \multicolumn{1}{c}{Avail.?} \\
-    \midrule
-    Vollmer\cite{vollmer-etal-cics2011} & +Traffic & List of Rules  & Manually crafted & ICMP & TP, FP & No\\
-    Fallahi\cite{fallahi} & +-Traffic & One Rule  & \cite{iscx} & HTTP, SSH, TCP & TP, FP, F1 & No\\    
-    Kao\cite{Kao2015AutomaticNR} & +-Traffic, Rules &
-    One Rule & Manually crafted, \cite{emerging-threats-open} & HTTP & Gen. time, FP & No \\
-    Guruprasad\cite{guruprasad}& +Traffic & List of Rules  & \cite{iscx} \cite{darpa1999} &
-    ICMP, TCP & FP & No\\
-    Syrius & +-Traffic, Rules & Ranked List of Rules & Manually crafted, \cite{emerging-threats-open}, \cite{iscx} & HTTP, TCP, ICMP & Rule List & Yes \\
-    \bottomrule
-    \end{tabular}
-\end{table*}
-
-\subsubsection{Lack of Comparison with Other Tools}
-
+\noindent\textbf{Lack of comparison with other tools}
 Table~\ref{table:comparison} summarizes the characteristics of
-alternative techniques to \tname, and provides details about the evaluation used in corresponding papers.  Side comparison was not possible for two central reasons. First, we did not have access to the tools. Unsuccessfully, We searched for the tools on the web and tried making contact with authors to obtain the tools. Second, the tools output different objects. For that reason, a comparison based on published results is not realistic. Note that we did not report precision and recall because they are guaranteed to be 100\%, modulo the datasets we used. \tname\ captures, by construction, all positive traffic and does not capture any negative traffic. We used the position of the correct rule in the ranking, which we understand is a stronger criteria. It is possible that other rules, higher in the ranking, are useful, but only domain experts can identify that.
+alternative techniques and provides details about the evaluation used
+in corresponding papers. Unfortunately, side comparison was not
+possible for two central reasons. First, we did not have access to the
+tools. We tried, unsuccessfully, making contact with authors to obtain
+the tools. Second, the tools output different objects. For that
+reason, a comparison based on published results was not realistic. It
+is important to recall that we did not report precision and recall as
+it is 100\% always. \tname\ captures, by construction, all positive
+traffic and does not capture any negative traffic. We used a stronger
+criteria instead---the position of the correct rule in the ranking. It
+is possible that other rules, higher in the ranking, are useful, but
+only domain experts can identify that.
 
-\subsubsection{Impact of positive and negative examples}
-We observed that additional positive examples and negative examples have an impact on the ranking of the golden rules. For example, Figure \ref{fig:impact-number-attacks}a shows an average improvement of up to 3 ranking positions when adding a second positive example to \tname\ for rule synthesis (.idq access). Likewise, Figure \ref{fig:impact-negative}a shows an average improvement of 3 positions when using 10k negative examples instead of no negative examples (Basebuilder LFI). 
-
-\subsubsection{Running Times}
-
-We ran all our tests using an
+\noindent\textbf{Running times.}~We ran all our tests using an
 Intel(R) Xeon(R) CPU E3-1240 v6 and 8GB RAM. For attacks with only
 categorical and numerical options, the average running time was 6
 seconds per attack. For attacks with the content option, it was 
 1,445 seconds (=24.1 minutes) on average.  
 
-\subsubsection{Threats to Validity}
-
-Considering external validity, 
+\noindent\textbf{Threats to Validity.}~Considering external validity, 
 our results cannot be generalized beyond the subjects we selected. To 
 mitigate that threat we selected a variety of attacks with different
 characteristics. Unfortunately, related techniques are unavailable, 
 but there is strong evidence that \tname\ performs very
 well and is the only technique to support content options, an important 
-aspect in this domain. Considering internal validity, in
+aspect this domain. Considering internal validity, in
 principle, the implementation of \tname\ could contain errors. We
 mitigated that threat by carefully inspecting code and
 results. Considering construct validity, the choice of ranking to
@@ -2214,9 +2243,9 @@ places the golden rule close to the top in most cases.
 
 % There are important differences between our work and prior work. 
 
-\subsection{Alternative Methods for Rule Synthesis}
-
-Vollmer~\etal{}~\cite{vollmer-etal-cics2011} proposed the use of search to
+\noindent
+\textbf{Alternative methods for rule synthesis.}~Vollmer
+\etal{}~\cite{vollmer-etal-cics2011} proposed the use of search to
 derive rules for Snort, which are very similar to \suri's.  Their
 solution focused on icmp attacks for which plausible attacks can be
 created directly from packets (see
@@ -2245,7 +2274,7 @@ propose a clustering method to create rules. They characterize
 candidate solutions as a set of field values and use a clustering
 algorithm---hybrid k-means partitioned around menoids---to isolate
 malicious from benign traffic. Subsequently, they optimize the formed
-clusters using a genetic algorithm and hill-climbing search. Our
+clusters using a genetic algorithm and hill-climbing search. Ou
 approach differs from theirs in the method used, results, and support
 for content options. Kao~\etal~\cite{Kao2015AutomaticNR} proposed
 ARGS, a system to synthesize http rules that take malicious traffic as
@@ -2263,41 +2292,27 @@ attack. As it won't analyse individual details of each packet, it
 wouldn't be able to identify and generate rules for attacks that
 require detailed options, such as the HTTP PESC, RCE and LFI.
 
-\subsection{Rule Repair}
-
-Hallahan~\etal{}~\cite{8102263} proposes to
-repair existing firewall rules based on false positives detected by the rules. %\Gui{Appelt~\etal{}~\cite{8395015} proposed idea uses an evolutionary approach to develop new attacks, and the created attacks that bypass the web application firewall are used for repairing the rule set in use.}
-Although firewall and \nids\ rules have differences and the
+\noindent
+\textbf{Rule repair.}~Hallahan~\etal{}~\cite{8102263} propose to
+repair firewall rules based on false positive detected by the
+rules. Although firewall and \nids\ rules have differences and the
 problem addressed is different---repair not synthesis---the work is
-similar in spirit. We remain to evaluate how \tname\ can
-be used for repair. Ganesan \etal{}\cite{ganesan} applied similar
+similar in spirit and inspiring. We remain to evaluate how \tname\ can
+be used for repair.  Ganesan \etal{}\cite{ganesan} applied similar
 ideas in the context of IDS, \ie{}, they proposed to adjust existing
 rules with the goal of capturing variations of existing attacks. They
-used the community edition of Snort rules from 2012 for the
+used the community edition of snort rules from 2012 for the
 modifications and tested them with pcap file from the MACCDC 2012
-dataset \cite{MACCDC}. Their technique is complementary to \tname{}.
+dataset. Their technique is complementary to \tname{}.
 
-%firewall rule repairing.
-Appelt~\etal{}~\cite{8395015} proposed an approach to test web application firewalls using SQL injection attacks.  Their approach creates new attacks---through evolutionary search---and learn regular expressions characterizing the attacks that were able to bypass the firewall under test. They used those regular expressions to capture the attacks. More precisely, they add new rules, including those regular expressions, to the firewall rule set. As already mentioned, the structures of firewall rules and NIDS rules are different (NIDS rules have a much larger set of options) and the problem addressed is different. However, we are eager to explore the ideas proposed by Appelt~\etal{} to repair NIDS rules.
-
-% It is an interesting idea for rule repairing, as it is able to find new variations of existing attacks and repair the rules for those. But, as mentioned before, 
-
-Following a similar approach as Appelt~\etal{}, Jan~\etal{}~\cite{8125155} proposed a search-based approach to generate XML injection attacks for testing web applications. Their solution uncovered vulnerabilities in all tested applications. As in the work of Appelt~\etal{}, the discovery of new vulnerabilities could be used to improve safety barriers, like the rules used by NIDS.
-
-\subsection{Anomaly-based Intrusion Detection}
-
+\noindent
+\textbf{Anomaly-based intrusion detection.}
 Cordy~\etal{}\cite{cordy-etal-issta19} used genetic search to not only
 to generate attacks capable of penetrating the tested anomaly-based
 NIDS, but also to repair the NIDS to identify these
-attacks. Javaid~\etal{}\cite{javaidanomaly} also proposes an anomaly-based solution, but now using Self-Taught Learning techniques to different types of attack.  \tname\ and their approaches are complementary as anomaly-based
+attacks. \tname\ and their approach are complementary as anomaly-based
 and rule-based \nids\ are complementary (see
 Section~\ref{sec:background}).
-
-\subsection{Machine Learning for NIDS}
-
-Buczak~\etal{}\cite{buczakclass} had a similar idea from Anomaly-Based approaches, using Machine Learning to classify packets in a network traffic. They also wrote a Table that compares other similar works, considering the ML methods, datasets used, and number of times cited. As explained by Wang~\etal{}\cite{wangclass}, traffic classification represents an essential step that precedes Anomaly or Rule based NIDS. Traffic classification and Anomaly-based approaches are complementary and, therefore, also complementary to \tname{}.
-
-
 
 %% It was reported an increase in the number of alerts, but it
 %% wasn't analysed the false alarmrates for abduced rules.
@@ -2335,29 +2350,36 @@ Buczak~\etal{}\cite{buczakclass} had a similar idea from Anomaly-Based approache
 
 %% \Gui{\textbf{Search-based test and improvement of machine-learning-based anomaly detection systems -} o autor desenvolve uma ferramenta search-based que ira testar e explorar automaticamente vulnerabilidades em Anomaly-Based NIDS, e entao apresentando medidas preventivas contra o ataque recem criado atravez de attack schemes, que detectam apenas o ataque e com o minimo de falsos positivos possivel. Semelhante a nos, eles tambem utilizam trafego benigno para simular uma rede normal. (Os metodos preventivos sao para Anomaly-Based NIDS, nao sei como se encaixa no nosso paper tambem)}
 
+
+
+
 \section{Conclusions}
 
 Network Intrusion Detectors are an important defense mechanism against
-network attacks. Generating rules to capture new attacks can be
+networks attacks. Generating rules to capture new attacks can be
 time-consuming and error-prone. This paper presents \tname{}, a novel
 approach to generate rules for Rule-based \nids. \tname\ leverages
 positive and negative traffic and examples of trusted rules to
-synthesize new rules. \tname{} is organized as a pipeline of three
+synthesize rules. \tname{} is organized as a pipeline of three
 components that 1)~create an over-specified seed rule, 2)~derive
 plausible rules from the seed, and 3)~rank plausible
 rules. Experimental results provide early evidence showing that
 \tname\ is promising. It was able to rank the correct rule among the
 first ten rules of the reported ranking in \percTopTenRanking\ of
-the cases we analyzed, for example. The associated artifacts, including the data set containing our experimental results, is publicly accessible at \ourdataset.
+the cases we analyzed, for example. The data set containing our
+experimental artifacts is publicly accessible at \ourdataset.
 
-\section*{Acknowledgments}
-This material is based upon work supported by Ministério da Ciência, Tecnologia, Inovações e Comunicações (MCTIC, Brazil) under the reference number 002951 and Fundação para a Ciência e a Tecnologia (FCT, Portugal), with thereference PTDC/CCI-COM/29300/2017 and UIDB/50021/2020.
+%\rui{thinking out loud here: one of the motivations is that it is
+%time-consuming and troublesome to generate new rules. Time-consuming
+%is not being addressed in the RQs and I think that, albeit it is
+%difficult to conduct such a study, we shuold discuss it. I would
+%think that mentinoing the human-on-the-loop (not in-the-loop) should also be dscussed (this is more about the troublesomeness)}
 
-% \balance
-%% to adjust at the end as to balance columns
-\IEEEtriggeratref{24}
+
+\balance
+%\bibliographystyle{ACM-Reference-Format}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
-% that's all folks
+
 \end{document}

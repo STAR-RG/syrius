@@ -1,0 +1,19 @@
+Dear editors, members of the editorial board, and reviewers,
+
+This letter acknowledges that our paper
+
+  “Syrius: Synthesis of Rules for Intrusion Detectors”
+
+has not been previously published. The paper makes the following original contributions:
+
+- A method to synthesize rules for Network Intrusion Detectors (NIDS), which are very popular kind of tool used in industry to defend networks against different kinds of attacks.
+
+- A comprehensive evaluation showing that Syrius can be effective in practice. For example, it produced the golden rule (the rule that the human created for a given attack) in all attack scenarios we studied.
+
+As such, we request that the paper be categorized as Journal First.
+
+Yours sincerely,
+
+Marcelo d'Amorim (on behalf of the co-authors)
+Federal University of Pernambuco
+damorim@cin.ufpe.br
