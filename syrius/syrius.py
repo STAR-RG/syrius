@@ -1218,9 +1218,7 @@ def optimizeRule(rule):
 
     print("normal pos:", current_pos)
 
-    print("pegando precision")
     normal_precision=checkPrecision(normal_rules_list)
-    print("pegando recall")
     normal_recall=checkFalseNegative(normal_rules_list)
 
     print('recall golden rule:', normal_recall[golden_rule_pos])
